@@ -7893,3 +7893,24 @@ subagent's `until` loop on a results file's line count, had no deadline and a gu
 at 58). **The rule:** bound a remote run's whole process group (`setsid` plus `timeout --kill-after`, or kill the group),
 never the parent alone; a local waiter waits on the producer's own end marker AND a deadline, never on a guessed count;
 and the close lists each remote host's processes older than the session's last remote run and kills the session's own.
+
+## A RE-POINT SWEEP REWRITES A QUOTED RULING — and an attribution window misses a pointer that straddles its end (paid: 14z-216, the M24 freeze)
+
+**The sweep, a fifth time.** The M24 apply (`build/agent216/m24/freeze/sweep_apply.py`, 412 lines in 198 files) held
+the lines this file already names — pinned controls, `CTL_BUILD`, `<set> (build/…)` pairings — and still rewrote 16
+dated records: the M23 note in `build/manifest/pcrel_escapes.toml`, `type6_fallback.toml`'s "Frozen on BUILD=… at
+a36dd6d3", `test_attribute_patch_delta`'s pinned pair on its second line, two trace records — and, the new class, **the
+maintainer's own words**: *"Move to hui61, re-time 2"* in four Phobos stage gates, with the 14z-197 lines that say what
+was measured on that build. A quotation is a record whatever build it names. They were found by listing every swept
+COMMENT line and reading it (`build/agent216/m24/freeze/sweep_comment_lines.txt`), not by the sweep. The apply also
+lists only TRACKED files, so a gate written this session is not swept at all (three were re-pointed by hand).
+**Rule:** after a sweep, list every comment line it changed and read each one; a line holding a quotation mark, a session
+key or "measured" is a record until proven a default.
+
+**The attribution tool's window.** `tools/attribute_patch_delta.py` checks each relocated pointer's TARGET over at most
+8 bytes, and a byte that differs only inside a relocated long passes. A long that STARTS inside the window and ENDS past
+it is never covered, so a target whose last two bytes are the high word of a relocated pointer reads "content
+differs". M24 listed 617 such targets in Phobos's anim region (moved +0xF80); every one was equal once the window
+was widened by 4 bytes (`build/agent216/m24/apd_straddle.py`, a scratch copy). An alarming count is a report about
+the instrument first ([VSP-148]'s mirror). The same straddle explains the pointer-flow WEAK rows that come and go
+at a freeze (a relocated pointer's low word read as the next long).

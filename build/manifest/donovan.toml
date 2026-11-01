@@ -208,6 +208,48 @@ records_src = 0x3B63DC
 records_orc = 0x3963B0
 records_len = 0x180
 
+# #294 (14z-216): HIS PER-FRAME PALETTE ROUTINE. vsavj's per-frame palette table (PRG:0x02ADEC, entered for every
+# fighter every frame at PRG:0x02ADDC, indexed by the WHOLE id byte +0x382) keeps the default no-op at row 0x13, so
+# nothing rewrites his weapon row (+0x18B+2) when his palette state changes: the sword stays red where vs2 turns it
+# yellow in the shock (the maintainer, on the captures: "Yes: Donovan's shock aura is yellow, as it should, but his
+# sword his red on our build, yellow on native."). vs2's own routine (vs2 0x2A316, row 0x13 of its twin table
+# 0x2A142) is ported by the generator ([perframe_hook], tools/gen_donovan_patch.py): read from vs2 at build time,
+# its 26 external references re-pointed (fix_* below, each verified at build to be the stated form and target;
+# completeness and body equality checked on the built image by tools/audit_perframe_hook.py), vs2's palette-sequence records for ids
+# 0x2D4-0x341 placed privately (the state_hook's design: vsavj has its own live records at those ids), the body in
+# hole B, the jump on the six proven-dead bytes PRG:0x024024 (tests/test_dead_span.sh; the table's 16-bit word
+# reaches only PRG:0x022DEC-0x032DEB), row 0x13 -> 0x024024. Ruled 2026-11-01: the maintainer's "Yes" to A after
+# the dead-byte search (DECISIONS_HISTORY.md). Legacy reach: none by construction — row 0x13 is read only for a
+# fighter whose id byte is exactly 0x13, and the dead span is reached only through it.
+# The id range: states 2/6/8 -> 0x2D5/0x2E9/0x2F3 + colour (+0x3AE), 4 -> 0x2DF, 0xC/0xE -> 0x30A/0x30B, 0x1C ->
+# 0x2D5 + table (max 43) or, with +0x1C3, 0x2D4 + table (max 109) = 0x341, 0x1E -> 0x2D5 + table (max 51), the
+# default with +0x1C3 -> 0x316 + 4*colour + table (max 3) = 0x33D at colour 9.
+[perframe_hook]
+stage = 6
+only_variant_slot = true
+src_set = "vsav2"
+table = 0x02ADEC
+row = 0x13
+row_old = 0x0040
+src_table = 0x02A142
+src_routine = 0x02A316
+src_len = 0x160
+src_rts = 0x029B6A                 # vs2's rts the routine's "nothing to do" branches reach
+src_blk = 0x02A11E                 # vs2's block-row re-upload; vsavj twin below (+0xCAA, the reload's own offset)
+blk_twin = 0x02ADC8
+src_seq = 0x02A0EA                 # vs2's palette-sequence upload (seq table base movea, then the uploader)
+seq_set = 0x02AD94                 # vsavj's twin; the private entry jumps to +6 (after its movea)
+seq_src_base = 0x3B0A3C            # vs2's 32-byte-stride palette-sequence table
+seq_orc_base = 0x390A10            # vhunt2's twin (the state_hook's records_orc 0x3963B0 - 0x2CD*32)
+seq_first = 0x2D4
+seq_count = 0x6E                   # ids 0x2D4-0x341
+lea_tables = "0x2AFC8:12"          # two 6-byte tables read through lea (d16,PC): a DATA-view read
+fix_rts = "0x2A36A,0x2A3A6,0x2A3BA,0x2A3D0,0x2A40E,0x2A436,0x2A446,0x2A456,0x2A466"
+fix_blk = "0x2A360,0x2A386,0x2A3E8,0x2A3FC,0x2A41C"
+fix_seq = "0x2A398,0x2A3B2,0x2A3C6,0x2A3F0,0x2A404,0x2A424,0x2A43E,0x2A44E,0x2A45E,0x2A472"
+fix_lea = "0x2A3E0=0x2AFC8,0x2A3F4=0x2AFCE"
+dead_span = 0x024024
+
 # Hit-reaction dispatch extension (session 11, playtest DP-spam crash):
 # the defender-side reaction dispatch (vsavj site 0x18460
 # `move.w (6,PC,D0.w),D1; jmp (2,PC,D1.w)`, table 0x18468, real extent
@@ -2399,6 +2441,23 @@ old_hex = "0448"
 new_hex = "0441"
 only_variant_slot = true
 
+# ── THE PALETTE RELOAD'S MASK (#127, #162; RULED 2026-11-01, 14z-216: "1. Yes, (M) at the next freeze,
+# closing both (recommended) -> agreed"; rule-checker run 2026-11-01-1528 OK on the recommendation) ──
+# The palette reload at PRG:0x02ADAC (vs2 twin 0x02A102) tests `btst.l d0,d1` on the fighter's id mod 32
+# against this mask: a set bit skips reloading block rows 1-3 into palette rows +1..+3. vs2's high word
+# 0xEF9A sets bit 0x13 (Donovan); vsavj's 0xEF92 does not, so ours reloaded rows 0x0B-0x0D at every
+# palette-state change of his and wiped row 0x0B's effect palette (#127's black foot, #162's deity flash
+# and cyan burst). Bits 0x10 and 0x11 already agree with vs2. No legacy fighter carries id 0x13
+# (tests/audit_id_writers.sh), so legacy reach is nil; the analysis: docs/game/engine_internals.md
+# "ANSWERED 14z-189 (#162".
+[[code_word]]
+stage = 6
+name = "palette_reload_mask_hi"
+addr = 0x02ADB4          # move.l #$EF92EF96,d1 at 0x02ADB2; vs2 0x02A108 $EF9AEF96
+old_hex = "ef92"
+new_hex = "ef9a"
+only_variant_slot = true
+
 # ── SELECT WHEEL: three appended cells (14z-60s) ────────────────────────────
 # Adds Huitzil/Phobos (0x10), Pyron (0x11) and Donovan (0x13) to the
 # character-select wheel. Profile-gated CONTENT: a stock build skips this
@@ -2479,7 +2538,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M23"
+version_text = "M24"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202

@@ -1,0 +1,11 @@
+  FLAG D-ABSOLUTE: So on every palette-state change ours also reloads rows 0x0B-0x0D and wipes row 0x0B's effect palette:  [build/agent216/rc127/recommendation_127_162.md]
+  FLAG D-ABSOLUTE: It goes in as a builder-produced code word, never a hex edit.  [build/agent216/rc127/recommendation_127_162.md]
+  FLAG D-ABSOLUTE: - **What it does, measured with the bit set in the emulator (nothing built):**  [build/agent216/rc127/recommendation_127_162.md]
+  FLAG D-ABSOLUTE: The rig and the sheet pick Donovan by poking P1's id byte (+0x382 := 0x13 at f1400/1450/1500) on all three legs, the byte the mask is tested on.  [build/agent216/rc127/recommendation_127_162.md]
+  FLAG D-ABSOLUTE: - Over all 15 Donovan attacker parts, row 0x0B goes from 36676 frames differing from native to 0.  [build/agent216/rc127/recommendation_127_162.md]
+  FLAG D-ABSOLUTE: Oboro tests bit 0x18, which this change leaves alone; it flips bit 0x13 only.  [build/agent216/rc127/recommendation_127_162.md]
+  FLAG D-ABSOLUTE: ## If you give the green light (the plan, nothing built yet)  [build/agent216/rc127/recommendation_127_162.md]
+  FLAG D-ABSOLUTE: Each requires row 0x0B to equal native, and each gets a must-fire known-bad leg (the current build).  [build/agent216/rc127/recommendation_127_162.md]
+  FLAG D-ABSOLUTE: - Any legacy writer outside the audit's corpus that could give a fighter an id whose low five bits are 0x13.  [build/agent216/rc127/recommendation_127_162.md]
+  FLAG D-ABSOLUTE: (M) gives the black foot native behaviour by itself, so (B) on top of it would change nothing you can see.  [build/agent216/rc127/recommendation_127_162.md]
+packet_check: 10 flag(s): D-ABSOLUTE 10

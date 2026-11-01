@@ -187,6 +187,10 @@ mkdir -p "$W/site/vs-proof-sheets" && echo stale > "$W/site/vs-proof-sheets/old.
 if DEPLOY_TARGET="$W/site/" sh tools/publish_sheets.sh "$W/web" > "$W/pub.out" 2>&1 && cmp -s "$W/site/vs-proof-sheets/index.html" "$W/web/index.html" \
    && [ ! -e "$W/site/vs-proof-sheets/old.html" ]; then ok "published into <DEPLOY_TARGET>vs-proof-sheets/, replacing what was there"
 else bad "publish: $(tail -1 "$W/pub.out")"; fi
+# --dry-run (approved 14z-216) passes through to rsync: it lists what would change and writes nothing
+DEPLOY_TARGET="$W/site3/" sh tools/publish_sheets.sh --dry-run "$W/web" > "$W/pubd.out" 2>&1 && [ ! -e "$W/site3" ] \
+   && grep -q "index.html" "$W/pubd.out" && grep -q "dry run: nothing changed" "$W/pubd.out" \
+   && ok "--dry-run listed the pages and wrote nothing" || bad "dry run: $(tail -1 "$W/pubd.out")"
 env -u DEPLOY_TARGET sh tools/publish_sheets.sh "$W/web" > "$W/pub2.out" 2>&1 && bad "published with no DEPLOY_TARGET" \
     || { grep -q "DEPLOY_TARGET is not set" "$W/pub2.out" && ok "refused with no DEPLOY_TARGET" || bad "no-target refusal: $(tail -1 "$W/pub2.out")"; }
 rm -rf "$W/p" && cp -R "$W/web" "$W/p" && printf '<p>/Users/someone/x</p>' >> "$W/p/index.html"

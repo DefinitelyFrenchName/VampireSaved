@@ -1,0 +1,38 @@
+# 127_pod_hit.rpl — tests/audit_don_row0b.sh's #127 rig (14z-216, promoted from build/agent216/t127/rig/hit_late.rpl).
+# Played with the gate's POKES: P1 id 0x13 and P2 id 0x01 at 1400/1450/1500, Dark Force stock 3 at 2800/2900, speed level
+# 6 from 2000 and the RNG state 0000 from 2363. Press of Death (41236+LK) from 2950; the effect palette loads f2967.
+# P2 jabs every 6 frames from 2972: Donovan is hit at f2994 (both games).
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+2860-2900 p1=R
+2950-2952 p1=L
+2954-2956 p1=DL
+2958-2960 p1=D
+2962-2964 p1=DR
+2966-2970 p1=R
+2968-2972 p1=4
+# P2: walk in 2860-2860, button 1 every 6 from 2972 to 3070
+2972-2973 p2=1
+2978-2979 p2=1
+2984-2985 p2=1
+2990-2991 p2=1
+2996-2997 p2=1
+3002-3003 p2=1
+3008-3009 p2=1
+3014-3015 p2=1
+3020-3021 p2=1
+3026-3027 p2=1
+3032-3033 p2=1
+3038-3039 p2=1
+3044-3045 p2=1
+3050-3051 p2=1
+3056-3057 p2=1
+3062-3063 p2=1
+3068-3069 p2=1
+3300 wait

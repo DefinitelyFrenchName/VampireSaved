@@ -3570,3 +3570,18 @@ section 32 measured #327's premise by counting `Broken pipe` lines only, so on e
 it read 0 and FAILed on unchanged code from 14z-209 until 14z-212. **The rule:** a check that reads a shell's or a
 tool's message must name every wording the hosts it runs on produce (here `Broken pipe` or `I/O error`), and a gate
 that passes on the Mac is run on PILOT before it is trusted on Linux.
+
+## ON GNOME 46, THE FIRST `xwininfo -tree` LINE NAMING A WINDOW IS ITS FRAME, OWNED BY `mutter-x11-frames` — focus that frame through Xlib and, since mutter 46.2-1ubuntu0.24.04.18, the client LOSES focus (FBNeo pauses) (paid: 14z-216, PILOT)
+
+GNOME 46 draws X11 window decorations in a separate X client, `mutter-x11-frames`, and its frame window carries the
+client's title: in `xwininfo -root -tree` the frame (`("mutter-x11-frames" "mutter-x11-frames")`, ids `0x800xxx` on
+PILOT) is listed BEFORE the client (`("fbneo" "fbneo")`, its child). `tools/desktop_session_play.py` took the first line
+naming the game, so it captured and focused the FRAME — through 14z-195's green run too (FBNeo's mark rectangle began at
+`[14, 49]`, the client's offset in its frame). Until mutter `.16` an `XSetInputFocus` on the frame still reached the
+game; after the upgrade to `.18` (PILOT, 2026-10-20, first loaded by the 2026-11-01 reboot) it takes focus FROM the
+game: FBNeo's SDL build pauses on `SDL_WINDOWEVENT_FOCUS_LOST` (`emu/fbneo/src/burner/sdl/run.cpp:456`, "PAUSE" on its
+warning screen at 17 s, its title focused at 9 s, before the first key), and MAME's frames stopped changing.
+`audit_release_linux_desktop` read the mark absent on both emulators and FBNeo silent — the release innocent. Excluding
+`mutter-x11-frames` lines (the client window, `0x1000008`) gave the select screen and its mark on the same session.
+**The rule:** a desktop driver targets the CLIENT window, never the first title match; and when a desktop gate goes red
+on unchanged release bytes, check the host's window-manager packages (`/var/log/dpkg.log`) before the release.

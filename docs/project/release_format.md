@@ -433,8 +433,12 @@ OF THE RELEASE'S COMMIT, so the page names a tagged release and every gate it sh
 ```sh
 ROMDIR=... python3 tools/proof_sheets.py run <the release commit> [--host pilot]   # the local run: build/sheets/<commit>/
 python3 tools/proof_sheets.py web build/sheets/<commit> --to build/sheets_web/<tag> --release <tag>
+tools/publish_sheets.sh --dry-run build/sheets_web/<tag>   # what would change on the site; changes nothing
 tools/publish_sheets.sh build/sheets_web/<tag>        # webcheck, then <DEPLOY_TARGET>vs-proof-sheets/, replacing it
 ```
+
+`publish_sheets.sh` is run by hand, like the maintainer's site deploy (approved 14z-216): `DEPLOY_TARGET` and
+`DEPLOY_PORT` are that deploy's settings, and ssh asks for the password when the upload starts (or uses an SSH key).
 
 What `web` does: every picture halved by Lanczos into WebP quality 85 with the © line in its EXIF, unlinked; every sound
 clip mixed to mono at 24 kHz with a credit chunk and a "short, down-sampled" caption; a credits footer on every page

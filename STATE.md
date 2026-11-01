@@ -38,134 +38,135 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-215 — **#341, #342, #343 and #118 closed done; #129 closed declined on the maintainer's word; #310 groups 1-6 done (groups 5-6 after rule-checker run -1514), kept open for next session's crash-injection sweep and group 7; the strict tier's six reds fixed; two orphaned waits found and killed.**
+## Session 14z-216 — **in progress: #310's crash-injection sweep; #127, #128, #162 and #294 unparked, under analysis.**
 
 ### opened with
-The 14z-214 close's opener; the sweep CLEAN, `main` = `origin/main` at `b68922a6`, the 14z-214 CLOSE section's last four
-lines uncommitted as it said. The maintainer, on the proposed order (#341's closure and the remote scratch, then #118's
-rigs): **"the order you propose i agree, don't hesitate to parallelize what you can. The goal is to address all the
-non-parked tickets"**. Working evidence: `build/agent215/` (local).
+The 14z-215 close's opener; the sweep CLEAN, `main` = `origin/main` at `3979abea`, the CLOSE section's last lines and the
+opener's note uncommitted as they said; ROMDIR audited 76/76. The maintainer, on the proposed order (the remote scratch,
+then #310's crash-injection sweep, then group 7's first batch): **"your order recommendation is fine. Of note, I unparked 4
+tickets on github, they can be worked on in parallel but each one requires analysis before implementation and the green
+light for implementation is done by the maintainer"** (`DECISIONS_HISTORY.md`, 14z-216). The remote scratch's deletion
+(PILOT's `~/t215*`, about 31 GB; ERIS's `~/t129b`, `~/t129w`) was refused by the session's permission classifier; the
+maintainer, 2026-11-01: **"-> do it"**. ERIS's two deleted (1.1 GB and 933 MB, no process using them; read back absent).
+PILOT did not answer (ssh timed out, no ping reply), so its `~/t215*` waits until it is back. Working evidence:
+`build/agent216/` (local).
 
-### (1) THE REMOTE SCRATCH; #341
-PILOT's and ERIS's 14z-214 scratch deleted (PILOT's came to about 2.9 GB, not the 1.6 GB the opener said: the three
-`t214_tr*` traces were about 950 MB each). **#341:** rule-checker run `2026-10-31-1465` VIOLATED the first closure packet
-(the first step's selection read only the row's status, so it could still pick a row whose issue had closed and crashed
-with no open row left; the first measurement ran in a tree with `STATE.md` edited). Fixed: `parked-disagrees` takes the
-first open or parked row whose saved issue is OPEN, and says `NOT JUDGED:` when none qualifies; run in clean worktrees
-over three index states (`build/agent215/t341/recheck/`); `docs/project/gotchas.md`'s entry updated; re-traced on PILOT
-(`pilot:3ccc77fd`, 7 controls HONOURED, SAFE). **Closed `done`** with its closing comment after run `2026-10-31-1466` (OK). Committed
-`be2ecabc` on its strict GREEN tier (the first tier read RED on `test_rule_checker`: the two run directories the ledger's
-new rows name were untracked, so `git add -u` left them out of the snapshot; added, the gate PASSed in a clean worktree,
-and the re-run, confirmed on the red run's results, read GREEN 103/0/0).
+### (1) #127, #128, #162, #294 — ANALYSIS, IN PARALLEL
+Four analysis workers (`build/agent216/COMMON_BRIEF.md`, one directory each, local); nothing built. All four reported
+(`build/agent216/t<N>/REPORT.md`, saved by the session: the harness refuses a subagent's own file). #127 and #162 are one
+defect: the palette reload at `PRG:0x02ADAC` keeps vsavj's mask word at `PRG:0x02ADB4` without Donovan's bit 0x13 (vs2 sets
+it), so his block rows 1-3 overwrite rows 0x0B-0x0D at every palette-state change (the black foot when hit during Press of
+Death; the orange deity at the column's end; a 22-frame cyan sword burst after three moves); vs2's value, probed in the
+opcode share, matched native on every compared frame and changed nothing on five legacy replays. #294 is the sword on
+Donovan's back while he is electrocuted, drawn from his row 0x0C, which vs2's per-frame per-character routine (vs2
+`0x2A316`, in the twin of vsavj's per-frame table `0x02ADEC`) rewrites and ours leaves at vsavj's no-op; the 2026-07-31
+"engine-global" ruling was measured on a quick press that does not electrocute. 14z-171's "vs2 `0x02A142` twins vsavj
+`0x02A8A4`" is wrong (it twins `0x02ADEC`), a retraction to make. #128: cost 0.30% of a frame; her identity is presentation;
+the port changes a vanilla menu input (7 START on "?"). Captures sent to the maintainer for their read; no recommendation
+put yet. **#127's sheet read (2026-11-01), the maintainer, verbatim:** *"#127: build/agent216/t127/sheet_127_pod_hit.png. Is
+the right-hand column (the one-word probe) the Press of Death you expect  -> yes"*. The recommendation, (M) (vs2's mask word,
+instead of the ticket's option (B)), went to rule-checker run `2026-11-01-1525` (`build/agent216/rc127/`). Runs -1525,
+-1526 and -1527 VIOLATED, each resolved by work: the rig's shared id poke named and the result carried by the census, whose
+legs poke no id; a positive control for the inertness probe's palette half (Donovan part 4: 5365 frames differ); the census
+script reading census.sh's own pokes; the unparking attribution dropped. With #162's read in, the two went as ONE
+recommendation, (M) for both (`build/agent216/rc127/recommendation_127_162.md`): run `2026-11-01-1528` **OK**; put to the
+maintainer. #294's recommendation (A, port vs2's per-frame routine after a dead-byte check; the worker's 1.2% of a frame was
+on a wrong ~198k-cycle frame, 0.9% on the tree's 268,288) went to run `2026-11-01-1529`.
+**#294's sheets read (2026-11-01), the maintainer, verbatim:** *"Yes: Donovan's shock aura is yellow, as it should, but his
+sword his red on our build, yellow on native."* (the question and sheets: `build/agent216/rc294/capture_read_294.txt`).
+**#162's sheets read (2026-11-01), the maintainer, verbatim:** *"probe is indeed the correct behavior (hard to see during play
+as it is very few frames, maybe only one frame, but still incorrect."* (`build/agent216/rc162/capture_read_162.txt`).
+**#128's sheets read (2026-11-01), the maintainer, verbatim:** *"this is indeed the correct behavior in vs2 and the current state
+of our build since it does not implement Marionnette. An implementation should follow vs2's behavior"*
+(`build/agent216/rc128/capture_read_128.txt`).
+**#128 PARKED AGAIN (ruled 2026-11-01):** *"let's park again, documenting what we now know"* (`DECISIONS_HISTORY.md`, 14z-216);
+the findings in `docs/game/atlas/select_screen.md` "WHAT 14z-216 MEASURED (#128, parked again", the issue relabelled `parked`
+with a summary comment and its stale "has not been located" line struck; the index row `parked`. A gate gap found on the way:
+`tests/audit_marionette_cost.sh`'s asset census walks only record `0xB3` (`0xB2`, 44 cells, is hers too), recorded, not fixed.
+**#127 + #162: GREEN LIGHT FOR (M) (ruled 2026-11-01):** *"1. Yes, (M) at the next freeze, closing both (recommended) ->
+agreed"*. In progress: the `[[code_word]] palette_reload_mask_hi` row in `donovan.toml`; `build_merged.sh` refused on the
+op-count fixture (849 vs 848), `test_tenant_loop` measured +1 Donovan only and re-frozen (354 / 636 / 849, PASS); rule 5
+reports the row's `only_variant_slot` as one new baked value (a declared growth, M23's precedent). Rule-checker run `2026-11-01-1534` VIOLATED (the row's comment put vs2's mask
+at `0x02A106`, copied from the #127 worker's report; listed: it is `0x02A108`, and the two high words differ in bit 0x13 only),
+corrected; `-1535` **OK**. Rule 5 re-frozen with the declared growth (221 -> 222) and its ledger row; `test_rule5_census` PASS.
+**BUILT** (`build/agent216/mb_m`, scratch, fingerprint `48f729b9`): the opcode view differs from `m3b_merged31` in exactly one
+byte, `0x02ADB5`; on BUILT images the five legacy replays are identical every frame (work RAM and OBJ palette), and Donovan
+part 4 differs exactly as the opcode-patch counterfactual did (RAM 1691, palette 5365 frames) (`build/agent216/rc127/`).
+`docs/project/patch_notes.md` has the 14z-216 entry. **(M)'s gates, written and frozen on `mb_m`** (the maintainer: *"Then do it"*): the new `tests/audit_don_row0b.sh` (tap `tests/lua/pal_rows_tap.lua`, rigs `tests/replays/127_pod_hit.rpl` / `127_pod_nohit.rpl`) requires P1's row 0x0B to equal native vs2 on every frame from 2500 on #127's hit rig, its no-hit control, the 15 Donovan naming parts and donovan_4's column — PASS on `mb_m`, 0 frames; its known-bad leg (vsavj's mask word in the opcode share) differs in R1 206 / R2 124 / R4 26 frames and in 13 of 15 parts, the two parts whose moves never show the defect (donovan_8, donovan_13) frozen as a blind set; the mode fails R1-R4. `audit_column_flash` and `audit_column_flash_cause` changed and RE-FROZEN to "ours = native" (the old shape is now the cause gate's BAD leg; the flash gate's control plants row 10 into row 11 and judges the hash rows alone) — both PASS on `mb_m` against the new expectations, all controls fired, the cause gate's two modes fail as required. Rule-checker `2026-11-01-1536` VIOLATED (the flash control fired on stale rows — fixed), `-1537` VIOLATED (a false claim that the cause gate names the build; the known-bad leg not required per check — fixed), `-1538` **OK**. All three gates expect the (M) build: at the default BUILD (m3b_merged31) they FAIL by design until the freeze re-points them (and `audit_column_flash`'s build row is re-frozen on the registered build). Still to do for (M): the freeze. **#294:** the maintainer, on the recommendation as first summarised: *"indeed if the 6 free bytes exist,
+given the cost this seems like the best solution"*; the packet's runs `-1529`..`-1532` each VIOLATED on real gaps (the
+dispatcher's head diverts into the state hook on ours, so whether ours reaches the per-frame table was measured: Donovan
+enters `0x02ADDC` on all 66 frames of the shock window; every leg re-run with its pokes recorded); `-1533` **OK**; the recommendation re-put to the maintainer for an explicit green light.
+Asked *"Do you give the green light, starting with the free-byte search?"*, the maintainer: **"Yes"** (DECISIONS_HISTORY,
+"#294: A ... after the dead-byte check"). **The search found six:** vsavj `PRG:0x024024-0x024029`, an orphaned
+`moveq #$4b,d0 / bra.w 0x27EC0` tail between the class-0x20 and class-0x21 handlers of the victim reaction dispatch
+(`0x2385C`), behind row 0x20's own `bra.w` (the idiom's six other copies are reached by fall-through). Judged DEAD by
+the new `tools/audit_dead_span.py` (no instruction at any even address, no long in either view, no table row names a
+span byte; fenced by reached code); its gate `tests/test_dead_span.sh` (static tier) passes with four controls fired, each
+also failing as a mode. Runtime bound `tests/audit_dead_span_exec.sh` (on demand): 64/64 legacy replays on MAME, 0
+executions at the span — weak, the corpus never dispatches rows 0x20/0x21 either; the live-site control (`0x02ADDC`,
+597,329) fired. The vs2/vh2 twins sit in the same place but the tool does not prove them dead. Recorded in
+`engine_internals.md`. Next for #294: the port itself (vs2 `0x2A316` transcribed with its calls re-pointed, its private
+palette-sequence rows, row 0x13 -> `0x024024` -> `jmp` to it), with the rule-checker before the build. **The port, written** (the maintainer: *"Then do it"*): a new generator section `[perframe_hook]` (`tools/gen_donovan_patch.py`) reads vs2 `0x2A316` from the vs2 opcode view at build time (no ROM bytes in the tree), re-points its 26 external references (9 to a local rts, 5 to `jmp 0x2ADC8`, 10 to a PRIVATE sequence entry over vs2's records 0x2D4-0x341 placed in hole B, 2 lea tables copied from vs2's data view), each fixup checked at build, the records checked against vhunt2 (a missing twin fails the build); the body in hole B, `jmp` on the dead span, row 0x13 -> `0x024024`. Manifest `[perframe_hook]` in `donovan.toml`. Static checker `tools/audit_perframe_hook.py` (finds the routine's external references from the SOURCE, compares the built body instruction by instruction; reads `absent` on m31 and `mb_m`). Emulator gate `tests/audit_don_row0c.sh` written (row 0x0C equal native on the electrocute rig `tests/replays/294_don_electrocuted.rpl` and the 15 naming parts; known-bad leg reverts row 0x13 in the opcode share), not yet run. `test_tenant_loop` re-frozen +4 Donovan (358/640/853) with its one-iteration bound made relative (the fixed `< 300` tripped at 303 with the loop iterating); rule 5: the 24 keys classified, the one new baked value re-frozen with a ledger row. `+0x1CA` (the routine's counter) searched with controls: no reached instruction uses it. Record corrections made: `engine_internals.md` (vs2 `0x02A142` twins vsavj `0x02ADEC`, not `0x02A8A4`), `test_don_accent.sh` section 3's comment, the 2026-07-31 premise in DECISIONS_HISTORY (marked, kept). Rule-checker `2026-11-01-1539` VIOLATED (the packet's diffs carried (M)'s edits, the re-freezes stated but not made, the ruling excerpt wrong, `+0x1CA` unscoped, the twin check skippable — all fixed); `-1540` VIOLATED (the `+0x1CA` split leaned on the descent; the dead span unjudged on our image — each candidate placed in a jump table, the span judged DEAD on `mb_m`'s full ranges), `-1541` **OK**. **Built:** `build/agent216/mb_294` (scratch, (M) + #294), fingerprint `0e6f423b`. `tools/audit_perframe_hook.py`: hooked, the body equal to vs2's instruction for instruction, all 26 references on their stubs, records/tables equal; its four plants FAIL. `tests/audit_don_row0c.sh`: row 0x0C = native on every frame of the electrocute rig (reverted leg: 55 differ) and of the 15 parts outside native's Dark Force frames; inside them 1,511 frames differ (parts 3/4/6/7) — cause NOT ESTABLISHED: first attributed to the ruled Dark Force CHANGE never setting `+0x1C3`, RETRACTED (poking `+0x1C3` over native's window left it unchanged, a poke with no positive control; rule-checker `-1543`/`-1544`). The Dark Force look goes to the maintainer (`build/agent216/rc294/sheets/sheet294_df.png`). Blind set frozen (10 parts). The gate PASSES on `mb_294`, both controls fire, both modes fail as required. Rule-checker on the gate's expectation: `-1542` (run 1541 and the dead-span result not in the packet; the CHANGE ruling unquoted), `-1543` (the `+0x1C3` premise unshown — tested: the poke leaves the difference, attribution retracted), `-1544` (the colour split measured on donovan_6 only; R5 without a positive control), `-1545` (the mode log from the previous wording) all VIOLATED and fixed; `-1546` **OK**. `audit_don_row0b` re-run on `mb_294`: PASS ((M) intact). Built-image legacy replays vs `mb_m`: 01 identical; 02/03/07/105 differ on ONE frame (890), 2 bytes `RAM:$FF06CC-CD` = a stacked return address into ported select code moved by 0xDC0 by the new allocations (execution position; for the legacy MAME oracle at the freeze); OBJ palette identical. Capture sheet for the maintainer: `build/agent216/rc294/sheets/sheet294_p1..p3.png`. **The maintainer, on page 3** (first reading the burnt Killshread at f3458 as missing on our build, then seeing the #294 column): *"Also, sheet294_p3 shows a difference in rendering I had missed: the burnt state after electrocution is different in our build because the burnt palette is not applied to killshread in our build apparently"* — then *"oh but you corrected it already, my bad"*. Dark Force colours ticketed as **#344** (*"ticket and attach the capture"*; *"the difference is very small rendering wise and certainly not game breaking, but good catch"*). The body-check static gate wrapper (`tests/test_perframe_hook.sh`) is added at the freeze, when the default build carries the port.
+**PILOT** went down at 01:00:13 CET right after a Proxmox `guest-fsfreeze` (the host's backup job, most likely); back at
+02:42, its 14z-215 scratch deleted on the maintainer's word (32 GB; disk 86% -> 73%).
 
-### (2) #118 — THE REMAINING RIGS, IN PARALLEL
-Five rig workers on pristine vsavj (`build/agent215/t118/`, local; the common brief `COMMON_BRIEF.md`), each with a draft
-gate (unregistered) whose run passed with every control fired: +0x354 and +0x3A8 (`s354_3a8/`), B5 Lilith +0x14C and B7
-Bishamon +0x316 (`b5b7/`), B3 Felicia +0x37F, B4 Gallon +0x366 and +0xB2 (`b3b4b2/`), B1 Anakaris +0x152, +0x156, +0x1A0,
-+0x1AA, +0x374 (`b1/`); B2 (the finish types, on the win screen's banner) running. Every sheet was checked, then sent to
-the maintainer with its question; no atlas row changes before the answers. *[Resolved: (6), (7).]*
+### (1b) THE M24 FREEZE — (M) + #294 (the maintainer, 2026-11-01: *"I suggest compacting then freeze"*, *"You can start the freeze"*)
+Evidence: `build/agent216/m24/` (local). **Builds** (mark M24; `build_all.sh`): `build/don_m28`, `hui62`, `pyron47`, `m3b_merged32`,
+stock `m5_stock23`, stage-4 — programs donovan `167d870f` -> `5ebd4fea`, huitzil/pyron UNCHANGED, merged `6148d0b1` -> `0e6f423b` (=
+`mb_294`), stock `a3910ded` and stage-4 `2fa7c2f1` UNCHANGED; ERIS reproduced all six (program, set key, manifest). **Delta** +5 ops on
+donovan and merged (body, records, `0x024024`, `0x02AE12`, `0x02ADB4`), the rest relocated pointers (`attribution.txt`,
+`site_delta.txt`; the tool's 617 "differing" targets straddle its 8-byte window, `apd_straddle_merged.txt`); byte diff
+`tests/expected/freeze_bytediff/merged-m24.txt` (313,332 ranges, every fixed site explained, `bytediff_fixed_review.txt`).
+**Registry** donovan-m28 `3beb0d2c` / huitzil-m35 `1fb00f39` / pyron-m29 `c7f6a2cf` / merged-m24 `43505a12`; **sets** frozen on the Mac
+and ERIS, 472 files equal; the legacy oracle GREEN (frame 890 inside the frozen select windows). **Sweep** 412 lines (16 rewritten
+dated records restored — a gotcha); `test_m3a_reproducible`, charmaps, MiSTer tail (fork `8d527341`, patch 0040), `release/merged-m24`.
+**Battery** ERIS `--freeze` on snapshot S1: 26 FAIL, 4 SKIP, every red read — relocated placed addresses/PCs, build rows, the hitbox
+base table (Phobos `0x45B6F0`, Pyron `0x4AF86C`), the 40,620-frame arcade leg's clock and counts (110_don_arcade_mash, the only replay
+whose defense reads changed), Donovan's move parity moving TOWARD native (32 events DIFF -> IDENT under the 0000 pin), #294's two
++0x1C3 reads. **Real findings fixed**: the three 14z-216 rigs sat in the suite's legacy corpus (moved to `tests/replays/don/`);
+`audit_don_row0b`'s native legs CROSS-FLAVOR (two `audit_latch_reads` legs: no reader fires; accepted); three gates missing from
+`ci_emulator.tsv`; `audit_tenant_cpu_ai`'s seven hard-coded placed PCs; `audit_column_flash_cause`'s C1 fixed string (now ours =
+native leg); 14z-215's mode-only last-bar controls in `audit_edge_cases`/`audit_tenant_downwin` (now in-gate). **Rulings**: #294's
+lag frame accepted (`audit_lag_budget` ACCEPTED list); #345's rows exempt in `audit_rng_forms`, 0000 kept. **Re-frozen** on ERIS
+at snapshot S2 and verified by a second whole battery (`s2_results.tsv`: 2 FAIL re-frozen since, 4 SKIP host-covered — Mac
+`test_release_binaries`/`test_readme_recording`, PILOT `audit_release_linux_cleanhost` PASS); the Mac MiSTer lane PASS 2 +
+`test_mister_prg_window` re-frozen from its legs. **Tickets** #345 (Blizzard Sword overrun, the maintainer confirmed it on the
+sheets), #346 (the ice streak, cosmetic); sheets `build/agent216/s345/`. **The re-freeze rule-checker** (packet `build/agent216/m24/rc_refreeze/`): runs `-1550` (VIOLATED Q1-Q5), `-1551` (Q1 Q2 Q4),
+`-1552` (Q1) — each resolved (the clean-host gate re-run on merged-m24 itself, `rng_forms` verified fresh, the release binaries
+re-run on PILOT's linux-x86_64, `audit_column_flash_cause`'s in-gate control fixed, `audit_lag_budget`'s accepted frame tied to
+`pass_overrun.tsv`'s native row with a new control `native-basis-moved`, the maintainer's re-confirmation on the captures: *"Still
+accepted but as a tradeoff. #345 is there to fix it later"*, the attribution window shown); `-1553` (Q1 Q4: `rule5_baked`'s growth note re-frozen for both rows, 251 -> 253; the defense-row attribution over all 97
+replays with a planted-change control) — resolved; **`-1554` OK** (the plant caught). **Remote state**: ERIS's checkout
+at S2 `6263d617` plus the re-frozen files (copied to the Mac); PILOT at S2 with merged-m24's linux-x86_64 binaries copied in and a
+SCRATCH tag `freeze/merged-m24` on its checkout only. **Since the S3 tier** (all evidence `build/agent216/m24/`):
+`audit_release_linux_desktop` on PILOT first read the mark absent on both emulators with FBNeo paused — the gate's driver
+focused the window's FRAME (`mutter-x11-frames`), which since mutter `.18` (PILOT 2026-10-20, loaded by the 02:42 reboot)
+takes focus from the game; `tools/desktop_session_play.py` now targets the client window (gotcha in
+`docs/platform/gotchas.md`), and the gate PASSes on merged-m24 (mark 0/147 both, sound -30.0/-29.8 dBFS), its three CONTROL=
+modes failing (`rc_freeze/desktop/`). **The S3 static freeze tier**: PASS 227 FAIL 10 — fixed: the five new gates frozen in
+the description/follows censuses and three FOLLOWS widened, coverage and index pages regenerated, two unguarded `mktemp`,
+`test_phasea_a3_liveness` (latent since 14z-212: its copy's REPO lost `tests/lib/jobs.sh`), `test_checkdocs_rom`'s
+denominator 394 -> 407 (the 13 addresses of this session's #128 paragraph, `denominator_diff.txt`); waiting:
+`test_rule_checker` (the freeze run), `test_controls_concurrent` (both lists re-traced on PILOT by a fork — the maintainer:
+*"Re-trace all 45 (Recommended)"*), `test_emulator_staleness` (the battery records brought to the Mac). **Snapshot S4**
+`d1aed6a8`: Mac `test_mame_parity` GREEN (`build/emu_m24_parity_s4`); ERIS `--stale --freeze --scope all` (the 22 NOTE-class
+instruments `--skip`ped: the runner's `--stale` names them at the audit's default cadence and refuses — a ticket to file)
+PASS 29 SKIP 4 FAIL 1 (`build/emu_e216s4`); the red, `audit_ladder_selector`, was M24's timeline shift (match 2's selection
+960 frames earlier) moving its frame-pinned saturation window past the selection — window moved 7100-7290 -> 6140-6330,
+PASS on merged-m24 with merged-m23's original reading. **Open, in order**: the Mac's runner rows on S4 for
+`test_release_binaries`, `test_readme_recording`, `test_mister_prg_window` (running); PILOT's runner rows for the desktop and
+clean-host gates after the trace; the freeze rule-checker run; snapshot S5 and the static freeze tier on it; commit; re-cut
+the four tags; comments on #127/#162/#294. #344, #345, #346 stay open. #338's publisher: `BatchMode=yes` dropped and
+`--dry-run` passed through (the maintainer, 14z-216: "That's fine by me"; DEPLOY_TARGET is their site deploy's).
 
-### (3) #310 — GROUPS 1-4 NOW
-A read-only worker scoped the remaining work at HEAD (`build/agent215/t310/REMAINING.md`, local); the question went
-through runs `2026-10-31-1468` to `-1470` (each caught a miscount). The maintainer: **"Groups 1-4, then re-census 5-7
-(Recommended)"** (`DECISIONS_HISTORY.md`, 14z-215). Groups 1-4 in an isolated worktree. *[Continued: (8).]*
-
-### (4) #342 FILED — `$FF8120` IS THE WINNER'S PERFECT FLAG, NOT THE SIDE
-B2's legs read 0xFF after P2-won downs; a write tap (`build/agent215/t118/b2/ff8120/`, local) and the static read of
-`PRG:0x0098DC-0x0098FC` show 0xFF when the winner's white HP is full and 0x01 when the winner was hurt; the side is
-`$FF8105`. ram.md's row (14z-104) and three gates' winner checks rest on legs that confounded side with damage; none is
-falsely green on these facts. Filed **#342**; its fix (retraction, gates judging the side by `$FF8105`, the confound's
-legs as controls) in an isolated worktree. The fix came back (`build/agent215/t342/`, local): all three gates judge the side by `$FF8105`
-and name `$FF8120` the perfect flag, each with the two confound legs and a `side-by-perfect`/`perfect-by-side` control
-pair (plain PASS, six modes HONOURED); no frozen value changed; no gate had been green on the misreading. Applied to the
-main tree beside #310's change; one poke read-back finding (`audit_tenant_downwin ff8450 FIELDS:p1hp`) awaits a class.
-
-### (5) #343 FILED — THE TIMEOUT GATE'S "ROUND 2 LIVE" IS THE NEXT MATCH
-#342's worker noticed `audit_tenant_timeout` reports "round 2 live at f4990", after `$FF810E` = 0xFF (match end) at f4934.
-Traced on the ctl rig (`build/agent215/t342/round2/`, local): identical on pristine vsavj and our merged build, so no
-regression; the round byte returns to 0 at f4082 with no refill and the timer at 0, both HP read 0 from f4107, the match
-ends at f4934, and the refill the check counts is the next match's. Filed **#343**; its capture comes first. The capture
-(`build/agent215/t343/sheets/`, local) showed the time over ending the 2P match; the maintainer: **"on standard dip switch
-settings, you need two downs to win HOWEVER, there is only one timer so TIME OVER ends the match, not the round. Think of
-Vampire savior as having only one round but you get a new full life bar after your first down"**. The downwin rig's single
-KO also ended the match: measured, the rig's HP-only poke leaves the spare bar unused (`+0x138` 144, the bat `+0x3B0` 1), so
-the KO skips the first-down band and is a death natural play cannot reach (DIPs standard: a natural match needs two downs).
-Fixed in worktrees and applied: the timeout gate checks the time over ending the match and the next match spawning live;
-downwin's KO legs poke the victim onto its last bar (bat 0 -> 0xFF at the KO), first-down legs added (the §4 life-marker
-transition); `audit_edge_cases`' throw-KO and double-KO legs the same — the double KO still reads the draw on real last
-bars, and **14z-104's "Phobos' throw cannot finish an opponent, restores HP to half" is RETRACTED**: it was a first down
-made by the HP-only poke (native vsav2 the same, 7 frames earlier). Every gate PASS, every control HONOURED. The
-retraction was then shown on captures and re-measured on a last bar the game made itself (a real first down from 145, then
-HP alone lowered): the throw KOs on our build and native vsav2; the maintainer: **"yes"**. The 24 poke read-back findings of
-#342/#343/#118's gates classed by the maintainer after runs `2026-10-31-1471` to `-1475` (each caught a real error in the
-proposal): **"As proposed (Recommended)"**, **"OBSERVES"** (the reads after a one-frame poke), row 36 **"Re-rule to OBSERVES
-(Recommended)"**, the notes **"Approve the notes (Recommended)"**. **#342 and #343 closed `done`** with their comments after
-run `2026-10-31-1478` (OK; `-1476` withdrawn unspawned, `-1477` VIOLATED and resolved by work).
-
-### (6) #118 PROMOTED
-The seven draft gates moved to `tests/` (six gates, all PASS fresh, 50 control modes HONOURED), the atlas rows written from
-the measurements and the maintainer's answers (`build/agent215/t118/ANSWERS.md`, local), `character_tables.md`'s 15 tables;
-the candidates table: no NO ROW, no NOT OBSERVED, no batch left (CONSISTENT 44, NOT ADOPTED 23, OWNER ONLY 11, COVERED 5,
-REFUTED IN PART 4, CROSS-CHECKED 1, REFUTED 1). 24 poke read-back findings across the new and changed gates await the
-maintainer's classes. *[Classed: (5).]*
-
-### (7) #118 CLOSED DONE ON GITHUB
-On the maintainer's **"Close #118"** (`DECISIONS_HISTORY.md` "Ruled 2026-10-31 (14z-215) — #118 closes"), after rule-checker
-runs `2026-10-31-1480` to `-1484` (each VIOLATED on a real gap: the batch "-" read as "nothing left"; the table and ram.md
-never compared after the test; "these gates do not read" #310's files, when they follow `tests/lib/controls.sh`; the logs'
-count of 85 against the snapshot's 84 — the `emu/fbneo` submodule, which `git stash create` cannot record; the portable-tier
-control and the 15-table count unshown) and `-1485` OK. Commented and closed 2026-10-31T15:07:31Z; row 118 `done`.
-
-### (8) #310 GROUPS 1-4 RE-TRACED; GROUPS 5-7 CENSUSED; GROUPS 5 AND 6 DONE
-Groups 1-4's stale concurrent-controls rows all re-traced on PILOT (15 emulator rows at `pilot:69321107`, three of them
-re-run with the hui30/don_m5 rompaths copied INTO the clone) and ERIS's batch of the four long gates PASS with every control
-honoured. A read-only census of groups 5-7 on the working tree (`build/agent215/t310/census57/`, local) went to the maintainer
-after rule-checker runs `2026-10-31-1486` to `-1493` (each VIOLATED on a real gap) and `-1494` OK; the maintainer: **"5 and 6
-now, 7 in batches (Recommended)"** (`DECISIONS_HISTORY.md`). Two worktree workers built group 5 (`tests/lib/controls.sh`
-`vs_ctl_show_err`, ~23 gates, proof gate `tests/test_ctl_show_err.sh`) and group 6 (four gates' plant/refusal paths,
-`tools/dead_exit_census.py`'s P4/P5 patterns and the gates they named, proof gate `tests/test_plants_not_applied.sh`); applied,
-the census and proof gates PASS on the main tree, and PILOT re-traced the 25 rows the edits staled (all SAFE, 176 controls
-HONOURED; `pilot:42e7f251`) and ran `audit_release_linux_cleanhost` on Linux (PASS, both controls honoured). Run `-1498` found
-the per-gate planted proofs missing for most changed modes; the maintainer: **"Next session, first batch (Recommended)"** — a
-crash-injection sweep gate opens next session, before group 7's first batch. Runs `-1500` to `-1512` each named a further
-gap. In order:
-- the claim lists the six planted modes exactly and names every other changed mode as unplanted;
-- `test_ctl_show_err`'s own mode runs ended an unplantable plant in the old plain FAIL, now a refusal proved by case (e) and the new known-bad control `refusal-reverted` (run `-1510`);
-- `test_rule_checker` and `test_poked_legs` were re-traced on PILOT from a tree whose plain runs pass (`pilot:6c9598b3`);
-- `test_rule_checker`, the fourth group-5 unknown, is now MEASURED with a crash planted where each mode's probe runs: the pre-fix gate reads HONOURED for exactly the three modes the reading named, and the fixed gate reads HONOURED for none (`build/agent215/t310/rcmeas/`, local; the seed of next session's sweep gate) — measured after its fix, not first as the chosen option's text says, a departure stated on #310. Runs `-1513` (the census's own naming of the three unknowns) and `-1514` OK; committed `5fad1c92`.
-
-### (9) #129 — CAPTURES, TWO READS, AND A GATE
-On the maintainer's *"if at some point a machine is idle, the analysis part of #129 is ok to work on"*, ERIS captured
-Behaviours A and B natively and on ours (`build/agent215/t129/`, local). Read: A *"test is correct, behaviour is different but
-seems somewhat consistent"*; B *"starting positions is entirely different ... I fail to see how we can compare things"* — so a
-matched-start B capture (same venue, positions, facing, RNG, CPU state; `build/agent215/t129/b2/`) followed, read *"seems like
-our build is similar to vs2 from what I see"*. `0x416312` IS reached on ours (`docs/game/engine_internals.md` corrected). The
-measurements are kept as `tests/audit_tenant_cpu_ai.sh` (release scope, as `audit_tenant_cpu_soak`; its four pins READS-BACK on
-the maintainer's word), after rule-checker runs `2026-10-31-1495` to `-1501` (a formula read as the routine's return; the
-registry scope; a run made before the rescope; truncated evidence) and `-1502` OK. Recommended (B not ported; A as A1, both of Phobos's calls repointed) after rule-checker runs `2026-10-31-1515` (VIOLATED:
-A1 named one of the two calls) and `-1516` (OK). The maintainer: **"Neither, close #129"**. #129 closed `declined`
-(`DECISIONS_HISTORY.md`).
-
-### (10) TWO ORPHANED WAITS, FOUND ON THE MAINTAINER'S QUESTION
-The maintainer asked whether a background task, "wait for the s354 re-run results", was still progressing after 10 h 43 min.
-It was not: the #118 promotion subagent's `until` loop on `build/agent215/t118/promote/RESULTS.tsv` reaching 59 lines had no
-deadline, and the run had finished at 58 lines at 12:23 (all six gates PASS, all 50 modes HONOURED; the +0x354 re-run's
-row went to another file). Killed; the subagent then finished, and its worktree holds nothing main lacks. On ERIS, three
-`cps2 vsavj` legs of the first #310 batch (`audit_command_throws`, `audit_es_ex`) had outlived the batch's 4-hour bound by
-10 h at 99% CPU, reparented to `/init`, their temp dirs deleted; both gates had since passed on the re-run (13/13, 10/10).
-Killed on the maintainer's **"Kill all three (Recommended)"**. The rule: `docs/project/gotchas.md` ("A `timeout` ON A REMOTE
-RUNNER KILLS THE RUNNER, NOT ITS EMULATORS").
-
-### CLOSE (14z-215, 2026-10-31)
-- **The work commit:** `5fad1c92` on the strict tier GREEN at `95eb69b3` (`build/agent215/t310/tier2/tier_results.tsv`;
-  the first tier, at `448722ab`, NOT GREEN on six reds from this sitting's edits, all fixed before it — section (8)'s commit
-  message lists them). #310's progress comment posted (the departure on its fourth unknown stated there).
-- **The close** (`python3 tools/close.py`, run `build/agent215/close/`, `--prev` the work commit's GREEN tier): sections;
-  next-session (the 14z-214 opener moved verbatim, quoted, to `docs/NEXT_SESSION_HISTORY.md`'s top; START HERE: #310's
-  crash-injection sweep first); rollover (14z-214's group to `STATE_HISTORY.md`, its ledger line at the top; no citation
-  pointed into it); indexes; dashboard (14z-163..14z-215, 3,266 figures, 0 unclassed; five assets uploaded; datasets
-  figures 24, rc_runs 24, tiers 25, costly 24, actions 4). The tier's results: `build/agent215/close/tier_results.tsv`,
-  the next close's `--prev`.
+### (2) #310 — THE CRASH-INJECTION SWEEP, DISCOVERY
+A python3/sh shim crashes the commands a mode runs (a 30-frame Python stack; a syntax error in an untracked shell copy, a
+tracked file never edited), each plant on the gate as it stands and on a copy with `vs_ctl_show_err` neutered; the 47 helper
+call sites tagged. Discovery over the 20 static gates (`build/agent216/t310/`, local; the runner gates on PILOT): every runner
+mode PROVEN but one LIES; first finding F1, `test_agent_hooks`' twins read a copy that could not be made as FIRED and the
+plain run PASSes (`build/agent216/t310/FINDINGS.md`). Two defects of the session's own rig caught and fixed: a shell shim
+resolving only a symlink's directory (would have written through a mirror's link into a tracked script; nothing was
+written) and a relative shim dir on PATH. The gate is not built yet.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
@@ -173,6 +174,8 @@ RUNNER KILLS THE RUNNER, NOT ITS EMULATORS").
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **#345's rows may turn DIFF under a non-zero RNG; the parity gates keep the 0000 pin (2026-11-01, 14z-216):** `tools/rng_forms.py` exempts rows `after:` a SLOWDOWN root, by name — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #345's rows under a non-zero RNG".
+- **A new zero-pass frame native vs2 has too is accepted, frame by frame (2026-11-01, 14z-216, #294):** `audit_lag_budget`'s ACCEPTED list (today donovan_2:3094, vs2's 3098, checked against `pass_overrun.tsv`'s native row), re-confirmed on the captures as *"a tradeoff. #345 is there to fix it later"*; the no-new-lag rule stands for every other frame — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #294's lag frame" and "…re-confirmed on the captures".
 - **ERIS tiers skip parity; the Mac's parity run is the row of record (#321, 2026-10-26, 14z-209):** ERIS runs `--skip test_mame_parity` — `DECISIONS_HISTORY.md` "Ruled 2026-10-26 (14z-209) — #321 phase 2".
 - **ROM content in the tree (2026-10-18, 14z-205):** addresses and discrete values are fine; a whole graphic or sound, or a whole algorithm, is not ([VSP-8]; the four quoted sound-driver bytes stay) — `DECISIONS_HISTORY.md` "Ruled 2026-10-18 (14z-205) — the no-ROM-bytes rule: …".
 - **#291's last 22 gates (2026-10-18, 14z-205):** the tap gates prove by an EVENT-PROVEN basis (D2), groups 3-5 take a `no-picture` declaration kind (D4), D4 first — `DECISIONS_HISTORY.md` "Ruled 2026-10-18 (14z-205) — #291 S2: …".

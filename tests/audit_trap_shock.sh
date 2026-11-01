@@ -54,7 +54,7 @@
 # which section 2 now asserts as the TIMELINE: the dome's first hit, the shock's end and the recovery on
 # the same frames on native and merged.
 #
-# Usage: ROMDIR=... [MERGED=build/m3b_merged31] tests/audit_trap_shock.sh [solo builddir]
+# Usage: ROMDIR=... [MERGED=build/m3b_merged32] tests/audit_trap_shock.sh [solo builddir]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -74,8 +74,8 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/hui61}"  # the SOLO Phobos build (re-pointed 14z-117b, 14z-119, ...; re-point at every freeze)
-MERGED="${MERGED:-build/m3b_merged31}"
+BUILD="${1:-build/hui62}"  # the SOLO Phobos build (re-pointed 14z-117b, 14z-119, ...; re-point at every freeze)
+MERGED="${MERGED:-build/m3b_merged32}"
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 [ -d "$MERGED/rompath" ] || { echo "SKIP: no merged build at $MERGED"; exit 0; }
 WIDE_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

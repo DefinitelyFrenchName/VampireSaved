@@ -1,5 +1,5 @@
 # tests/expected/column_shock.tsv — every write to both fighters' hit-freeze byte +0x5C around Killshread Lightning [MP]'s
-# first column hit (#136 rig donovan_4, event 1 at 2800), ours (m3b_merged27) vs native vsav2 (tests/audit_column_shock.sh;
+# first column hit (#136 rig donovan_4, event 1 at 2800), ours (m3b_merged32) vs native vsav2 (tests/audit_column_shock.sh;
 # tests/lua/read_tap.lua, non-debug), the move's timeline, and a column KO. Evidence class: in-emulator. Frozen with FREEZE=1:
 # first 14z-168 (the defect as measured), re-frozen 14z-170 on the class-0x52 fix (ours' writes equal native's in
 # frame and value; the placed thunk PCs move with a freeze).
@@ -26,7 +26,7 @@ w	native	p2	2850	02309e	17
 w	native	p2	2851	02309e	16
 w	native	p2	2852	02309e	15
 w	ours	p2	2837	018902	11
-w	ours	p2	2838	3ffbda	24
+w	ours	p2	2838	3ffd6a	24
 w	ours	p2	2839	02447c	23
 w	ours	p2	2840	02447c	22
 w	ours	p2	2841	02447c	21
@@ -35,7 +35,7 @@ w	ours	p2	2842	02447c	19
 w	ours	p2	2843	02447c	18
 w	ours	p2	2844	02447c	17
 w	ours	p2	2844	018902	11
-w	ours	p2	2845	3ffbda	24
+w	ours	p2	2845	3ffd6a	24
 w	ours	p2	2845	02447c	23
 w	ours	p2	2846	02447c	22
 w	ours	p2	2847	02447c	21

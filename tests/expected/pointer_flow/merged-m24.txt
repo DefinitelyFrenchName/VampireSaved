@@ -1,0 +1,13 @@
+# pointer-flow baseline for merged-m24 (build/m3b_merged32), frozen 14z-216 — the M24 freeze ((M) and #294).
+# vs merged-m22 (which merged-m23 satisfied unchanged): the two STRONG `code:movea_imm` findings are the SAME two,
+# RELOCATED BY EXACTLY 0xF50 — site 0x4d45b0 -> 0x4d5500 and targets 0x4c7b30 -> 0x4c8a80 and 0x4cdad0 -> 0x4cea20
+# (WIDE-HOLE, offset preserved) — the placement cascade of #294's body (0x184) and records (0xDC0) ahead of them. Same
+# class, same count. `data:long` 1189 -> 1183 (-6 = +4 -10), every row ATTRIBUTED (build/agent216/m24/pflow/weak_diff.txt):
+# +4 in anim@huitzil (moved 0x42D6A0 -> 0x42E620, +0xF80) — 0x4327c6, 0x4327de, 0x432842 (0x005e0000) and 0x43b9de
+# (0x005c28a0): a pointer into the region relocated +0xF80 whose low word now reads past a long boundary (the class
+# merged-m22 recorded at 0x4877ac); -10: eight longs whose values (0x4cff9a-0x4cfff8, 0x4c3f14, 0x4d3f14) now land on
+# occupied space after the shift, and two straddles that ended (0x43bc68, and merged-m22's 0x4877ac). No STRONG
+# finding appears or disappears.
+STRONG	code:movea_imm	0x4d5500+0x16	0x4c8a80	WIDE-HOLE
+STRONG	code:movea_imm	0x4d5500+0x24	0x4cea20	WIDE-HOLE
+WEAK-COUNT	data:long	1183

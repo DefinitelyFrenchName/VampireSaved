@@ -671,7 +671,8 @@ control claims.
   `tests/controls_concurrent_emu.txt` gives its slot back after its PASS and runs each control as a pool job of its own;
   an unlisted gate runs them one after another in its slot. A gate is listed only from a PILOT write trace of its
   control modes (the #315 method, ruled 2026-10-26, *"Write trace on PILOT, don't use PILOT for any other task to avoid
-  overlap"*); `tests/test_controls_concurrent.sh` holds each row to its traced blob (section 18, control
+  overlap"*; clarified 2026-11-01, 14z-216: *"concurrent is possible but other tasks per machine should be avoided to avoid
+  overlap or interference. But splitting the load between machines is perfectly fine"* — DECISIONS_HISTORY.md); `tests/test_controls_concurrent.sh` holds each row to its traced blob (section 18, control
   `concurrent-off`). Why: the 14z-208b release run on ERIS (`build/emu_rel208_eris`) spent 53,104 of its 60,228 s in
   control rows and took 3 h 29 min, about 60% of its `--jobs 8` floor.
 - **An UNJUDGED control mode** (#310): a FAIL whose log carries a line starting `NOT JUDGED: ` measured nothing and is

@@ -105,7 +105,7 @@
 #      shapes and must simply produce an action without a stock spend
 #      (measured 14z-104 (4)); Phobos and Pyron fire theirs.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [JOBS=5]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [JOBS=5]
 #        tests/audit_edge_cases.sh          (~17 legs x ~1 min, JOBS at a time)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -123,7 +123,7 @@ export MAME_BIN
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 JOBS="${JOBS:-5}"
-BUILD="${BUILD:-build/m3b_merged31}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged32}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)" || { echo "FAIL: audit_edge_cases — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 FIELDS="ff8450:w:p1hp,ff8850:w:p2hp,ff8120:b:perfect,ff810e:b:rounds,ff8509:b:stk,ff8406:b:p1seq,ff8105:b:side05"
@@ -172,8 +172,10 @@ LAST1=";3006:ff8538:0000;3006:ff87b0:00"     # P1 victim's +0x138, +0x3B0
 KL1="$LAST1"; KL2="$LAST2"; DL="$LAST1$LAST2"
 if vs_ctl_is ko-without-last-bar; then KL1=""; KL2=""; fi    # the control: the 14z-104 throw-KO rig, HP alone
 if vs_ctl_is dko-without-last-bar; then DL=""; fi            # the control: the 14z-104 double-KO rig, HP alone
-KO=";3006:ff8850:0002;3008:ff8852:0002$KL2"
-DK=";3004:ff8450:0001;3005:ff8452:0001;3006:ff8850:0001;3007:ff8852:0001$DL"
+KOBASE=";3006:ff8850:0002;3008:ff8852:0002"                                  # the KO pokes; KL2 adds the last bar
+DKBASE=";3004:ff8450:0001;3005:ff8452:0001;3006:ff8850:0001;3007:ff8852:0001"   # the trade's; DL adds both last bars
+KO="$KOBASE$KL2"
+DK="$DKBASE$DL"
 MT=";2860:ff8509:03;2880:ff8509:03"
 # family 1: throw-KO, both directions
 leg tko_ctl 01 03 "$W/throw.rpl" "$KO"
@@ -191,6 +193,9 @@ leg dko_ctl 01 01 "$W/dko.rpl" "$DK"
 leg dko_don 13 13 "$W/dko.rpl" "$DK"
 leg dko_hui 10 10 "$W/dko.rpl" "$DK"
 leg dko_pyr 11 11 "$W/dko.rpl" "$DK"
+# the two last-bar controls' legs, in-gate (14z-216): the base pokes alone, as the modes leave them
+leg kctl_nolast 01 03 "$W/throw.rpl" "$KOBASE"
+leg dctl_nolast 01 01 "$W/dko.rpl" "$DKBASE"
 # family 3: frame-1 EX
 leg f1_ctl 01 03 "$W/frame1.rpl" "$MT"
 leg f1_don 13 03 "$W/frame1.rpl" "$MT"
@@ -323,6 +328,20 @@ for leg, want in F1.items():
                     f"acted={acted})")
     else:
         print(f"  ok: {leg} — frame-1 behavior held ({'EX fired' if fired else 'action, no stock'})")
+# THE LAST-BAR CONTROLS, IN-GATE (14z-216, the M24 freeze: declared at 14z-215 but fired only as CONTROL= modes, so a
+# plain run printed neither and the runner read both NOT FIRED): one leg each with the SAME base pokes as the KO legs and
+# NO last-bar pokes (the 14z-104 rig, HP alone) must fail last_bar(); a leg with no KO is DEAD, never caught.
+for ctl, leg, vic in (("ko-without-last-bar", "kctl_nolast", ["2"]), ("dko-without-last-bar", "dctl_nolast", ["1", "2"])):
+    rows = load(leg)
+    if not rows:
+        print(f"CONTROL DEAD: {ctl} — the control leg {leg} produced no samples"); errs.append(f"{ctl} dead"); continue
+    adv = [fr for fr in sorted(rows) if rows[fr]["rounds"] >= 1]
+    e = last_bar(rows, adv[0] if adv else max(rows), vic)
+    if e and "never went negative" not in e:
+        print(f"CONTROL FIRED: {ctl} — with HP alone ({leg}) the last-bar check fails: {e[:150]}")
+    else:
+        print(f"CONTROL DEAD: {ctl} — the HP-only leg {leg} {'passed the last-bar check' if not e else 'had no KO'}")
+        errs.append(f"{ctl} dead")
 for e in errs:
     print("FAIL:", e)
 sys.exit(1 if errs else 0)

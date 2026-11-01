@@ -47,6 +47,11 @@
 #                          specific: vs2 0x05A650, 0x065FE2, 0x066020);
 #   donovan-victim         the naming victim rig (P2 Donovan poked over Victor's
 #                          cell): no reader fires;
+#   donovan-pod-hit        the #127 pod rigs of tests/audit_don_row0b.sh (14z-216),
+#   donovan-pod-nohit      with its own pokes: Donovan poked over Demitri's cell on
+#                          native vs2 (P1 13, P2 01 over Victor), DF forced at
+#                          2800/2900 — the rows these legs freeze are what lets
+#                          that gate's native legs stay (poked_legs_accepted.tsv);
 #   pyron-over-demitri     Pyron poked: no reader fires — Pyron's code never
 #                          consults the flavor (the census has no reader of his);
 #   ours-phobos            the WIDE build, Phobos poked over Bulleta's cell (R,R
@@ -58,17 +63,17 @@
 # (0x007254 / vsavj 0x008A86) are the pre-match readers and are excluded by the
 # frame floor.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [LEGS="..."] [FREEZE=1] [JOBS=N] tests/audit_latch_reads.sh
-#   emulator tier, MAME; ~2 min for the seven legs (two tap runs each).
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [LEGS="..."] [FREEZE=1] [JOBS=N] tests/audit_latch_reads.sh
+#   emulator tier, MAME; ~3 min for the nine legs (two tap runs each).
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged31}"
+BUILD="${BUILD:-build/m3b_merged32}"
 EXPECT="$REPO/tests/expected/latch_reads.tsv"
 CONTROL="${CONTROL:-}"
-LEGS="${LEGS:-phobos-real phobos-over-donovan phobos-over-demitri donovan-over-demitri donovan-victim pyron-over-demitri ours-phobos}"
+LEGS="${LEGS:-phobos-real phobos-over-donovan phobos-over-demitri donovan-over-demitri donovan-victim donovan-pod-hit donovan-pod-nohit pyron-over-demitri ours-phobos}"
 FLOOR=2000      # in play: after the confirm (1300), the pokes (1500) and the load
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
@@ -100,6 +105,8 @@ leg() {
         phobos-over-demitri)  echo "vsav2 $R/hui/80_hui_grab_2p.rpl $(pk 10 03) 6300 -" ;;
         donovan-over-demitri) echo "vsav2 $R/df/97_df_mech.rpl $(pk 13 03);3100:ff8509:03;3120:ff8509:03 7050 -" ;;
         donovan-victim)       echo "vsav2 $R/naming/donovan_victim_1.rpl $(rig_pokes "$R/naming/donovan_victim_1.json") 6300 -" ;;
+        donovan-pod-hit)      echo "vsav2 $REPO/tests/replays/don/127_pod_hit.rpl $(pk 13 01);2800:ff8509:03;2900:ff8509:03;2000-3199:ff8116:06;2363-3199:ff80d4:0000 3200 -" ;;
+        donovan-pod-nohit)    echo "vsav2 $REPO/tests/replays/don/127_pod_nohit.rpl $(pk 13 01);2800:ff8509:03;2900:ff8509:03;2000-3199:ff8116:06;2363-3199:ff80d4:0000 3200 -" ;;
         pyron-over-demitri)   echo "vsav2 $R/pyron/76_pyron_blink_vs2.rpl $(pk 11 03) 6300 -" ;;
         ours-phobos)          echo "vsavjw $R/hui/90_hui_oracle.rpl $(pk 10 03);2360:ff80d4:42;2360:ff80d5:42;2500:ff8509:09 5000 $REPO/$BUILD/rompath" ;;
         *) echo "FAIL: unknown leg $1" >&2; exit 1 ;;

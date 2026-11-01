@@ -214,6 +214,12 @@ test_poked_legs
 test_same_data_p2
 test_df_field_readers
 test_reaction_classes
+# test_dead_span — the six bytes #294's per-frame palette jump goes on are dead in pristine vsavj (14z-216);
+# ROMDIR or a warm decrypt cache, no build dir, no emulator.
+test_dead_span
+# test_perframe_hook — #294's per-frame palette port on the built image is vs2's routine re-pointed, nothing else (14z-216);
+# ROMDIR or a warm decrypt cache, the merged and Donovan solo build dirs, no emulator.
+test_perframe_hook
 # test_anim_signed_offsets — tools/anim_nodes.py reads the anim index tables' offsets SIGNED (#318);
 # ROMDIR or a warm decrypt cache, no build dir, no emulator.
 test_anim_signed_offsets

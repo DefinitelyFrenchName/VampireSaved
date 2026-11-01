@@ -22,12 +22,12 @@
 # SHEET: legs vs2,ours — moments: per tenant, each read of the landing-sound site (the k-th on each leg, at its own frame), each picture EVENT-PROVEN on that leg's own read-tap log in a window around the read; and the first landing by ear, each leg's own -wavwrite capture as a playable clip (the ruled clips, 2026-10-17) — not comparable: each game's stage and palette, and P2's art (each game's own copy; [VSP-168]); the site's address (ours 0x00395E, vs2 0x003994); the clip is the gate's own run to the landing + 120 frames, judged by ear against native's
 # SHEET-BUILD: CTL_BUILD freeze/merged-m22 MERGED — the control leg (must-fire pre-swap-build) runs the build BEFORE #223's swap, which a clean checkout of the commit cannot make (#291 S4-A, the maintainer's Q5)
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [CTL_BUILD=build/m3b_merged30] [KEEP=<dir>] tests/audit_landing_sound.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [CTL_BUILD=build/m3b_merged30] [KEEP=<dir>] tests/audit_landing_sound.sh
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 : "${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged31}"
+BUILD="${BUILD:-build/m3b_merged32}"
 CTL_BUILD="${CTL_BUILD:-build/m3b_merged30}"   # the build BEFORE #223's swap: the control (merged-m22; NOT a current-build default — a re-point sweep must leave it, 14z-192)
 # CTL_BUILD may be absolute: tools/proof_sheets.py passes the control build it made from freeze/merged-m22 in a second
 # clean checkout (#291 S4-A, 14z-206). A relative one is the repository's, as before.

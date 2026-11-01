@@ -46,7 +46,7 @@
 #
 # Emulator tier (MAME, ~3 min: five native legs in parallel). ROM-free parts
 # (1, 2) run first and alone when NOLIVE=1.
-# Usage: ROMDIR=... [MAME_BIN=...] [DON=build/don_m27 PYR=build/pyron46 HUI=build/hui61] [NOLIVE=1] [FREEZE=1] tests/test_projectile_params.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [DON=build/don_m28 PYR=build/pyron47 HUI=build/hui62] [NOLIVE=1] [FREEZE=1] tests/test_projectile_params.sh
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -63,7 +63,7 @@
 #   the rigs, or a projectile handler region
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
-DON="${DON:-build/don_m27}"; PYR="${PYR:-build/pyron46}"; HUI="${HUI:-build/hui61}"
+DON="${DON:-build/don_m28}"; PYR="${PYR:-build/pyron47}"; HUI="${HUI:-build/hui62}"
 W="$(mktemp -d "${TMPDIR:-/tmp}/projparams.XXXXXX")" || { echo "FAIL: test_projectile_params — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 EXP="tests/expected/projectile_params.txt"

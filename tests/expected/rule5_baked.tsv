@@ -2,11 +2,11 @@
 # columns, frozen so it can only SHRINK. `fact` is deliberately
 # NOT frozen (see FROZEN_COLUMNS in tools/audit_rule5.py) and is
 # reported as a NOTE instead; at this freeze it stood at
-# 7973 baked / 541 derived of 8514.
+# 8006 baked / 541 derived of 8547.
 # Produced by `python3 tools/audit_rule5.py --freeze
 # tests/expected/rule5_baked.tsv`. Provenance: static (the tree
 # itself). Columns: column file kind key value class note.
-# growth allowed: 14z-192 the M23 freeze: #222's air_dash_mask_hi and air_dash_height_row (huitzil.toml) and #223's landing_bigbody_mask_hi_a/_b (donovan.toml and huitzil.toml) carry only_variant_slot = true (6 instances, 215 -> 221); NOT migrated, a build gate, not a value a player feels; rule-checker run 2026-10-05-698
+# growth allowed: 14z-216 (M) and #294: (M)'s palette_reload_mask_hi [[code_word]] (#127/#162) and #294's [perframe_hook] (donovan.toml) each carry only_variant_slot = true (2 rows, 251 -> 253; both ruled 2026-11-01); NOT migrated, build gates, not values a player feels; the rule-checker runs that clear (M)'s and #294's builds (14z-216)
 code	tools/build_gfx_donovan.py	(module)	DELTA	0x2750	BAKED	
 code	tools/build_gfx_donovan.py	(module)	DST_BANK	2	BAKED	
 code	tools/build_gfx_donovan.py	(module)	SRC_BANK	3	BAKED	
@@ -65,6 +65,7 @@ gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED
 gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
+gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	data_port	only_base_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	data_port	only_base_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	data_port	only_base_slot	true	BAKED	
@@ -96,6 +97,7 @@ gameplay	build/manifest/donovan.toml	data_port	only_variant_slot	true	BAKED
 gameplay	build/manifest/donovan.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	data_port	only_variant_slot	true	BAKED	
+gameplay	build/manifest/donovan.toml	perframe_hook	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	port	dst_slot	0x0F	BAKED	
 gameplay	build/manifest/donovan.toml	port	mirror_variant	true	BAKED	
 gameplay	build/manifest/donovan.toml	select_wheel	layout	"build/manifest/wheel_layout_proposed.json"	BAKED	

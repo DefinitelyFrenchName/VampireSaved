@@ -98,7 +98,7 @@ build drives inputs through the 0001 harness instead), so record on MAME.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged31 fbneo # THE 3-TENANT BUILD (all 18
+tools/run_wide.sh build/m3b_merged32 fbneo # THE 3-TENANT BUILD (all 18
                                            # (14z-97: the build argument is
                                            # now REQUIRED. It used to default
                                            # to build/m5w — the known-bad
@@ -108,7 +108,7 @@ tools/run_wide.sh build/m3b_merged31 fbneo # THE 3-TENANT BUILD (all 18
                                            # newest first; m5w and merged1 are
                                            # refused by name.)
                                            # selectable, art included) =
-                                           # merged-m23, FROZEN 14z-192 (the
+                                           # merged-m24, FROZEN 14z-216 (the
                                            # current freeze: "Current WIDE
                                            # builds" below says what it
                                            # carries and names its
@@ -119,7 +119,7 @@ tools/run_wide.sh build/m3b_merged31 fbneo # THE 3-TENANT BUILD (all 18
                                            # naked-eye tell, and the first
                                            # thing on screen;
                                            # (1) the select screen shows
-                                           # "M23" bottom-right — THE NAKED-
+                                           # "M24" bottom-right — THE NAKED-
                                            # EYE A/B TELL (CLAUDE.md §5,
                                            # finally implemented; since the
                                            # 14z-132 ruling the text is the
@@ -132,34 +132,35 @@ tools/run_wide.sh build/m3b_merged31 fbneo # THE 3-TENANT BUILD (all 18
                                            # "Bishamon" — aliased rows).
                                            # Works for P1 and P2. Without
                                            # Start it is plain Bishamon.
-tools/run_wide.sh build/don_m27 fbneo      # or the solo builds (hui61,
-                                           # pyron46); ... mame
+tools/run_wide.sh build/don_m28 fbneo      # or the solo builds (hui62,
+                                           # pyron47); ... mame
                                            # (registry rows name the CURRENT
-                                           # fingerprints — donovan-m27/
-                                           # huitzil-m34/pyron-m28 since the
-                                           # 14z-192 M23 freeze)
+                                           # fingerprints — donovan-m28/
+                                           # huitzil-m35/pyron-m29 since the
+                                           # 14z-216 M24 freeze)
 ```
 
 *(Moved 2026-10-14, #282 item B: Running a CPS-2 WIDE build — the Oboro path → `docs/project/operations.md`.)*
 
-**Current WIDE builds — THE 14z-192 M23 FREEZE: #222 (PHOBOS'S AIR-DASH MINIMUM HEIGHT)
-AND #223 (THE TENANTS' LANDING SOUND) (mark M23, the merged build number per the 14z-132
-option-A ruling): donovan-m27 / huitzil-m34 / pyron-m28 / merged-m23.**
-`build/don_m27`, `build/hui61`, `build/pyron46`, `build/m3b_merged31`, stock
-twin `build/m5_stock22` — the stock twin UNCHANGED (`a3910ded`, donovan-m25-stock
-carries: every M23 row is `only_variant_slot`); the stage-4 image UNCHANGED too
+**Current WIDE builds — THE 14z-216 M24 FREEZE: (M) (#127/#162, DONOVAN'S PALETTE-RELOAD MASK)
+AND #294 (DONOVAN'S PER-FRAME PALETTE ROUTINE) (mark M24, the merged build number per the 14z-132
+option-A ruling): donovan-m28 / huitzil-m35 / pyron-m29 / merged-m24.**
+`build/don_m28`, `build/hui62`, `build/pyron47`, `build/m3b_merged32`, stock
+twin `build/m5_stock23` — the stock twin UNCHANGED (`a3910ded`, donovan-m25-stock
+carries: every M24 row is `only_variant_slot`); the stage-4 image UNCHANGED too
 (`2fa7c2f1`, `donovan-m23-stage4` carries).
-**WHAT TO LOOK AT FIRST ON THIS ONE:** the wheel reads **M23**. Phobos's air dash (j.66)
-now refuses a dash input below vs2's minimum height of 24 px, as on vs2 (an input at height
-21 used to dash; `tests/audit_air_dash_height.sh` holds `--expect same` against native vs2
-on eight events), and the landing sound after a jump is swapped to vs2's: Phobos lands with
-the big-body sound and Donovan with the ordinary one (`tests/audit_landing_sound.sh`, the
-landing window against native vs2, both tenants). #222 is two rows — the caller mask bit
-0x10 at `0x022AF4` and Phobos's height row at `0x0BE25A`; #223 is the big-body mask's high
-word at its two reads `0x003960`/`0x003B38` — patch_notes 14z-192. Program fingerprints:
-donovan `fd840d67` -> `167d870f`, huitzil `f1fb0e45` -> `cc9c4b68`, pyron UNCHANGED
-`9d135e7b` (the mark only), merged `110467a7` -> `6148d0b1`; rows whole-set keyed. The
-previous freeze's paragraph follows.
+**WHAT TO LOOK AT FIRST ON THIS ONE:** the wheel reads **M24**. Donovan's palette is vs2's in two
+places: the palette reload takes vs2's mask word, so the pod/column flash no longer shows (#127,
+#162; `tests/audit_don_row0b.sh`, `tests/audit_column_flash.sh`, `tests/audit_column_flash_cause.sh`
+against native vs2), and vs2's per-frame palette routine runs for him, so his sword turns yellow
+while electrocuted and brown after (#294; `tests/audit_don_row0c.sh` against native vs2,
+`tests/test_perframe_hook.sh` on the image). (M) is one word at `0x02ADB4`; #294 is vs2's routine
+`0x02A316` placed in the wide extension with its records, reached through the per-frame table
+`0x02ADEC`'s row `0x13` and a jump on six dead bytes at `0x024024` (`tests/test_dead_span.sh`) —
+patch_notes 14z-216. Inside Dark Force vs2 still draws Donovan in other colours than ours (#344,
+open, cosmetic). Program fingerprints: donovan `167d870f` -> `5ebd4fea`, huitzil UNCHANGED
+`cc9c4b68`, pyron UNCHANGED `9d135e7b` (the mark only), merged `6148d0b1` -> `0e6f423b`; rows
+whole-set keyed. The previous freeze's paragraph is in `HANDOFF_HISTORY.md`.
 
 *(Moved 2026-10-14, #282 item B: Running a CPS-2 WIDE build — the previous freezes and the registry cut → `HANDOFF_HISTORY.md`.)*
 
@@ -414,7 +415,7 @@ well as the old build names. The gotcha is
 
 | build (mark) | fingerprint(s) | dir · tag | what changed | detail |
 |---|---|---|---|---|
-| THE 14z-192 M23 FREEZE — #222 (PHOBOS'S AIR-DASH MINIMUM HEIGHT) AND #223 (THE TENANTS' LANDING SOUND) | donovan-m27 whole-set `a4c70276` (`build/don_m27`), huitzil-m34 `51ee6a00` (`build/hui61`), pyron-m28 `6e782cc8` (`build/pyron46`), merged-m23 `f601342d` (`build/m3b_merged31`). **Program fingerprints:** donovan `fd840d67` -> `167d870f`, huitzil `f1fb0e45` -> `cc9c4b68`, pyron UNCHANGED `9d135e7b`, merged `110467a7` -> `6148d0b1`; rows whole-set keyed. Stock twin **UNCHANGED** `a3910ded` (`donovan-m25-stock` carries, `build/m5_stock22`: every M23 row `only_variant_slot`); stage-4 target **UNCHANGED** at `2fa7c2f1` (`donovan-m23-stage4` carries). All six program fingerprints and all four expectation sets reproduced byte-for-byte on ERIS | tags `freeze/donovan-m27`, `freeze/huitzil-m34`, `freeze/pyron-m28`, `freeze/merged-m23` | **#222 and #223, ruled 14z-191 (2026-10-05); the small tickets #214, #227, #210, #211, #213 ride in the same freeze at the maintainer's request** — #222: Phobos's air dash takes vs2's minimum height, the caller mask bit 0x10 at `0x022AF4` and his height row 0x10 = 24 at `0x0BE25A`; #223: the landing site's big-body mask high word 0448 -> 0441 at `0x003960`/`0x003B38` (Phobos lands big, Donovan ordinary, as on vs2); donovan +2 ops, huitzil +4, merged 844 -> 848 | patch_notes 14z-192; STATE 14z-192; battery reds attributed and re-frozen under rule-checker runs 2026-10-05-684..690 (690 OK) |
+| THE 14z-216 M24 FREEZE — (M) (#127/#162: DONOVAN'S PALETTE-RELOAD MASK) AND #294 (DONOVAN'S PER-FRAME PALETTE ROUTINE) | donovan-m28 whole-set `3beb0d2c` (`build/don_m28`), huitzil-m35 `1fb00f39` (`build/hui62`), pyron-m29 `c7f6a2cf` (`build/pyron47`), merged-m24 `43505a12` (`build/m3b_merged32`). **Program fingerprints:** donovan `167d870f` -> `5ebd4fea`, huitzil UNCHANGED `cc9c4b68`, pyron UNCHANGED `9d135e7b`, merged `6148d0b1` -> `0e6f423b`; rows whole-set keyed. Stock twin **UNCHANGED** `a3910ded` (`donovan-m25-stock` carries, `build/m5_stock23`: every M24 row `only_variant_slot`); stage-4 target **UNCHANGED** at `2fa7c2f1` (`donovan-m23-stage4` carries). All six builds reproduced on ERIS (program, set key and whole-artifact manifest) | tags `freeze/donovan-m28`, `freeze/huitzil-m35`, `freeze/pyron-m29`, `freeze/merged-m24` | **(M) and #294, ruled 2026-11-01 (14z-216)** — (M): the palette-reload mask's high word at `0x02ADB4` ef92 -> ef9a (vs2's bit 0x13); #294: vs2's per-frame palette routine `0x02A316` (+0x160) placed with its records (sequence ids 0x2D4-0x341, 0xDC0 bytes), the table `0x02ADEC` row `0x13` -> the dead span `0x024024` -> `jmp` the body: donovan +5 ops (353 -> 358), merged 848 -> 853, every other changed op a relocated pointer into placed space (`build/agent216/m24/`) | patch_notes 14z-216; STATE 14z-216 |
 *(Moved 2026-10-14, #282 item B: Build registry — the rows before the current freeze → `HANDOFF_HISTORY.md`.)*
 
 ## The port pipeline — its tools, and the guarded-replay debug environment (M2a, 2026-07-25)

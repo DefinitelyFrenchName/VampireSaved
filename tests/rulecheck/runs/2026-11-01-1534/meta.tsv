@@ -1,0 +1,11 @@
+decision	build
+subject	#127/#162 (M): add the palette_reload_mask_hi code_word, re-freeze test_tenant_loop and rule 5's inventory, build the merged set
+session	14z-216
+model	rule-checker@163e4ce9cf7b
+claim	CLAIM: implement the maintainer's green light for (M) (m_ruling.txt: '1. Yes, (M) at the next freeze, closing both (recommended) -> agreed') in four steps: (1) the [[code_word]] row palette_reload_mask_hi in build/manifest/donovan.toml, addr 0x02ADB4, old_hex ef92, new_hex ef9a, only_variant_slot = true, beside and in the form of M23's landing_bigbody_mask_hi rows (m_manifest.diff; Donovan alone, because bits 0x10 and 0x11 of the two masks already agree with vs2, per the row's comment and engine_internals_1760_1790.txt); (2) tests/test_tenant_loop.sh re-frozen donovan 353 -> 354, 2 tenants 635 -> 636 (sum 696 -> 697), 3 tenants 848 -> 849 (sum 970 -> 971) (m_tenant_loop.diff), the gate's own measurement before the edit showing exactly those three FAILs and huitzil 381 / pyron 317 unchanged (tenant_loop_before.log) and PASS after (tenant_loop_after.log) — tools/build_merged.sh reads its fixture from that gate and refused the build at 849 vs 848; (3) tests/expected/rule5_baked.tsv re-frozen with tools/audit_rule5.py --freeze --allow-growth giving the reason (one more only_variant_slot instance, 221 -> 222, a build gate not a value a player feels, NOT migrated, this run's id) and a docs/project/tables/rule5_ledger.md row in the form of 14z-192's (m_rule5_m23_line.txt, m_rule5_ledger_prec.txt) — test_rule5_census today reports exactly that one new baked value (m_rule5_now.txt, rule5.log); (4) then tools/build_merged.sh builds the merged set to a scratch outbase. NOT TESTED: the build itself has not run (it refused at step 2's fixture); that the built image carries ef9a at 0x02ADB4 and nothing else changed is to be checked on the built verify_op.bin against m3b_merged31's after the build, as are the (M) gates the ruling names (none exists yet) and the legacy MAME oracle at the freeze; the rule-5 re-freeze and ledger row are not written yet; test_rule5_census's other checks after the re-freeze are not run; FBNeo and MiSTer builds are not part of this step.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	0 flag(s)
+action	2026-11-01-1534

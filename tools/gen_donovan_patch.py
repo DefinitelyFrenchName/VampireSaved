@@ -4245,6 +4245,134 @@ def main():
                 fragments.append((mt, 50, "GEN", "state_hook thunk"))
                 fragments.append((site, 6, "GEN", "state_hook engine site"))
 
+        ph = singleton("perframe_hook") if args.stage >= _int((port.get("perframe_hook") or {}).get("stage", 6)) else None
+        if ph and not row_applies(ph, owner_of(ph)):
+            notes.append("# perframe_hook: SKIPPED (variant-id-only; the per-frame table row is the tenant's "
+                         "variant id)")
+            ph = None
+        if ph:
+            # #294 (14z-216; the maintainer, 2026-11-01: "Yes" to A after the dead-byte search, DECISIONS_HISTORY.md):
+            # vsavj's per-frame palette table (PRG:0x02ADEC, indexed by the whole id byte +0x382) holds the default
+            # no-op at the tenant's row, so nothing rewrites his weapon row when his palette state changes. Port vs2's
+            # own per-frame routine for him:
+            #   1. the routine's bytes are read from the SOURCE set's opcode view at build time (never stored in the
+            #      tree, rule 7) and its external branches re-pointed to stubs appended to the body: vs2's `rts`
+            #      -> a local rts; vs2's block-row re-upload -> `jmp` its vsavj twin; vs2's palette-SEQUENCE upload ->
+            #      a PRIVATE seq entry (subtract the first ported id, load the ported records' address, enter vsavj's
+            #      seq-set after its own movea) — the state_hook's design: vanilla's seq table is never read for
+            #      these ids, vsavj has its own live records there;
+            #   2. the two byte tables the routine reads through `lea (d16,PC)` are copied from the source DATA view
+            #      (a read through a register is a data read on CPS-2) and appended, the lea displacements re-pointed;
+            #   3. vs2's palette-sequence records for the ported id range -> hole B (raw), checked against the
+            #      sibling twin;
+            #   4. the body -> hole B (raw: the opcode and data views are the same bytes, so the inline PC-indexed
+            #      tables and the appended lea tables read the same either way);
+            #   5. the six proven-dead bytes PRG:0x024024 (tests/test_dead_span.sh) -> `jmp body`, and the table's
+            #      row -> the dead span (a 16-bit word reaches only +-32K of the table).
+            # Completeness of the fixup list (every external reference of the routine re-pointed) and the body's
+            # equality with the source modulo those fixups: tools/audit_perframe_hook.py (capstone) on the built image,
+            # made a static gate once a built image carries the port.
+            src_opc = (root / f"build/out/{man['src_set']}_opcodes.bin").read_bytes()
+            src_dat = (root / f"build/out/{man['src_set']}_data.bin").read_bytes()
+            vj_opc = (root / "build/out/vsavj_opcodes.bin").read_bytes()
+            if man["src_set"] != ph.get("src_set", "vsav2"):
+                fail.append(f"perframe_hook: src_set {man['src_set']!r} != {ph.get('src_set')!r}")
+            tbl, row = _int(ph["table"]), _int(ph["row"])
+            tid = _int(owner_of(ph)["dst_slot"]) & 0xFF
+            if tid != row:
+                fail.append(f"perframe_hook: row {row:#x} is not the tenant's runtime id {tid:#x}")
+            rsite = tbl + 2 * row
+            if int.from_bytes(vj_opc[rsite:rsite + 2], "big") != _int(ph["row_old"]):
+                fail.append(f"perframe_hook: vsavj's row {row:#x} word at {rsite:#x} is not {_int(ph['row_old']):#06x}")
+            s0, slen = _int(ph["src_routine"]), _int(ph["src_len"])
+            stb = _int(ph["src_table"])
+            w = int.from_bytes(src_opc[stb + 2 * row:stb + 2 * row + 2], "big")
+            if stb + (w - 0x10000 if w & 0x8000 else w) != s0:
+                fail.append(f"perframe_hook: the source table {stb:#x} row {row:#x} does not point at {s0:#x}")
+            body = bytearray(src_opc[s0:s0 + slen])
+            fix = {}
+            for kind in ("rts", "blk", "seq"):
+                for x in str(ph.get(f"fix_{kind}", "")).split(","):
+                    if x.strip():
+                        fix[_int(x)] = kind
+            lea_fix = {}
+            for kv in str(ph.get("fix_lea", "")).split(","):
+                if kv.strip():
+                    a_, _, t_ = kv.partition("=")
+                    lea_fix[_int(a_)] = _int(t_)
+            src_tgt = {"rts": _int(ph["src_rts"]), "blk": _int(ph["src_blk"]), "seq": _int(ph["src_seq"])}
+            # the appended tail: rts | jmp blk twin | private seq entry | lea tables
+            o_rts = slen
+            o_blk = o_rts + 2
+            o_seq = o_blk + 6
+            o_tab = o_seq + 16
+            lt0, ltlen = (_int(x) for x in ph["lea_tables"].split(":"))
+            total = o_tab + ltlen
+            pdst = alloc("b", total, "perframe_hook body")
+            seq_first, seq_n = _int(ph["seq_first"]), _int(ph["seq_count"])
+            rlen = 32 * seq_n
+            rsrc = _int(ph["seq_src_base"]) + 32 * seq_first
+            recs = src_dat[rsrc:rsrc + rlen]
+            # the sibling-twin check is REQUIRED (rule-checker run 2026-11-01-1539 Q4): a missing oracle view or key is a
+            # build failure, never a silent skip
+            orc_p = root / f"build/out/{man['oracle_set']}_data.bin"
+            if "seq_orc_base" not in ph or not orc_p.is_file():
+                fail.append(f"perframe_hook: the sibling-twin check cannot run (seq_orc_base "
+                            f"{'set' if 'seq_orc_base' in ph else 'missing'}, {orc_p} "
+                            f"{'present' if orc_p.is_file() else 'missing'})")
+            else:
+                otw = _int(ph["seq_orc_base"]) + 32 * seq_first
+                if orc_p.read_bytes()[otw:otw + rlen] != recs:
+                    fail.append("perframe_hook: the ported seq records differ from the sibling twin")
+            rdst = alloc("b", rlen, "perframe_hook seq records")
+            if None not in (pdst, rdst):
+                for pc, kind in sorted(fix.items()):
+                    o = pc - s0
+                    opw = int.from_bytes(body[o:o + 2], "big")
+                    disp = int.from_bytes(body[o + 2:o + 4], "big")
+                    disp = disp - 0x10000 if disp & 0x8000 else disp
+                    if not (0 <= o < slen - 3) or (opw & 0xF0FF) != 0x6000 or pc + 2 + disp != src_tgt[kind]:
+                        fail.append(f"perframe_hook: fixup {pc:#x} is not a Bcc.w/BRA.w to {src_tgt[kind]:#x}")
+                        continue
+                    tgt_o = {"rts": o_rts, "blk": o_blk, "seq": o_seq}[kind]
+                    body[o + 2:o + 4] = ((tgt_o - (o + 2)) & 0xFFFF).to_bytes(2, "big")
+                for pc, t in sorted(lea_fix.items()):
+                    o = pc - s0
+                    opw = int.from_bytes(body[o:o + 2], "big")
+                    disp = int.from_bytes(body[o + 2:o + 4], "big")
+                    disp = disp - 0x10000 if disp & 0x8000 else disp
+                    if (opw & 0xF1FF) != 0x41FA or pc + 2 + disp != t or not (lt0 <= t < lt0 + ltlen):
+                        fail.append(f"perframe_hook: lea fixup {pc:#x} is not lea (d16,PC) to {t:#x} inside the tables")
+                        continue
+                    body[o + 2:o + 4] = ((o_tab + (t - lt0) - (o + 2)) & 0xFFFF).to_bytes(2, "big")
+                tail = (b"\x4e\x75"
+                        + b"\x4e\xf9" + _int(ph["blk_twin"]).to_bytes(4, "big")
+                        + b"\x04\x40" + seq_first.to_bytes(2, "big")
+                        + b"\x20\x7c" + rdst.to_bytes(4, "big")
+                        + b"\x4e\xf9" + (_int(ph["seq_set"]) + 6).to_bytes(4, "big")
+                        + src_dat[lt0:lt0 + ltlen])
+                body += tail
+                assert len(body) == total
+                ds = _int(ph["dead_span"])
+                ops.append({"op": "data", "addr": f"{rdst:#x}", "hex": recs.hex()})
+                ops.append({"op": "code", "addr": f"{pdst:#x}", "hex": bytes(body).hex()})
+                ops.append({"op": "code", "addr": f"{ds:#x}",
+                            "hex": (b"\x4e\xf9" + pdst.to_bytes(4, "big")).hex()})
+                ops.append({"op": "code", "addr": f"{rsite:#x}",
+                            "hex": f"{(ds - tbl) & 0xFFFF:04x}"})
+                notes.append(f"data   {rdst:#08x} +{rlen:#x}  perframe_hook seq records (src ids "
+                             f"{seq_first:#x}-{seq_first + seq_n - 1:#x})")
+                notes.append(f"code   {pdst:#08x} +{total:#x}  perframe_hook body (src {s0:#x} +{slen:#x}, "
+                             f"{len(fix)} branch + {len(lea_fix)} lea fixups)")
+                notes.append(f"code   {ds:#08x} perframe_hook dead span -> jmp {pdst:#08x}; table {tbl:#08x} row "
+                             f"{row:#x} -> {ds:#08x}")
+                fragments.append((rdst, rlen, "VS2", "perframe_hook seq records"))
+                fragments.append((pdst, slen, "VS2", "perframe_hook routine"))
+                fragments.append((pdst + slen, total - slen - ltlen, "GEN", "perframe_hook stubs"))
+                fragments.append((pdst + o_tab, ltlen, "VS2", "perframe_hook lea tables"))
+                fragments.append((ds, 6, "GEN", "perframe_hook dead-span jump"))
+                fragments.append((rsite, 2, "GEN", "perframe_hook table row"))
+
         rh = singleton("reaction_hook") if args.stage >= 4 else None
         if rh:
             # Hit-reaction dispatch extension (donovan.toml [reaction_hook];

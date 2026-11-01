@@ -59,6 +59,8 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
+   **THE WORKING TREE CARRIES UNCOMMITTED RECORDS** written after the 14z-215 push: the CLOSE section's last lines and
+   this note. They ride this session's close.
 1. **#310 — THE CRASH-INJECTION SWEEP, FIRST** (the maintainer, 14z-215: **"Next session, first batch (Recommended)"**,
    `DECISIONS_HISTORY.md`). A sweep gate that forces each changed gate's perturbed copies to crash and requires DIED or
    UNJUDGED, never HONOURED: the ~20 other group-5 gates (`vs_ctl_show_err`), every changed control mode outside the six

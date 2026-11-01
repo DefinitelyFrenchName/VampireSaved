@@ -1,0 +1,5 @@
+  FLAG FIGURE: 1020
+  FLAG FIGURE: 1500
+  FLAG FIGURE: 164
+  FLAG QUOTE: every fixed site of the merged byte diff is explained
+packet_check: 4 flag(s): FIGURE 3, QUOTE 1

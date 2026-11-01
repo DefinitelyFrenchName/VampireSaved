@@ -69,7 +69,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-BUILD="${LADDER_BUILD:-build/m3b_merged31}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${LADDER_BUILD:-build/m3b_merged32}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 FRAMES="${LADDER_FRAMES:-40700}"
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
@@ -78,8 +78,12 @@ export MAME_BIN
 
 RPL="$REPO/tests/replays/26_don_arcade_mash.rpl"
 PICK="1704:ff8782:13;1760:ff8782:13;1900:ff8782:13;2100:ff8782:13;2400:ff8782:13"
-# saturate the mask across the whole pre-selection window of match 2
-SAT="$(python3 -c "print(';'.join(f'{f}:ff8110:ff;{f}:ff8111:ff;{f}:ff8112:ff;{f}:ff8113:ff' for f in range(7100,7290,10)))")"
+# saturate the mask across the whole pre-selection window of match 2. Frame-pinned to the build's trajectory: the M24
+# freeze (14z-216) moved match 2's first selection 960 frames earlier (control timeline: stage 0x12 at f7860 on
+# merged-m23, f6900 on merged-m24; the same 15 advances and stage set on both), and the old window 7100-7290 then landed
+# after the selection, so saturating changed no stage (build/agent216/m24/ladder_m23.log, ladder_m24.log). Moved by the
+# measured 960 frames, from 7100-7290.
+SAT="$(python3 -c "print(';'.join(f'{f}:ff8110:ff;{f}:ff8111:ff;{f}:ff8112:ff;{f}:ff8113:ff' for f in range(6140,6330,10)))")"
 DF="$(python3 -c "import sys;print(';'.join(f'{f}:ff8100-ff8140' for f in range(2400, int(sys.argv[1]) - 80, 60)))" "$FRAMES")"
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

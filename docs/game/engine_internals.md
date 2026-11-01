@@ -666,6 +666,23 @@ the attacker's `+4` word `0x0202` -> class 5, `+0x117` := 1, on to `0x22582`) th
 two are a difference between the games, as #191's records are (vsavj is the standard); which moves reach them is not
 measured.
 
+**A dead tail between the class-0x20 and class-0x21 handlers (14z-216, GitHub #294; static, `tests/test_dead_span.sh`).**
+Class 0x20's handler (vsavj `0x024002`, row 0x20 of `0x2385C`) sets `+0x140` and `+0x14E`, calls `0x3E3A`, then
+reads its anim index from the byte table `0x28D00` by `+0x54` and leaves by `bra.w 0x27EC0` at `0x024020`. The six bytes
+after it, `0x024024-0x024029`, hold `moveq #$4b,d0 / bra.w 0x27EC0` — the tail a constant-index version of the handler
+would end with — and class 0x21's handler starts at `0x02402A`. Nothing reaches them: no instruction decoded at any
+even address of `0x000000-0x0FFFFF` names one of them, no 32-bit value in either view equals one, no row of the 80-row
+dispatch (or of any table, by the jump-table extent rule) gives one, and they are fenced by reached code (an
+unconditional `bra.w` ends at `0x024024`, `0x02402A` is reached) — `tools/audit_dead_span.py`, whose header states what
+it cannot see (an address formed at run time from no constant). The same idiom occurs six more times in vsavj
+(`0x024888`, `0x0248A2`, `0x024C00`, `0x025592`, `0x025622`, `0x025AF4`), each reached by fall-through from the
+instruction before it; this is the only copy behind an unconditional branch. vsav2 (`0x022C20`, after the same
+handler's `bra.w` at `0x022C1C`) and vhunt2 (`0x022C4E`) carry it in the same place, but the tool does not prove those
+dead (over-approximated references it cannot exclude). Runtime bound, weaker: `tests/audit_dead_span_exec.sh`, 0
+executions over the 64-replay legacy corpus on MAME, where rows 0x20/0x21 are never dispatched either. #294's port puts
+the per-frame palette routine's jump here, within reach of the per-frame table's 16-bit word (`0x022DEC-0x032DEB`);
+other unreached spans in that range (a 14z-216 scratch descent, `build/agent216/rc294/dead/reach.py`, listed fourteen others of six bytes or more after a reached terminator) were not judged.
+
 **The paths, tapped (14z-187b, #195; the victim's `+0x26` countdown, `+0x54` class and `+0x117`, PC-attributed by
 `tests/lua/read_tap.lua`; native vs2 against the staged #194 merged build):** Pyron's Cosmo Disruption and Donovan's
 Ifrit Sword (ES, a2:0x30 — the six class-0x51 records 33-38; P2 pinned 60 px in front of him over 2800-2839 of
@@ -742,9 +759,16 @@ game's default it is not. [M: `tests/audit_tick_cadence.sh` section C;
 their work does not fit, the activation runs into the next frame, the task is not dispatched there
 (the scheduler's state-8 write at `PRG:0x001204/0x001218` skips its slot), and `RAM:$FF8081` does not
 step: a ZERO-PASS frame. In the #136 corpus (30 parts, both games, level 6) it happens on three
-Blizzard Sword frames only — twice on native vsav2 (donovan_2 at 3098, donovan_11 at 4580), once on
-ours (donovan_10 at 2977) — and after it the rest of the part stays one engine pass out of step with
-its (per-frame) inputs. It is not a port cost: the scheduler's idle spin (slot 15, dispatched between
+Blizzard Sword frames only — twice on native vsav2 (donovan_2 at 3098, donovan_11 at 4580), ~~once on
+ours (donovan_10 at 2977)~~ once on ours until M23 (donovan_10 at 2977); SINCE M24 (14z-216, #294 runs vs2's per-frame
+palette routine for Donovan) once on ours at donovan_2 3094 and none on donovan_10, as native — accepted 2026-11-01
+("#294's lag frame"); donovan_11's 4580 stays native-only — and after it the rest of the part stays one engine pass out
+of step with its (per-frame) inputs (on M24, under the parity gates' 0000 RNG pin, 32 of donovan_2's and donovan_10's events read IDENT with native again; donovan_2's
+23 still DIFF under a non-zero RNG word, the overrun falling differently — #345, `tests/audit_rng_forms.sh`). ON SCREEN (#345,
+the maintainer's reading of the every-frame comparative sheets of Blizzard Sword [HP]'s end, `build/agent216/s345/e2_d2_f3109.png`,
+local; their comment on the issue, 2026-11-01): *"on our build the projectile is a few pixels behind, especially visible at frame
+3113. However it seems to catch up later. The diff is real and visually confirmed. It is also likely real in terms of hitboxes
+although that has yet to be proven"* — the projectile's hitbox difference is NOT measured. It is not a port cost: the scheduler's idle spin (slot 15, dispatched between
 passes until the frame flag) averages the same per event window on both builds (ratio 1.00-1.01);
 WHICH frame overruns is decided by where the work falls inside a frame. [M:
 `tests/audit_pass_overrun.sh`; attribution `tests/audit_move_parity_attribution.sh`, class SLOWDOWN]
@@ -1433,6 +1457,15 @@ in its handler (above); the type's handler is `pool_table[type]` through
 the walker's LONG table ([VSE-18]), and the projectile hit-class map of
 "The projectile-pool HIT-CLASS map" is indexed by these same types.
 
+### Blizzard Sword's snowflake: ours draws an ice streak behind it that native vs2 does not (seen 14z-216, #346)
+
+On the #345 comparative sheets (native vs2 above merged-m24, the same frames, `tools/naming_pair_sheet.sh` on the move-parity
+rig) our snowflake drags a long blue ice streak and native's does not: donovan_2's Blizzard Sword [HP] about f3097-3102, and
+every frame of donovan_11's Blizzard Sword [LP] blocked from f4574 into the shatter (about f4587). The maintainer read it
+so (*"indeed there is a blue ice streak"*). What draws it is NOT measured — an effect object, a frame of the snowflake's own
+animation, a palette or a priority difference — nor whether merged-m23 shows it. Fighter-state parity cannot see it (it
+compares the fighter, not effect objects). [M: the captures, `build/agent216/s345/` (local); no gate]
+
 ### Every `$FF9400` type's parameters, decoded and measured (14z-121)
 
 `tools/projectile_params.py` decodes the init block of a type handler
@@ -1752,9 +1785,15 @@ not the match-start palette load. **Read this before attributing any
   all three dispatcher tables — `PRG:0x02A8A4` (in-match), `PRG:0x02B650`
   (select) and `PRG:0x073790` (route map) — on our build AND on pristine
   vsavj** —
-  while vs2's in-match twin table **`PRG:0x02A142`** (located by the
-  dispatcher's own byte sequence, the twin of vsavj's `0x02A8A4`) gives id
-  `0x13` a real routine, displacement **`0x01D4`**. `build/manifest/pyron.toml`
+  while vs2's ~~in-match twin table **`PRG:0x02A142`** (located by the
+  dispatcher's own byte sequence, the twin of vsavj's `0x02A8A4`)~~ **per-frame
+  table `PRG:0x02A142` — CORRECTED 14z-216 (#294): its dispatcher `PRG:0x02A132`
+  (`moveq #0,d1 / move.b $382(a6),d1 / add.w d1,d1 / move.w (tbl,pc,d1.w),d1 /
+  jmp (tbl,pc,d1.w)`) is the shape twin of vsavj's PER-FRAME dispatcher
+  `PRG:0x02ADDC`, so `0x02A142` twins vsavj's `PRG:0x02ADEC`, not the state-0
+  routine table `0x02A8A4`; vsavj's `0x02ADEC` also keeps row `0x13` at the default
+  `0x0040`** — gives id `0x13` a real routine, displacement **`0x01D4`** (vs2
+  `0x2A316`, ported by #294's `[perframe_hook]`). `build/manifest/pyron.toml`
   recorded this at 14z-75 as "a missing feature, not a spurious one".
   ~~NOT ESTABLISHED: which path sets `a0` to the sprite block at f2807/f2859.~~
   **ANSWERED 14z-189 (#162; `tests/audit_column_flash_cause.sh`, measured on MAME on
@@ -5044,6 +5083,17 @@ pal-06 tiles, intersection 441, ours-only 0, native-only 0, zero blank. The
 residual "ours-only / native-only contents" of 14z-70e was the 5-6 frame leg
 phase lag (the seq-D thunk's cycle cost), and the "fuchsia" of the original
 report (ping #7) is pal-06's correct orange -> magenta fade. CLOSED.
+
+
+**Donovan's colours inside Dark Force differ from vs2's (14z-216, GitHub #344; cause OPEN).** On the naming parts that use
+Dark Force (`donovan_3`, `_4`, `_6`, `_7`), P1's palette rows 0x0A and 0x0C differ from native vs2 on about 378 frames
+each, all inside native's Dark Force window (P1 `+0x1C3`, the Power field, set: 2900-3287 on `donovan_6`, where ours
+never sets it) — on merged-m23 (without #294) and merged-m24 (with it) alike (`tests/audit_don_row0c.sh` MEASURE lines); row 0x0A
+also differs OUTSIDE that window on `donovan_3` and `_4` (739 and 410 frames against 388-frame windows), not
+characterised. On `donovan_6` every differing frame differs in the low 12 bits (colour) and read equal in the brightness
+nibble — a split without a control showing it could read a brightness difference. Poking `+0x1C3` to 1 over
+native's window on our build leaves it unchanged — a poke without a positive control, so the Power-field branch of the
+ported per-frame routine is neither ruled in nor out. Capture: `build/agent216/rc294/sheets/sheet294_df.png` (local).
 
 ### Rig facts (measured 14z-70/70b)
 

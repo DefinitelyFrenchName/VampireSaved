@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent216/rc127/recommendation_127.md	710757c11d8ecd7a5e023a0adc3292b34a929510
+build/agent216/rc127/capture_read_127.txt	46d4c413145ed952e1aacf2cfe53938abef83321
+build/agent216/rc127/rig_window.txt	52f4ffa305d4d1037dd9a599579d8fb9d53d1b9e
+build/agent216/rc127/window.py	243ff5f85d9efccb7d021b7c419f6f1e99b96e5c
+build/agent216/t127/census/census_cmp.txt	510bf9984dae6adf4998de6ab7eab59f0d292363
+build/agent216/rc127/inert_window.txt	ca087eaf96db88ace7c68133dc88c8f7890e43d4
+build/agent216/rc127/inert_window.py	3a646a9be319fc4ad6a4fa67f209e9e2f9cf7645
+build/agent216/rc127/engine_internals_1760_1790.txt	879d9e5bca6a4a756409b84c9f945c746d61157f
+build/agent216/rc127/rulings.txt	eacea51ca2be4d6ce7ee9bc5b3ebceb37175f645
+build/agent216/rc127/issue_127.md	a946491c6a26b937f5aef4dd29e497ca0fc883d5
+build/agent216/t127/REPORT.md	e5d75a01849ee313c415db9cb0abe7ad6375a7a0
+build/agent216/t162/REPORT.md	35816e9c855f1afbb0390777fa03495a6064c826
+build/agent216/t127/sheet_127_pod_hit.png	6592b71fda835d9f35d18dec38b6fb868dce2c34

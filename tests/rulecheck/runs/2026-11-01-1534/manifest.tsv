@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent216/rc127/m_ruling.txt	c9c94d814a134303ee37b5990e922f280ea1b072
+build/agent216/rc127/m_manifest.diff	063970503b4b92f4490e8cd1ca6a7727b6995479
+build/agent216/rc127/engine_internals_1760_1790.txt	879d9e5bca6a4a756409b84c9f945c746d61157f
+build/agent216/rc127/m_tenant_loop.diff	5dbc5a2155f11622ffe14de23682e1df39e6c609
+build/agent216/rc127/tenant_loop_before.log	20c35622a7b5db2f0a5fb25285a9b161e6d8b2b2
+build/agent216/rc127/tenant_loop_after.log	697b21601d0d1116a46054904e06e0d7d8e17793
+build/agent216/rc127/m_rule5_now.txt	043da30f5c279d9cc0c67036b6fb415ff6157846
+build/agent216/rc127/rule5.log	dd22783d431c3bc26407d1d4eb2e0e7d1ec0cf8c
+build/agent216/rc127/m_rule5_m23_line.txt	c55f646653f7b4af9e61bc3358abea392084f5a6
+build/agent216/rc127/m_rule5_ledger_prec.txt	e9d0ada566b0ffd6868553f36611ac065af688e1
+build/agent216/mb_m.log	78b0ea958e74a18bb549b30d1e53578f7dfce906

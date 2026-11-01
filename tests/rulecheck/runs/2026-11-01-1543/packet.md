@@ -1,0 +1,19 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: #294: freeze audit_don_row0c (row 0x0C = native outside Dark Force; the blind set)
+Claim (the working agent's sentence): Freeze tests/audit_don_row0c.sh's expectation (audit_don_row0c.sh.txt; tap pal_rows_tap.lua.txt, whose V line now carries P1's +0x1C3 as f1c3): P1's palette row 0x0C equals native vs2 on every frame from 2500 of the electrocute rig (R1) and, on the 15 Donovan naming parts (R3), on every frame OUTSIDE native's P1 +0x1C3 frames; inside them the difference is MEASURED, not asserted; the known-bad leg (row 0x13 put back to vsavj's 0x0040 in the opcode share; readback control) must differ on R1 and outside Dark Force in every census part except a frozen blind set of ten (donovan_1, 2, 6, 8, 9, 10, 11, 13, 14, 15). The Dark Force exclusion rests on: run1_before_df_rule.log (the first run on build/agent216/mb_294: R1 0 differing frames, R3 1511 differing frames in donovan_3/4/6/7 only, each ~378 frames, the same parts that differ on row 0x0A); df6_runs.txt (donovan_6: native sets P1 +0x1C3 over 2900-3287, ours never, with the match Dark Force flag on both); ruling_df_change.txt (DECISIONS_HISTORY 'Ruled 2026-09-18 (14z-168)': the maintainer, verbatim, "have the new tenants use the VS Dark Force Change like their shell would (same common DF rules)") and engine_internals_df.txt (+0x1C3 named vs2's Power field); run2_df_rule.log (with the rule: outside native's +0x1C3 frames 0 differing frames over all 15 parts, inside 1511 = 378+378+378+377, within native's 388/388/388/387 +0x1C3 frames). run3_frozen_blind.log: PASS with the blind set frozen, both controls FIRED; mode_row_reverted.log: the row-reverted MODE FAILS R1 (55 frames) and R3 (852 frames outside Dark Force). The port behind it is ruled (ruling_294.txt: the maintainer's "indeed if the 6 free bytes exist, given the cost this seems like the best solution." and "Yes"), the condition met by the dead-byte search (test_dead_span.log: vsavj PRG:0x024024-0x024029 DEAD, four controls fired; dead_span_ours.txt: DEAD on our merged image), and built after rule-checker run 2026-11-01-1541 (run_1541_verdict.txt: VERDICT OK). NOT TESTED: the opatch-readback MODE (its in-gate control fired); that the +0x1C3 window is the Dark Force window on parts other than donovan_6 (on 3/4/7 it is inferred from the same +0x1C3 rule the gate applies and the matching ~378/388 counts, not traced); whether vs2's Dark Force POWER weapon-row animation should be reproduced under vsav's CHANGE (a gameplay-look question for the maintainer, not decided here); how the sword LOOKS (the capture sheet build/agent216/rc294/sheets/sheet294_p1..p3.png goes to the maintainer; no conclusion about the look is drawn here); Donovan as P2; FBNeo and MiSTer; the gate expects the #294 build — at the default BUILD (m3b_merged31) it FAILS its precondition by design until the freeze re-points it.
+Artifacts (read every one, in full):
+  - build/agent216/rc294/g0c/audit_don_row0c.sh.txt
+  - build/agent216/rc294/g0c/pal_rows_tap.lua.txt
+  - build/agent216/rc294/g0c/run1_before_df_rule.log
+  - build/agent216/rc294/g0c/df6_runs.txt
+  - build/agent216/rc294/g0c/ruling_df_change.txt
+  - build/agent216/rc294/g0c/engine_internals_df.txt
+  - build/agent216/rc294/g0c/run2_df_rule.log
+  - build/agent216/rc294/g0c/run3_frozen_blind.log
+  - build/agent216/rc294/g0c/mode_row_reverted.log
+  - build/agent216/rc294/g0c/ruling_294.txt
+  - build/agent216/rc294/g0c/test_dead_span.log
+  - build/agent216/rc294/g0c/dead_span_ours.txt
+  - build/agent216/rc294/g0c/run_1541_verdict.txt

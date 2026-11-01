@@ -14,6 +14,8 @@ phobos-over-donovan	P1	+0x3C2	026322	01
 phobos-over-demitri	P1	+0x3C2	026322	00
 donovan-over-demitri	-	-	-	-
 donovan-victim	-	-	-	-
+donovan-pod-hit	-	-	-	-
+donovan-pod-nohit	-	-	-	-
 pyron-over-demitri	-	-	-	-
-ours-phobos	P1	+0x3C2	41d2c0	00
-ours-phobos	P1	+0x3C2	41d2f0	00
+ours-phobos	P1	+0x3C2	41e080	00
+ours-phobos	P1	+0x3C2	41e0b0	00

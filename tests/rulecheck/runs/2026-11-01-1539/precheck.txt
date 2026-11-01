@@ -1,0 +1,3 @@
+  FLAG FIGURE: 975
+  FLAG QUOTE: indeed if the 6 free bytes exist, given the cost this seems like the best solution
+packet_check: 2 flag(s): FIGURE 1, QUOTE 1

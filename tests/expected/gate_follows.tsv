@@ -17,6 +17,7 @@ declares	audit_command_throws
 declares	audit_continue_ladder
 declares	audit_continue_switch
 declares	audit_crouch_flag
+declares	audit_dead_span_exec
 declares	audit_defense_row_reads
 declares	audit_defense_row_residue
 declares	audit_demitri_split
@@ -34,6 +35,8 @@ declares	audit_dmg_legacy_sweep
 declares	audit_don_grab_pose
 declares	audit_don_ko_writer
 declares	audit_don_lilith_ko
+declares	audit_don_row0b
+declares	audit_don_row0c
 declares	audit_don_vs_cpu
 declares	audit_down_attack
 declares	audit_edge_cases

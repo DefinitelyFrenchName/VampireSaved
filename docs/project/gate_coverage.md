@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**501 of 501 gates described.**
+**506 of 506 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 88 | 88 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 101 | 101 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 106 | 106 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2330,7 +2330,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ### `audit_tenant_cpu_ai.sh` — audit, emulator
 
-**WHAT:** the two CPU-AI differences (Behaviour A and Behaviour B) that docs/game/engine_internals.md "The CPU AI action-script system" names, measured as counts of logging-breakpoint stops on the soak's own rig (tests/audit_tenant_cpu_soak.sh: P1 by the real cursor, the CPU by the ladder's own draw steered by venue/mask, speed level 6, HP and timer pinned, the RNG free), ours = the merged build against native vsav2, both on the WIDE MAME build. Per leg it freezes: A  the class-0x10 continuation-check calls (vs2 PRG:0x2CB50 / vsavj PRG:0x2D374, conditional on +0x382 == 0x10), those with +0x1BC != 0, native's refusals at the guard (stops at vs2 PRG:0x2CB7A with +0x1BC != 0), the checks returning 1 with +0x1BC != 0 (the return sites vs2 0x025AA6 / 0x056E68, ours 0x41D40C / 0x416318), and the continuations taken (vs2 0x026B50, ours 0x41E21E) by +0x1BC before the increment — so ours' +0x1BC 1 -> 2 is the `01` bucket; asserted besides: on native every call with +0x1BC != 0 is refused and no continuation starts at +0x1BC = 1; R  the CPU's entries into state family +0x06 = 0x14 (per-frame trace) and the reaches of the ported caller ours PRG:0x416312 / native PRG:0x056E62 (the `jsr` in the state's handler), with +0x1BC at each reach and d0 at its return; asserted besides: both sides reach it on the CONF=1702 pair, every reach at +0x1BC = 0; B  on every native leg, the Lua copy of vs2 PRG:0x2CD38 (tests/lua/tenant_ai_tap.lua) evaluated at the routine's entry against the routine's RETURN as its callers read it: 0x2CD38 returns its answer in the Z flag, and each of its six callers branches on it with a `bne` at its return address (vs2 0x021A72, 0x021B52, 0x021BE0, 0x022516, 0x0236FE, and the internal bsr.w's 0x02CD18) — so each entry stop (whose logged ret= is the long at the active a7, the return address) is paired with the next stop AT THAT ADDRESS, and the real answer is 1 when SR's Z bit is clear there; every entry must be paired (none unread), 0 disagreements, calls on every native leg but the passive one (a still P1 draws none), and at least one real 1. The routine's own exit sites (0x2CD88, 0x2CD9A, the btst of bit (d3 mod 32) of d4) are kept only as a cross-check (xchk = formula/return mismatches, frozen); and, in each adaptive leg on its own, inside that leg's live window, the EVENT — on vs2: the real test returns 1 while the opponent's +0x121 is 0; on ours: a crouch-decision block (vsavj PRG:0x023068, 0x02313E, 0x0231C4, 0x023998, 0x024AC8) reached with the shadow 1 and the opponent's +0x121 0 — frozen as a PER-LEG measurement (asserted: the detector fires at least once in each adaptive leg). B is NOT compared between the builds: the two legs' starting positions differ entirely (the maintainer on the #129 captures, 2026-10-31), so the two counts are two separate measurements; a matched-start B capture is a separate piece of work. Only counts are claimed; what they change in play was read by the maintainer on the #129 capture sheets, not here.
+**WHAT:** the two CPU-AI differences (Behaviour A and Behaviour B) that docs/game/engine_internals.md "The CPU AI action-script system" names, measured as counts of logging-breakpoint stops on the soak's own rig (tests/audit_tenant_cpu_soak.sh: P1 by the real cursor, the CPU by the ladder's own draw steered by venue/mask, speed level 6, HP and timer pinned, the RNG free), ours = the merged build against native vsav2, both on the WIDE MAME build. Per leg it freezes: A  the class-0x10 continuation-check calls (vs2 PRG:0x2CB50 / vsavj PRG:0x2D374, conditional on +0x382 == 0x10), those with +0x1BC != 0, native's refusals at the guard (stops at vs2 PRG:0x2CB7A with +0x1BC != 0), the checks returning 1 with +0x1BC != 0 (the return sites vs2 0x025AA6 / 0x056E68, ours 0x41E1CC / 0x4170d8), and the continuations taken (vs2 0x026B50, ours 0x41EFDE) by +0x1BC before the increment — so ours' +0x1BC 1 -> 2 is the `01` bucket; asserted besides: on native every call with +0x1BC != 0 is refused and no continuation starts at +0x1BC = 1; R  the CPU's entries into state family +0x06 = 0x14 (per-frame trace) and the reaches of the ported caller ours PRG:0x4170d2 / native PRG:0x056E62 (the `jsr` in the state's handler), with +0x1BC at each reach and d0 at its return; asserted besides: both sides reach it on the CONF=1702 pair, every reach at +0x1BC = 0; B  on every native leg, the Lua copy of vs2 PRG:0x2CD38 (tests/lua/tenant_ai_tap.lua) evaluated at the routine's entry against the routine's RETURN as its callers read it: 0x2CD38 returns its answer in the Z flag, and each of its six callers branches on it with a `bne` at its return address (vs2 0x021A72, 0x021B52, 0x021BE0, 0x022516, 0x0236FE, and the internal bsr.w's 0x02CD18) — so each entry stop (whose logged ret= is the long at the active a7, the return address) is paired with the next stop AT THAT ADDRESS, and the real answer is 1 when SR's Z bit is clear there; every entry must be paired (none unread), 0 disagreements, calls on every native leg but the passive one (a still P1 draws none), and at least one real 1. The routine's own exit sites (0x2CD88, 0x2CD9A, the btst of bit (d3 mod 32) of d4) are kept only as a cross-check (xchk = formula/return mismatches, frozen); and, in each adaptive leg on its own, inside that leg's live window, the EVENT — on vs2: the real test returns 1 while the opponent's +0x121 is 0; on ours: a crouch-decision block (vsavj PRG:0x023068, 0x02313E, 0x0231C4, 0x023998, 0x024AC8) reached with the shadow 1 and the opponent's +0x121 0 — frozen as a PER-LEG measurement (asserted: the detector fires at least once in each adaptive leg). B is NOT compared between the builds: the two legs' starting positions differ entirely (the maintainer on the #129 captures, 2026-10-31), so the two counts are two separate measurements; a matched-start B capture is a separate piece of work. Only counts are claimed; what they change in play was read by the maintainer on the #129 capture sheets, not here.
 
 **HOW:** nine MAME legs under -debug (logging breakpoints whose stops are logged and resumed), at most JOBS (5) at once: pa_native / pa_ours   CPU Phobos, P1 Donovan, ACTIVE (the soak's leg: confirm at 1700)       A, R (0 reaches), B agreement pp_native / pp_ours   the same, PASSIVE (the soak's other Phobos leg)                         A, R p2_native / p2_ours   the same with the confirm moved to 1702 (another RNG stream)              A, R (both sides reach) lw_native / lw_ours   CPU Phobos, adaptive P1 standing LK (CONF=1704, ADAPT=4:48:3000:60)     B event (per leg), B agreement da_native             CPU Donovan, P1 Phobos, ACTIVE (the most native calls of 0x2CD38)         B agreement chosen from the capture worker's 42 legs as the fewest that exercise each claim (A and R on both builds, B's event in one adaptive leg per build); the frozen figures are this rig's, not the worker's table (whose sums run over 15 legs a side); the first run on the Mac reproduced every figure the worker's ERIS legs gave for the same rig. Three more legs for the in-gate controls: ctl_guard (pa_native with the guard's breakpoint shifted), ctl_drop (lw_native with the shadow's SHADOW_DROP class), ctl_retshift (lw_native, its six return breakpoints shifted) and ctl_wrong (the native rig on vsavj, 3000 frames); return-flag-swapped re-reads the plain legs' own stops.
 
@@ -2532,7 +2532,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **WHAT:** Phobos's air movement is alive with its measured mode signatures: hold-8 rises then HOVERS at a pinned height, and a dash input in the air engages the air dash (seq 0x14, airborne) with a flat advance — not merely no crash.
 
-**HOW:** replay 75 (float) and replay 79 (air dash) on MAME against build/hui61 (another build can be given; a stage-4 build until 14z-197), Y and X and the seq byte read from dumps at the frames after the rise completes.
+**HOW:** replay 75 (float) and replay 79 (air dash) on MAME against build/hui62 (another build can be given; a stage-4 build until 14z-197), Y and X and the seq byte read from dumps at the frames after the rise completes.
 
 **EXPECTS:** Y pinned >= 100px over f3350-f3370; seq 0x14 AIRBORNE (Y >= 100px) with X moving >= 30px at near-constant height over f3322-f3337. A red is the float or dash dead again, the dash on the ground, or a rise-speed change moving the sample window.
 
@@ -2612,7 +2612,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **WHAT:** Phobos's Reflect Wall guard-cancel and his pair-press Dark Force both come out with their native-matched signatures (GC seq 0x0E with blowback; DF seq 0x0A at both activations).
 
-**HOW:** the two rigs on MAME against build/hui61 (a self-built stage-4 build until 14z-197; one can be given), the sequence bytes read from dumps at the measured frames.
+**HOW:** the two rigs on MAME against build/hui62 (a self-built stage-4 build until 14z-197; one can be given), the sequence bytes read from dumps at the measured frames.
 
 **EXPECTS:** both signatures present; a red is either mechanism dead or changed, not merely a crash.
 
@@ -2620,7 +2620,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **WHAT:** Phobos survives an 11,000-frame input-chaos soak across round transitions on the REAL packed set, with both satellites alive in round 2 (the pod-lifecycle regression tripwire).
 
-**HOW:** on build/hui61 (a self-built stage-4 build until 14z-197; one can be given), forces id 0x10 through the vanilla select flow and runs 70_hui_mash guarded on MAME on the set the build packed (a vsavj-set run against a WIDE build is the pristine ROM: false green).
+**HOW:** on build/hui62 (a self-built stage-4 build until 14z-197; one can be given), forces id 0x10 through the vanilla select flow and runs 70_hui_mash guarded on MAME on the set the build packed (a vsavj-set run against a WIDE build is the pristine ROM: false green).
 
 **EXPECTS:** guard clean end to end and both satellite pointers non-zero at f6000 (round 1) and at f9000 with the match live (round 2); a red is a crash or a pod lost across the round.
 
@@ -2794,7 +2794,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 101 of 101 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 106 of 106 described.
 
 ### `audit_air_dash_height.sh` — audit, emulator
 
@@ -2846,19 +2846,19 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_column_flash.sh` — audit, emulator
 
-**WHAT:** the orange flash on the deity as Donovan's Killshread Lightning column ends, frozen AS MEASURED for the open cosmetic ticket: our merged build's palette row 11 holds a fire ramp where native vs2 keeps its blue ramp through the move's end, and the extra 2858 palette-sequence upload is ours alone.
+**WHAT:** the orange flash on the deity as Donovan's Killshread Lightning column ends is GONE: our merged build's palette row 11 equals native vs2's blue ramp at the move's end, and ours makes no 2858 palette-sequence upload (14z-170's measurement, before (M): a fire ramp from 2860, the extra 2858 upload ours alone — tests/audit_column_flash_cause.sh keeps that shape as its known-bad leg).
 
 **HOW:** the naming part donovan_4 on native vs2 and on the build (the merged wheel's real cursor path, the parity gate's pins) on MAME; palette RAM dumped at 2858/2860/2866 and hashed per leg (a hash, never the bytes: rule 7), plus a non-debug write tap on row 11 attributing every writer PC; the control replaces our row 11 by native's.
 
-**EXPECTS:** the frozen hashes per leg, native's row constant over the three frames and ours equal to native at 2858 (so a leg that missed the move cannot pass), every writer the uploader's `movem.l` in its own opcode image. A red is the flash gone or moved; which sequence id we upload, and why, is NOT covered.
+**EXPECTS:** the frozen hashes per leg, native's row constant over the three frames and ours equal to native at ALL THREE (2858, 2860, 2866), every writer the uploader's `movem.l` in its own opcode image, and the writer rows frozen (the leg reached the move: a write to row 11 from 2780 on both). A red is the flash back or the row moved.
 
 ### `audit_column_flash_cause.sh` — audit, emulator
 
-**WHAT:** at frames 2807 and 2858 (the move's start and end) P1's fighter block (Donovan, id 0x13) runs the palette RELOAD entry — vsavj/ours PRG:0x02ADAC, vs2 PRG:0x02A102: `movea.l $3a4(a6),a0 / bsr 0x2AD3C` (block row 0 into palette row +0x18B), then `move.l #mask,d1 / move.b $382(a6),d0 / btst.l d0,d1 / bne -> rts`, else block rows 1-3 into the next three rows. vs2's mask (PRG:0x02A108) sets bit 0x13, so native reloads row 0 ONLY; vsavj's (PRG:0x02ADB2, unchanged in our build) does not, so ours also reloads rows 1-3 and row 11 ($90C160) gets block row 1 — the orange ramp (Donovan's sprite-palette block, PRG:0x0CEB50, placed by `[[palette]]`). A COUNTERFACTUAL leg sets the bit in the emulator's decrypted-opcode share (nothing built, nothing on disk): the 2858 reload then writes row 0 only and nothing writes row 11 after the move's own 2813 upload. A STATIC CENSUS of every `move.l #mask,Dn / move.b $382(An),Dm / btst` site pairs vs2's to ours and records where a TENANT bit differs.
+**WHAT:** at frames 2807 and 2858 (the move's start and end) P1's fighter block (Donovan, id 0x13) runs the palette RELOAD entry — vsavj/ours PRG:0x02ADAC, vs2 PRG:0x02A102: `movea.l $3a4(a6),a0 / bsr 0x2AD3C` (block row 0 into palette row +0x18B), then `move.l #mask,d1 / move.b $382(a6),d0 / btst.l d0,d1 / bne -> rts`, else block rows 1-3 into the next three rows. vs2's mask (PRG:0x02A108) sets bit 0x13, so native reloads row 0 ONLY; vsavj's (PRG:0x02ADB2) does not. Since (M) ours carries vs2's word and reloads row 0 only; the BAD leg puts vsavj's word back in the emulator's decrypted-opcode share (nothing built, nothing on disk) and reloads rows 1-3 too, row 11 ($90C160) getting block row 1 — the orange ramp (Donovan's sprite-palette block, placed by `[[palette]]`). A STATIC CENSUS of every `move.l #mask,Dn / move.b $382(An),Dm / btst` site pairs vs2's to ours and records where a TENANT bit differs.
 
-**HOW:** the naming part donovan_4 (audit_column_flash.sh's rig: the part's pokes, the level and RNG pins, ours through the merged wheel's real cursor path) on MAME, three legs at once — native vsav2, ours, ours with OPATCH — each under tests/lua/upload_tap.lua: a NON-DEBUG write tap on the object palette that logs, per uploader instruction, the CPU registers at that instant (a0 = source + 0x10, the destination) and the requester's +0x382/+0x18B/+0x3A4. A -debug breakpoint would read the same registers but desynchronise the replay ([MFI-5]). Then tools/audit_charid_masks.py over vs2's, our build's and vsavj's opcode images.
+**HOW:** the naming part donovan_4 (audit_column_flash.sh's rig: the part's pokes, the level and RNG pins, ours through the merged wheel's real cursor path) on MAME, three legs at once — native vsav2, ours, BAD (ours with OPATCH 02adb4:ef92, vsavj's word) — each under tests/lua/upload_tap.lua: a NON-DEBUG write tap on the object palette that logs, per uploader instruction, the CPU registers at that instant (a0 = source + 0x10, the destination) and the requester's +0x382/+0x18B/+0x3A4. A -debug breakpoint would read the same registers but desynchronise the replay ([MFI-5]). Then tools/audit_charid_masks.py over vs2's, our build's and vsavj's opcode images.
 
-**EXPECTS:** the frozen rows; C1 ours reloads block rows 0-3 into rows 0x0A-0x0D at both frames, row 11 from block row 1; C2 native reloads row 0 only, no row-11 write at either frame; C3 the counterfactual reloads row 0 only and leaves row 11 untouched after 2813; C4 the census reads the #162 site DIFF (vs2 bit 0x13 set, ours clear).
+**EXPECTS:** the frozen rows; C1 ours uploads exactly as native at both frames (block row 0 into 0x0A and, since #294 at M24, the per-frame routine's row 0x0C), and nothing writes row 11 after the move's 2813 upload; C2 native reloads row 0 only, no row-11 write at either frame; C3 the BAD leg reloads block rows 1-3 into rows 0x0B-0x0D BEYOND native at both frames (row 11 from block row 1) and writes row 11 after 2813 — the defect, so the word is what decides; C4 the census reads the #162 site SAME (vs2 and ours both set bit 0x13).
 
 ### `audit_column_shock.sh` — audit, emulator
 
@@ -2883,6 +2883,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** the naming part donovan_1 (Down held 2840-2870) on both games on MAME, P1's (+0x121, seq, sub) at every change over 2830-2880 and P2's flag frozen per leg; the control deletes the Down from the replay and the flag must then never rise.
 
 **EXPECTS:** the frozen transitions on both legs, P2's flag held 0, the stripped run flat. NOT covered: +0x121 in the air, while blocking, or on P2.
+
+### `audit_dead_span_exec.sh` — audit, emulator
+
+**WHAT:** on PRISTINE vsavj (MAME), over every replay with a frozen vanilla masked-basis log, how often the CPU executes the span's two instruction heads PRG:0x024024 (moveq) and PRG:0x024026 (bra.w), beside the neighbouring handlers of the victim reaction dispatch (PRG:0x024002 / 0x024020, row 0x20's head and tail; PRG:0x02402A, row 0x21's head) and the per-frame palette dispatcher PRG:0x02ADDC (every fighter, every match frame).
+
+**HOW:** tests/lua/pc_count.lua (breakpoints, the emulated-frame clock), one run per replay, FRAMES = the replay's last input frame + 120; every run must end with PCEND equal to EMUFRAMES (it covered its replay in emulated frames).
+
+**EXPECTS:** 0 executions at 0x024024 and 0x024026 in every replay. A BOUND, NEVER A PROOF — the static proof is tests/test_dead_span.sh. Measured 14z-216: 64/64 replays complete, 0 at the span, 0 at the three neighbouring handlers too (the corpus never lands reaction classes 0x20/0x21), 597,329 at 0x02ADDC in 62 replays: the bound says nothing about the span's own neighbourhood, and that is stated, not hidden. Read taps cannot add a READ bound: MAME read taps are blind to ROM fetches (RH-15).
 
 ### `audit_defense_row_reads.sh` — audit, emulator
 
@@ -2971,6 +2979,22 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** 175 MAME runs, six at a time (section 2's 98: 16 legacy victims x 3 legs x 2 sides and Donovan's two; section 5's 74; section 6's one, and its control's two 60-frame runs); the ours legs pass `-verbose` (#291 S4-A): 16 legacy victims x vsavj/vsav2/ours x 2 sides on the 14z-186 control's two replays (victim and Demitri by the early-window forced picks, the victim's HP pinned to 288 sixty frames before each hit, the level pinned 6 from 2000 and the RNG word 0000 from 2363), and Donovan's 14z-186 probe-12 rig on native vs2 and ours (the parity gates' cursor path and pins); tools/dmg_sweep.py reads every line of every trace into one row per hit (red and white HP lost, first-drop frame, the attacker's id and the victim's reaction class there); the damage pipeline's tables compared between the two games' data images; section 5 reads the three hits' attack records on both games (tools/dmg_sweep.py records) and replays one leg per game with those bytes set to the other game's values through tests/lua/rom_poke.lua (verified writes, an own-value poke as the inert control on each of the three images: vsavj and vs2 on victim 0x00's leg, the merged build and vs2 on Donovan's). Section 6 (#295) compares each ours legacy trace with the same run's vsavj trace byte for byte (tools/dmg_sweep.py ours) and the rows hit for hit, and runs one ours leg (P1, victim 0x00) with vs2's three records through rom_poke.lua.
 
 **EXPECTS:** every leg's forced ids as traced, Demitri the attacker at every hit, the defense rows differing only for ids 0a 10 13 19 1a with the attack table and the 2D map equal, and every row equal to tests/expected/dmg_legacy_sweep.tsv (on 2026-10-01: vsavj one more red HP on 2HK on 14 of the 15 victims hit, Victor 0x03 alone equal, Oboro 0x18's 2HK no hit on vsavj; the same on both sides; Donovan 9 ours / 8 native); the three records differ, each game poked to the other's records deals the other's damage hit for hit (vsavj 9/13/19, vs2 8/12/17 on victim 0x00), the hits are the record chains' nodes; over the WHOLE sweep (64 swapped legs) 176 of 192 rows equal the other game's frozen row, the 16 others exactly Sasquatch 0x0A's and Oboro 0x18's; Donovan's own legs swapped (ours given vs2's records, native given vsavj's) read the other leg's frozen rows, 8 of 8, and his own-value legs reproduce their unpoked traces; on our build every legacy leg's trace is byte-identical to vsavj's, 32 of 32, and its rows equal vsavj's, 96 of 96 hits, each leg running $BUILD's vsavjw.zip (section 6, not frozen: judged against the same run's vsavj legs, which section 4 holds); all six controls fire.
+
+### `audit_don_row0b.sh` — audit, emulator
+
+**WHAT:** Donovan's palette reload (PRG:0x02ADAC) tests vsavj's per-character mask; without his bit it reloads his block rows 1-3 into palette rows 0x0B-0x0D at every palette-state change, and block row 1 overwrites the effect palette in row 0x0B (#127: the Press of Death deity's foot turns black when he is hit; #162: the deity flashes orange as the Killshread column ends). With (M) the build reloads row 0x0A only, as vs2 does. This gate requires P1's palette row 0x0B — all sixteen words — to equal native vs2's on every frame from 2500, on: R1 #127's hit rig (tests/replays/don/127_pod_hit.rpl: Press of Death, P2 jabbing, Donovan hit at f2994); R2 its NO-HIT control (tests/replays/don/127_pod_nohit.rpl); R3 the 15-part census: every Donovan attacker naming part (tests/replays/naming/donovan_1..15, ours through the merged wheel's real cursor path, as tests/audit_column_flash_cause.sh builds it); R4 #162's part-4 compare: donovan_4's Killshread column, frames 2800-2870, reported on its own.
+
+**HOW:** three legs per rig on MAME under tests/lua/pal_rows_tap.lua (non-debug; P1's rows 0x0A-0x0D dumped every frame): native vsav2, OURS (BUILD), and BAD — the same build with vsavj's mask word put back in the emulator's decrypted-opcode share (OPATCH 02adb4:ef92, nothing built). A precondition reads BUILD's opcode image: the word at PRG:0x02ADB4 must be vs2's (the build carries (M)).
+
+**EXPECTS:** every leg complete (END), P1 id 0x13 from 2500 on every leg, R1-R4 0 differing frames on ours. MEASURED, not asserted: rows 0x0A and 0x0C native vs ours (their differences are #294's per-frame routine and Dark Force, which (M) leaves alone; t127 census, 14z-216: 0x0A 1904 frames, 0x0C 2363) and row 0x0D. Not covered: Donovan as P2 (rows 0x10-0x13); FBNeo and MiSTer; census parts donovan_8 and donovan_13, whose moves never show the defect on row 0x0B (the BAD leg equals native there too, measured 14z-216), so their 0 is not evidence; how it LOOKS (the maintainer read the captures before the ruling: build/agent216/t127/sheet_127_pod_hit.png, t162/sheets).
+
+### `audit_don_row0c.sh` — audit, emulator
+
+**WHAT:** vsavj's per-frame palette table (PRG:0x02ADEC) kept the default no-op at Donovan's row 0x13, so nothing rewrote his weapon row (P1: palette row 0x0C) when his palette state changed — the sword stayed red where vs2 turns it yellow in Victor's electrocute and brown after it. With the port, row 0x13 jumps (through the dead span PRG:0x024024) to vs2's routine. This gate requires P1's palette row 0x0C — all sixteen words — to equal native vs2's on every frame from 2500 on: R1 the electrocute rig (tests/replays/don/294_don_electrocuted.rpl: P2 Victor's held HP, Donovan shocked from f3412); R3 the 15 Donovan naming parts (tests/replays/naming/donovan_1..15; Foot Stab (ES) among them), judged OUTSIDE native's Dark Force frames (P1 +0x1C3, vs2's Dark Force POWER field, set). INSIDE them row 0x0C differs on about 378 frames per Dark Force part (14z-216 on mb_294: 1511 frames, donovan_3/4/6/7); the CAUSE IS OPEN — measured, never asserted, never explained away. R5 MEASURES, every run, donovan_6 re-run with P1's +0x1C3 POKED to 1 over native's window (14z-216: the difference unchanged, 378 frames); whether that poke reaches the routine's read is NOT established (no positive control), so R5 rules nothing in or out.
+
+**HOW:** three legs per rig on MAME under tests/lua/pal_rows_tap.lua (non-debug; P1's rows 0x0A-0x0D dumped every frame): native vsav2, OURS (BUILD), and BAD — the same build with the per-frame table's row 0x13 put back to vsavj's default word in the emulator's decrypted-opcode share (OPATCH 02ae12:0040, nothing built: the table is read PC-relatively, from the opcode view). A precondition reads BUILD's opcode image: row 0x13 must give the dead span.
+
+**EXPECTS:** every leg complete (END), P1 id 0x13 from 2500 on every leg, R1 and R3 0 differing frames on ours. MEASURED, not asserted: rows 0x0A, 0x0B, 0x0D native vs ours. Not covered: Donovan as P2; FBNeo and MiSTer; how it LOOKS (a capture sheet goes to the maintainer before the ticket is reported done).
 
 ### `audit_entrance_draw.sh` — audit, emulator
 
@@ -3106,7 +3130,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** 84 field-trace runs on MAME (42 parts on BOTH builds, the same replays and pokes, the tenant parts through the merged wheel's path, level and RNG pinned), the build's zero-pass frame set checked as a subset of the reference's; a leg that does not complete is VOID and fails; the control removes one frame's pass advance from a build trace.
 
-**EXPECTS:** no new zero-pass frame on any part; the planted frame is caught. NOT covered: content outside the naming corpus and the idle-time margin short of a lost pass.
+**EXPECTS:** no new zero-pass frame on any part but the ACCEPTED native-matched ones (one since 2026-11-01: donovan_2 frame 3094, #294 — vs2 overruns there at 3098), each still measured; the planted frame is caught. NOT covered: content outside the naming corpus and the idle-time margin short of a lost pass.
 
 ### `audit_landing_sound.sh` — audit, emulator
 
@@ -3214,11 +3238,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_pass_overrun.sh` — audit, emulator
 
-**WHAT:** the Blizzard Sword CPU overruns, ours vs native, frozen as measured: on three frames of the #136 corpus a double-pass activation runs past the frame so one frame completes no logic pass — twice on native, once on ours — and the scheduler's idle time per event window is equal on both builds within about 1%; not a port cost, the host clock governs.
+**WHAT:** the Blizzard Sword CPU overruns, ours vs native, frozen as measured: on three frames of the #136 corpus a double-pass activation runs past the frame so one frame completes no logic pass — twice on native, once on ours (since M24 both on donovan_2, native alone on donovan_11) — and the scheduler's idle time per event window is equal on both builds within about 1%; not a port cost, the host clock governs.
 
 **HOW:** 12 MAME runs (task-table taps and pass-counter traces of donovan_2, donovan_10 and donovan_11 on both legs with the parity gate's pins); the zero-pass frames after the round start and the idle-spin dispatches per frame per event window are frozen; the control removes one pass-counter step from our trace.
 
-**EXPECTS:** the overrun rows (native donovan_2 and donovan_11, ours donovan_10) and idle rows equal; the planted zero-pass frame changes a row and fails.
+**EXPECTS:** the overrun rows (native donovan_2 and donovan_11; ours donovan_2 since M24, donovan_10 until M23) and idle rows equal; the planted zero-pass frame changes a row and fails.
 
 ### `audit_phobos_dmg_residual.sh` — audit, emulator
 
@@ -3282,7 +3306,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** each gate is run UNCHANGED through its RNG_WORD/RNG_UNTIL probe knob (A: none; B: RNG_WORD=0100; C: RNG_WORD=5a5a RNG_UNTIL=2600), its table kept (GOT_OUT, KEEP); tools/rng_forms.py compares every B and C row against form A's row from the same build and script, and form A's move_parity table against the frozen tests/expected/move_parity_events.tsv, so a build or basis move cannot pass for an RNG effect. A gate's own verdict under B or C is not this audit's verdict (audit_chains184 stops at its native outcome check under both).
 
-**EXPECTS:** form A passes all three gates and equals the frozen move_parity table; under B no IDENT row of audit_move_parity or audit_chains174 turns DIFF, and some move_parity rows move (the pin reaches the game); every tally row equal to tests/expected/rng_forms.tsv; every control fails.
+**EXPECTS:** form A passes all three gates and equals the frozen move_parity table; under B no IDENT row of audit_move_parity or audit_chains174 turns DIFF — but a move_parity row downstream (`after:`) of a SLOWDOWN root of tests/expected/move_parity_attribution.tsv, listed by name (the #345 exemption, ruled 2026-11-01: donovan_2's events 3-25, IDENT under 0000 on M24 and DIFF under 0100 as on M23) — and some move_parity rows move (the pin reaches the game); every tally row equal to tests/expected/rng_forms.tsv; every control fails.
 
 ### `audit_sas_penguin_count.sh` — audit, emulator
 
@@ -3428,6 +3452,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **EXPECTS:** every case's verdict equals its expected one (the case table below), and each control's perturbation makes at least one case differ — on the case it targets.
 
+### `test_dead_span.sh` — test, ci_static
+
+**WHAT:** PRG:0x024024-0x024029 of pristine vsavj — a `moveq #$4b,d0 / bra.w $27ec0` tail wedged between rows 0x20 and 0x21 of the victim reaction dispatch (table PRG:0x02385C), after row 0x20's own `bra.w` — can be neither executed nor read, so a jump placed there for #294 (the per-frame palette table PRG:0x02ADEC's row 0x13, whose 16-bit word reaches only PRG:0x022DEC-0x032DEB) touches nothing legacy content reaches. Its twins in vsav2 (PRG:0x022C20) and vhunt2 (PRG:0x022C4E) sit in the same place, after the same `bra.w` — the look of a leftover in all three builds — but the tool does NOT prove them dead (vsav2: two data longs and a palette-offset table's op-view rows; vhunt2: a base from data decoded as code; all over-approximations it cannot exclude), so they are not judged here.
+
+**HOW:** tools/audit_dead_span.py on the decrypted views (tests/lib/decrypt_cache.sh): no instruction decoded at ANY even address of the code window names a span byte (A), no 32-bit value at any 2-aligned offset of either full view equals one (C), no table row inside the jump-table extent gives one (T), and the span is FENCED by reached code — an unconditional transfer ends exactly at its start and the byte after it is reached (L).
+
+**EXPECTS:** VERDICT DEAD for vsavj's span. A red names the reference (instruction, long or table row) or the missing fence. Stated, not tested: an address formed at run time from no constant anywhere (the tool's header); the runtime bound (build/agent216/rc294/dead/exec_bound.sh, 14z-216: 0 executions over the 64-replay legacy corpus on MAME) is a separate, weaker instrument — the corpus never reaches the neighbouring rows 0x20/0x21 either. What reaches the span on OUR build after the port is a different question, for the port's own gate.
+
 ### `test_defense_rows_census.sh` — test, ci_static
 
 **WHAT:** the defense curve and rally threshold of every character id, vsavj against vs2 and our build: the 15 legacy rows identical between the games but for Sasquatch's, vsavj's variant ids carrying copies of their base rows, the tenants' rows on our build classed against the bases (vs2's since the ruled fix), and every instruction that names either table by absolute long or pc-relative lea/pea.
@@ -3472,7 +3504,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** who CAN read the select-confirm latch: the static census of every instruction naming a fighter block's +0x3BC/+0x3BD/+0x3C2/+0x3E0/+0x3E3 on vsav2, vsavj and the ported image, by addressing form, frozen — the whole population the per-leg tap (audit_latch_reads) can ever attribute a read to, with the census's data-region `movep` noise frozen and named.
 
-**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged31/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first (an immediate store among its positive controls since #197); controls: a shadow copy of the tool blind to the (d16,An) form, a copy with the pre-#197 nearest-decodable scan, and the frozen inventory minus one vs2 reader row; a PLANTED 44-byte opcode image carries one site of each form (abs.l immediate, abs.l register, (d16,An) immediate), since no abs.l site exists in any real image.
+**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged32/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first (an immediate store among its positive controls since #197); controls: a shadow copy of the tool blind to the (d16,An) form, a copy with the pre-#197 nearest-decodable scan, and the frozen inventory minus one vs2 reader row; a PLANTED 44-byte opcode image carries one site of each form (abs.l immediate, abs.l register, (d16,An) immediate), since no abs.l site exists in any real image.
 
 **EXPECTS:** the frozen inventory equal (vs2's confirm writers and clears, the tenants' in-play flavour readers and their relocated copies, the Shadow-flag readers); the blind tool fails its selftest, the planted image gives exactly its three write rows, the pre-#197 copy misses the immediate store vs2 PRG:0x00712A and both planted immediates, the dropped row fails the compare.
 
@@ -3507,6 +3539,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** eight Donovan, four Pyron and eight Phobos parts on native vs2 on MAME (legs in parallel), P1's node pointer +0x1C sampled per frame and mapped onto tools/anim_nodes.py's graph; the negative control replaces an event's frozen chain by a neighbour's.
 
 **EXPECTS:** every event's entered-chain list equal to the frozen line, every TOML seq entered, P2 = 0x01 at every event and never in b:0x71/b:0x74; the neighbour swap fails.
+
+### `test_perframe_hook.sh` — test, ci_static
+
+**WHAT:** the generator's [perframe_hook] section (tools/gen_donovan_patch.py; build/manifest/donovan.toml) ports vs2's per-frame palette routine PRG:0x02A316 (+0x160) for Donovan: the per-frame table PRG:0x02ADEC's row 0x13 points at the dead span PRG:0x024024 (tests/test_dead_span.sh), which jumps to the placed body; the body's 26 external references are re-pointed to stubs, its records (vs2's sequence ids 0x2D4-0x341) placed beside it.
+
+**HOW:** tools/audit_perframe_hook.py on each build's verify_op.bin against vsavj's and vs2's decrypted views (tests/lib/decrypt_cache.sh). It finds the routine's external references by decoding the SOURCE (never from the manifest), compares the body instruction for instruction (capstone mnemonic + operand text), each re-pointed reference against the stub its target maps to, the inline tables (opcode view), the appended lea tables (data view) and the records (data view), and checks the other 31 table rows equal vsavj's.
+
+**EXPECTS:** STATE hooked and VERDICT OK on the merged build and on the Donovan solo build. A red names the check. Stated, not tested: what the routine DOES at run time (tests/audit_don_row0c.sh, the emulator gate against native vs2); the stock twin and the Phobos/Pyron solo builds (the section is only_variant_slot, Donovan's manifest only).
 
 ### `test_poked_legs.sh` — test, ci_static
 

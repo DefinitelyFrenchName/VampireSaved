@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent216/mgates/m_ruling.txt	c9c94d814a134303ee37b5990e922f280ea1b072
+build/agent216/mgates/audit_don_row0b.sh.txt	f0112faa78f5e018707cf18bdf03ec38ffd5464b
+build/agent216/mgates/pal_rows_tap.lua.txt	2aab5c719f1e863c79a619f0b81a98968de91d7a
+build/agent216/mgates/row0b_mbm.log	4afd4f8fcf577bb993b791b8e164a3b62cea11bd
+build/agent216/mgates/cause.diff	3cdf7a40d691b11550708624a1ba78ab61ffbc97
+build/agent216/mgates/cause_pre.log	dc0224c0d47fdd4ec057174e1cad1333d6a56109
+build/agent216/mgates/flash.diff	cbce166b11791e91d948972712c997491585bab3
+build/agent216/mgates/flash_pre.log	6a6e0db87731fdc3ab65b626ba39f46607cf1338

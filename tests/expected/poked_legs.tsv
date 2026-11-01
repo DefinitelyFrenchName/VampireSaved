@@ -141,6 +141,14 @@ tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/donovan_p12.rpl	P2	R	01 Demi
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/donovan_p12.rpl	P2	R	01 Demitri	01	SAME	
 tests/audit_don_ko_writer.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	$2	PARAM	no id is CROSS-FLAVOR here
 tests/audit_don_lilith_ko.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	$2	PARAM	no id is CROSS-FLAVOR here
+tests/audit_don_row0b.sh	native	replays/don/127_pod_hit.rpl	P1	-	01 Demitri	13	CROSS-FLAVOR	
+tests/audit_don_row0b.sh	native	replays/don/127_pod_hit.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_don_row0b.sh	native	replays/don/127_pod_nohit.rpl	P1	-	01 Demitri	13	CROSS-FLAVOR	
+tests/audit_don_row0b.sh	native	replays/don/127_pod_nohit.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_don_row0b.sh	ours	replays/don/127_pod_hit.rpl	P1	-	01 Demitri	13	CROSS-INERT	
+tests/audit_don_row0b.sh	ours	replays/don/127_pod_hit.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_don_row0b.sh	ours	replays/don/127_pod_nohit.rpl	P1	-	01 Demitri	13	CROSS-INERT	
+tests/audit_don_row0b.sh	ours	replays/don/127_pod_nohit.rpl	P2	R R	03 Victor	01	CROSS-INERT	
 tests/audit_don_vs_cpu.sh	ours	replays/109_2p_don_vs_phobos.rpl	P1	L L D D	13 Donovan	13	SAME	
 tests/audit_don_vs_cpu.sh	ours	replays/110_don_arcade_mash.rpl	P1	L L D D	13 Donovan	13	SAME	
 tests/audit_down_attack.sh	ours	replays/judge/03_down_attack.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
@@ -188,10 +196,14 @@ tests/audit_hui_grunt.sh	ours	replays/hui/95_hui_electrocuted_x4.rpl	P1	-	01 Dem
 tests/audit_hui_grunt.sh	ours	replays/hui/95_hui_electrocuted_x4.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_kill_poke_shape.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	03	CROSS-INERT	
 tests/audit_ladder_selector.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	13	CROSS-INERT	
-tests/audit_latch_reads.sh	native	(replay not named in the script)	P1	-	-	$1	PARAM	no id is CROSS-FLAVOR here
-tests/audit_latch_reads.sh	native	(replay not named in the script)	P2	-	-	$2	PARAM	no id is CROSS-FLAVOR here
-tests/audit_latch_reads.sh	ours	(replay not named in the script)	P1	-	-	$1	PARAM	no id is CROSS-FLAVOR here
-tests/audit_latch_reads.sh	ours	(replay not named in the script)	P2	-	-	$2	PARAM	no id is CROSS-FLAVOR here
+tests/audit_latch_reads.sh	native	replays/don/127_pod_hit.rpl	P1	-	01 Demitri	$1	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_latch_reads.sh	native	replays/don/127_pod_hit.rpl	P2	R R	03 Victor	$2	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_latch_reads.sh	native	replays/don/127_pod_nohit.rpl	P1	-	01 Demitri	$1	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_latch_reads.sh	native	replays/don/127_pod_nohit.rpl	P2	R R	03 Victor	$2	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_latch_reads.sh	ours	replays/don/127_pod_hit.rpl	P1	-	01 Demitri	$1	PARAM	no id is CROSS-FLAVOR here
+tests/audit_latch_reads.sh	ours	replays/don/127_pod_hit.rpl	P2	R R	03 Victor	$2	PARAM	no id is CROSS-FLAVOR here
+tests/audit_latch_reads.sh	ours	replays/don/127_pod_nohit.rpl	P1	-	01 Demitri	$1	PARAM	no id is CROSS-FLAVOR here
+tests/audit_latch_reads.sh	ours	replays/don/127_pod_nohit.rpl	P2	R R	03 Victor	$2	PARAM	no id is CROSS-FLAVOR here
 tests/audit_legacy_pairings.sh	ours	replays/16_xemu_2p.rpl	P1	-	01 Demitri	$id	PARAM	no id is CROSS-FLAVOR here
 tests/audit_lilith_gps_counter.sh	native	replays/df/105_df_sas_armor.rpl	P1	-	01 Demitri	0e	CROSS-INERT	
 tests/audit_lilith_gps_counter.sh	native	replays/df/105_df_sas_armor.rpl	P2	R R	03 Victor	03	SAME	

@@ -1,7 +1,7 @@
 # tests/expected/column_flash.tsv — palette row 11 (RAM:$90C160, 32 bytes, HASHED) at the end of Donovan's Killshread Lightning
 # column (naming part donovan_4), native vsav2 against our merged build (tests/audit_column_flash.sh). Evidence class:
-# in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on m3b_merged31: native keeps its blue ramp, ours turns to a
-# fire ramp — the open cosmetic ticket. Columns: <leg> <frame> <row 11 SHA-1, 12 hex — never the bytes>; then
+# in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on m3b_merged32: native keeps its blue ramp and, since (M)
+# (14z-216), so does ours. Columns: <leg> <frame> <row 11 SHA-1, 12 hex — never the bytes>; then
 # <leg> writer <pc> <frames>: every writer of row 11 from 2780 (a non-debug write tap); <leg> run <pc> <count>: every
 # writer over the whole run; one ours build row.
 #--
@@ -9,8 +9,8 @@ native	2858	8250af4dffdb
 native	2860	8250af4dffdb
 native	2866	8250af4dffdb
 ours	2858	8250af4dffdb
-ours	2860	4c7396d85cee
-ours	2866	4c7396d85cee
+ours	2860	8250af4dffdb
+ours	2866	8250af4dffdb
 native	writer	02a0ba	2813
 native	writer	02a0ce	2813
 native	run	000d34	32
@@ -40,8 +40,8 @@ native	run	01b16e	8
 native	run	0129b4	240
 native	run	02a0ba	16
 native	run	02a0ce	16
-ours	writer	02ad64	2807,2813,2858
-ours	writer	02ad78	2807,2813,2858
+ours	writer	02ad64	2813
+ours	writer	02ad78	2813
 ours	run	000d34	32
 ours	run	000d3a	32
 ours	run	01c104	16
@@ -67,6 +67,6 @@ ours	run	01418e	144
 ours	run	01c6e4	8
 ours	run	01c6e8	8
 ours	run	01433c	240
-ours	run	02ad64	56
-ours	run	02ad78	56
-ours	build	merged-m23	f601342d
+ours	run	02ad64	16
+ours	run	02ad78	16
+ours	build	merged-m24	43505a12

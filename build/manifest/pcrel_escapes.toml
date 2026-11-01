@@ -52,11 +52,12 @@
 # RE-POINTED 14z-185 (the M21 freeze): hui58/pyron43/don_m24 -> hui59/pyron44/don_m25, merged m3b_merged28 -> m3b_merged29.
 # RE-POINTED 14z-189 (the M22 freeze): hui59/pyron44/don_m25 -> hui60/pyron45/don_m26, merged m3b_merged29 -> m3b_merged30.
 # RE-POINTED 14z-192 (the M23 freeze): hui60/pyron45/don_m26 -> hui61/pyron46/don_m27, merged m3b_merged30 -> m3b_merged31.
+# RE-POINTED 14z-216 (the M24 freeze): hui61/pyron46/don_m27 -> hui62/pyron47/don_m28, merged m3b_merged31 -> m3b_merged32.
 # RE-POINTED 14z-183 (the M20 freeze): hui57/pyron42/don_m23 -> hui58/pyron43/don_m24, merged m3b_merged27 -> m3b_merged28.
 # RE-POINTED 14z-170 (the M19 freeze): hui56/pyron41/don_m22 -> hui57/pyron42/don_m23,
 # merged m3b_merged26 -> m3b_merged27 (no RE-POINTED line was added here between 14z-119
 # and this one; the sections read hui56/pyron41/don_m22 at HEAD). The gate measures.
-[hui61]
+[hui62]
 unresolved = 69
 resolved = 0
 escapes = [
@@ -132,7 +133,7 @@ escapes = [
 ]
 
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-[pyron46]
+[pyron47]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -152,7 +153,7 @@ escapes = [
 # same lea->table pairs — the d2 window + the remap touch neither region). The section is keyed by
 # build dir, so a re-point with no re-key reads as "10 NEW" (paid for 14z-111).
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-[don_m27]
+[don_m28]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -183,27 +184,27 @@ escapes = [
 
 [merged_don]
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-build = "m3b_merged31"
+build = "m3b_merged32"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-extract = "build/don_m27/extract"
+extract = "build/don_m28/extract"
 placement_suffix = ""
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-same_as = "don_m27"
+same_as = "don_m28"
 
 [merged_hui]
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-build = "m3b_merged31"
+build = "m3b_merged32"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-extract = "build/hui61/extract"
+extract = "build/hui62/extract"
 placement_suffix = "@huitzil"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-same_as = "hui61"
+same_as = "hui62"
 
 [merged_pyr]
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-build = "m3b_merged31"
+build = "m3b_merged32"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-extract = "build/pyron46/extract"
+extract = "build/pyron47/extract"
 placement_suffix = "@pyron"
 # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-same_as = "pyron46"
+same_as = "pyron47"

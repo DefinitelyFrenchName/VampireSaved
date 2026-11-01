@@ -1,18 +1,19 @@
 #!/bin/sh
-# audit_column_flash.sh — THE ORANGE FLASH ON THE DEITY AS DONOVAN'S KILLSHREAD LIGHTNING COLUMN ENDS, frozen AS MEASURED (14z-170, the maintainer's capture read): palette row 11 holds a FIRE ramp on our merged build where native vs2 keeps its BLUE ramp through the move's end — the colour swap the maintainer saw, recorded as the palette RAM it is, for the open cosmetic ticket.
+# audit_column_flash.sh — THE ORANGE FLASH ON THE DEITY AS DONOVAN'S KILLSHREAD LIGHTNING COLUMN ENDS (14z-170, the maintainer's capture read; GitHub #162), RE-FROZEN 14z-216 TO "OURS = NATIVE": with (M) (vs2's mask word at PRG:0x02ADB2; the maintainer, 2026-11-01: "1. Yes, (M) at the next freeze, closing both (recommended) -> agreed") our palette row 11 keeps native vs2's BLUE ramp through the move's end, where until then it turned to a FIRE ramp — the colour swap the maintainer saw.
 #
-# WHAT: the orange flash on the deity as Donovan's Killshread Lightning column ends, frozen
-#   AS MEASURED for the open cosmetic ticket: our merged build's palette row 11 holds a fire
-#   ramp where native vs2 keeps its blue ramp through the move's end, and the extra 2858
-#   palette-sequence upload is ours alone.
+# WHAT: the orange flash on the deity as Donovan's Killshread Lightning column ends is GONE:
+#   our merged build's palette row 11 equals native vs2's blue ramp at the move's end, and
+#   ours makes no 2858 palette-sequence upload (14z-170's measurement, before (M): a fire
+#   ramp from 2860, the extra 2858 upload ours alone — tests/audit_column_flash_cause.sh
+#   keeps that shape as its known-bad leg).
 # HOW: the naming part donovan_4 on native vs2 and on the build (the merged wheel's real
 #   cursor path, the parity gate's pins) on MAME; palette RAM dumped at 2858/2860/2866 and
 #   hashed per leg (a hash, never the bytes: rule 7), plus a non-debug write tap on row 11
 #   attributing every writer PC; the control replaces our row 11 by native's.
 # EXPECTS: the frozen hashes per leg, native's row constant over the three frames and ours
-#   equal to native at 2858 (so a leg that missed the move cannot pass), every writer the
-#   uploader's `movem.l` in its own opcode image. A red is the flash gone or moved; which
-#   sequence id we upload, and why, is NOT covered.
+#   equal to native at ALL THREE (2858, 2860, 2866), every writer the uploader's `movem.l` in
+#   its own opcode image, and the writer rows frozen (the leg reached the move: a write to row
+#   11 from 2780 on both). A red is the flash back or the row moved.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/column_flash.tsv
 #   tests/expected/registry.tsv tests/lib/controls.sh tests/lua/read_tap.lua
 #   tests/lua/replay.lua tests/replays/naming/donovan_4.json tests/replays/naming/donovan_4.rpl tools/build_fingerprint.py tools/name_moves.py
@@ -20,7 +21,7 @@
 #
 # SHEET: legs vs2,ours — moments: the three palette-dump frames the verdict compares (2858, before the swap; 2860 and 2866, after), each proven on that leg's own checksum log — not comparable: each game's stage, the palette rows other than row 11, and P2's art (each game's own copy; [VSP-168]); row 11 is compared as a hash, never its bytes
 #
-# MUST-FIRE: perturbed-copy: flash-gone — a copy of our leg's palette dumps with row 11 replaced by native's (what a fix of the flash looks like) must FAIL the frozen compare, so the gate reads the row it claims to read (in-gate: the planted copy must differ from the frozen rows; mode: the planted copy IS our leg and the gate FAILs)
+# MUST-FIRE: perturbed-copy: flash-planted — a copy of our leg's palette dumps with row 11 at 2860 and 2866 replaced by its own row 10 (another ramp, as the flash was) must FAIL the frozen compare and the ours-equals-native check, so the gate reads the row it claims to read (in-gate: the planted copy must differ from the frozen rows; mode: the planted copy IS our leg and the gate FAILs)
 #
 # WHY. The maintainer, on the 14z-170 capture of the fixed column: "The orange flash at 2860
 # is cosmetic but strange as it's the sprite of the stand-like entity above Donovan that turns
@@ -62,14 +63,14 @@
 # NOT COVERED: WHICH sequence id our build uploads at 2807 and 2858, and why (the ticket's open
 # question); other palette rows; FBNeo and the MiSTer core.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [FREEZE=1] tests/audit_column_flash.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [FREEZE=1] tests/audit_column_flash.sh
 #   emulator tier, MAME; four runs of 2870 frames (two dump legs, two write taps), all at once
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged31}"
+BUILD="${BUILD:-build/m3b_merged32}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/column_flash.tsv"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
@@ -119,11 +120,13 @@ done
 # row 11 as a HASH, never its bytes: palette content is ROM-derived data, and the tree keeps
 # hashes of such data, not the data (CLAUDE.md rule 7; the frame-data rule of 14z-126)
 row11() { python3 -c "import sys,hashlib; print(hashlib.sha1(open(sys.argv[1],'rb').read()[11*32:12*32]).hexdigest()[:12])" "$1"; }
-plant() {  # THE PERTURBATION: our dumps with row 11 replaced by native's, frame by frame
-    for f in $FRAMES_AT; do python3 - "$W/ours/dump_${f}_90c000.bin" "$W/native/dump_${f}_90c000.bin" "$W/pl_$f.bin" <<'PY'
+plant() {  # THE PERTURBATION: our dumps with row 11 at 2860 and 2866 replaced by our own row 10 (2858 left as is)
+    for f in $FRAMES_AT; do python3 - "$W/ours/dump_${f}_90c000.bin" "$W/pl_$f.bin" "$f" <<'PY'
 import sys
-o = bytearray(open(sys.argv[1], "rb").read()); n = open(sys.argv[2], "rb").read()
-o[11*32:12*32] = n[11*32:12*32]; open(sys.argv[3], "wb").write(o)
+o = bytearray(open(sys.argv[1], "rb").read())
+if sys.argv[3] != "2858":
+    o[11*32:12*32] = o[10*32:11*32]
+open(sys.argv[2], "wb").write(o)
 PY
     done
 }
@@ -133,7 +136,7 @@ table() {  # table <ours dump prefix> > rows
 }
 _ours="$W/ours/dump"; for f in $FRAMES_AT; do cp "$W/ours/dump_${f}_90c000.bin" "$W/ours/dump_${f}.bin"; done
 plant
-[ "$MODE" = flash-gone ] && _ours="$W/pl"
+[ "$MODE" = flash-planted ] && _ours="$W/pl"
 table "$_ours" > "$W/got.tsv"
 _bid="$(python3 "$REPO/tools/build_fingerprint.py" "$BUILD/rompath" --set vsavjw --registry "$REPO/tests/expected/registry.tsv" 2>/dev/null | tail -1)"
 _bfp="$(python3 "$REPO/tools/build_fingerprint.py" "$BUILD/rompath" --set vsavjw --set-key 2>/dev/null | tail -1 | cut -c1-8)"
@@ -150,8 +153,10 @@ echo "== 2. the rows"
 sed 's/^/     /' "$W/got.tsv"
 n_native="$(awk -F'\t' '$1=="native" && $2 ~ /^[0-9]+$/ {print $3}' "$W/got.tsv" | sort -u | wc -l | tr -d ' ')"
 [ "$n_native" = 1 ] && ok "native's row 11 is one ramp at all three frames" || bad "native's row 11 changes across the frames ($n_native values) — the reference moved"
-_n58="$(awk -F'\t' '$1=="native" && $2==2858 {print $3}' "$W/got.tsv")"; _o58="$(awk -F'\t' '$1=="ours" && $2==2858 {print $3}' "$W/got.tsv")"
-[ "$_n58" = "$_o58" ] && ok "ours equals native at 2858, before the swap — both legs reached the move" || bad "ours differs from native already at 2858 — not the frozen shape"
+for _f in $FRAMES_AT; do
+    _nf="$(awk -F'\t' -v f="$_f" '$1=="native" && $2==f {print $3}' "$W/got.tsv")"; _of="$(awk -F'\t' -v f="$_f" '$1=="ours" && $2==f {print $3}' "$W/got.tsv")"
+    [ -n "$_nf" ] && [ "$_nf" = "$_of" ] && ok "ours equals native at $_f (row 11 $_of)" || bad "ours differs from native at $_f (native $_nf, ours $_of) — the flash is back"
+done
 if python3 - "$W/wr.tsv" "$REPO/build/out/vsav2_opcodes.bin" "$BUILD/verify_op.bin" <<'PY'
 import sys
 rows = [l.rstrip("\n").split("\t") for l in open(sys.argv[1]) if l.strip()]
@@ -187,8 +192,8 @@ echo "== 3. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ] && [ -z "$MODE" ]; then
     { echo "# tests/expected/column_flash.tsv — palette row 11 (RAM:\$90C160, 32 bytes, HASHED) at the end of Donovan's Killshread Lightning"
       echo "# column (naming part donovan_4), native vsav2 against our merged build (tests/audit_column_flash.sh). Evidence class:"
-      echo "# in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on $(basename "$BUILD"): native keeps its blue ramp, ours turns to a"
-      echo "# fire ramp — the open cosmetic ticket. Columns: <leg> <frame> <row 11 SHA-1, 12 hex — never the bytes>; then"
+      echo "# in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on $(basename "$BUILD"): native keeps its blue ramp and, since (M)"
+      echo "# (14z-216), so does ours. Columns: <leg> <frame> <row 11 SHA-1, 12 hex — never the bytes>; then"
       echo "# <leg> writer <pc> <frames>: every writer of row 11 from 2780 (a non-debug write tap); <leg> run <pc> <count>: every"
       echo "# writer over the whole run; one ours build row."
       echo "#--"
@@ -200,8 +205,21 @@ grep -v '^#' "$EXPECT" > "$W/want.tsv"
 if cmp -s "$W/want.tsv" "$W/got.tsv"; then ok "every row as frozen"
 else bad "differs from the frozen rows"; diff "$W/want.tsv" "$W/got.tsv" | sed 's/^/        /'; fi
 if [ -z "$MODE" ]; then
-    { table "$W/pl"; cat "$W/wr_all.tsv"; } > "$W/ctl.tsv"; printf 'ours\tbuild\t%s\t%s\n' "${_bid:-unregistered}" "${_bfp:-?}" >> "$W/ctl.tsv"
-    if cmp -s "$W/want.tsv" "$W/ctl.tsv"; then echo "CONTROL DEAD: flash-gone — our dumps with native's row 11 still match the frozen rows"; fail=1
-    else echo "CONTROL FIRED: flash-gone — our dumps with native's row 11 differ from the frozen rows ($(diff "$W/want.tsv" "$W/ctl.tsv" | grep -c '^>') rows)"; fi
+    # THE CONTROL JUDGES ROW 11 ALONE (rule-checker run 2026-11-01-1536 Q1/Q4): only the frame-hash rows are compared, so
+    # writer, run and build rows cannot make it fire; the plant must change ours' row-11 hash at 2860 and 2866, the
+    # planted rows must differ from the FROZEN hash rows there, and the ours-equals-native check must fail on them.
+    table "$W/pl" > "$W/ctl_h.tsv"; table "$W/ours/dump" > "$W/real_h.tsv"
+    awk -F'\t' '$2 ~ /^[0-9]+$/' "$W/want.tsv" > "$W/want_h.tsv"
+    _pch=0; _neq=0
+    for _f in 2860 2866; do
+        _rp="$(awk -F'\t' -v f="$_f" '$1=="ours" && $2==f {print $3}' "$W/ctl_h.tsv")"; _rr="$(awk -F'\t' -v f="$_f" '$1=="ours" && $2==f {print $3}' "$W/real_h.tsv")"
+        _rn="$(awk -F'\t' -v f="$_f" '$1=="native" && $2==f {print $3}' "$W/ctl_h.tsv")"
+        [ -n "$_rp" ] && [ "$_rp" != "$_rr" ] && _pch=$((_pch + 1))
+        [ "$_rp" != "$_rn" ] && _neq=$((_neq + 1))
+    done
+    _dh="$(diff "$W/want_h.tsv" "$W/ctl_h.tsv" | grep -c '^>' || true)"
+    if [ "$_pch" = 2 ] && [ "$_neq" = 2 ] && [ "$_dh" -gt 0 ]; then
+        echo "CONTROL FIRED: flash-planted — with row 10 planted in row 11 at 2860/2866 ours' row-11 hash changes at both frames, the ours-equals-native check fails at both, and $_dh frozen hash rows differ (writer, run and build rows not compared)"
+    else echo "CONTROL DEAD: flash-planted — the plant changed the hash at $_pch/2 frames, the native check failed at $_neq/2, $_dh frozen hash rows differ"; fail=1; fi
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_column_flash"; else echo "FAIL: audit_column_flash"; exit 1; fi

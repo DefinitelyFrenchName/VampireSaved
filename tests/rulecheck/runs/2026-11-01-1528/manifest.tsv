@@ -1,0 +1,24 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent216/rc127/recommendation_127_162.md	bd16ba065a74826d1254ebb30e7276992223af64
+build/agent216/rc127/capture_read_127.txt	46d4c413145ed952e1aacf2cfe53938abef83321
+build/agent216/rc162/capture_read_162.txt	c9531b7b76c2209b2ac154e1e97d3b70ae1074b5
+build/agent216/rc127/rig_window.txt	52f4ffa305d4d1037dd9a599579d8fb9d53d1b9e
+build/agent216/rc127/window.py	243ff5f85d9efccb7d021b7c419f6f1e99b96e5c
+build/agent216/t127/census/census_cmp.txt	510bf9984dae6adf4998de6ab7eab59f0d292363
+build/agent216/rc127/census_ids.txt	33e643f3f5e628211792975762bc6afdc7f1d2fa
+build/agent216/rc127/census_ids.py	234bd4e1f501832c8144789086e7788c3e300021
+build/agent216/t127/rig/census.sh	bcc2f1544642750f5afe53042db78a1276cb1a66
+build/agent216/t127/rig/pod_rig.lua	af0f2628d3bb1f8d10299c43761e0babb01f4502
+build/agent216/rc162/palrows_0b.txt	e4f4184dcc51313571f5baa1f37c916d80b33972
+build/agent216/t162/rig/palrows_cmp.py	4d0ea9768927420b59cc7c9f051d684bfadc1788
+build/agent216/t162/rig/palrows_legs.sh	ac233990d8dc964ff85492f79e70230e9c43a16d
+build/agent216/rc127/inert_window.txt	ca087eaf96db88ace7c68133dc88c8f7890e43d4
+build/agent216/rc127/inert_pc_window.txt	991521fc8218625044a93934941690e8c704219c
+build/agent216/rc127/inert_window.py	3a646a9be319fc4ad6a4fa67f209e9e2f9cf7645
+build/agent216/rc127/engine_internals_1760_1790.txt	879d9e5bca6a4a756409b84c9f945c746d61157f
+build/agent216/rc127/audit_id_writers_40_48.txt	1e0093f9362da0a5d350e1529e13d0c93d68db18
+build/agent216/rc127/rulings_112.txt	acf0cf3bdee976249711b7a74b17e108cdedabaa
+build/agent216/rc127/issue_127.md	a946491c6a26b937f5aef4dd29e497ca0fc883d5
+build/agent216/t127/REPORT.md	e5d75a01849ee313c415db9cb0abe7ad6375a7a0
+build/agent216/t162/REPORT.md	35816e9c855f1afbb0390777fa03495a6064c826
+build/agent216/t127/sheet_127_pod_hit.png	6592b71fda835d9f35d18dec38b6fb868dce2c34

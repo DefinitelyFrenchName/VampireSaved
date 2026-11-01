@@ -65,8 +65,12 @@ def ev(kind, **kw):
 
 def window():
     t = subprocess.run(["xwininfo", "-root", "-tree"], capture_output=True, text=True, env=env).stdout
+    # the CLIENT window, never its frame: GNOME 46 draws decorations in a separate X client whose frame window carries
+    # the client's title and is listed first; since mutter 46.2-1ubuntu0.24.04.18 an XSetInputFocus on that frame takes
+    # focus FROM the game (FBNeo pauses on focus loss), measured on PILOT 14z-216 (docs/platform/gotchas.md)
     for l in t.splitlines():
-        if ("Vampire" in l or "FinalBurn" in l or "MAME" in l or "vsav" in l) and "has no name" not in l:
+        if ("Vampire" in l or "FinalBurn" in l or "MAME" in l or "vsav" in l) and "has no name" not in l \
+                and "mutter-x11-frames" not in l:
             return l.split()[0]
     return None
 

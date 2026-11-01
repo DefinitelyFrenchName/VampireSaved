@@ -35,7 +35,7 @@
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] tests/audit_ranking_tenant.sh [--freeze-clock]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] tests/audit_ranking_tenant.sh [--freeze-clock]
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
@@ -44,7 +44,7 @@ FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
 CLOCKS="tests/expected/instr_gameclock/audit_ranking_tenant.tsv"
 [ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
 _clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
-BUILD="${BUILD:-build/m3b_merged31}"
+BUILD="${BUILD:-build/m3b_merged32}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 RPL=tests/replays/26_don_arcade_mash.rpl

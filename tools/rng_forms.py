@@ -19,6 +19,27 @@ import argparse, collections, os, re, sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FROZEN_MP = os.path.join(REPO, "tests/expected/move_parity_events.tsv")
+ATTRIB = os.path.join(REPO, "tests/expected/move_parity_attribution.tsv")
+
+
+def slowdown_exempt(table_a):
+    """THE #345 EXEMPTION (ruled 2026-11-01, 14z-216: "Exempt #345's rows, keep 0000 (Recommended)";
+    DECISIONS_HISTORY.md "#345's rows under a non-zero RNG"): a move_parity row whose form-A row is `after:<root>` of a
+    root the attribution file (tests/expected/move_parity_attribution.tsv) classes SLOWDOWN — a frame overrun that falls
+    differently with the RNG — may turn IDENT -> DIFF under form B; it is listed by name, never silently. Mechanical:
+    read from the two frozen files, never from a list typed here."""
+    slow = set()
+    if os.path.exists(ATTRIB):
+        for l in open(ATTRIB):
+            f = l.rstrip("\n").split("\t")
+            if len(f) > 3 and f[0] == "root" and f[3] == "SLOWDOWN":
+                slow.add(f[1])                    # "part:event"
+    out = set()
+    for (part, ev), v in table_a.items():
+        m = re.match(r"after:(\d+)$", v[4]) if len(v) > 4 else None
+        if m and f"{part}:{m.group(1)}" in slow:
+            out.add((part, ev))
+    return out
 
 
 def mp_table(p):
@@ -73,11 +94,12 @@ def main():
     c174 = {f: chains_table(f"{W}/c174_{f}/got.tsv") for f in "ABC"}
     c184 = {f: chains_table(f"{W}/c184_{f}/got.tsv") for f in "ABC"}
     # --- the must-fire perturbations, applied to COPIES (in-gate) or to the real input (mode) ---
-    def flip_one_ident(t):
-        t = dict(t); k = next(k for k in sorted(t) if t[k][0] == "IDENT"); t[k] = ["DIFF"] + t[k][1:]; return t
+    exempt = slowdown_exempt(mp["A"])
+    def flip_one_ident(t):   # the first IDENT row the #345 exemption does not cover, so the control cannot go dead on it
+        t = dict(t); k = next(k for k in sorted(t) if t[k][0] == "IDENT" and k not in exempt); t[k] = ["DIFF"] + t[k][1:]; return t
     def move_one(t):
         t = dict(t); k = sorted(t)[len(t) // 2]; t[k] = ["DIFF" if t[k][0] == "IDENT" else "IDENT"] + t[k][1:]; return t
-    fired["ident-flipped"] = any(k.startswith("IDENT->DIFF") for k in transitions(mp["A"], flip_one_ident(mp["B"])))
+    fired["ident-flipped"] = any(k not in exempt for k in transitions(mp["A"], flip_one_ident(mp["B"])).get("IDENT->DIFF", []))
     fired["baseline-moved"] = mp_table(FROZEN_MP) != move_one(mp["A"])
     fired["form-inert"] = not [k for k in transitions(mp["A"], mp["A"]) if k != "same"]
     if ctl == "ident-flipped":
@@ -111,8 +133,14 @@ def main():
         print(f"  {k}\t{rows[k]}")
 
     print("== 3. the reading ruled on (#183, 2026-09-30)")
-    b_new = [k for k in rows if k.startswith("mp\tB\tIDENT->") and "DIFF" in k] + \
+    mp_b = transitions(mp["A"], mp["B"]) if mp["A"] is not None and mp["B"] is not None else {}
+    b_exempt = [k for t, ks in mp_b.items() if t.startswith("IDENT->") and "DIFF" in t for k in ks if k in exempt]
+    b_new = [f"mp\tB\t{t}\t{p}:{e}" for t, ks in mp_b.items() if t.startswith("IDENT->") and "DIFF" in t
+             for (p, e) in ks if (p, e) not in exempt] + \
             [k for k in rows if k.startswith("c174\tB\tIDENT->") and "DIFF" in k]
+    if b_exempt:
+        print(f"  note  {len(b_exempt)} IDENT row(s) turn DIFF under B downstream of a SLOWDOWN root — the #345 exemption "
+              f"(ruled 2026-11-01): {' '.join(f'{p}:{e}' for p, e in sorted(b_exempt))}")
     (ok if not b_new else bad)("under B (a non-zero word every frame) no IDENT row of move_parity or chains174 turns DIFF"
                                + ("" if not b_new else f": {b_new}"))
     b_moves = sum(int(v.split("\t")[0]) for k, v in rows.items() if k.startswith("mp\tB\t") and not k.endswith("\tsame"))

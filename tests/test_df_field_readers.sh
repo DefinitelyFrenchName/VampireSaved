@@ -38,11 +38,11 @@
 # moves a placed region moves these addresses: re-freeze at every freeze (FREEZE=1),
 # reviewing the diff.
 #
-# Usage: [BUILD=build/m3b_merged31] [FREEZE=1] tests/test_df_field_readers.sh
+# Usage: [BUILD=build/m3b_merged32] [FREEZE=1] tests/test_df_field_readers.sh
 #   static tier (a build dir, no emulator); measured 14z-168 on this MacBook: ~6 s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD="${BUILD:-build/m3b_merged31}"
+BUILD="${BUILD:-build/m3b_merged32}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/df_field_readers.tsv"
 CONTROL="${CONTROL:-}"
@@ -105,7 +105,9 @@ if [ "${FREEZE:-0}" = 1 ]; then
         echo "# access each makes and its base register (tests/test_df_field_readers.sh; tools/audit_df_field_readers.py). Evidence class:"
         echo "# static. First frozen 14z-168; this freeze with FREEZE=1 on $(basename "$BUILD"). The x028122 meter adder copies, the one reader"
         echo "# measured to change play, test +0x111 since the M19 gauge fix (tests/audit_df_meter.sh) and are no rows; the rest are"
-        echo "# unmeasured. Columns: <access> <field> <addr> <region> <base> <insn>."
+        echo "# unmeasured. Since M24 (14z-216) the two code-op reads of +0x1C3 at the head of the placed body are #294's routine, vs2's"
+        echo "# per-frame palette code verbatim: ours never sets +0x1C3, so its Dark Force branch never runs (#344; tests/audit_don_row0c.sh)."
+        echo "# Columns: <access> <field> <addr> <region> <base> <insn>."
         echo "# Re-freeze at every freeze (placed addresses move), reviewing the diff."
         echo "#--"
         cat "$W/got.tsv"

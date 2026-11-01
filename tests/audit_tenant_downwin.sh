@@ -99,7 +99,7 @@
 # `round2-before-end` (#343) prove the gate tells a last-bar death from
 # a spare-bar-skipping one and a match end from a round 2.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [JOBS=6]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [JOBS=6]
 #        tests/audit_tenant_downwin.sh          (~13 legs x ~1.5 min, JOBS at a time)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -117,7 +117,7 @@ export MAME_BIN
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 JOBS="${JOBS:-6}"
-BUILD="${BUILD:-build/m3b_merged31}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged32}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)" || { echo "FAIL: audit_tenant_downwin — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 RPL="$REPO/tests/replays/judge/01_timeout_lead.rpl"
@@ -133,7 +133,8 @@ FIELDS="$FIELDS,ff8452:w:wh1,ff8852:w:wh2,ff8538:w:nb1,ff8938:w:nb2,ff87b0:b:bat
 LAST2=";3006:ff8938:0000;3006:ff8bb0:00"     # P2 victim's +0x138, +0x3B0
 LAST1=";3006:ff8538:0000;3006:ff87b0:00"     # P1 victim's +0x138, +0x3B0
 if vs_ctl_is ko-without-last-bar; then LAST2=""; LAST1=""; fi   # the control: the 14z-104 rig, HP alone
-KOPK=";3006:ff8850:0001;3008:ff8852:0001$LAST2"
+KOBASE=";3006:ff8850:0001;3008:ff8852:0001"   # the KO pokes; LAST2 adds the victim's last bar
+KOPK="$KOBASE$LAST2"
 
 n=0
 leg() {  # name  p1id  p2id  extra-pokes  [replay]
@@ -167,6 +168,8 @@ leg p1hurt 01 03 ";3004:ff8450:00c800c8$KOPK"
 # down on each side: P2 (Victor) hit by P1's jab; P1 (Demitri) hit by P2's jab
 leg fd 01 03 ";3006:ff8850:0091;3008:ff8852:0091"
 leg fd1 01 03 ";3006:ff8450:0091;3008:ff8452:0091" "$W/p2jab.rpl"
+# the last-bar control's leg, in-gate (14z-216): ctl with the base pokes alone, as the mode leaves them
+leg ctl_nolast 01 03 "$KOBASE"
 wait
 
 python3 - "$W" "$MODE" <<'PY' || { echo "FAIL: tenant downwin audit"; exit 1; }
@@ -334,6 +337,25 @@ else:
     missing = [l for l in WANT if l not in ends]
     print(f"CONTROL DEAD: round2-before-end — KO leg(s) {missing} reached no match end")
     errs.append(f"round2-before-end: legs {missing} not judged")
+# THE LAST-BAR CONTROL, IN-GATE (14z-216, the M24 freeze: declared at 14z-215 but fired only as a CONTROL= mode, so a plain
+# run never printed it and the runner read it NOT FIRED): ctl's KO with the SAME base pokes and NO last-bar pokes (the
+# 14z-104 rig, HP alone) must not be a last-bar death — P2's +0x138/bat not 0 the frame before the KO; no KO is DEAD.
+crow = {}
+try:
+    for line in open(f"{W}/ctl_nolast/field.txt"):
+        f = line.split()
+        if len(f) >= 3 and f[0] == "F":
+            crow[int(f[1])] = {k: int(v) for k, v in (kv.split("=") for kv in f[2:])}
+except OSError:
+    pass
+cko = next((fr for fr in sorted(crow) if crow[fr]["p2hp"] < 0), None)
+if cko is None or cko - 1 not in crow:
+    print("CONTROL DEAD: ko-without-last-bar — the HP-only leg ctl_nolast has no KO"); errs.append("ko-without-last-bar dead")
+elif (crow[cko - 1]["nb2"], crow[cko - 1]["bat2"]) != (0, 0):
+    print(f"CONTROL FIRED: ko-without-last-bar — with HP alone the KO (f{cko}) is not a last-bar death: P2's +0x138 "
+          f"{crow[cko - 1]['nb2']} and bat {crow[cko - 1]['bat2']} the frame before (expected 0 and 0 on the last bar)")
+else:
+    print("CONTROL DEAD: ko-without-last-bar — the HP-only leg died on its last bar anyway"); errs.append("ko-without-last-bar dead")
 for e in errs:
     print("FAIL:", e)
 sys.exit(1 if errs else 0)

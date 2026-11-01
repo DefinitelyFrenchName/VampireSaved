@@ -43,13 +43,15 @@
 # the document and its checker moved in one commit.
 #
 # THE COVERAGE NUMBER IS NOTE-CLASS, NEVER FATAL (ruled 2026-09-07, the L2
-# convention): the tool prints `NOTE: checkdocs_rom.coverage <n>/394` at column
+# convention): the tool prints `NOTE: checkdocs_rom.coverage <n>/407` at column
 # 0, and because this gate CAPTURES the tool's output to a file it must RE-EMIT
 # that line itself, unindented — asserting the note inside a captured file
 # proves the tool works and says nothing about what the runner receives
-# (paid twice; docs/project/gotchas.md). 394 is the atlas tier (379 until 14z-189, 370 until 14z-161, 364 until 14z-160) minus the
+# (paid twice; docs/project/gotchas.md). 407 is the atlas tier (394 until 14z-216, 379 until 14z-189, 370 until 14z-161, 364 until 14z-160) minus the
 # addresses carried only by `ram.md` (346 at the 2026-09-07 ruling, 473 minus 127;
-# 394 since 14z-189 — the 15 addresses f1ab31d9's docs/game/atlas/select_screen.md paragraph on #128's Marionette sites
+# 407 since 14z-216 — the 13 addresses docs/game/atlas/select_screen.md's #128 Marionette paragraph added (vs2 code sites,
+# records and tables), 0 removed, measured by build/rc189/h5/denominator/tier_diff.py, HEAD -> the M24 tree
+# (build/agent216/m24/denominator_diff.txt); 394 since 14z-189 — the 15 addresses f1ab31d9's docs/game/atlas/select_screen.md paragraph on #128's Marionette sites
 # added (vs2 code sites and records, and the scan bounds 0x0BFFFF/0x0C0000, which the tool's NOT_ADDRESSES policy keeps in
 # the denominator), measured by build/rc189/h5/denominator/tier_diff.py; 379 since 14z-161; 370 since 14z-160; 364 since 14z-157), whose claims are dataflow and belong
 # to the suite (scope §6.5). The COVERED set freezes at the atlas-tier close,
@@ -167,8 +169,8 @@ grep -q '^  ok: the covered set equals the frozen inventory' "$out" \
 note=$(grep '^NOTE: checkdocs_rom.coverage ' "$out")
 [ -n "$note" ] || bad "the coverage NOTE is absent from the tool's output"
 case "$note" in
-    "NOTE: checkdocs_rom.coverage "*"/394 atlas ROM-tier addresses")
-        ok "the coverage number reports against the ruled denominator, 394 since 14z-189" ;;
+    "NOTE: checkdocs_rom.coverage "*"/407 atlas ROM-tier addresses")
+        ok "the coverage number reports against the ruled denominator, 407 since 14z-216" ;;
     *)  bad "the coverage NOTE does not report against the ruled denominator: $note" ;;
 esac
 # RE-EMIT IT AT COLUMN 0. The tool's own output is captured to a file, so the

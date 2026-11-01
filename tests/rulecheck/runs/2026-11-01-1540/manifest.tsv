@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent216/rc294/build/ruling_294.txt	99a0c17298d0c4dd253972ee2604375ab80214bd
+build/agent216/rc294/build/run_1533_verdict.txt	102043c66542636ea4b03b2e83dd34f7a098d64d
+build/agent216/rc294/build/recommendation_294.md	db547106cf715e47f69acdcb90a4fc414182ff1b
+build/agent216/rc294/build/test_dead_span.log	52e35b0a71d522f01a19e38e0e45fef57f3cfedc
+build/agent216/rc294/build/gen.diff	b067eccd849ff720a256809f0eddcd3e401241e0
+build/agent216/rc294/build/manifest_perframe.txt	4759ff6e9a37d8fd547252af95203c32f3ef4f7c
+build/agent216/rc294/build/tenantloop_294.diff	c165c1dd0307c916837df097bab43f2cd4912b34
+build/agent216/rc294/build/tenant_loop_294.log	ffa9ddf0fc44e8885ddae7d6dbce9f3454c6b464
+build/agent216/rc294/build/tenant_loop_after.log	bdde7e15ec12586f4e0fb82013135e73751d1dad
+build/agent216/rc294/build/rule5_tool.diff	f567c5cab73a88333109c0edc83dc13726d8a12b
+build/agent216/rc294/build/rule5_change.txt	63c5045bf881e0f26f0f07c97afb6f5d507f97fa
+build/agent216/rc294/build/rule5_294.log	7741fde11b6599a1e42e244b91e674dd33bf30ca
+build/agent216/rc294/build/rule5_after.log	eb99a2f240e212e034330e2587addae2a2037e17
+build/agent216/rc294/build/gen_fragments.txt	1ab55c21e33bac34889f2cb4e74a5d20aafca0ab
+build/agent216/rc294/build/twins_check.txt	3225e765426c3f548d6aca89a4fc1c81cb5a4fbe
+build/agent216/rc294/build/field_1ca.txt	286104f69d05f8e39bf352af4d6092c0b89bd2c1

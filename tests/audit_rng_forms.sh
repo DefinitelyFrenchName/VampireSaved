@@ -13,10 +13,13 @@
 #   tests/expected/move_parity_events.tsv, so a build or basis move cannot pass for an RNG effect. A gate's own
 #   verdict under B or C is not this audit's verdict (audit_chains184 stops at its native outcome check under both).
 # EXPECTS: form A passes all three gates and equals the frozen move_parity table; under B no IDENT row of
-#   audit_move_parity or audit_chains174 turns DIFF, and some move_parity rows move (the pin reaches the game); every
+#   audit_move_parity or audit_chains174 turns DIFF — but a move_parity row downstream (`after:`) of a SLOWDOWN root of
+#   tests/expected/move_parity_attribution.tsv, listed by name (the #345 exemption, ruled 2026-11-01: donovan_2's events
+#   3-25, IDENT under 0000 on M24 and DIFF under 0100 as on M23) — and some move_parity rows move (the pin reaches the game); every
 #   tally row equal to tests/expected/rng_forms.tsv; every control fails.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_chains174.sh tests/audit_chains184.sh
-#   tests/audit_move_parity.sh tests/expected/move_parity_events.tsv tests/expected/rng_forms.tsv tests/lib/controls.sh
+#   tests/audit_move_parity.sh tests/expected/move_parity_events.tsv tests/expected/move_parity_attribution.tsv
+#   tests/expected/rng_forms.tsv tests/lib/controls.sh
 #   tools/rng_forms.py tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: none — a wrapper: it re-runs audit_move_parity, audit_chains174 and audit_chains184 under three RNG forms; those gates carry the sheets
@@ -31,7 +34,7 @@
 #   C's IDENT->DIFF rows (not attributed; ours draws in vsavj's motion trackers where native does not, #176); FBNeo;
 #   a second host; run-to-run repeats.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [FREEZE=1] [KEEP=<dir> [REUSE=1]] tests/audit_rng_forms.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [FREEZE=1] [KEEP=<dir> [REUSE=1]] tests/audit_rng_forms.sh
 #   REUSE=1 with KEEP re-reads a work dir an earlier run of THIS audit filled (the control modes on the real tables,
 #   seconds instead of hours); a form whose tables are missing is run
 #   emulator tier, MAME; ~8 min on this MacBook (nine gate runs, each parallel inside; 7 min 30 s measured 14z-186)
@@ -41,7 +44,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 export ROMDIR
-BUILD="${BUILD:-build/m3b_merged31}"; export BUILD
+BUILD="${BUILD:-build/m3b_merged32}"; export BUILD
 EXPECT="$REPO/tests/expected/rng_forms.tsv"
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"

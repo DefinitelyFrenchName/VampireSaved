@@ -50,7 +50,11 @@ fail() { echo "  FAIL: $*"; rc=1; }
 # The stub answers by which Lua script it was asked for, so A1 and A2 are
 # satisfied (their measurements are irrelevant here) and only A3's is varied.
 mkstub() { # mkstub <mode> <outfile>
-    sed 's|tools/run_mame\.sh|"$STUB_MAME"|g' "$SRC" > "$2"
+    # The copy runs from $T, so its own `REPO="$(cd "$(dirname "$0")/.." ...)"` would name $T's parent: since 14z-212
+    # the audit sources "$REPO/tests/lib/jobs.sh", and the copy died there before any section ran (red at the M24
+    # freeze tier, 14z-216; session tiers had carried it). The copy's REPO is pinned to this tree (the audit writes
+    # only under its own mktemp WORK); section 3 still proves the refusals are A3's.
+    sed -e 's|tools/run_mame\.sh|"$STUB_MAME"|g' -e "s|^REPO=.*|REPO=\"$REPO\"|" "$SRC" > "$2"
     chmod +x "$2"
     cat > "$T/mame_$1.sh" <<STUB
 #!/bin/sh

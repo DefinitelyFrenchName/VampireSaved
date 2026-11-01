@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-592 entries (49 game / 148 platform / 395 project), counted from the buckets at generation.
+594 entries (49 game / 149 platform / 396 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
@@ -74,7 +74,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A MOTION THAT LEAVES A NEUTRAL FRAME BETWEEN BACK AND DOWN-BACK IS TWO TAPS TOWARD BACK, AND A CHARACTER WITH A BACKDASH DASHES — the press then lands in the hop (paid: 14z-205, #229, forks F3 and P1)
 - THE GAME HAS ONE ROUND: A DOWN THAT ENDS THE MATCH IS NEVER FOLLOWED BY A ROUND 2, AND A KO POKED WITH HP ALONE ENDS THE MATCH WITH THE SPARE BAR UNUSED (paid: 14z-215, GitHub #343)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 148 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 149 entries
 
 - LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB; `/bin/sh` IS DASH; THE PINNED MAME'S VERBOSITY IS A BUILD FACT — three macOS facts the first Linux emulator tier paid for (paid: 2026-10-01, ERIS WSL2 Ubuntu, GitHub #201)
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
@@ -224,8 +224,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A BUILTIN `printf` OR `echo` PIPED INTO `grep -q` CAN PRINT THE SHELL'S WRITE ERROR — `grep -q` exits at its first match, and with SIGPIPE ignored the builtin's next write fails loudly (paid: 14z-208c/14z-210, #327)
 - A FAILED `X="$(mktemp -d)"` LEAVES X EMPTY AND THE SCRIPT RUNS ON — `"$X/sub"` IS THEN A PATH UNDER `/` (paid: 14z-210, ERIS; fixed 14z-211/212, #333)
 - A SHELL'S WRITE-ERROR TEXT IS ITS OWN — bash says `write error: Broken pipe`, dash (Ubuntu's `sh`) `printf: I/O error` (paid: 14z-212, PILOT; #336)
+- ON GNOME 46, THE FIRST `xwininfo -tree` LINE NAMING A WINDOW IS ITS FRAME, OWNED BY `mutter-x11-frames` — focus that frame through Xlib and, since mutter 46.2-1ubuntu0.24.04.18, the client LOSES focus (FBNeo pauses) (paid: 14z-216, PILOT)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 395 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 396 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -622,3 +623,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A CONTROL THAT PERTURBS "THE FIRST ROW" DEPENDS ON THAT ROW'S STATE — test_tickets' parked-disagrees went DEAD the day the newest ticket closed (paid: 14z-214, #341)
 - A CRASH PLANTED ON EVERY CALL PROVES NOTHING ABOUT WHERE A GATE HIDES ONE — and a census counting `# MUST-FIRE:` lines anywhere counts a heredoc stub's header (paid: 14z-215, #310)
 - A `timeout` ON A REMOTE RUNNER KILLS THE RUNNER, NOT ITS EMULATORS — three MAME legs spun 10 h on ERIS after their batch's bound (paid: 14z-215, #310)
+- A RE-POINT SWEEP REWRITES A QUOTED RULING — and an attribution window misses a pointer that straddles its end (paid: 14z-216, the M24 freeze)

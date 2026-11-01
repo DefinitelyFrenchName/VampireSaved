@@ -29,7 +29,7 @@
 # or the note that the pairing is one the script never executes.
 #
 # Static tier: needs ROMDIR only on a cold decrypt cache (tests/lib/decrypt_cache.sh)
-# and build/m3b_merged31/verify_data.bin for our wheel (SKIP without it).
+# and build/m3b_merged32/verify_data.bin for our wheel (SKIP without it).
 #
 # Usage: ROMDIR=... [FREEZE=1] tests/test_poked_legs.sh
 set -eu
@@ -39,7 +39,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 CONTROL="${CONTROL:-}"
 case "$CONTROL" in ""|new-flavor-leg|dropped-row) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 . "$REPO/tests/lib/controls.sh"   # vs_ctl_show_err (#310 group 5)
-WIDE_DATA="${WIDE_DATA:-$REPO/build/m3b_merged31/verify_data.bin}"
+WIDE_DATA="${WIDE_DATA:-$REPO/build/m3b_merged32/verify_data.bin}"
 [ -f "$WIDE_DATA" ] || { echo "SKIP: no WIDE data view at $WIDE_DATA"; exit 0; }
 EXPECT="$REPO/tests/expected/poked_legs.tsv"
 ACCEPT="$REPO/tests/expected/poked_legs_accepted.tsv"

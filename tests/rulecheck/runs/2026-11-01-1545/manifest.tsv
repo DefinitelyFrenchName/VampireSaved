@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent216/rc294/g0c/audit_don_row0c.sh.txt	1da8b482a09ca59ada12091626757a819c38b552
+build/agent216/rc294/g0c/pal_rows_tap.lua.txt	930fa7c2610fa0182b1c49622d0fd2c1065fd1e5
+build/agent216/rc294/g0c/run1_before_df_rule.log	3e3020b2aea110d44b6882751a031a304273a8bb
+build/agent216/rc294/g0c/df6_runs.txt	b3dceba0029cf8971f2039644a9ac42fa45d9dfb
+build/agent216/rc294/g0c/run2_df_rule.log	cdc468f87533a97e32723aff711698b145bc3a30
+build/agent216/rc294/g0c/df_colour_vs_brightness.txt	607f10c25b70e74377f9143058a6d85f18b67844
+build/agent216/rc294/g0c/run4_r5_premise_failed.log	c2f334665b0ce9dd3268f1561dcbbcc074186478
+build/agent216/rc294/g0c/run6_final.log	f4800815e1227d8c0d98f1e28c2635458549a296
+build/agent216/rc294/g0c/mode_row_reverted_final.log	c51801e9f9e08204fd0bb6a65448eafa9c88b753
+build/agent216/rc294/g0c/ruling_294.txt	99a0c17298d0c4dd253972ee2604375ab80214bd
+build/agent216/rc294/g0c/ruling_df_change.txt	cb398f6de87fcdf2d72faebfc9358767c731e108
+build/agent216/rc294/g0c/test_dead_span.log	52e35b0a71d522f01a19e38e0e45fef57f3cfedc
+build/agent216/rc294/g0c/dead_span_ours.txt	cd6a6644817ca598d96e7cd364c47e853d23e690
+build/agent216/rc294/g0c/run_1541_verdict.txt	f0e22f4754dd765a82e1c83592ec64f84ad4c948
+build/agent216/rc294/g0c/sheet294_df.png	1cabdd96ccd9584985bc15181af0a8a75091754c

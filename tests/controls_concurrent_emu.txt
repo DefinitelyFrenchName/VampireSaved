@@ -4,7 +4,7 @@
 # unlisted gate runs its controls one after another in its own slot, as before. A gate is listed only when a write trace
 # of each of its control modes on PILOT shows no path two of them write and none writes a path a sibling reads (each
 # control's own mktemp directories aside) — the #315 method, ruled for the emulator lanes 2026-10-26 (14z-210): "Write
-# trace on PILOT, don't use PILOT for any other task to avoid overlap". gate<TAB>traced blob<TAB>trace<TAB>reason
+# trace on PILOT, don't use PILOT for any other task to avoid overlap" (clarified 14z-216: "splitting the load between machines is perfectly fine", each tracing machine running nothing else). gate<TAB>traced blob<TAB>trace<TAB>reason
 # HELD BY tests/test_controls_concurrent.sh (tools/controls_concurrent.py --emulator): a script changed since its trace, a
 # gate with no fbneo/mame row, or one declaring fewer than two controls is named and must be re-traced or taken off.
 # TRACES: pilot:688edef8 = PILOT (Ubuntu 24.04), 14z-210 (fork T, #321): every control of the 61 fbneo/mame gates with 2+ controls, 200 runs, 15,664 s + a 1,166 s re-trace of 9 (strace 6.8 --seccomp-bpf); 51 SAFE, 5 SAFE once a relative rename is placed (listed since the scorer places it, re-scored 14z-210), 5 SHARED (local evidence build/agent210/t321trace/).
@@ -18,63 +18,64 @@
 # TRACES: pilot:69321107 (second batch, build/agent215/pilot_t215d/, local) = PILOT, 14z-215: the 12 further gates #310 groups 1-4 changed — audit_defense_row_reads, audit_defense_row_residue, audit_effect_class_rows, audit_guard_mask_reads, audit_hitclass_map_cost, audit_merged_legacy, audit_palette_seq_ids, audit_phase_mode_cost, audit_projectile_clash, audit_ranking_tenant, audit_tenant_throw_geometry, test_beam_anim_walk — 35 control runs, all SAFE in tools/controls_overlap.py, every control log HONOURED by tests/lib/classify.sh, each gate's plain run PASS there.
 # TRACES: pilot:69321107 (third batch, build/agent215/pilot_t215e/, local) = PILOT, 14z-215: audit_merged_vec3, audit_objhook_owner_census, audit_walker_repoint, re-run with build/hui30 and build/don_m5 copied INTO the clone (the second batch had skipped existing dirs, so these three SKIPped or failed there) — 7 control runs, all SAFE, every control log HONOURED, each plain run PASS.
 # TRACES: pilot:42e7f251 = PILOT, 14z-215 (#310 groups 5-6: the hidden-traceback helper vs_ctl_show_err and the plants-not-applied fixes, scratch commit 42e7f251, local evidence build/agent215/pilot_t215h/): the 2 emulator gates those edits changed — 12 control runs, all SAFE in tools/controls_overlap.py, every control log HONOURED by tests/lib/classify.sh.
-audit_air_gc_legacy	4293809dce1cd410066f2c660bd868755a5de826	pilot:eb6606fd	5 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
-audit_chains174	9037fa556f2dbd78c451b70ad6ea1dd3592f14a7	pilot:688edef8	5 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_chains184	f99ab8888180c71d4de21cd63481fe388f5e2301	pilot:688edef8	7 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_column_flash_cause	68725e38d9a8044d0fd6bf8cf5d9080783d336f9	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_column_shock	f7dad1d83048005e5d6d4022dec27052dcbe7c91	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_defense_row_reads	c6d08bf844abab25429aa26533bea5d1e0f024f1	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-audit_defense_row_residue	bde1c2655b85746893c8a4ebe6e7302c290fc4b4	pilot:69321107	3 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-audit_df_field_readers_live	3aeba778ed0876c4a61fa596806bae0775e9ead7	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_df_moves	ca4e221384a1c77b1b52171a8ec63fe2fb62a9a8	pilot:688edef8	10 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_dmg_legacy_sweep	0dce235e8e8ac2115171614e50c42c9a934b9637	pilot:688edef8	6 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+# TRACES: pilot:d1aed6a8 + eris:d1aed6a8 = PILOT and ERIS (WSL2 Ubuntu), 14z-216, the M24 freeze re-trace at snapshot S4 d1aed6a8 (refs/scratch/m24-s4) of the 45 rows the M24 re-point sweep staled, each control run with the runner's resolved arguments (CMDS), strace --seccomp-bpf, ×2 control timeout: PILOT 54 runs (34,022 s of control time; 13 gates, then the two release gates ERIS cannot run), ERIS 110 runs (3,897 s; 30 gates), each machine running nothing else (the load split between machines, ruled 14z-216, DECISIONS_HISTORY.md); 45 SAFE, 0 SHARED, 0 HOLLOW in tools/controls_overlap.py, all 164 control logs HONOURED by tests/lib/classify.sh (local evidence build/agent216/m24/rt216_emu/).
+audit_air_gc_legacy	025f0d076f37af39096fded4e758dc5b241cbf89	eris:d1aed6a8	5 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_chains174	cfeb505e39a873aa5a4a2d19614f58cea467cc6f	eris:d1aed6a8	5 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_chains184	cc811f707cc6fd51a31848063d4f7d7ad939f444	eris:d1aed6a8	7 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_column_flash_cause	e2f98402ab0e4172c6183d122f15f01d94f394a6	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_column_shock	21f540ae46bff5afb707604f2925d13c4cc0fb38	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_defense_row_reads	554d3525ce078d9fd5decfc8f42cfadb58aa2e81	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
+audit_defense_row_residue	f0da248be9d53ecc3019b95313e42fe86148b11a	eris:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_df_field_readers_live	c79aa1999546cb226000463872e41f75bdfe010a	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_df_moves	35c68f91544b841fbbef7a702810ba4695cd2def	eris:d1aed6a8	10 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_dmg_legacy_sweep	50a982c59527025b66a28c3962d05808eb203ce3	pilot:d1aed6a8	6 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
 audit_effect_class_rows	d37d17797360118283564bc41ea3d22f38a91943	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-audit_facing_hook_ab	15a12d4325a545479e82ec557893aaeceef3b13a	pilot:688edef8	4 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_facing_rule	01811206534381e37968645335dd2fd6e42535a0	pilot:eb6606fd	2 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
-audit_facing_sweep	aa83073bd675723ee505dbefbe33f47f6f77ec22	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_flicker_attribution	2d83b2c1715b0c42ec4106a6c6a9e6e96715d3e4	pilot:eb6606fd	2 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
+audit_facing_hook_ab	ed276d0ec25626e81fc35c6c6ae1f68705098a55	pilot:d1aed6a8	4 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
+audit_facing_rule	d17a8d7e0dd3df24c75d3a4bcb331a0ae53c8c01	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_facing_sweep	af6e000eec25e664a2306e06ec24dbbb05c054df	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
+audit_flicker_attribution	103be1e0495c269b8c9cfa54839df5b78b4f2cc1	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
 audit_forced_pick_fidelity	8659170834191d3fd1610a817580a8e8d6b6fd7b	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_guard_mask_reads	eeec39c9c7c546c34061d9fc22a6f5a3eb7da1f2	pilot:69321107	3 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-audit_guard_reentry	3e275f3fd134d613a85f1d4444a3e93f95a72259	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_hitbox_parity	085cb147acb9c3c9d58d1111088775ac36a07e01	pilot:6829e446	3 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
+audit_guard_mask_reads	b08eb2145910016662080528fda8ac56bc53886a	eris:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_guard_reentry	d78ce36e27ea786a69f26b02d3ff32fbc74aed3e	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_hitbox_parity	a1fba97905bcacffba5968df5b99f74fc09959b1	eris:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
 audit_hitclass_map_cost	1086007eef04863b1e180cf719081b4ab8536d6b	pilot:69321107	3 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-audit_latch_reads	df74ccbdcf6bff598bfaf0621066577a61544c19	pilot:42e7f251	2 controls write-traced 14z-215 (#310 groups 5-6): none writes a path a sibling writes or reads
-audit_merged_legacy	4f7d40e7b596a7dd5028471b8a874e7d0aeab715	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
+audit_latch_reads	cc6f76c4e51c04193670eda351f9b0674dd22cc7	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_merged_legacy	610161b05d40708e2084794e27421cec2c9fa0d6	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
 audit_merged_vec3	2c75b72ae2e63f70fcc74408a919d538185ba5ce	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-audit_move_parity	b6004d90f7eb380467403385833264e7b3157678	pilot:dd0c9357	7 controls write-traced 14z-213 (#310 rule 1): none writes a path a sibling writes or reads
-audit_move_parity_attribution	fa5744cf04825216069b3064531ac2bd2cf01e92	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_move_parity	1a6eb91ed708ebb7f9180e19a1c5c33db02cd2ba	eris:d1aed6a8	7 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_move_parity_attribution	1b903e658c76cb7f429d6512aa986e7038868253	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
 audit_objhook_owner_census	34d0241fdd0a6963e3d3396a1c007bcc4fe10baf	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
 audit_palette_seq_ids	560b814cd97dcb9cf8daca30d499df8075e73545	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
 audit_phase_mode_cost	8a1861227eb0dffafeae5dd37a7c6de8506a21d6	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-audit_phobos_dmg_residual	86e804adc530f835f73641149a3af3c20e5c07bb	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_projectile_clash	7bbb4f1075926ccfd6500c0d5f94ec60d921ac22	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-audit_pursuit_flag	420c01c28f24e0fe1940c2a6e5a8a6aef1933473	pilot:688edef8	4 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_ranking_tenant	b87c92e3d2eb16311ed84bde4a3b3fe95db658bf	pilot:69321107	3 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-audit_reaction_class_live	875fe1edee9a00f283e7b84d082834dae16c2bec	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_phobos_dmg_residual	2815cc61f17c9ccde36fb2b3c01d17b5baced74f	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_projectile_clash	490e2d9244ae457b18d129bfb78207b6823d119e	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_pursuit_flag	df706d8b018d4c4e236d949fee45c384ee6e35bb	eris:d1aed6a8	4 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_ranking_tenant	66f4e87bc0a0c1fb88129ea0f4820debffecf99f	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
+audit_reaction_class_live	90aeb9e68652cf06c75026399813cbcff19677ca	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
 audit_release_linux_desktop	df7b25f6ee601332023bba18b4f86b244744eb1a	pilot:f6ba8f02	3 controls write-traced 14z-210 (fork Q, #321): none writes a path a sibling writes or reads
-audit_rig_opening	96a943fe97fa4e3047a0bc2fc04ec4b4cd8ff3e6	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_rng_draws	ad09f77e97fd13b53da5628fbe6edce42fb6416e	pilot:688edef8	5 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_rng_forms	f8881b85bc5a07b139cbe0e5007f05b9937d48c6	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_shared_wall_push	a32ff99f897f5f035e887b8db547e0caea300281	pilot:eb6606fd	3 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
-audit_tenant_continue_switch	0188a19ee932d09d8ad17f3dd992d53277e8e3de	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_tenant_cpu_soak	ef7ac8f665379a75e20322a10a8241b808f6a740	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_tenant_throw_geometry	3cc7008c3d987b029a21f26a7624433ca2432cc6	pilot:69321107	9 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-audit_throw_registration	1cdb38a5057a71cf6b85ab66dc020ca1144806c8	pilot:688edef8	4 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_rig_opening	654bf7690c16c46968b73513bd3fa088407fc470	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_rng_draws	87f0bfe6e5833205f9ebfa9be888a1e1b6b4d91a	eris:d1aed6a8	5 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_rng_forms	238c0a86d40c7ea8c792fc63610a16b4b844658c	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
+audit_shared_wall_push	85aee4ef3aa358c8846abd1dcb9cce71f8fdd09f	eris:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_tenant_continue_switch	efb684b6da1e6effc85c27988d1a2f404bd45ae9	eris:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_tenant_cpu_soak	92ba2ca17f1f3417e00fbc48a2dff2a1489dfb62	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
+audit_tenant_throw_geometry	d8b15aea5c177f48cf2df75fd2f75800d38d1b26	pilot:d1aed6a8	9 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
+audit_throw_registration	71e334fc9b587b542654fbac196a19dbaa84a6a0	eris:d1aed6a8	4 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
 audit_tick_phase	74cd1368ad136e1deac6327ae38350b364a68fdb	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-audit_trap_air_hit	9536cad06050aca251876c4118bb734e81e79f4a	pilot:6829e446	7 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
-audit_trap_airborne	68c0b90ba71a7232856df3b3061e0668e42ce847	pilot:6829e446	3 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
-audit_victim_parity	76ff96cb4d0b1cc986c6439a8d414d830b971686	pilot:42e7f251	10 controls write-traced 14z-215 (#310 groups 5-6): none writes a path a sibling writes or reads
-audit_walker_ghost	57c4ede18b6ed61c9ac429de228ead9a48efdd4c	pilot:688edef8	5 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_trap_air_hit	a2171657017897080c5720b922c1534b5926e610	eris:d1aed6a8	7 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_trap_airborne	0a67a0f6596f5e8287eabd58f679c5d459866504	eris:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_victim_parity	cb7b02511fc5cc9f2ab506ea5cd72e58958738b9	eris:d1aed6a8	10 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+audit_walker_ghost	ef7b5d7dfd1d10bac728148681a1a8b49428b45f	pilot:d1aed6a8	5 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
 audit_walker_repoint	1f85e5cd6d01573a3b8cf4962dc9a801ff133dd5	pilot:69321107	3 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-test_beam_anim_walk	ce0a7f6b05148ed3666b60f14d688467a1b1a45b	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-test_don_immortal_native	cd6d5720e48e9211f8e7e45da41d5b734de94e7d	pilot:6829e446	3 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
+test_beam_anim_walk	c773cde1c0cfdd00507e3a68fbab72b25cf5c3a7	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+test_don_immortal_native	94769e37f895794a46051434be13b1cedb94d3a7	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
 test_don_throw_mirror	844fa0ddebe6c20d67a360473094faf80405c9b9	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-test_hitbox_encoding	c24d5c04fa94c326cd65d89fae5fbda35003d8e9	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
+test_hitbox_encoding	1da732625e7299d447b5eb6fa910ddc8c4a66e90	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
 test_hui_boot	892f79521026842c393c855b8ad868bbde43c98a	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-test_ladder_tenant_vs_palette	35b346d253a35156f4c3e93abae894d462e63417	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
-test_readme_recording	bbd32c452244914db75e3924fd2321802cfa73b2	pilot:688edef8	5 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
-test_release_binaries	659f561f2d28db445bf17ce43d5e5f56050d7bd7	pilot:86d1ca10	4 controls write-traced 14z-210 (fork P, #321): none writes a path a sibling writes or reads
-test_shim_charid	f980944d604f892fd2c0797b94734c636e2b7eaf	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
+test_ladder_tenant_vs_palette	27fae509539ca6462f5acf33f2557a4d1eeab3ee	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
+test_readme_recording	e2713a0469ce68c769bb6a7e22a4c712c5da9bab	pilot:d1aed6a8	5 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
+test_release_binaries	3f1f281ba8526f2d27d9309785ed2a1028a12251	pilot:d1aed6a8	4 controls write-traced 14z-216 (the M24 freeze re-trace, on PILOT): none writes a path a sibling writes or reads
+test_shim_charid	47f1a48be1c4f4000547cc23520a013e9715e5f5	eris:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, on ERIS): none writes a path a sibling writes or reads
 test_tenant_select_records	43b74e7d8c45a5f9ba98ccd9d80867144044611e	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
 test_wheel_bank5	029837ad90f0cc17e57c182ae9ee74b4ba76515e	pilot:69321107	2 controls write-traced 14z-215 (#310 groups 1-4): none writes a path a sibling writes or reads
 test_wide_profile	ee54d19bd0bfcf2dbbc86233903c3b8965edb251	pilot:6829e446	2 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads

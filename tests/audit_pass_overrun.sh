@@ -1,15 +1,15 @@
 #!/bin/sh
-# audit_pass_overrun.sh — THE BLIZZARD SWORD CPU OVERRUNS, ours vs native, frozen AS MEASURED (14z-168, GitHub #136): on three Blizzard Sword frames of the whole #136 corpus a double-pass activation runs past the frame, so one frame completes NO logic pass — twice on native vsav2 (donovan_2, donovan_11), once on ours (donovan_10) — and the rest of each part stays one engine pass out of step with its inputs. Per event window the scheduler's idle time is equal on both builds within about 1%.
+# audit_pass_overrun.sh — THE BLIZZARD SWORD CPU OVERRUNS, ours vs native, frozen AS MEASURED (14z-168, GitHub #136): on three Blizzard Sword frames of the whole #136 corpus a double-pass activation runs past the frame, so one frame completes NO logic pass — twice on native vsav2 (donovan_2, donovan_11), once on ours (donovan_10 until M23; donovan_2 since M24, #294, accepted 2026-11-01) — and the rest of each part stays one engine pass out of step with its inputs. Per event window the scheduler's idle time is equal on both builds within about 1%.
 #
 # WHAT: the Blizzard Sword CPU overruns, ours vs native, frozen as measured: on three frames
 #   of the #136 corpus a double-pass activation runs past the frame so one frame completes
-#   no logic pass — twice on native, once on ours — and the scheduler's idle time per event
+#   no logic pass — twice on native, once on ours (since M24 both on donovan_2, native alone on donovan_11) — and the scheduler's idle time per event
 #   window is equal on both builds within about 1%; not a port cost, the host clock governs.
 # HOW: 12 MAME runs (task-table taps and pass-counter traces of donovan_2, donovan_10 and
 #   donovan_11 on both legs with the parity gate's pins); the zero-pass frames after the
 #   round start and the idle-spin dispatches per frame per event window are frozen; the
 #   control removes one pass-counter step from our trace.
-# EXPECTS: the overrun rows (native donovan_2 and donovan_11, ours donovan_10) and idle rows
+# EXPECTS: the overrun rows (native donovan_2 and donovan_11; ours donovan_2 since M24, donovan_10 until M23) and idle rows
 #   equal; the planted zero-pass frame changes a row and fails.
 # FOLLOWS: build/manifest/ docs/platform/gotchas.md emu/mame-patches/
 #   tests/expected/pass_overrun.tsv tests/lua/field_trace.lua tests/lua/read_tap.lua
@@ -39,7 +39,7 @@
 #   for donovan_2 (events 0-2), donovan_10 (0-1) and donovan_11 (the P2 block event and
 #   Blizzard Sword [LP] blocked), the committed rigs with the parity gate's pins.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [FREEZE=1] tests/audit_pass_overrun.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [FREEZE=1] tests/audit_pass_overrun.sh
 #   emulator tier, MAME; 12 runs (the task taps write ~100 MB each, deleted with the work dir) —
 #   measured 14z-168 on this MacBook, solo: ~60 s wall
 set -eu
@@ -47,7 +47,7 @@ set -eu
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged31}"
+BUILD="${BUILD:-build/m3b_merged32}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/pass_overrun.tsv"
 CONTROL="${CONTROL:-}"
@@ -156,8 +156,10 @@ sed 's/^/  /' "$W/got.tsv"
 
 if [ "${FREEZE:-0}" = 1 ]; then
     { echo "# tests/expected/pass_overrun.tsv — the Blizzard Sword CPU overruns (zero-pass frames, RAM:\$FF8081) and the scheduler's idle"
-      echo "# spin dispatches per event window, ours (merged-m18) vs native vsav2 (tests/audit_pass_overrun.sh; field_trace + read_tap on"
-      echo "# the task table). Evidence class: in-emulator. Frozen 14z-168 with FREEZE=1 (GitHub #136, class SLOWDOWN)."
+      echo "# spin dispatches per event window, ours ($(basename "$BUILD")) vs native vsav2 (tests/audit_pass_overrun.sh; field_trace + read_tap"
+      echo "# on the task table). Evidence class: in-emulator. First frozen 14z-168 with FREEZE=1 (GitHub #136, class SLOWDOWN); since M24"
+      echo "# (14z-216, #294: vs2's per-frame palette routine) ours overruns where native does on donovan_2 (3094, native 3098) and"
+      echo "# donovan_10 (neither) — the 3094 frame accepted 2026-11-01 (DECISIONS_HISTORY.md \"#294's lag frame\"); donovan_11 native only."
       echo "# Columns: overrun <part> <leg> <frames|none> | idle <part> <event> <leg> mean= zero="
       echo "#--"; cat "$W/got.tsv"; } > "$EXPECT"
     echo "  FROZE  $(basename "$EXPECT") — VERIFY by re-running without FREEZE"; exit 0

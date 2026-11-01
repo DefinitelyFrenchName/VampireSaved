@@ -351,6 +351,50 @@ Marionette and Shadow are both mirror-match routes (STATE_HISTORY 14z-116
 "MARIONETTE — a vs2 character"), so the cost buys a second route to a mirror
 match.
 
+**WHAT 14z-216 MEASURED (#128, parked again — `DECISIONS_HISTORY.md` "Ruled
+2026-11-01 (14z-216) — #128 (Marionette) parked again"; the analysis and its rigs
+under `build/agent216/t128/`, local).** *The arming, in full:* vs2's helper at
+`0x01F930` clears `$48`/`$49` when the cursor leaves "?" or the count is not
+exactly 7 (vs2's 5-press Shadow helper `0x01F8CC` is vsavj's twin); on confirm
+`st.b $3c3` (`0x01F6AC`) and, if the opponent has already confirmed, the
+opponent's id is copied at once (`0x01F6BA`); `+0x3E3 = +0x3BC | +0x3C3`.
+*Native, measured on RAM dumps and captures* (P2 Morrigan confirmed first, 7 START
+on "?"): `$43` = FF after press 5, then `$43` = 00, `$48` = 07, `$49` = FF after
+press 7; after confirm `+0x3C3` = `+0x3E3` = FF and P1 takes id `0x05` at once,
+keeping P1's own colour choice (`+0x3AE`); at the next arcade stage P1 re-copies
+the new CPU opponent (vs2 `0x009828` live) and her intro plays again. Ours, same
+input: an ordinary random pick. The maintainer, on those sheets: *"this is indeed
+the correct behavior in vs2 ... An implementation should follow vs2's behavior"*.
+*In the match she IS the copied character* (fight data, HUD name, VS portrait
+borrowed); *her own content is presentation only:* the select puppet (select
+record row `0x10` of `0x2A04FA`), an intro at round/stage start (vs2 `0x025E1A`, the
+puppet on strings over the fallen copy), a puppet companion object (records `0xB2`
+and `0xB3` of `0x2B7EF4`; "her own palette" is the puppet's 10 rows at `0x3CB91C`),
+a black win portrait (vs2 `0x06B296`), and a queued command id `0x2C` (vs2
+`0x00525A`, content not established). **The frozen asset census in
+`tests/audit_marionette_cost.sh` walks only record `0xB3`:** `0xB2` (44 cells) is
+hers too, so her cells come to about 102 (~13 KB), not 58 — the gate's asset line
+undercounts. *RAM (write tap, pristine vsavj, replays 128_shadow, 04_select_fuzz,
+03_two_player_vs):* `+0x3C3` is written only by the boot clears and the struct
+clear `0x016E4C`; `$48`/`$49` have no select-screen writer but are match-phase
+scratch (`0x03113A`, `0x03118E`, `0x0283B6`), shared the same way in vs2. Freeness
+over the whole corpus or in tenant play is not established. *Our build* already
+carries three dormant `+0x3C3` readers (`or.b $3c3(a4),d1` at `0x0D2332`,
+`0x42B8B2`, `0x483E52`, ported copies of vs2 `0x08A6D4`), reading 0 today.
+*Cost:* `tests/audit_marionette_cost.sh` worst frame 14 hook executions = 812
+cycles, 0.30% of a 268,288-cycle frame, legacy and tenant paths alike. *The port it
+would take:* WIDE only, 26 hook points (24 new `jsr` sites and two extensions of
+existing thunks, at `0x00AEFA` and `0x05F1B6`), a new per-player flag and the
+select-screen counter, about 4-5 sessions (estimated); no collision with Shadow
+(5 presses Shadow, 6 nothing, 7 Marionette, 8+ nothing) or Oboro (START held on
+another cell). **Its impact, as the analysis put it:** 7 START presses on "?"
+would stop being a random pick, a vanilla menu input changing outcome (the Oboro
+hold-START hook of 2026-08-22 is the precedent), and about 22 thunks on hot legacy
+paths may move the frozen hooked-build classes, measurable only by building. The
+maintainer parked it on that: *"while the cost in frames is small, the impact makes
+your recommendation "re-park or close" which I think is the safest thing to do right
+now"*.
+
 **THE ARCADE HAS EXACTLY THREE HIDDEN CHARACTERS: Oboro Bishamon, Dark Gallon
 and Shadow** (confirmed by the maintainer, 2026-08-28). The alternate Lilith,
 Aulbath and Victor are CONSOLE-PORT ONLY, and the ROMs agree: the only variant

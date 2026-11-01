@@ -1,0 +1,9 @@
+  FLAG D-ABSOLUTE: So on every palette-state change ours also reloads rows 0x0B-0x0D, and that is the same defect as #162's flash.  [build/agent216/rc127/recommendation_127.md]
+  FLAG D-ABSOLUTE: It goes in as a builder-produced code word, never a hex edit.  [build/agent216/rc127/recommendation_127.md]
+  FLAG D-ABSOLUTE: - **What it does, measured with the bit set in the emulator (nothing built):**  [build/agent216/rc127/recommendation_127.md]
+  FLAG D-ABSOLUTE: - Over all 15 Donovan attacker parts, row 0x0B goes from 36676 frames differing from native to 0.  [build/agent216/rc127/recommendation_127.md]
+  FLAG D-ABSOLUTE: ## If you give the green light (the plan, nothing built yet)  [build/agent216/rc127/recommendation_127.md]
+  FLAG D-ABSOLUTE: Gate it with the hit rig plus its no-hit control, and with the 15-part census, each requiring row 0x0B to equal native.  [build/agent216/rc127/recommendation_127.md]
+  FLAG D-ABSOLUTE: Each gate gets a must-fire known-bad leg (the current build).  [build/agent216/rc127/recommendation_127.md]
+  FLAG D-ABSOLUTE: Keep (C), do nothing  [build/agent216/rc127/recommendation_127.md]
+packet_check: 8 flag(s): D-ABSOLUTE 8

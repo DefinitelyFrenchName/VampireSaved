@@ -1,0 +1,9 @@
+# pointer-flow baseline for donovan-m28 (build/don_m28), frozen 14z-216 — the M24 freeze ((M) and #294).
+# vs donovan-m23 (which every Donovan build to donovan-m27 satisfied unchanged): `data:long` 1260 -> 1262 (+2 = +4 -2),
+# every row ATTRIBUTED (build/agent216/m24/pflow/weak_diff.txt): +4 inside #294's records block (vs2's palette records
+# for sequence ids 0x2D4-0x341, placed at 0x4010E0 +0xDC0) — 0x40130c, 0x40158c (0x00470fea), 0x401c6c (0x00480fea),
+# 0x401c8c (0x00490fea): pairs of palette words that read as a long into the WIDE hole, data copied verbatim from vs2,
+# not pointers; -2: vanilla longs at 0xebc7a (0x0041adc6) and 0xf1ae6 (0x0041b030), unchanged, whose values now land on
+# occupied space (the thunk bodies #294's body displaced to the wide_ext tail). Nothing STRONG.
+WEAK-COUNT	code:move_imm	1
+WEAK-COUNT	data:long	1262

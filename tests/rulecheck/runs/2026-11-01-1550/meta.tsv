@@ -1,0 +1,11 @@
+decision	expectation
+subject	M24 freeze: the expectations re-frozen after the battery and the early static gates, and the gate changes behind them
+session	14z-216
+model	rule-checker@163e4ce9cf7b
+claim	Re-freeze the M24 expectations the freeze battery and the early static gates turned red, with the gate changes behind them. On merged-m24 each per-file diff in diffs/ is one of: (a) a placed address or PC moved by #294's allocations (+0xDC0, +0xF50, +0xF80, +0x190); (b) a build row, or the build named in a header; (c) Phobos's and Pyron's hitbox bases re-derived from the image's own table; (d) the alignment clock of the 40,620-frame Donovan arcade leg; (e) counts from 110_don_arcade_mash, the only replay whose read lines changed (defrows_read_lines_changed.txt); (f) Donovan's move parity moving toward native (got_m3b_merged31.tsv against got_m3b_merged32.tsv: donovan_2 events 3-25 and donovan_10 events 1-9 DIFF to IDENT, donovan_2:2 +58 to +54), with its overrun rows (pass_overrun_m24.log) and the maintainer's two rulings behind the audit_lag_budget ACCEPTED frame and the audit_rng_forms exemption (rulings.txt); (g) #294's two +0x1C3 reads. Gate changes (gate_diffs/): audit_column_flash_cause's C1 compares ours with the native leg (cause_verify.log); audit_tenant_cpu_ai's seven PCs re-derived (cpu_ai_plain_relocated.log: every figure but the BUILD line equal to M23's); audit_edge_cases and audit_tenant_downwin fire their last-bar controls in-gate (plain and mode logs). ERIS's verify battery on snapshot S2 (s2_results.tsv) leaves two FAILs since re-frozen and verified (rngf_verify.log, rcl_verify.log, rngf_modes.txt) and four SKIPs covered on the Mac and PILOT (test_release_binaries.mac.log, test_readme_recording.mac.log, linux_cleanhost.log). NOT TESTED: audit_release_linux_desktop (it waits for the maintainer's desktop session); how #294's per-frame work moves Donovan's overruns; prg_window's small count moves (cyc -13, rd_lo +34), not separated by controls; the arc110 counts and the arcade clock follow the replayed fight and are not attributed frame by frame; the static freeze tier on the final tree.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	1 flag(s): ATTRIB 1
+action	2026-11-01-1550

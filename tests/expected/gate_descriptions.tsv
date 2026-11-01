@@ -18,6 +18,7 @@ declares	audit_command_throws
 declares	audit_continue_ladder
 declares	audit_continue_switch
 declares	audit_crouch_flag
+declares	audit_dead_span_exec
 declares	audit_defense_row_reads
 declares	audit_defense_row_residue
 declares	audit_demitri_split
@@ -35,6 +36,8 @@ declares	audit_dmg_legacy_sweep
 declares	audit_don_grab_pose
 declares	audit_don_ko_writer
 declares	audit_don_lilith_ko
+declares	audit_don_row0b
+declares	audit_don_row0c
 declares	audit_don_vs_cpu
 declares	audit_down_attack
 declares	audit_edge_cases
@@ -218,6 +221,7 @@ declares	test_crosscheck_229
 declares	test_crypt_boundary
 declares	test_ctl_show_err
 declares	test_dead_exit_census
+declares	test_dead_span
 declares	test_decode_stage_banners
 declares	test_decrypt_cache
 declares	test_decrypt_oracle
@@ -391,6 +395,7 @@ declares	test_patch_overlap
 declares	test_patch_prg
 declares	test_patch_source_identity
 declares	test_pcrel_escapes
+declares	test_perframe_hook
 declares	test_phasea_a3_liveness
 declares	test_phasec_image
 declares	test_phasec_spaces

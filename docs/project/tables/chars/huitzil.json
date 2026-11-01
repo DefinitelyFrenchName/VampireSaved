@@ -12,7 +12,7 @@
  },
  "inputs": {
   "bank_map.toml": "414f66951fee3a2ca94932baeb8d3189c1c03aee",
-  "manifest": "1aa9f8c038980477d72f9075ab6f97cf10d65767",
+  "manifest": "489113e8d9b48bb63c41de6d3e200d09ad0ede80",
   "overrides": "be0e9b96c8414532cc7a1d60f7a4a235a7d6362d",
   "placements.json": "913270ce40f1e46e11e9b6daa7ff4346771009c3",
   "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
@@ -25,7 +25,7 @@
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/hui61"
+   "set": "build/hui62"
   },
   "vh": null,
   "vs2": {

@@ -156,7 +156,7 @@ KNOWN_PAIRS = {
         "note", "only_base_slot", "only_variant_slot", "orc",
         "slot_ptr_table", "slot_rows", "src", "stage"
     },
-    "don_m27": {
+    "don_m28": {
         "escapes", "resolved", "unresolved"
     },
     "file": {
@@ -174,7 +174,7 @@ KNOWN_PAIRS = {
     "hole_b": {
         "end", "start"
     },
-    "hui61": {
+    "hui62": {
         "escapes", "resolved", "unresolved"
     },
     "init_shim": {
@@ -228,7 +228,7 @@ KNOWN_PAIRS = {
     "profile": {
         "bank4_word", "bank5_word", "collision_rule", "group", "name"
     },
-    "pyron46": {
+    "pyron47": {
         "escapes", "resolved", "unresolved"
     },
     "reaction_hook": {
@@ -276,6 +276,13 @@ KNOWN_PAIRS = {
     "sound_table": {
         "entries", "hole", "keep_ids", "name", "profile", "ptr_old",
         "ptr_table", "remap_ids", "src", "stage", "unstub"
+    },
+    "perframe_hook": {
+        "blk_twin", "dead_span", "fix_blk", "fix_lea", "fix_rts", "fix_seq",
+        "lea_tables", "only_variant_slot", "row", "row_old", "seq_count",
+        "seq_first", "seq_orc_base", "seq_set", "seq_src_base", "src_blk",
+        "src_len", "src_routine", "src_rts", "src_seq", "src_set",
+        "src_table", "stage", "table"
     },
     "space": {
         "class", "end", "fallback", "name", "profile", "start"

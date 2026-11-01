@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent216/mgates/m_ruling.txt	c9c94d814a134303ee37b5990e922f280ea1b072
+build/agent216/mgates/audit_don_row0b.sh.txt	8a7368e20c6d4282eac83f1284ecda8437794fb5
+build/agent216/mgates/pal_rows_tap.lua.txt	2aab5c719f1e863c79a619f0b81a98968de91d7a
+build/agent216/mgates/row0b_mbm3.log	84c88d26624295e2cf3c796978123e6fc1c554e8
+build/agent216/mgates/row0b_mode_reverted.log	a9e59f19dab5284cd5eedba5432c0b0f977e9822
+build/agent216/mgates/cause.diff	3cdf7a40d691b11550708624a1ba78ab61ffbc97
+build/agent216/mgates/cause_pre.log	dc0224c0d47fdd4ec057174e1cad1333d6a56109
+build/agent216/mgates/flash.diff	a740490159f79fd22bbfab36ce9071b83d1dd56c
+build/agent216/mgates/flash_pre.log	6a6e0db87731fdc3ab65b626ba39f46607cf1338
+build/agent216/mgates/column_flash_scratch.tsv.txt	c87908bbf026f5dd6d6636910a5ec1bca1aed430
+build/agent216/mgates/flash_scratch_verify.log	8482bf0296f1c37680e25175979461270e7ec45b
+build/agent216/mgates/flash_scratch_mode.log	46b075b9239fbb3b3f7f943005e42fb1d4f49e8e

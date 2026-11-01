@@ -384,7 +384,7 @@ def abs_rompath(rp):
     """A leg's rom path with each relative element made absolute against ROOT, the tree its gate ran in (gates run
     from it: run_gate's cwd). A capture runs in its own work directory, where a relative element names nothing and MAME
     falls through to the next element: #291 S4-A (14z-206) measured test_gfx_menus' ours leg, recorded as
-    `build/m5_stock22/rompath;$ROMDIR` (the registry's %STOCK_RP%), re-run on PRISTINE vsavj from ROMDIR."""
+    `build/m5_stock23/rompath;$ROMDIR` (the registry's %STOCK_RP%), re-run on PRISTINE vsavj from ROMDIR."""
     return ";".join(e if not e.strip() or os.path.isabs(e) else str(ROOT / e) for e in rp.split(";"))
 
 
@@ -1374,7 +1374,7 @@ WEB_LOCAL_PATH = re.compile(r"(?:/Users/|/home/|/private/|/var/folders/|/tmp/|[A
 # that pattern knows fails too, by construction rather than by sampled forms. The detector matches any
 # absolute path of two or more parts outside a URL, a ~/ path, a drive path, a session scratch dir, a path after a colon
 # too (rompath:/Users/...), while a URL's own slashes never match (each follows a slash or a word character). A
-# repo-relative name (build/m3b_merged31, tests/...) names the repository's own directory and is allowed.
+# repo-relative name (build/m3b_merged32, tests/...) names the repository's own directory and is allowed.
 WEB_PATH_LEAK = re.compile(r"(?<![\w./~-])/[\w.@-]+(?:/[\w.@-]+)+|(?<!\w)~/|(?<!\w)[A-Za-z]:[\\/]|(?<![\w/.-])build/agent")
 WEB_FILES = (".html", ".webp", ".wav", ".css")
 

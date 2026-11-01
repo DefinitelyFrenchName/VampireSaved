@@ -1,0 +1,23 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent216/rc294/recommendation_294.md	ac44ea7f8556976d09871341bd95e4bdccdd7152
+build/agent216/rc294/capture_read_294.txt	cad315ad226416a8d6d36ced33db8ecf68095a76
+build/agent216/rc294/palsum.txt	236c3a9cea971872207f229dab7778dd13ff6b25
+build/agent216/rc294/palsum.py	d9d789aff8816631e691bd5919613d7985b009e1
+build/agent216/rc294/palcmp_3406_3457.txt	1f09ccaaed755469c1e1f094d30f5fff629a1165
+build/agent216/t294/rig/palcmp.py	3178e37c61a3f90d93cff68af4aac006d3037fca
+build/agent216/rc294/rowentries.txt	275a441299b9a295b87b10adf54c1fc1fcc4ae72
+build/agent216/rc294/rowentries.py	d4b16b13c271aa40016d74f46e2f782d75cd6bbb
+build/agent216/rc294/utap_window.txt	87d40b32ad52e06d9c418189ad3d56a23da312a8
+build/agent216/rc294/utap_window.py	044531a9d1726e67521267d33277759a4b7c5555
+build/agent216/t294/rig/legs.sh	955864c7058752f5867551752f59e7eeaa04a5e1
+build/agent216/t294/rig/snap.sh	c95843c80e83273ff3537d7f08a127ea675a950f
+build/agent216/t294/rig/utap.sh	533600906ed41f6aad95acdf721d305aca939e56
+build/agent216/rc294/dispatch_listing.txt	39f7556ac61e9ec310bcf2c834c1a5fd0bd77a52
+build/agent216/rc294/engine_internals_1760_1790.txt	879d9e5bca6a4a756409b84c9f945c746d61157f
+build/agent216/rc294/audit_id_writers_40_48.txt	1e0093f9362da0a5d350e1529e13d0c93d68db18
+build/agent216/rc294/frame_budget.txt	5432b7485cc726b02db6446c02f41ab3060afb9e
+build/agent216/rc294/history.txt	4738e942d033096d812ef2eb0e49ee7d70de7bfb
+build/agent216/rc294/issue_294.md	166fcf08aee5cc4e49e1884ed961ee910be6149c
+build/agent216/t294/REPORT.md	1c18514dca7f5c77ea305d715f0e5273f48cd91d
+build/agent216/t294/sheets/s1_electrocuted_sword.png	0c7687a2c0a3a743c8b3dcf59109441cd7421d67
+build/agent216/t294/sheets/s2_attribution_poke.png	8cd6d51d7c6b8cd7f26a422161e4ed7930cd0184

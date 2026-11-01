@@ -12,20 +12,20 @@
  },
  "inputs": {
   "bank_map.toml": "414f66951fee3a2ca94932baeb8d3189c1c03aee",
-  "manifest": "31ef688df48922419c11362cc43018cf6fe8779d",
+  "manifest": "2eabe8e7a196b1a701df98082c4521ed2eb8744e",
   "overrides": "72b9812942192bf348508ddf7473cbb37b2d5275",
   "placements.json": "74b756174c2eac1a4e41919145114e2498d11082",
   "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
   "reconciliation_donovan.toml": "242368518282f41a728d879e0714380f621aaf49",
   "regions.json": "a819047aa0b2491e3bc5e72149608639854a813d",
-  "verify_data.bin": "fe692129ed03546e69220cc93c0837832508c48f"
+  "verify_data.bin": "757bf91872755051fa80c24e5bf8b031c5ce29ba"
  },
  "overrides": [],
  "schema": 1,
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/don_m27"
+   "set": "build/don_m28"
   },
   "vh": null,
   "vs2": {
@@ -194350,7 +194350,7 @@
        "diff": true,
        "expected_placed": "0x3fbda2",
        "fmt": "addr",
-       "ours": "0x4010e0",
+       "ours": "0x401ea0",
        "ours_source": "UNATTRIBUTED",
        "vh": null,
        "vs2": "0x0ca1ca"
@@ -194371,7 +194371,7 @@
        "diff": true,
        "expected_placed": null,
        "fmt": "addr",
-       "ours": "0x3ffdb0",
+       "ours": "0x3fff40",
        "ours_source": "no-vs2-value",
        "vh": null,
        "vs2": null
@@ -195468,7 +195468,7 @@
        "diff": true,
        "expected_placed": "0x3fcbf2",
        "fmt": "addr",
-       "ours": "0x413b10",
+       "ours": "0x4148d0",
        "ours_source": "manifest:sound_table:don_sfx_records (the array is placed by the sound op; the row is its ptr_table)",
        "vh": null,
        "vs2": "0x0cb01a"
@@ -195584,7 +195584,7 @@
     "diff": true,
     "expected_placed": "0x0c1030",
     "orc": "0x05ae50",
-    "ours": "0x3ffdb0",
+    "ours": "0x3fff40",
     "ours_source": "manifest:init_shim (synthesised pool-seeding shim; falls into the relocated handler)",
     "vs2": "0x05ae20"
    },

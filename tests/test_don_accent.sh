@@ -149,6 +149,12 @@ EOF
 # and the fixture-override rows must hold native content under effect
 # load. Frozen from a vanilla run, session 14z-20 (arc values are
 # global, so they freeze char-independently).
+# CORRECTED 14z-216 (#294): the ARCS stand — on Victor's real electrocute the arc
+# rows 0x01-0x03 equal native vs2 (build/agent216/rc294/palsum.txt) — but "vs2's
+# yellow was a game-wide re-theme" was wrong for Donovan's SWORD: that is his
+# weapon row 0x0C, rewritten by his own vs2 per-frame palette routine (vs2
+# 0x2A316, row 0x13 of the per-frame table), which vsavj's table lacked; #294
+# ports it ([perframe_hook]). This section locks rows 0-3 only and is unaffected.
 run_status shock
 
 python3 - "$WORK/shock" <<'EOF'

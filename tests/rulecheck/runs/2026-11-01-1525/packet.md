@@ -1,0 +1,19 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #127: recommend vs2's mask bit (M) instead of option (B)
+Claim (the working agent's sentence): CLAIM: recommend to the maintainer option (M) for #127 — PRG:0x02ADB4 EF92 -> EF9A, vs2's mask bit 0x13 in the palette reload, built through the pipeline and landed at the next freeze — instead of the ticket's option (B), with #127 closing as fixed by (M) when that release ships (recommendation_127.md, the deliverable). It rests on: the maintainer's verbatim read that the right-hand column of sheet_127_pod_hit.png (ours with the bit set in MAME's decrypted-opcode share) is the Press of Death they expect (capture_read_127.txt); rig_window.txt (script-written by window.py from the three legs' rig logs: row 0x0B index 14 fcff on native f2994-3096, f111 on ours f2995-3096 after writes at f2994 and f3017 by PC 0x02AD78, fcff on the bit leg with readback 223cef9a); census_cmp.txt (TOTAL line: row 0x0B 36676 differing frames ours vs native, 0 with the bit, rows 0x0A 1904 and 0x0C 2363 unchanged); inert_window.txt (script-written by inert_window.py from #162's legs: five legacy replays 01/02/03/07/105 identical work RAM and OBJ palette every frame with and without the bit; 109 a tenant replay differs on 230 frames; 12_donovan_vs_cpu and 109dump are listed but not counted); engine_internals_1760_1790.txt (the reload, the masks at 0x02ADB2 and vs2 0x02A108, btst.l mod 32, no legacy id 0x13 per audit_id_writers); rulings.txt (the #112 rulings: (C) with (B) kept open, 14z-189 keep parked, 14z-216 unparked with implementation on the maintainer's green light); issue_127.md (the ticket as it stands: option (B)); the two worker reports (t127 REPORT.md, t162 REPORT.md) for the (B) estimate and #162's six instances. NOT TESTED: nothing is built — every 'with the bit' figure is an emulator opcode-share counterfactual, not a pipeline build; FBNeo and MiSTer; Donovan as P2; whether Donovan reaches the engine palette states writing rows +1..+3; the 0-legacy-cycle cost is by construction (same instruction, a different immediate) and the Donovan saving is derived; the (B) estimate (3-4 sessions, two free rows) is the worker's, not measured; the maintainer has not read the no-hit control sheet nor #162's sheets, so #162 is named as also changed but is not part of this recommendation; the gate plan is a plan.
+Artifacts (read every one, in full):
+  - build/agent216/rc127/recommendation_127.md
+  - build/agent216/rc127/capture_read_127.txt
+  - build/agent216/rc127/rig_window.txt
+  - build/agent216/rc127/window.py
+  - build/agent216/t127/census/census_cmp.txt
+  - build/agent216/rc127/inert_window.txt
+  - build/agent216/rc127/inert_window.py
+  - build/agent216/rc127/engine_internals_1760_1790.txt
+  - build/agent216/rc127/rulings.txt
+  - build/agent216/rc127/issue_127.md
+  - build/agent216/t127/REPORT.md
+  - build/agent216/t162/REPORT.md
+  - build/agent216/t127/sheet_127_pod_hit.png

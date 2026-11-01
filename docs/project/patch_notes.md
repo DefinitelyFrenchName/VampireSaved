@@ -1,5 +1,72 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-216 — #294: DONOVAN'S PER-FRAME PALETTE ROUTINE (FROZEN as M24 at 14z-216: donovan-m28 / merged-m24)
+
+**WHAT IT IS.** Ruled 2026-11-01 (`DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #294"): the maintainer, *"indeed if
+the 6 free bytes exist, given the cost this seems like the best solution."*, then *"Yes"* to the green light starting with the
+free-byte search. Built after rule-checker run 2026-11-01-1541 (OK; `-1539` and `-1540` VIOLATED on the packet, fixed).
+
+**THE MECHANISM.** Every fighter, every frame, enters vsavj's per-frame palette dispatcher (`PRG:0x02ADDC`), which indexes the
+table `PRG:0x02ADEC` by the WHOLE id byte `+0x382`. vsavj's row `0x13` is the default `0x0040` (an `rts`); vs2's twin table
+(`PRG:0x02A142`) points row `0x13` at Donovan's own routine (vs2 `0x2A316`), which rewrites his weapon row (`+0x18B+2`, P1's
+row 0x0C) for his palette states — 4 (the electrocute: the yellow sword), 6 (the after-shock), 2, 8, 0xC, 0xE, 0x1C, 0x1E and
+an idle animation. Ours never rewrote it: the sword stayed red in the shock.
+
+**THE CHANGE.** A new generator section `[perframe_hook]` (`tools/gen_donovan_patch.py`; manifest in `donovan.toml`):
+- vs2's routine (0x160 bytes, 88 instructions) is read from the vs2 opcode view AT BUILD TIME (no ROM bytes in the tree); its
+  26 external references are re-pointed to stubs appended to the body — 9 to a local `rts`, 5 to `jmp 0x02ADC8` (vsavj's
+  block-row re-upload, vs2 `0x2A11E`'s twin), 10 to a PRIVATE palette-sequence entry (`subi.w #$2d4,d0 / movea.l #records,a0 /
+  jmp 0x02AD9A`, entering vsavj's seq-set after its own `movea`: vsavj has its own live records at those ids — the state_hook's
+  design), 2 `lea (d16,PC)` to a copy of vs2's two data-view byte tables; each fixup is checked at build to be the declared
+  form and target;
+- vs2's palette-sequence records for ids 0x2D4-0x341 (0xDC0 bytes) are placed in hole B, checked against vhunt2's twin (a
+  missing twin fails the build);
+- the body goes in hole B (raw: both views hold the same bytes), `jmp body` on the six proven-dead bytes `PRG:0x024024`
+  (`tests/test_dead_span.sh`; the table's 16-bit word reaches only `0x022DEC-0x032DEB`), row `0x13` -> `0x024024`.
+Legacy reach: none by construction — row `0x13` is read only for a fighter whose id byte is exactly 0x13. The new allocations
+shift where later ported content lands (2-byte pointer changes across the image against `mb_m`): legacy safety rests on the
+built-image legacy replays and the legacy MAME oracle at the freeze, not on a byte diff.
+
+**MEASURED (scratch build `build/agent216/mb_294`, fingerprint `0e6f423b`).** `tools/audit_perframe_hook.py`: STATE hooked,
+the body equal to vs2's instruction for instruction with all 26 references landing on their stubs, the records and tables equal
+to vs2's; its four plants (an un-re-pointed branch, the row reverted, a flipped record bit, the dead span restored) each FAIL.
+`test_tenant_loop` re-frozen +4 Donovan (358 / 640 / 853), its one-iteration bound made relative; rule 5: one new baked
+value (`perframe_hook.only_variant_slot`), re-frozen with a ledger row. In play (`tests/audit_don_row0c.sh`, MAME): P1's row
+0x0C equals native vs2 on every frame of Victor's electrocute rig (the reverted-row leg: 55 frames differ), and on every frame
+of the 15 Donovan naming parts outside native's Dark Force frames — ten of which (`donovan_1/2/6/8/9/10/11/13/14/15`, the
+gate's frozen blind set) cannot show a missing routine there, the reverted leg equalling native too; inside them 1,511 frames differ (donovan_3/4/6/7) — the
+cause NOT ESTABLISHED (first attributed to the ruled Dark Force CHANGE never setting `+0x1C3`, RETRACTED the same session:
+poking `+0x1C3` over native's window left the difference unchanged, though that poke has no positive control; on donovan_6 the
+difference read in the colour bits, a split without a control) — GitHub #344. The Dark Force look is before the maintainer
+(`build/agent216/rc294/sheets/sheet294_df.png`, local): native draws Donovan in other colours than both of our builds. Built-image legacy replays against `mb_m` (01, 02, 03, 07, 105): 01 identical every
+frame; the other four differ on ONE frame (890), two bytes, `RAM:$FF06CC-$FF06CD` — the low word of a stacked return
+address into ported select-screen code that the new allocations moved by 0xDC0 (`0x413CDC` -> `0x414A9C`): the
+execution-position class, for the legacy MAME oracle at the freeze. OBJ palette identical on every frame of all five.
+
+## 14z-216 — #127 AND #162: THE PALETTE RELOAD'S MASK (FROZEN as M24 at 14z-216: donovan-m28 / merged-m24)
+
+**WHAT IT IS.** Ruled 2026-11-01 (`DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #127 and #162"): *"1. Yes, (M) at
+the next freeze, closing both (recommended) -> agreed"*, after the maintainer read the captures and rule-checker run
+2026-11-01-1528 (OK) on the recommendation. The rows were built after run 2026-11-01-1535 (OK).
+
+**THE MECHANISM.** Each fighter's palette reload (vsavj/ours `PRG:0x02ADAC`, vs2 `0x02A102`) uploads block row 0 into its
+base palette row, then tests `btst.l d0,d1` with `d0` = the fighter's id (mod 32) against a mask word; a set bit returns,
+a clear bit also reloads block rows 1-3 into palette rows +1..+3. vsavj's mask (`move.l #$ef92ef96,d1` at `0x02ADB2`)
+lacks bit 0x13; vs2's (`move.l #$ef9aef96,d1` at `0x02A108`) sets it. So on every palette-state change of Donovan's,
+ours also rewrote rows 0x0B-0x0D and wiped row 0x0B's effect palette: #127's black foot (Press of Death, when he is hit
+during it) and #162's deity flash at the column's end and cyan sword burst. The two high words differ in bit 0x13 only
+(`build/agent216/rc127/mask_words.txt`, local).
+
+**THE ROW.** One `[[code_word]]` in `donovan.toml`, stage 6, `only_variant_slot`: `palette_reload_mask_hi`, `PRG:0x02ADB4`,
+`ef92` -> `ef9a`. No legacy fighter carries id 0x13 (`tests/audit_id_writers.sh`; its stated gap is Oboro's 0x18, a bit
+this row leaves alone), so legacy reach is nil by construction; 0 legacy cycles (the same instruction, another immediate).
+
+**THE DELTA, MEASURED.** `tests/test_tenant_loop.sh` re-frozen: donovan 353 -> 354, 2 tenants 635 -> 636, 3 tenants
+848 -> 849 (+1 Donovan only; huitzil 381 and pyron 317 unchanged). Rule 5's inventory +1 (`only_variant_slot`, 221 -> 222,
+`docs/project/tables/rule5_ledger.md`). The merged build (`build/agent216/mb_m`, scratch, fingerprint
+`48f729b91b1ef7e0de30669e916ee3c745e3bb84`) differs from `build/m3b_merged31` in exactly one opcode-view byte,
+`0x02ADB5` (`0x92` -> `0x9a`), and the same word in the data view (`build/agent216/rc127/m_built_diff.txt`, local).
+
 ## 14z-192 — THE M23 FREEZE (donovan-m27 / huitzil-m34 / pyron-m28 / merged-m23, mark M23): #222 and #223 LANDED
 
 **WHAT THE FREEZE CARRIES.** The two fixes ruled at 14z-191 (2026-10-05), applied directly to the manifests (no staged

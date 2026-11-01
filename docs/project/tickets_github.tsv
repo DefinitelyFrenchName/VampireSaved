@@ -2,14 +2,17 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 343
+# issues: 346
 number	state	reason	closed	labels	title
+346	OPEN	-	-	cosmetic	Donovan's Blizzard Sword snowflake drags a blue ice streak on our build that native vs2 does not draw
+345	OPEN	-	-	bug,severity: medium	Donovan's Blizzard Sword overruns its frame at different frames than native vs2: two move-parity events differ (donovan_2:2, donovan_11:12)
+344	OPEN	-	-	cosmetic	Donovan's body and sword colours inside Dark Force differ from vs2's (rows 0x0A/0x0C)
 343	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	audit_tenant_timeout's 'round 2 spawns live' check passes on the next match's refill (after $FF810E = 0xFF), not on a round 2
 342	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	$FF8120 is the winner's PERFECT flag, not the round winner's side: ram.md row wrong, three gates' winner checks measure 'winner unhurt'
 341	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	test_tickets' parked-disagrees control went DEAD once the newest ticket was closed (it perturbs the first row whatever its state)
 340	CLOSED	COMPLETED	2026-10-30	bug,severity: low,test-integrity	Every strict emulator run read NOT GREEN: audit_pool_drop is a DEAD ROW to the runners' emulator-tier classifier
 339	CLOSED	COMPLETED	2026-10-30	-	The rule-checker ledger has 37 rows with session '-' (14z-187/187b/188); both ledger pages drop them without saying so
-338	OPEN	-	-	evolution,severity: low	Proof sheets: a web build for the community — half-size WebP tiles, credits on every page, a plain-language intro, no local paths
+338	OPEN	-	-	done unshipped,evolution	Proof sheets: a web build for the community — half-size WebP tiles, credits on every page, a plain-language intro, no local paths
 337	CLOSED	COMPLETED	2026-10-30	evolution,severity: low,test-integrity	The mktemp census does not check EXIT-trap order: a trap installed before a guarded site runs on the guard's stop
 336	CLOSED	COMPLETED	2026-10-30	bug,severity: low,test-integrity	test_static_runner section 32 FAILs on every Linux host: dash words its write error 'I/O error', the premise counted only bash's 'Broken pipe'
 335	CLOSED	COMPLETED	2026-10-30	evolution,severity: low	The session ledger: the rule-checker's first-run OK rate per action, and which question fails first
@@ -53,7 +56,7 @@ number	state	reason	closed	labels	title
 297	CLOSED	COMPLETED	2026-10-25	evolution,performance	Static tier scope: six families (109 gates) to freeze cadence, triggered by their own code (@code)
 296	CLOSED	COMPLETED	2026-10-22	evolution,severity: medium,test-integrity	run_mame.sh: refuse a run whose MAME_SANDBOX already holds an earlier run's state (#293's class, at run time)
 295	CLOSED	COMPLETED	2026-10-19	evolution,severity: medium,test-integrity	audit_dmg_legacy_sweep never runs Demitri's legacy hits on our build: add an exact vsavj-vs-ours leg (superset coverage)
-294	OPEN	-	-	cosmetic,parked	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff)
+294	OPEN	-	-	cosmetic	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff)
 293	CLOSED	COMPLETED	2026-10-18	bug,severity: medium,test-integrity	Two gates hand one MAME sandbox to several runs, so a later run boots on carried nvram (audit_flicker_attribution, audit_legacy_pairings)
 292	CLOSED	NOT_PLANNED	2026-10-20	bug,performance,severity: high	static_confirm: a tool's self-test strings count as a direct read (battery_reach names STATE.md), so 22 gates re-run with controls at every commit
 291	CLOSED	COMPLETED	2026-10-23	evolution	On demand, at a given tag or commit: comparative capture sheets (ours vs vsavj and/or vs2) for every comparing test, as a visual proof of accuracy for humans
@@ -145,7 +148,7 @@ number	state	reason	closed	labels	title
 205	CLOSED	COMPLETED	2026-10-03	bug,severity: medium,test-integrity	homes_tracked.py drops an unresolved bare document name silently and never checks each finding letter
 204	CLOSED	COMPLETED	2026-10-04	architecture,evolution	Close: a tracked standing close-check set with derived lists and generated plants, inherited by every close
 203	CLOSED	COMPLETED	2026-10-03	bug,severity: low	Linux: test_agent_sweep's post-kill check and test_run_on_snapshot's no-self-copy control fail on their own premises (fixed sleep vs zombies; dash reads ahead)
-202	CLOSED	NOT_PLANNED	2026-10-03	bug,severity: low	1P arcade: the 14z-87 keep-tenant thunk may make a tenant CPU opponent repeat (the ladder's pick skipped when the CPU side already holds a tenant id)
+202	CLOSED	NOT_PLANNED	2026-10-03	bug,out-of-scope,severity: low	1P arcade: the 14z-87 keep-tenant thunk may make a tenant CPU opponent repeat (the ladder's pick skipped when the CPU side already holds a tenant id)
 201	CLOSED	COMPLETED	2026-10-01	bug	Linux: per-frame pin lists in POKES exceed the 128 KiB single-environment-string limit, so the parity-style gates' legs never start off macOS
 200	CLOSED	COMPLETED	2026-10-02	bug,severity: high	Donovan's Lightning Sword (ES): native marks the victim pursuit-able at hit (class 0x4E, +0x117); ours (class 0x06 since the 14z-35 remap) does not
 199	CLOSED	COMPLETED	2026-10-02	bug	Merged-image extracts on a fresh host: the reproducibility gate reads INPUTS OK on directories alone, and the tracked regions.json are stale (region data identical)
@@ -185,7 +188,7 @@ number	state	reason	closed	labels	title
 165	CLOSED	COMPLETED	2026-09-19	bug	The tenants' vs2 EX inputs entered Dark Force through a placed copy of vs2's Change entry — a second, longer route into the mode
 164	CLOSED	COMPLETED	2026-09-19	bug	Phobos and Donovan took damage and rallied through their shells' defense rows (vsavj's copies for ids 0x10/0x13), not vs2's own
 163	CLOSED	COMPLETED	2026-09-25	bug	The Killshread Lightning column and the Plasma Trap ran vsavj's shock remap instead of vs2's class-0x52 rule — the victim's freeze and the attacker's hit-freeze differed from native
-162	OPEN	-	-	cosmetic,parked	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
+162	OPEN	-	-	cosmetic	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
 161	CLOSED	NOT_PLANNED	2026-09-25	bug	Phobos takes one more HP than native from Demitri's 5HP with his defense rows already vs2's (12 against 11)
 160	CLOSED	COMPLETED	2026-09-28	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
 159	CLOSED	COMPLETED	2026-09-28	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)
@@ -220,10 +223,10 @@ number	state	reason	closed	labels	title
 130	CLOSED	COMPLETED	2026-10-03	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	CLOSED	NOT_PLANNED	2026-10-31	evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
-127	OPEN	-	-	cosmetic,parked	fix Press of Death palette swap by making its effect own its palette row (scope first) [#112's option (B)]
+127	OPEN	-	-	cosmetic	fix Press of Death palette swap by making its effect own its palette row (scope first) [#112's option (B)]
 126	CLOSED	COMPLETED	2026-10-01	cosmetic,parked	Select-wheel look-and-feel polish
-125	OPEN	-	-	cosmetic,parked	Arcade-ladder map: for the three tenants the next opponent's name and small portrait are wrong (the VS screen that follows is correct)
-124	OPEN	-	-	cosmetic,parked	Arcade-ladder map tag shows the base/shell character for a VS2 tenant opponent
+125	OPEN	-	-	cosmetic,out-of-scope,parked	Arcade-ladder map: for the three tenants the next opponent's name and small portrait are wrong (the VS screen that follows is correct)
+124	OPEN	-	-	cosmetic,out-of-scope,parked	Arcade-ladder map tag shows the base/shell character for a VS2 tenant opponent
 123	OPEN	-	-	cosmetic,parked	Win-quote text for the three tenants (vanilla untouched, dangerously impactful for a cosmetic change)
 122	CLOSED	COMPLETED	2026-10-06	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the m2 pro (load balancing potential)
 121	CLOSED	COMPLETED	2026-10-25	evolution	Linux release binaries built on dedicated server, plus clean-machine check at release
