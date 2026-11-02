@@ -1813,7 +1813,7 @@ not the match-start palette load. **Read this before attributing any
   bsr 0x2AD3C` uploads block row 0 into palette row `+0x18B` (`0x0A`), then
   `move.l #mask,d1 / move.b $382(a6),d0 / btst.l d0,d1 / bne -> rts`, else block rows
   1-3 into rows `0x0B-0x0D`. **vs2's mask (`PRG:0x02A108`) sets bit `0x13`; vsavj's
-  (`PRG:0x02ADB2`), unchanged in our build, does not** — so native reloads row 0
+  (`PRG:0x02ADB2`), unchanged in our build until M24 (14z-216, below), does not** — so native reloads row 0
   only, while ours reloads rows 1-3 too and row 11 gets block row 1, the orange ramp.
   Rows 12/13 are rewritten with the same content native holds (palette dumps equal
   at every sampled frame); row 11 is the one that differs. A COUNTERFACTUAL leg that
@@ -1822,7 +1822,10 @@ not the match-start palette load. **Read this before attributing any
   upload, whose content equals native's. **The fix's surface is one bit of one
   immediate (`PRG:0x02ADB4`, the mask's high word), vs2's own value; legacy reach is
   nil by construction — `btst.l` tests `d0 mod 32`, and no legacy fighter carries id
-  `0x13` (`tests/audit_id_writers.sh`) — but it is not built.** ours' 2813 upload
+  `0x13` (`tests/audit_id_writers.sh`) — ~~but it is not built~~.** **BUILT since M24
+  (14z-216, freeze `be40e6f3`; released 14z-217, #127/#162 closed): `PRG:0x02ADB4` holds vs2's value, and
+  `tests/audit_column_flash.sh`, `tests/audit_column_flash_cause.sh` and `tests/audit_don_row0b.sh` read ours =
+  native.** ours' 2813 upload
   (the blue row) comes from the port's state-hook sequence records (`PRG:0x0CF050`).
   **Wider: the same class elsewhere** — a census of every `move.l #mask,Dn /
   move.b $382(An),Dm / btst` site (`tools/audit_charid_masks.py`) pairs vs2's 7 to
@@ -1842,6 +1845,8 @@ not the match-start palette load. **Read this before attributing any
   now matches vs2 (`tests/audit_landing_sound.sh` `same`, its pre-swap control hearing the old sound); `0x003B36` (request `0x17c`, keyed on the
   character at `+0x32`) is not reached by those rigs). The other 3 sites agree; since M23 so do the three above, and the census's four differing sites are down to the
   first (`0x02ADB2`) — measured 14z-192 on merged-m23, the census held by `tests/audit_column_flash_cause.sh`.
+  **Since M24 (14z-216) that one agrees too: every census site reads SAME** (ERIS's release run at `be40e6f3`,
+  14z-217; the gate's C4, with its `mask-bit-planted` control firing).
   Gates: `tests/audit_column_flash.sh` (the symptom), `tests/audit_column_flash_cause.sh` (the path).
 - **Superseded note (14z-170), kept for the frames it measured:** inside the move's window, palette row 11 (`RAM:$90C160`) is written
   ONLY by this uploader on both games: ours uploads it at frames 2807, 2813 and 2858,

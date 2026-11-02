@@ -1,0 +1,15 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #350 closed done: publish_sheets.sh's upload under timeout --foreground, gated by test_proof_sheets_web section 2b and its no-foreground control (14z-217), after run 2026-11-02-1570
+Claim (the working agent's sentence): #350 can close done with the closing comment closing_350.md. The hang (issue350.md: GNU timeout without --foreground puts rsync/ssh in a process group that is not the terminal's foreground, so ssh is stopped at its password read) is measured on this Mac in repro.txt (timeout is GNU coreutils 9.11; under a pty, plain timeout never reads and exits 124 at 8 s, --foreground reads at once) and fixed in tools/publish_sheets.sh, whose upload line now reads 'timeout --foreground 3600 rsync' (fix.diff; evidence350.txt). tests/test_proof_sheets_web.sh section 2b (fix.diff) runs the publisher under a pseudo-terminal with a stub rsync that prints a prompt on /dev/tty and reads the answer; on the final fixed script the answer reaches the stub and the run finishes (gate3.log: ok line, PASS, 15 CONTROL FIRED). Its new must-fire control no-foreground, a copy with --foreground removed and TOOLS pointed at the real tools, must reach its upload (the stub's pgid file written and the prompt shown) and lose the answer: in-gate it reads CONTROL FIRED (gate3.log), and as a mode on the final files the gate FAILs with exit 1 (mode2.log). The control's first version fired without reaching the upload (the copy could not find proof_sheets.py), which is why it now requires the stub to have started (evidence350.txt). NOT TESTED: a real ssh password prompt against the maintainer's site (needs the password; the next hand run at a release is the first real use); the 3600 s bound after the change (no run waited it out; with --foreground, ssh's ConnectTimeout bounds only the connection and an ssh still at its prompt after the timeout is the hand-runner's to answer or Ctrl+C, as publish_sheets.sh's comment says); a Linux host (the gate ran on the Mac only); the change is uncommitted until the 14z-217 close commit, so the issue closes before the fix is on GitHub.
+Artifacts (read every one, in full):
+  - build/agent217/t350/closing_350.md
+  - build/agent217/t350/issue350.md
+  - build/agent217/t350/fix.diff
+  - build/agent217/t350/evidence350.txt
+  - build/agent217/t350/repro.txt
+  - build/agent217/t350/gate3.log
+  - build/agent217/t350/mode2.log
+  - tools/publish_sheets.sh
+  - tests/test_proof_sheets_web.sh

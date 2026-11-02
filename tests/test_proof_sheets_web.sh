@@ -1,5 +1,5 @@
 #!/bin/sh
-# test_proof_sheets_web.sh — THE PROOF SHEETS' WEB BUILD SHIPS NOTHING THE RULING FORBIDS (GitHub #338, 14z-213). ci_portable: no ROM, no emulator, ~5 s.
+# test_proof_sheets_web.sh — THE PROOF SHEETS' WEB BUILD SHIPS NOTHING THE RULING FORBIDS (GitHub #338, 14z-213). ci_portable: no ROM, no emulator, ~20 s (15 s of it the no-foreground control's deadline, measured 14z-217).
 #
 # WHAT: `tools/proof_sheets.py web <local run> --to <dir>` re-draws a finished local run for the community, as ruled
 #   2026-10-30 (14z-212, DECISIONS_HISTORY.md "the proof sheets get a web build for the community"; the clips 14z-213:
@@ -15,7 +15,12 @@
 #   then each perturbed copy below (the fourteen controls) must FAIL webcheck, naming the fault; then tools/publish_sheets.sh
 #   publishes it into a local folder standing for the webroot (replacing what is there), and refuses with no
 #   DEPLOY_TARGET and for a build that fails webcheck.
-# EXPECTS: web exit 0 and webcheck PASS; the counts below; every perturbed copy FAILs webcheck on its own fault.
+#   Section 2b (#350, 14z-217) runs the publisher under a pseudo-terminal with a stub `rsync` first on PATH that prints a
+#   prompt on /dev/tty and reads the answer, as ssh asks for a password: the answer must reach it. Under GNU `timeout`
+#   without --foreground the stub is stopped at the read (the M24 release's hang: no prompt, a dead terminal).
+# EXPECTS: web exit 0 and webcheck PASS; the counts below; every perturbed copy FAILs webcheck on its own fault; under a
+#   terminal the publisher's upload receives the answer to its prompt and Ctrl+C at the prompt ends it within 5 s (section
+#   2b); without --foreground neither holds.
 #
 # MUST-FIRE: perturbed-copy: missing-credits — a copy of the web build with the credits footer stripped from one gate page must FAIL webcheck naming that page (in-gate: the copy is checked; mode: the real output is perturbed and the gate FAILs)
 # MUST-FIRE: perturbed-copy: full-size-tile — a copy with one tile replaced by a 384x224 WebP must FAIL webcheck as larger than the reduced size (in-gate: the copy is checked; mode: the real output is perturbed and the gate FAILs)
@@ -31,6 +36,7 @@
 # MUST-FIRE: perturbed-copy: event-handler — a copy with an onclick= handler added to a gate page's <body> must FAIL webcheck as refused by a strict Content-Security-Policy (in-gate: the copy is checked; mode: the real output is perturbed and the gate FAILs)
 # MUST-FIRE: perturbed-copy: missing-stylesheet — a copy with sheets.css removed must FAIL webcheck naming the missing stylesheet (in-gate: the copy is checked; mode: the real output is perturbed and the gate FAILs)
 # MUST-FIRE: perturbed-copy: builds-sentence — a copy whose intro says "Every build matched its frozen reference." while the run has an unregistered build must FAIL `webcheck --run` naming the builds sentence (in-gate: the copy is checked; mode: the real output is perturbed and the gate FAILs)
+# MUST-FIRE: perturbed-copy: no-foreground — a copy of tools/publish_sheets.sh whose upload runs under `timeout` WITHOUT --foreground, run under a pseudo-terminal with a stub rsync that asks the terminal for a line, must never receive the line (the #350 hang: ssh stopped at its password read) and must survive a Ctrl+C at the prompt for 5 s (#350's 'Ctrl+C did nothing') (in-gate: the copy is checked; mode: that copy is the publisher section 2b runs and the gate FAILs)
 #
 # WHY: the sheets are reduced screenshots of a copyrighted game; the ruling allows them public only reduced, credited and
 #   free of local paths, and a web build that quietly ships one full-size picture or one page without credits breaks it.
@@ -137,6 +143,88 @@ grep -q '(local path)' "$G" && ! grep -qE '/Users/|build/agent[0-9]|\(\(local pa
 mkdir -p "$W/full" && touch "$W/full/x"
 python3 "$T" web "$W/src" --to "$W/full" > "$W/full.out" 2>&1 && bad "web wrote into a non-empty --to" || ok "web refuses a non-empty --to"
 
+echo "== 2b. the publisher's upload can ask the terminal (#350): ssh's password prompt must reach the user"
+# A stub rsync first on PATH does what ssh does at a password prompt: writes to /dev/tty and reads the answer from it. A
+# pseudo-terminal driver answers once it sees the prompt and gives the run 15 s. Under `timeout` without --foreground the
+# stub sits in a process group that is not the terminal's foreground: the kernel stops it at the read, the answer never
+# arrives, and the driver kills the stopped group at the deadline (the stub records its pgid first).
+mkdir -p "$W/ttystub"
+cat > "$W/ttystub/rsync" <<'STUB'
+#!/bin/sh
+ps -o pgid= -p $$ | tr -d ' ' > "$TTY_MARK.pgid"
+printf 'PROMPT> ' > /dev/tty
+read ans < /dev/tty && printf '%s\n' "$ans" > "$TTY_MARK"
+exit 0
+STUB
+chmod +x "$W/ttystub/rsync"
+tty_check() {  # tty_check <publisher script> <tag> [intr] -> READ or NO-READ; with intr, Ctrl+C is sent at the prompt and it
+               # prints INTR-EXITED (the publisher and the stub's group gone within 5 s) or INTR-HUNG; output in $W/tty.<tag>.out
+    rm -f "$W/tty.$2" "$W/tty.$2.pgid"
+    python3 - "$1" "$W/web" "$W/ttysite.$2/" "$W/ttystub" "$W/tty.$2" "$W/tty.$2.out" "${3:-answer}" <<'PY'
+import os, pty, select, signal, sys, time
+pub, web, target, stub, mark, outp, how = sys.argv[1:8]
+env = dict(os.environ, PATH=stub + os.pathsep + os.environ["PATH"], DEPLOY_TARGET=target, TTY_MARK=mark)
+env.pop("DEPLOY_PORT", None)
+pid, fd = pty.fork()
+if pid == 0:
+    os.execvpe("sh", ["sh", pub, web], env)
+out, sent, done, deadline, t_intr = b"", False, False, time.time() + 15, None
+while time.time() < deadline:
+    if select.select([fd], [], [], 0.2)[0]:
+        try:
+            d = os.read(fd, 4096)
+        except OSError:
+            d = b""
+        out += d
+        if not sent and b"PROMPT> " in out:
+            if how == "intr":
+                os.write(fd, b"\x03"); t_intr = time.time(); deadline = min(deadline, t_intr + 5)
+            else:
+                os.write(fd, b"tty-answer\n")
+            sent = True
+    if os.waitpid(pid, os.WNOHANG)[0]:
+        done = True; break
+try:
+    g = int(open(mark + ".pgid").read().strip())
+except (OSError, ValueError):
+    g = None
+def group_alive(g):
+    if g is None:
+        return False
+    try:
+        os.killpg(g, 0); return True
+    except OSError:
+        return False
+time.sleep(0.3) if done else None
+stub_left = group_alive(g)
+if not done or stub_left:
+    if g is not None:
+        try:
+            os.killpg(g, signal.SIGKILL)
+        except OSError:
+            pass
+    try:
+        os.kill(pid, signal.SIGKILL); os.waitpid(pid, 0)
+    except OSError:
+        pass
+open(outp, "wb").write(out)
+got = open(mark).read().strip() if os.path.exists(mark) else ""
+if how == "intr":
+    print("INTR-EXITED" if sent and done and not stub_left else "INTR-HUNG")
+else:
+    print("READ" if got == "tty-answer" else "NO-READ")
+PY
+}
+PUB="tools/publish_sheets.sh"
+if vs_ctl_is no-foreground; then
+    sed -e 's/timeout --foreground /timeout /' -e "s#^TOOLS=.*#TOOLS=\"$REPO/tools\"#" tools/publish_sheets.sh > "$W/pub_nofg.sh"; PUB="$W/pub_nofg.sh"   # the copy must still find webcheck beside the real tools
+fi
+v="$(tty_check "$PUB" real)"
+[ "$v" = READ ] && grep -q "published" "$W/tty.real.out" && ok "under a terminal the upload's prompt reached the user and the answer reached the stub, the run finished" \
+    || bad "the upload could not read the terminal ($v): $(tr -d '\r' < "$W/tty.real.out" | tail -2 | tr '\n' ' ')"
+vi="$(tty_check "$PUB" intr intr)"
+[ "$vi" = INTR-EXITED ] && ok "under a terminal, Ctrl+C at the upload's prompt ended the publisher and its upload within 5 s" \
+    || bad "Ctrl+C at the upload's prompt did not end the run ($vi): $(tr -d '\r' < "$W/tty.intr.out" | tail -2 | tr '\n' ' ')"
 if [ -n "${VS_CTL:-}" ]; then
     [ "$fail" = 0 ] && echo "PASS: test_proof_sheets_web" || echo "FAIL: test_proof_sheets_web (control mode ${VS_CTL})"; exit "$fail"
 fi
@@ -181,6 +269,17 @@ rm -rf "$W/p"; cp -R "$W/web" "$W/p"; python3 -c "import sys,re; p=sys.argv[1]+'
 if python3 "$T" webcheck "$W/p" --run "$W/src" > "$W/p.out" 2>&1; then vs_ctl_dead builds-sentence "webcheck --run passed a false builds sentence"; fail=1
 elif grep -q 'WEB-PROBLEM.*builds sentence does not match' "$W/p.out"; then vs_ctl_fired builds-sentence "$(grep -m1 'builds sentence' "$W/p.out" | cut -c1-120)"
 else vs_ctl_dead builds-sentence "webcheck failed for another reason: $(grep -m1 WEB-PROBLEM "$W/p.out")"; fail=1; fi
+# no-foreground (#350): the publisher with --foreground removed, under the same terminal check, must lose the answer
+sed -e 's/timeout --foreground /timeout /' -e "s#^TOOLS=.*#TOOLS=\"$REPO/tools\"#" tools/publish_sheets.sh > "$W/pub_nofg.sh"   # the copy must still find webcheck beside the real tools
+if grep -q 'timeout --foreground' "$W/pub_nofg.sh" || ! grep -q '^timeout 3600 rsync' "$W/pub_nofg.sh"; then
+    vs_ctl_dead no-foreground "the copy did not lose --foreground on the upload line"; fail=1
+elif [ "$(tty_check "$W/pub_nofg.sh" nofg)" != NO-READ ]; then
+    vs_ctl_dead no-foreground "the stub read the terminal without --foreground"; fail=1
+elif [ ! -s "$W/tty.nofg.pgid" ] || ! grep -q "PROMPT> " "$W/tty.nofg.out"; then   # the run must have REACHED the upload
+    vs_ctl_dead no-foreground "the copy never reached its upload: $(tr -d '\r' < "$W/tty.nofg.out" | tail -1)"; fail=1
+elif [ "$(tty_check "$W/pub_nofg.sh" nofgintr intr)" != INTR-HUNG ]; then   # #350's second symptom: "Ctrl+C did nothing"
+    vs_ctl_dead no-foreground "Ctrl+C at the prompt ended the copy's upload without --foreground"; fail=1
+else vs_ctl_fired no-foreground "the copy reached its upload and showed the prompt; without --foreground the stub never received the answer (the #350 hang, killed at the deadline) and Ctrl+C at the prompt did not end it within 5 s"; fi
 
 echo "== 4. tools/publish_sheets.sh: to a local folder standing for the webroot"
 mkdir -p "$W/site/vs-proof-sheets" && echo stale > "$W/site/vs-proof-sheets/old.html"

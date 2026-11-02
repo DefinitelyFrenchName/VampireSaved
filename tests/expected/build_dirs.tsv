@@ -20,6 +20,7 @@ scratch	static_runs	tests/run_all_static.sh's run records (N-D; test_session_met
 scratch	snapshot_runs	tests/run_on_snapshot.sh's snapshots (N-D)
 scratch	tmp	tests/run_all_emulator.sh's per-run TMPDIR (#321, 14z-210): the gates' temp files under an emulator run, removed when it ends (N-D)
 scratch	sheets	tools/proof_sheets.py's pages and clean checkouts (N-D since #313)
+scratch	sheets_web	tools/proof_sheets.py web's community build of a release's sheets (#338; 14z-217, the M24 release's 23,429 files tripped the --confirm plan's budget); no static gate reads it
 scratch	ledger_page	tools/publish_ledger.sh's page output, written then published (#267, 14z-212); no gate reads it (N-D)
 input	out	the decrypt cache (38 gates read it in the PILOT trace)
 input	manifest	the build manifests (tracked)

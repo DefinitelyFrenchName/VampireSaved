@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent217/release/close/closing_338.md	23d8ab46ebb88c0021abe5b328212aef43e7ed74
+build/agent217/release/close/issue338.md	f126363dae01ff69cc8a655bc095738ab6a70a67
+build/agent217/release/close/maintainer_words.txt	ae5367b0542bd9e7e0aa46af63c580c70eebfbef
+build/agent217/release/closures_evidence.txt	7f79d102cb8e4f52c25c64defec7ade0215c67aa
+build/agent217/release/sheets_web.log	10575c6715a33ee1917d10d3625cd86884372666
+build/agent217/release/sheets_webcheck.log	33ed189d7ffc3cb3f6cccea4e3781472b75912a8
+build/agent217/release/close/served_check.sh	0ae5bc3109a288d3197473d457f6b481f3236032
+build/agent217/release/close/served_check.txt	da7c2f6c607ecdf5b71ad934bee99a4018300ac9
+build/agent217/release/findings.md	534bf0d52719961418c6ef76bc957ba6b6d1dd9b
+tools/publish_sheets.sh	ce1d61d0e493d452dc857cee32a376b8a948f019
+build/agent217/release/close/new_issue_publish_hang.md	b0634ebfc3985ed3a941d81361ea963653a2a853

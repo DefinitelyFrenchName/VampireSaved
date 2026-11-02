@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-216 CLOSE, 2026-11-01)
+# NEXT SESSION — orientation (rewritten at the 14z-217 CLOSE, 2026-11-02)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -18,21 +18,22 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
-drives (the maintainer logs in). Its checkout `~/vampire-saved` sits at S4 `d1aed6a8` with a SCRATCH tag
-`freeze/merged-m24` (S4, never pushed): **delete it before PILOT fetches tags** (`git tag -d freeze/merged-m24`), then move the
-checkout to `main`. Deletable scratch (14z-216): `~/rt216*` (12 GB, the re-trace), `~/m24_*`, `~/pilot_m24*.sh`,
-`~/pilot_emu*.sh`, `~/pilot_rows216.sh`, `~/rows216*`, `~/t216_*`, `~/vampire-saved/build/emu_p216_*` (copied to the Mac).
-**ERIS** (WSL2, 24 threads, 47 GB) runs the release shape; its checkout sits at the freeze commit `be40e6f3`, RUNNING the M24
-release emulator tier (below) — leave `~/rel216_out` and `~/vampire-saved/build/emu_rel216_eris` until the release is
-recorded. Deletable (14z-216): `~/rt216*`, `~/psw216*`, `~/lad216*`, `~/e216*`, `~/eris_*216.sh`, `~/s5.bundle`,
-`~/freeze216.bundle`, `~/c329c.bundle`, `~/c333a.bundle`, `~/t215b.bundle`. Neither profile sets
+drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
+idle`). Its checkout `~/vampire-saved` sits detached at the M24 freeze commit `be40e6f3`: move it to `main` before other work.
+Deletable scratch: 14z-216's `~/rt216*` (12 GB, the re-trace), `~/m24_*`, `~/pilot_m24*.sh`, `~/pilot_emu*.sh`,
+`~/pilot_rows216.sh`, `~/rows216*`, `~/t216_*`; 14z-217's `~/proof_sheets/` (the host proof-sheet run), `/tmp/emu_p217_*.tgz`,
+and in `~/vampire-saved/build/`: `emu_p216_*`, `emu_p217_*`, `emu_p217_desk_fail1`, `desktop_release_fail1` (all copied to the Mac).
+**ERIS** (WSL2, 24 threads, 47 GB) runs the release shape; its checkout sits at `be40e6f3`. Deletable: 14z-216's `~/rt216*`,
+`~/psw216*`, `~/lad216*`, `~/e216*`, `~/eris_*216.sh`, `~/s5.bundle`, `~/freeze216.bundle`, `~/c329c.bundle`, `~/c333a.bundle`,
+`~/t215b.bundle`; 14z-217's `~/rel216_out`, `~/vampire-saved/build/emu_rel216_eris` (copied to the Mac), and on the Windows side
+`C:/Users/chaton/m22logs/{tree217.tgz,t217,emu_rel216_eris.tgz}`. Neither profile sets
 ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare commit-tree needs a temporary ref; delete
 it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS) or `ssh pilot 'bash -s' < script`,
 never as a quoted command line (Windows' shell splits it at a pipe and mangles quotes), and a remote `pkill -f <pattern>`
 matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-216's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-217's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
@@ -62,37 +63,18 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** ERIS's release tier (item 1) is this session's own process,
-   left running on purpose: declare it, never kill it.
-1. **THE M24 RELEASE, FIRST** (the maintainer, 14z-216: close first, then release — *"plan accepted. proceeed"*). M24 is
-   frozen at `be40e6f3` (tags `freeze/donovan-m28`, `huitzil-m35`, `pyron-m29`, `merged-m24`; STATE 14z-216 (1b)). The
-   release's tiers run on THAT commit (ruled 14z-208, `docs/project/release_format.md` "The release run on the freeze's
-   tree"), through `tests/run_on_snapshot.sh --commit be40e6f3…`, whatever the close committed after it. In order:
-   1. **ERIS's emulator tier**, started 2026-11-01 22:24 CET: `~/rel216_out/meta.txt` (its end line), `~/rel216_out/run.log`
-      (the GREEN line), results in `~/vampire-saved/build/emu_rel216_eris/`. Read every red; bring the run dir to the Mac.
-   2. **THEN the host-covered gates** (never before ERIS ends: the newest row wins): the Mac's `test_mame_parity`,
-      `test_release_binaries`, `test_readme_recording` and its MiSTer lane with `--controls`; PILOT's
-      `audit_release_linux_desktop` (the maintainer logged in) and `audit_release_linux_cleanhost`, one after the other,
-      `RELEASE=merged-m24`, on a checkout of `be40e6f3`.
-   3. **The static release tier** on a snapshot of `be40e6f3`: `--strict --cadence release --reuse
-      build/agent216/m24/static_freeze_results_s5.tsv` (the freeze run of record, the same tree).
-   4. **The Windows half of `test_release_launcher_bat`** on ERIS (release cadence).
-   5. **The proof sheets (#338):** a local run of `be40e6f3` (`tools/proof_sheets.py run`), `web`, then
-      `tools/publish_sheets.sh --dry-run` and, on the maintainer's word, the real publish (by hand: ssh asks for the
-      password; `DEPLOY_TARGET` is the maintainer's site deploy's).
-   6. **Publish** on the maintainer's word: the assets (`tools/upload_release_assets.sh freeze/merged-m24`), the GitHub
-      release; then close #127, #162, #294 and #338 with the release (each has its done-awaiting-release comment).
-   **Before it, read each open ticket's comments for a step that runs AT a release.**
-2. **#310 — THE CRASH-INJECTION SWEEP** (the maintainer, 14z-215: **"Next session, first batch (Recommended)"**). Discovery
-   ran over the 20 static gates this sitting (STATE 14z-216 (2), `build/agent216/t310/FINDINGS.md`, local: every runner mode
-   PROVEN but one LIES; F1 `test_agent_hooks`' twins); the gate is not built. Its seed is
-   `build/agent215/t310/rcmeas/measure.sh` (local). Then group 7's first batch.
-3. **Clear PILOT's and ERIS's scratch** (the lists above), PILOT's scratch tag first.
-4. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
-   - awaiting release: #127, #162, #294, #338 (item 1).
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
+1. **#310 — THE CRASH-INJECTION SWEEP** (the maintainer, 14z-215: **"Next session, first batch (Recommended)"**; it was
+   item 2 behind the release at 14z-216 and 14z-217). Discovery ran over the 20 static gates at 14z-216 (STATE_HISTORY
+   14z-216 (2), `build/agent216/t310/FINDINGS.md`, local: every runner mode PROVEN but one LIES; F1 `test_agent_hooks`'
+   twins); the gate is not built. Its seed is `build/agent215/t310/rcmeas/measure.sh` (local). Then group 7's first batch.
+2. **Clear PILOT's and ERIS's scratch** (the lists above): deletions, so put the lists to the maintainer first.
+3. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
    - bugs: #345 (Blizzard Sword overrun), #347 (`--stale --freeze` refuses NOTE-class names), #349 (REFUSED control runs
-     read SAFE); evolution: #348 (no tracked-release-vs-build gate); cosmetic: #344 (Donovan's Dark Force colours),
-     #346 (the Blizzard Sword ice streak); low: #310 (item 2).
+     read SAFE), #351 (`proof_sheets run --host` and freeze-tag control builds), #353 (`--log` on an existing directory
+     appends: the 14z-213 gotcha, paid again); evolution: #348 (no tracked-release-vs-build gate), #352 (the desktop gate's
+     paused-FBNeo verdict), #354 (no gate on #294's dead span in the built image); cosmetic: #344 (Donovan's Dark Force
+     colours), #346 (the Blizzard Sword ice streak); low: #310 (item 1).
    - parked: #123, #124, #125, #128.
 
 ## PARKED (not open work)
@@ -102,22 +84,21 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **GNOME 46's first `xwininfo -tree` line naming a window is its FRAME** (`docs/platform/gotchas.md`): focusing it takes
-  focus from the game since mutter `.18` (FBNeo pauses); `tools/desktop_session_play.py` targets the client window.
-- **A byte-plant control that writes a constant is dead where the byte already holds it** (`docs/project/gotchas.md`):
-  invert, and `cmp` the copy before reading DEAD.
-- **A re-point sweep rewrites quoted records**, and the attribution tool's 8-byte window misses straddling pointers
-  (`docs/project/gotchas.md`, 14z-216).
-- **The concurrent-controls scorer reads an all-REFUSED gate SAFE** (#349): classify every traced log with
-  `tests/lib/classify.sh` and certify only HONOURED runs.
-- **`run_all_emulator.sh --stale --freeze`** refuses on NOTE-class names (#347): `--skip` each one meanwhile.
-- **No gate ties a tracked release to its build** (#348): for M24 it was checked directly,
-  `build/agent216/m24/rc_freeze/relid/` (local).
+- **GNU `timeout` without `--foreground` takes the terminal from its command** (`docs/platform/gotchas.md`): an ssh
+  password prompt never shows and Ctrl+C does not reach it. A bounded command that may prompt runs under `--foreground`.
+- **FBNeo's SDL build pauses when its window loses focus** (`emu/fbneo/src/burner/sdl/run.cpp:456`): a desktop run on a
+  session the maintainer is using can go red with PAUSE on every capture (#352). Re-run on a quiet session.
+- **`gh issue view N --comments` prints only the comments**: for an issue with none it prints nothing. Save an issue's text
+  for a packet with `gh issue view N` (rule-checker run `2026-11-02-1570`).
+- **A release closure's packet needs the published bytes, not the tree's**: download the assets back and compare them
+  with the freeze commit, apply EVERY package to the dumps, and list in each closing comment every NOT COVERED item and
+  frozen-blind census part of each gate it cites (rule-checker runs `2026-11-02-1561` to `-1566`, six rounds).
+- **A control that fires on an early failure is dead**: #350's first `no-foreground` copy failed before reaching its
+  upload and still read FIRED; a control now has to show it reached the code it perturbs.
 
-## WHAT CLOSED THIS SITTING (14z-216)
+## WHAT CLOSED THIS SITTING (14z-217)
 
-- **Frozen:** M24 at `be40e6f3` ((M) for #127/#162, #294's per-frame routine); freeze rule-checker run `2026-11-01-1560`.
-- **Ruled** (`DECISIONS_HISTORY.md`, 14z-216 entries): (M) and #294's implementations; #294's lag frame accepted, then
-  re-confirmed as a tradeoff; #345's rows exempt; the 45-row re-trace; the ERIS half accepted and the split clarified;
-  #338's publisher by hand.
-- **Filed:** #344, #345, #346, #347, #348, #349.
+- **Released:** M24, `freeze/merged-m24` on GitHub from `be40e6f3` (9 assets; merged-m23's pruned); the proof sheets at
+  alexrichard.org/vs-proof-sheets/.
+- **Closed done:** #127, #162, #294 (rule-checker run `2026-11-02-1566`), #338 (`-1569`), #350 (`-1572`).
+- **Filed:** #350, #351, #352, #353, #354.

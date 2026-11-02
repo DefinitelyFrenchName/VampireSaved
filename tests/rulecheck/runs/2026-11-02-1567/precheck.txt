@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: - all 133 files compared are byte-identical to the local build: the index, the stylesheet, all 101 gate pages and 30 pictures and clips drawn at random (seed...  [build/agent217/release/close/closing_338.md]
+  FLAG D-ABSOLUTE: **Nothing is left to do on this ticket:** the web build exists, is gated, and this release's sheets are published.  [build/agent217/release/close/closing_338.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

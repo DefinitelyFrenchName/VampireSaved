@@ -1,0 +1,12 @@
+decision	recommendation
+subject	#338 closed done: the M24 release's proof sheets drawn with web and published at alexrichard.org/vs-proof-sheets/ (14z-217)
+session	14z-217
+model	rule-checker@163e4ce9cf7b
+claim	#338 can close done with the closing comment closing_338.md. Its condition (issue338.md, the 14z-213 comment's 'What closes it': at the next tagged release, the release commit's local run is drawn with web and published with publish_sheets.sh) is met as follows. The local run build/sheets/be40e6f3f58c is of the release commit: its meta.json reads commit be40e6f3, 58 gates, exit codes [0], and the 8 verdicts not starting with PASS each read as a pass in their gate's own wording (closures_evidence.txt). The web build was drawn from it with --release freeze/merged-m24 (sheets_web.log: 102 pages, 23174 tiles, 152 clips, 0 problems), webcheck --run on that run reads PASS with 0 problems (sheets_webcheck.log), and the index carries the builds sentence counted from the run and the tag freeze/merged-m24 (closures_evidence.txt). It was published not by publish_sheets.sh, which ran webcheck (PASS) and then hung at the ssh password prompt (the maintainer's words, maintainer_words.txt; the mechanism, timeout without --foreground, reproduced under a pty: findings.md item 5; filed as #350, OPEN, new_issue_publish_hang.md), but by the maintainer by hand with the script's own rsync line minus timeout ('manual upload done successfully', maintainer_words.txt); the published copy was then checked from the site: index and stylesheet served HTTP 200 with text/html and text/css, and 133 files (index, css, all 101 gate pages, 30 pictures and clips drawn at random, seed 217) byte-identical to the local build (sheets_served_check.txt). NOT TESTED: the other pictures and clips were not compared one by one; the pages were not re-rendered under the site's style-src 'self' policy at this release (done on the 14z-213 trial, issue338.md; webcheck refuses inline style and script); publish_sheets.sh's own upload path did not complete and stays broken until #350; the upload's command line as the maintainer typed it is known only from their words and the line suggested to them, not from a log; the 30-file sample's seed is fixed, not independently drawn.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	2 flag(s): D-ABSOLUTE 2
+deliverables	build/agent217/release/close/closing_338.md
+action	2026-11-02-1567

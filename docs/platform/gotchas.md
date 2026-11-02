@@ -3585,3 +3585,20 @@ warning screen at 17 s, its title focused at 9 s, before the first key), and MAM
 `mutter-x11-frames` lines (the client window, `0x1000008`) gave the select screen and its mark on the same session.
 **The rule:** a desktop driver targets the CLIENT window, never the first title match; and when a desktop gate goes red
 on unchanged release bytes, check the host's window-manager packages (`/var/log/dpkg.log`) before the release.
+
+## GNU `timeout` WITHOUT `--foreground` TAKES THE TERMINAL AWAY FROM ITS COMMAND — an ssh password prompt then never shows, the run hangs to the timeout and Ctrl+C does not reach it (paid: 14z-217, the Mac; `tools/publish_sheets.sh`)
+
+`tools/publish_sheets.sh` ran its upload as `timeout 3600 rsync … -e "ssh -p …"`. GNU `timeout` (coreutils 9.11 here)
+puts itself and its command in a NEW process group, which is not the terminal's foreground group, so the moment ssh
+opens `/dev/tty` to ask for the password the kernel stops it: no prompt appears, the script sits silent until the
+timeout, and Ctrl+C, sent to the foreground group, never reaches it. The maintainer saw webcheck's `PASS` and the ssh
+banner, then a dead terminal, at the M24 release; the sheets went up by hand with the same rsync line without
+`timeout`. Measured under a pseudo-terminal (`script -q /dev/null sh -c "timeout [--foreground] 8 sh -c 'read v
+</dev/tty'"`): plain, the read never happens and `timeout` kills it at 8 s (exit 124); with `--foreground`, it reads at
+once (exit 0). **The rule:** a bounded command that may prompt on the terminal (ssh, sudo, gpg) runs under
+`timeout --foreground`; `--foreground` stops `timeout` from killing the command's own children at the limit, so give an
+ssh call `-o ConnectTimeout` as well. A command meant never to prompt keeps `timeout` and says so with ssh's
+`BatchMode=yes` (`tools/publish_ledger.sh` does).
+Fixed 14z-217 (#350): the upload runs under `timeout --foreground`, and `tests/test_proof_sheets_web.sh` section 2b drives
+the publisher under a pseudo-terminal with a stub `rsync` that prompts on `/dev/tty`; its `no-foreground` control (the
+flag removed) loses the answer and is killed at a 15 s deadline.

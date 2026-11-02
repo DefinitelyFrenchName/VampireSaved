@@ -1,0 +1,15 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #350 closed done: publish_sheets.sh's upload under timeout --foreground, gated by test_proof_sheets_web section 2b and its no-foreground control (14z-217)
+Claim (the working agent's sentence): #350 can close done with the closing comment closing_350.md. The hang (issue350.md: GNU timeout without --foreground stopped ssh at its password read) is fixed in tools/publish_sheets.sh, whose upload line now reads 'timeout --foreground 3600 rsync' with ssh keeping -o ConnectTimeout=20 (fix.diff; evidence350.txt). tests/test_proof_sheets_web.sh section 2b (fix.diff) runs the publisher under a pseudo-terminal with a stub rsync that prints a prompt on /dev/tty and reads the answer; on the fixed script the answer reaches the stub and the run finishes (gate.log, gate2.log: ok line and PASS, 15 CONTROL FIRED). Its new must-fire control no-foreground, a copy with --foreground removed and TOOLS pointed at the real tools, must reach its upload (the stub's pgid file written and the prompt shown) and lose the answer: in-gate it reads CONTROL FIRED, and as a mode (CONTROL=no-foreground) the gate FAILs with NO-READ after 'PROMPT> tty-answer' (mode.log). The control's first version fired without reaching the upload (the copy could not find proof_sheets.py), which is why it now requires the stub to have started (evidence350.txt). NOT TESTED: a real ssh password prompt against the maintainer's site (needs the password; the next hand run at a release is the first real use); a Linux host (the gate ran on the Mac only); the change is uncommitted until the 14z-217 close commit, so the issue closes before the fix is on GitHub.
+Artifacts (read every one, in full):
+  - build/agent217/t350/closing_350.md
+  - build/agent217/t350/issue350.md
+  - build/agent217/t350/fix.diff
+  - build/agent217/t350/evidence350.txt
+  - build/agent217/t350/gate.log
+  - build/agent217/t350/gate2.log
+  - build/agent217/t350/mode.log
+  - tools/publish_sheets.sh
+  - tests/test_proof_sheets_web.sh

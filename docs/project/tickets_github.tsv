@@ -2,8 +2,13 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 349
+# issues: 354
 number	state	reason	closed	labels	title
+354	OPEN	-	-	enhancement	no gate checks what reaches #294's dead span PRG:0x024024 in the built image
+353	OPEN	-	-	bug	run_all_emulator.sh --log on an existing directory appends to its results.tsv: a re-run inherits the earlier run's verdicts
+352	OPEN	-	-	enhancement	audit_release_linux_desktop reports a paused FBNeo window as missing mark and silence instead of NOT JUDGED: paused
+351	OPEN	-	-	bug	proof_sheets run --host cannot run gates whose control build is a freeze tag; the release recipe offers --host pilot
+350	CLOSED	COMPLETED	2026-11-02	bug	publish_sheets.sh hangs at the ssh password prompt: timeout without --foreground takes the terminal from rsync/ssh
 349	OPEN	-	-	bug	controls_overlap.py reads a gate SAFE when all its control runs were REFUSED (only SKIP reads HOLLOW)
 348	OPEN	-	-	evolution	No gate checks a tracked release/<name> is the package of its build; the Linux release gates do not follow release/<name>
 347	OPEN	-	-	bug	run_all_emulator.sh --stale --freeze refuses when any stale gate is outside a freeze (the audit names at its default cadence)
@@ -15,7 +20,7 @@ number	state	reason	closed	labels	title
 341	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	test_tickets' parked-disagrees control went DEAD once the newest ticket was closed (it perturbs the first row whatever its state)
 340	CLOSED	COMPLETED	2026-10-30	bug,severity: low,test-integrity	Every strict emulator run read NOT GREEN: audit_pool_drop is a DEAD ROW to the runners' emulator-tier classifier
 339	CLOSED	COMPLETED	2026-10-30	-	The rule-checker ledger has 37 rows with session '-' (14z-187/187b/188); both ledger pages drop them without saying so
-338	OPEN	-	-	done unshipped,evolution	Proof sheets: a web build for the community — half-size WebP tiles, credits on every page, a plain-language intro, no local paths
+338	CLOSED	COMPLETED	2026-11-02	done unshipped,evolution	Proof sheets: a web build for the community — half-size WebP tiles, credits on every page, a plain-language intro, no local paths
 337	CLOSED	COMPLETED	2026-10-30	evolution,severity: low,test-integrity	The mktemp census does not check EXIT-trap order: a trap installed before a guarded site runs on the guard's stop
 336	CLOSED	COMPLETED	2026-10-30	bug,severity: low,test-integrity	test_static_runner section 32 FAILs on every Linux host: dash words its write error 'I/O error', the premise counted only bash's 'Broken pipe'
 335	CLOSED	COMPLETED	2026-10-30	evolution,severity: low	The session ledger: the rule-checker's first-run OK rate per action, and which question fails first
@@ -59,7 +64,7 @@ number	state	reason	closed	labels	title
 297	CLOSED	COMPLETED	2026-10-25	evolution,performance	Static tier scope: six families (109 gates) to freeze cadence, triggered by their own code (@code)
 296	CLOSED	COMPLETED	2026-10-22	evolution,severity: medium,test-integrity	run_mame.sh: refuse a run whose MAME_SANDBOX already holds an earlier run's state (#293's class, at run time)
 295	CLOSED	COMPLETED	2026-10-19	evolution,severity: medium,test-integrity	audit_dmg_legacy_sweep never runs Demitri's legacy hits on our build: add an exact vsavj-vs-ours leg (superset coverage)
-294	OPEN	-	-	cosmetic	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff)
+294	CLOSED	COMPLETED	2026-11-02	cosmetic,done unshipped	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff)
 293	CLOSED	COMPLETED	2026-10-18	bug,severity: medium,test-integrity	Two gates hand one MAME sandbox to several runs, so a later run boots on carried nvram (audit_flicker_attribution, audit_legacy_pairings)
 292	CLOSED	NOT_PLANNED	2026-10-20	bug,performance,severity: high	static_confirm: a tool's self-test strings count as a direct read (battery_reach names STATE.md), so 22 gates re-run with controls at every commit
 291	CLOSED	COMPLETED	2026-10-23	evolution	On demand, at a given tag or commit: comparative capture sheets (ours vs vsavj and/or vs2) for every comparing test, as a visual proof of accuracy for humans
@@ -191,7 +196,7 @@ number	state	reason	closed	labels	title
 165	CLOSED	COMPLETED	2026-09-19	bug	The tenants' vs2 EX inputs entered Dark Force through a placed copy of vs2's Change entry — a second, longer route into the mode
 164	CLOSED	COMPLETED	2026-09-19	bug	Phobos and Donovan took damage and rallied through their shells' defense rows (vsavj's copies for ids 0x10/0x13), not vs2's own
 163	CLOSED	COMPLETED	2026-09-25	bug	The Killshread Lightning column and the Plasma Trap ran vsavj's shock remap instead of vs2's class-0x52 rule — the victim's freeze and the attacker's hit-freeze differed from native
-162	OPEN	-	-	bug,cosmetic	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
+162	CLOSED	COMPLETED	2026-11-02	bug,cosmetic,done unshipped	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
 161	CLOSED	NOT_PLANNED	2026-09-25	bug	Phobos takes one more HP than native from Demitri's 5HP with his defense rows already vs2's (12 against 11)
 160	CLOSED	COMPLETED	2026-09-28	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
 159	CLOSED	COMPLETED	2026-09-28	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)
@@ -226,7 +231,7 @@ number	state	reason	closed	labels	title
 130	CLOSED	COMPLETED	2026-10-03	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	CLOSED	NOT_PLANNED	2026-10-31	evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
-127	OPEN	-	-	bug,cosmetic	fix Press of Death palette swap by making its effect own its palette row (scope first) [#112's option (B)]
+127	CLOSED	COMPLETED	2026-11-02	bug,cosmetic,done unshipped	fix Press of Death palette swap by making its effect own its palette row (scope first) [#112's option (B)]
 126	CLOSED	COMPLETED	2026-10-01	cosmetic,parked	Select-wheel look-and-feel polish
 125	OPEN	-	-	cosmetic,out-of-scope,parked	Arcade-ladder map: for the three tenants the next opponent's name and small portrait are wrong (the VS screen that follows is correct)
 124	OPEN	-	-	cosmetic,out-of-scope,parked	Arcade-ladder map tag shows the base/shell character for a VS2 tenant opponent

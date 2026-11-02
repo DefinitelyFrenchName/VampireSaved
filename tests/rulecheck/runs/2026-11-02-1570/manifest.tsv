@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent217/t350/closing_350.md	5293b1f136298806584a27f26b35140f6d1ee524
+build/agent217/t350/issue350.md	da39a3ee5e6b4b0d3255bfef95601890afd80709
+build/agent217/t350/fix.diff	06ef39fcd153fcc8b02611020414757f31b4f679
+build/agent217/t350/evidence350.txt	80c89e290ecbb897a47bc481abf96cffd0dea101
+build/agent217/t350/gate.log	51529cfc2cadb6d1b9ff657032b6d7aba961fd4d
+build/agent217/t350/gate2.log	51529cfc2cadb6d1b9ff657032b6d7aba961fd4d
+build/agent217/t350/mode.log	b971d14f64ca2762da73dbc1c169f44fb195fd33
+tools/publish_sheets.sh	3c18fa957ebf5db6d77cfe65a4744310e9be48e7
+tests/test_proof_sheets_web.sh	399285076224d50ab0c6fa6ebbdd4bd1c259f410
