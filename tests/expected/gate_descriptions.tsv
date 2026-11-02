@@ -17,6 +17,7 @@ declares	audit_column_shock
 declares	audit_command_throws
 declares	audit_continue_ladder
 declares	audit_continue_switch
+declares	audit_crash_sweep_emu
 declares	audit_crouch_flag
 declares	audit_dead_span_exec
 declares	audit_defense_row_reads
@@ -217,6 +218,7 @@ declares	test_controls_concurrent
 declares	test_controls_contract
 declares	test_copy_flags
 declares	test_crash_guard
+declares	test_crash_sweep
 declares	test_crosscheck_229
 declares	test_crypt_boundary
 declares	test_ctl_show_err

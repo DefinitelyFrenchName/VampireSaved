@@ -8,6 +8,8 @@ row's runtime eating its cap? (GitHub #171 slices Q4 and Q5, ruled 2026-09-24:
   python3 tools/audit_emulator_staleness.py --cadence freeze   # a stale gate is a FAIL, not a NOTE
   python3 tools/audit_emulator_staleness.py --names            # stale gate names only, one per line
                                                                # (what run_all_emulator.sh --stale runs)
+  python3 tools/audit_emulator_staleness.py --cadence freeze --names   # only those a freeze judges; the others
+                                                               # named on stderr (what --stale --freeze runs, #347)
   python3 tools/audit_emulator_staleness.py --root DIR --repo DIR   # over a copy (the gate's controls)
 
 WHAT IT READS. A run directory written by tests/run_all_emulator.sh: `results.tsv` (one
@@ -402,10 +404,6 @@ def main():
                 f"({nrec} still the newest for some gate; newest {runs[-1]})")
         where = "in their newest run"
     stale, undeclared, passed, unknown, red = stale_gates(root, repo, commit, rows, a.run)
-    if a.names:
-        for g in sorted(set(stale) | set(red)):
-            print(g)
-        return 0
     reg_all = gf.registry_rows(root)
     def judged(g):   # does this row's finding FAIL at this cadence? (14z-192: a freeze judges what it runs)
         if a.cadence == "session":
@@ -416,6 +414,20 @@ def main():
             return True
         row = reg_all.get(g, {})
         return (row.get("cadence"), row.get("scope")) == FREEZE_SELECTS
+    if a.names:
+        # #347 (14z-218): at freeze or release cadence, only the names that cadence JUDGES — what a
+        # `run_all_emulator.sh --stale --freeze` runs; the others are named on stderr as a NOTE, never
+        # dropped silently. At session cadence (the default), every stale and red name, as before.
+        names = set(stale) | set(red)
+        if a.cadence != "session":
+            left = sorted(g for g in names if not judged(g))
+            names -= set(left)
+            if left:
+                print(f"NOTE: left out, outside what a {a.cadence} runs ({len(left)}): {' '.join(left)}",
+                      file=sys.stderr)
+        for g in sorted(names):
+            print(g)
+        return 0
 
     rc = 0
     since = {r["gate"]: (r.get("commit") or commit) for r in rows}

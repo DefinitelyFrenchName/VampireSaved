@@ -25,7 +25,9 @@ the commit does not make declares it, one line each, in the same leading block:
     # SHEET-BUILD: <VAR> <freeze/tag> <TRACK> — <why the gate needs it>
 `run` then checks the tag's commit out in a SECOND clean checkout (build/sheets/<sha>.ctl.tree), builds it there by the
 same recipe, refuses unless every track equals that commit's own frozen reference (and TRACK the tag's program key),
-passes VAR=<that build's dir> to the gate, and the page labels it "control build, from <tag>, not the commit".
+passes VAR=<that build's dir> to the gate, and the page labels it "control build, from <tag>, not the commit". The
+run's bundle carries each tag the selected gates' SHEET-BUILD lines name (#351), so a --host run resolves the tag, its
+`program key` and its commit from what it was sent (refs/bundle/tags/ of its checkout) and refuses as a local run does.
 
 A GATE-BUILT VARIANT (#291, 14z-206, ruled 2026-10-22 "Built in checkout, stated (Recommended)"): a gate whose `ours`
 leg runs a variant it builds for itself (test_tenant_select_records' 0x13 image) declares the builder:
@@ -71,11 +73,12 @@ DASH = re.compile(r"\s+(?:—|--)\s+")
 
 
 # ── the declaration ─────────────────────────────────────────────────────────────────────────────────────────────
-def leading_block(path):
+def leading_block(path, text=None):
     """The gate's leading comment block: every `#` line after the shebang up to the first non-comment line (a blank
-    line is one; a bare `#` continues it) — the must-fire reader's definition (docs/project/gate_header_contract.md)."""
+    line is one; a bare `#` continues it) — the must-fire reader's definition (docs/project/gate_header_contract.md).
+    `text` is the file's content when it is read from a commit rather than a path (#351)."""
     out = []
-    for i, line in enumerate(Path(path).read_text(errors="replace").splitlines()):
+    for i, line in enumerate((Path(path).read_text(errors="replace") if text is None else text).splitlines()):
         if i == 0 and line.startswith("#!"):
             continue
         if line.startswith("#"):
@@ -85,9 +88,9 @@ def leading_block(path):
     return out
 
 
-def parse_declaration(path):
+def parse_declaration(path, text=None):
     """-> (decl dict | None, error | None). None, None = no declaration."""
-    lines = [m.group(1).strip() for m in (DECL.match(l) for l in leading_block(path)) if m]
+    lines = [m.group(1).strip() for m in (DECL.match(l) for l in leading_block(path, text)) if m]
     if not lines:
         return None, None
     if len(lines) > 1:
@@ -118,10 +121,10 @@ def parse_declaration(path):
     return {"kind": "legs", "roles": roles, "moments": fields["moments"], "not_comparable": fields["not comparable"]}, None
 
 
-def parse_sheet_builds(path):
+def parse_sheet_builds(path, text=None):
     """-> ([{var, tag, track, why}], [errors]): the gate's `# SHEET-BUILD:` lines (its control builds)."""
     out, errs = [], []
-    for l in leading_block(path):
+    for l in leading_block(path, text):
         m = SHEET_BUILD.match(l)
         if not m:
             continue
@@ -166,9 +169,9 @@ def sources_sheet_lib(path):
     return False
 
 
-def registry_gates(registry):
+def registry_gates(registry, text=None):
     out = []
-    for line in Path(registry).read_text().splitlines():
+    for line in (Path(registry).read_text() if text is None else text).splitlines():
         if line.startswith("#") or not line.strip():
             continue
         f = line.split("\t")
@@ -899,21 +902,30 @@ def run_gate(row, sheet_dir, log, extra_env=None):
     return {"gate": gate, "rc": rc, "verdict": verdict[:200], "seconds": int(time.time() - t0)}
 
 
-def select(rows, gates, char, ticket):
+def root_text(rel):
+    """A file of ROOT (the clean checkout during `run`) as text, or None."""
+    p = ROOT / rel
+    return p.read_text(errors="replace") if p.exists() else None
+
+
+def select(rows, gates, char, ticket, read=None):
+    """The rows `run` draws. `read(rel)` -> a file's text or None (default: ROOT's; a commit's for the --host
+    bundle's tags, #351)."""
+    read = read or root_text
     picked = []
     tickets_where = {}
-    tsv = ROOT / "docs/project/tickets.tsv"
-    if ticket and tsv.exists():
-        for line in tsv.read_text().splitlines():
+    tsv = read("docs/project/tickets.tsv")
+    if ticket and tsv is not None:
+        for line in tsv.splitlines():
             f = line.split("\t")
             if f and f[0] == str(ticket) and len(f) > 4:
                 tickets_where = set(re.findall(r"tests/(\w+)\.sh", f[4]))
     for r in rows:
         g = r[0]
-        p = ROOT / "tests" / (g + ".sh")
         if gates and g not in gates:
             continue
-        head = "\n".join(leading_block(p)) if p.exists() else ""
+        text = read("tests/%s.sh" % g)
+        head = "\n".join(leading_block(None, text)) if text is not None else ""
         if char and char.lower() not in (g + head).lower():
             continue
         if ticket and not (re.search(r"#%s\b" % ticket, head) or g in tickets_where):
@@ -1656,9 +1668,27 @@ def build_commit(tree, romdir, logs, reuse):
     return rec, check_builds(built, expect)
 
 
+# Where a freeze tag is resolved (#351): on this machine, this repository's refs/tags/; on a host (`run --bundle`), the
+# clean checkout's refs/bundle/tags/, i.e. ONLY the tags the bundle carried (host_bundle) — never a tag found elsewhere.
+TAG_REPO = TOOL_ROOT
+TAG_NS = "refs/tags/"
+
+
+def bundle_tag_source(tree):
+    """Resolve freeze tags from the tags a bundle carried into `tree` (make_checkout fetches +refs/*:refs/bundle/*)."""
+    global TAG_REPO, TAG_NS
+    TAG_REPO, TAG_NS = Path(tree), "refs/bundle/tags/"
+
+
+def tag_commit(tag):
+    """The freeze tag's commit (full sha), or ""."""
+    return subprocess.run(["git", "rev-parse", "--verify", "--quiet", TAG_NS + tag + "^{commit}"], cwd=TAG_REPO,
+                          capture_output=True, text=True).stdout.strip()
+
+
 def tag_program_key(tag):
     """The freeze tag's own `program key` line (its message), or None."""
-    r = subprocess.run(["git", "cat-file", "-p", tag], cwd=TOOL_ROOT, capture_output=True, text=True)
+    r = subprocess.run(["git", "cat-file", "-p", TAG_NS + tag], cwd=TAG_REPO, capture_output=True, text=True)
     m = re.search(r"^program key\s+([0-9a-f]{40})\s*$", r.stdout, re.M)
     return m.group(1) if m else None
 
@@ -1676,10 +1706,10 @@ def control_build(tag, track, out, romdir, bundle):
     """A control build: `tag`'s commit in a second clean checkout, built by the recipe, every track its own frozen
     reference and `track` the tag's program key. -> (build dir | None, provenance line, problems). A checkout and build
     a previous run of this tag made are re-used and re-fingerprinted (the commit is fixed, so the build is too)."""
-    sha = subprocess.run(["git", "rev-parse", "--verify", "--quiet", tag + "^{commit}"], cwd=TOOL_ROOT,
-                         capture_output=True, text=True).stdout.strip()
+    sha = tag_commit(tag)
     if not sha:
-        return None, "", ["%s does not resolve to a commit in %s (a --host run carries no tags: not supported)" % (tag, TOOL_ROOT)]
+        return None, "", ["%s does not resolve to a commit (%s%s in %s)%s" % (tag, TAG_NS, tag, TAG_REPO,
+                          ": the bundle did not carry that tag" if TAG_NS != "refs/tags/" else "")]
     ctree = (Path(out).parent / ("%s.ctl.tree" % sha[:12])).resolve()
     reuse = ctree.exists() and any(ctree.iterdir())
     if bundle is None and not reuse:
@@ -1817,15 +1847,60 @@ def make_checkout(sha, tree, bundle, reuse):
     return None
 
 
-def make_bundle(sha, path):
-    """A bundle of the commit's history, through a temporary ref (git bundles refs, not bare commits); the ref is gone after."""
+def make_bundle(sha, path, tags=(), repo=None):
+    """A bundle of the commit's history, through a temporary ref (git bundles refs, not bare commits); the ref is gone after.
+    Each of `tags` that is a tag here goes in as refs/tags/<tag>, with its tag object and its commit's history (#351)."""
+    repo = repo or TOOL_ROOT
     ref = "refs/proof-sheets/run-%d" % os.getpid()
+    refs = [ref] + ["refs/tags/" + t for t in tags if subprocess.run(
+        ["git", "rev-parse", "--verify", "--quiet", "refs/tags/" + t], cwd=repo, capture_output=True).returncode == 0]
     try:
-        subprocess.run(["git", "update-ref", ref, sha], cwd=TOOL_ROOT, check=True)
-        r = subprocess.run(["git", "bundle", "create", str(path), ref], cwd=TOOL_ROOT, capture_output=True, text=True)
+        subprocess.run(["git", "update-ref", ref, sha], cwd=repo, check=True)
+        r = subprocess.run(["git", "bundle", "create", str(path)] + refs, cwd=repo, capture_output=True, text=True)
         return None if r.returncode == 0 else (r.stderr.strip().splitlines() or ["git bundle failed"])[-1]
     finally:
-        subprocess.run(["git", "update-ref", "-d", ref], cwd=TOOL_ROOT)
+        subprocess.run(["git", "update-ref", "-d", ref], cwd=repo)
+
+
+def git_text(sha, rel, repo=None):
+    """A file of commit `sha` as text, or None."""
+    r = subprocess.run(["git", "show", "%s:%s" % (sha, rel)], cwd=repo or TOOL_ROOT, capture_output=True, text=True, errors="replace")
+    return r.stdout if r.returncode == 0 else None
+
+
+def commit_control_tags(sha, gates, char, ticket, repo=None):
+    """-> the freeze tags named by the `# SHEET-BUILD:` lines of the gates `run` draws at `sha` (the commit's own
+    registry, tickets.tsv and gate headers, selected by `select` as `run` selects them, `legs` gates only, as `run` builds
+    controls only for those), sorted (#351)."""
+    read = lambda rel: git_text(sha, rel, repo)
+    reg = read("tests/ci_emulator.tsv")
+    tags = set()
+    for r in select(registry_gates(None, reg or ""), gates, char, ticket, read):
+        text = read("tests/%s.sh" % r[0])
+        d, err = parse_declaration(None, text) if text is not None else (None, "absent")
+        if err or d is None or d["kind"] != "legs":
+            continue
+        tags.update(cb["tag"] for cb in parse_sheet_builds(None, text)[0])
+    return sorted(tags)
+
+
+def bundle_tags(path, repo=None):
+    """-> {tag: object id} for every refs/tags/* a bundle carries (read back from the bundle itself)."""
+    r = subprocess.run(["git", "bundle", "list-heads", str(path)], cwd=repo or TOOL_ROOT, capture_output=True, text=True)
+    out = {}
+    for line in r.stdout.splitlines():
+        f = line.split()
+        if len(f) == 2 and f[1].startswith("refs/tags/"):
+            out[f[1][len("refs/tags/"):]] = f[0]
+    return out
+
+
+def host_bundle(sha, gates, char, ticket, path, repo=None):
+    """The --host run's bundle (#351): the commit's history plus the freeze tag of every control build the selected
+    gates declare, so the host resolves and checks each tag exactly as a local run does. -> (error | None, needed, carried)."""
+    needed = commit_control_tags(sha, gates, char, ticket, repo)
+    err = make_bundle(sha, path, needed, repo)
+    return err, needed, ({} if err else bundle_tags(path, repo))
 
 
 # The hosts (docs/project/operations.md / the remote machines): how to reach a shell, where files land for scp, where
@@ -1873,10 +1948,13 @@ def host_run(a, sha):
     stage = local_out / "host_stage"
     shutil.rmtree(stage, ignore_errors=True)
     stage.mkdir()
-    err = make_bundle(sha, stage / "c.bundle")
+    err, needed, carried = host_bundle(sha, a.gate, a.char, a.ticket, stage / "c.bundle")
     if err:
         print("REFUSED: could not bundle %s: %s" % (sha[:12], err))
         return 2
+    for t in needed:                                    # a tag absent here is absent there: the host says so per gate
+        print("   the bundle carries the control build's tag %s (tag object %s)" % (t, carried[t][:12]) if t in carried
+              else "   %s is not a tag here: the bundle cannot carry it, its gate's control build is NOT RUN" % t, flush=True)
     shutil.copyfile(Path(__file__).resolve(), stage / "proof_sheets_s3.py")
     r = ssh_script(h, "set -e; rm -rf %s; mkdir -p %s %s" % (run, run, seen if seen != run else run), 60)
     if r.returncode != 0:
@@ -2001,7 +2079,7 @@ def cmd_run(a):
     tree = Path(a.tree or out.parent / ("%s.tree" % sha[:12])).resolve()
     if bundle is None and not (a.reuse_tree and tree.exists()):
         bundle = out / "c.bundle"
-        err = make_bundle(sha, bundle)
+        err = make_bundle(sha, bundle, commit_control_tags(sha, a.gate, a.char, a.ticket))
         if err:
             print("REFUSED: could not bundle %s: %s" % (sha[:12], err))
             return 2
@@ -2010,6 +2088,8 @@ def cmd_run(a):
     if err:
         print("REFUSED: %s" % err)
         return 2
+    if a.bundle:                                         # on a host: a freeze tag is what the bundle carried, nothing else
+        bundle_tag_source(tree)
     if not (tree / "tests/lib/sheet.sh").exists():
         print("REFUSED: %s predates #291 S1 (no tests/lib/sheet.sh): no gate of it declares a sheet" % sha[:12])
         return 2
@@ -2166,7 +2246,7 @@ def main(argv):
     r.add_argument("--out")
     r.add_argument("--tree", help="the clean checkout (default build/sheets/<commit>.tree)")
     r.add_argument("--reuse-tree", action="store_true", help="use the checkout and builds a previous run of this commit made")
-    r.add_argument("--bundle", help="clone the commit from this bundle (what a --host run does on the host)")
+    r.add_argument("--bundle", help="clone the commit from this bundle, and resolve freeze tags only from the tags it carries (what a --host run does on the host)")
     r.add_argument("--host", help="run on pilot or eris and bring the page back")
     r.add_argument("--host-dir", help="the work dir under the host's home (default proof_sheets)")
     r.add_argument("--host-romdir", help="ROMDIR on the host (PILOT's default: ~/roms)")

@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**506 scripts** — 154 ci_portable, 95 ci_static, 257 emulator-tier (run by name).
+**508 scripts** — 154 ci_portable, 96 ci_static, 258 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 61 | the suite runners and their own ground truth |
+| [runner](#runner) | 63 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -37,6 +37,7 @@ the suite runners and their own ground truth.
 
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
+| `tests/audit_crash_sweep_emu.sh` | audit | emulator | MAME | THE EMULATOR ROWS OF THE CRASH SWEEP (#310, 14z-218): tests/test_crash_sweep.sh --tier emulator. | 14z-218 |
 | `tests/audit_pool_drop.sh` | audit | emulator | a build dir, ~100 s | EVERY GATE THAT POOLS ITS EMULATOR RUNS STILL FAILS WHEN THE POOL LOSES ONE (#334, 14z-212). | 14z-212 |
 | `tests/run_all_emulator.sh` | run | emulator | Verilator, MAME, FBNeo, a build dir | THE EMULATOR-TIER GATE CHAIN. One command, every gate that needs MAME, FBNeo or the Verilator simulator. (14z-128.) | 14z-128 |
 | `tests/run_all_static.sh` | run | emulator | FBNeo, a build dir | THE PRE-COMMIT GATE CHAIN. One command, every gate that does not need an emulator. (14z-94, GitHub #30.) | 14z-94 |
@@ -58,11 +59,12 @@ the suite runners and their own ground truth.
 | `tests/test_control_classifier.sh` | test | ci_portable | — | THE CONTROL CLASSIFIER'S #310 RULES ON KNOWN ANSWERS (14z-213). ci_portable: no ROM, ~1 s. | 14z-213 |
 | `tests/test_controls_concurrent.sh` | test | ci_portable | — | THE CONCURRENT-CONTROLS LIST STILL DESCRIBES THE GATES IT NAMES (#315, 14z-207). ci_portable: no ROM, ~2 s. | 14z-207 |
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |
+| `tests/test_crash_sweep.sh` | test | ci_static | ROMDIR | EVERY CALL OF vs_ctl_show_err IS PROVEN BY A PLANTED CRASH (#310, 14z-218). Freeze cadence. | 14z-218 |
 | `tests/test_ctl_show_err.sh` | test | ci_portable | — | A PERTURBED COPY THAT CRASHED IS NOT THE CONTROL FIRING (#310 group 5, 14z-215). ci_portable: no ROM, ~3 s. | 14z-215 |
 | `tests/test_dead_exit_census.sh` | test | ci_portable | — | NO CONTROL MODE'S DEAD BRANCH IS PRINTED IN WORDS ONLY (#310 group 2, 14z-215). ci_portable: no ROM, ~2 s. | 14z-215 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_emu_run_compare.sh` | test | ci_portable | — | two emulator-tier runs are compared per row over what BOTH ran and BOTH passed (`tools/emu_run_compare.py`, 14z-193, GitHub #122). | 14z-193 |
-| `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~72 s (measured 14z-210 on the Mac; ~26 s at 14z-162, before sections 18-19). | 14z-128 |
+| `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~85 s (measured 14z-218 on the Mac, sections 24-25 added; ~72 s at 14z-210; ~26 s at 14z-162, before sections 18-19). | 14z-128 |
 | `tests/test_emulator_staleness.sh` | test | ci_portable | — | WHICH EMULATOR GATES' GREEN IS STALE, and is any row eating its cap (GitHub #171 slices Q4 and Q5, ruled 2026-09-24: "NOTE at session, FAIL at freeze/release"; | 2026-09-24 |
 | `tests/test_figure_check.sh` | test | ci_portable | — | a close's stated figures equal their sources, and a claim's figures are each checked or named unchecked (`tools/figure_check.py`, 14z-185b, GitHub #190 P1). | 14z-185b |
 | `tests/test_freeze_set_shape.sh` | test | ci_portable | — | every numbered expectation set LOSES NOTHING its predecessor held, and the committed freeze driver carries, pins, verifies and cleans up in that order (`tools/freeze_set_shape.py`, `tools/freeze_expectation_set.py`; 14z-185b, GitHub #150). | 14z-185b |

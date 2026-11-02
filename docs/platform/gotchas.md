@@ -3602,3 +3602,30 @@ ssh call `-o ConnectTimeout` as well. A command meant never to prompt keeps `tim
 Fixed 14z-217 (#350): the upload runs under `timeout --foreground`, and `tests/test_proof_sheets_web.sh` section 2b drives
 the publisher under a pseudo-terminal with a stub `rsync` that prompts on `/dev/tty`; its `no-foreground` control (the
 flag removed) loses the answer and is killed at a 15 s deadline.
+
+## A `trap '<cleanup>' EXIT INT TERM` WITH NO `exit` LETS A TERM'D SCRIPT RUN ON — the trap runs, then the script resumes after the interrupted command, its work directory already deleted (paid: 14z-218, the Mac and PILOT)
+
+Measured on macOS `/bin/sh` (bash in sh mode), PILOT's dash and bash: a script `trap 'echo trapped' EXIT INT TERM; sleep 3;
+echo AFTER-SLEEP` under `timeout 1` prints `trapped`, then `AFTER-SLEEP (still running)`, then `trapped` again at its real
+exit. A POSIX shell runs a signal trap's action and then RESUMES; only an `exit` inside the action ends the script. So a
+gate stopped by a runner's timeout keeps running against the `$W` its cleanup just removed, and a sweep driver killed
+with `kill` (TERM) survived (14z-218, `run_jobs3.sh` on PILOT, ended with KILL). 210 scripts under `tests/` use the
+pattern (`grep -l "trap '[^']*' EXIT INT TERM" tests/*.sh | wc -l` at 14z-218). **The rule:** clean up on EXIT and END
+on the signal: `trap '<cleanup>' EXIT` plus `trap 'exit 143' INT TERM` (the EXIT trap then runs once).
+`tests/test_crash_sweep.sh` does this; the tree-wide pattern is #359.
+
+## GNU `timeout` PUTS ITS COMMAND IN A PROCESS GROUP OF ITS OWN — `kill -- -<pgid>` of the caller's group does not reach it (paid: 14z-218, PILOT)
+
+Ending a sweep's process group (`kill -TERM -- -1705163`, then `-KILL`) left `timeout 1800 /bin/sh <gate>` and the gate's
+`podman run` alive: `timeout` (without `--foreground`) calls `setpgid` for itself and its child, so they are in group
+`<timeout's pid>`, still in the caller's SESSION (`ps -s <sid>` lists them). **The rule:** to end a tree that runs
+`timeout`, end the session's groups one by one (`ps -o pgid= -s <sid> | sort -u`), or the `timeout` process's own group
+(`kill -- -<timeout pid>`); then stop any container it started.
+
+## AN EXCEPTION RAISED IN `sitecustomize.py` DOES NOT CRASH PYTHON — `site.py` catches it, prints "Error in sitecustomize", and the program runs (paid: 14z-218, the Mac; `tests/lib/crash_sweep.sh`)
+
+`site.py` imports `sitecustomize` inside a `try` that reports the exception and continues, so a hook meant to crash a
+Python process at start (the crash sweep's `pyx` plant) cannot simply `raise`. `sys.argv` is already set when the hook
+runs (measured: a child started with `subprocess.run([sys.executable, "-c", "pass", "child-arg"])` saw
+`['-c', 'child-arg']`). **The rule:** to fail a process from `sitecustomize`, print the traceback yourself and call
+`os._exit(1)`; a process started with `-I`, `-E` or `-S` never runs the hook.

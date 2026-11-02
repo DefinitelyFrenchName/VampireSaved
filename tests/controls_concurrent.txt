@@ -11,15 +11,17 @@
 # (14z-217: test_proof_sheets_web taken OFF the list until the next freeze's re-trace — #350 changed the script and added the
 #  no-foreground control, which was never write-traced; its controls run serially meanwhile.)
 # TRACES: eris:d1aed6a8+psw = ERIS (WSL2 Ubuntu), 14z-216 (#338: publish_sheets.sh runs by hand, --dry-run passed through, approved by the maintainer): test_proof_sheets_web in a worktree of S4 d1aed6a8 carrying the working tree's tests/test_proof_sheets_web.sh and tools/publish_sheets.sh, 14 control runs, SAFE, every run HONOURED; the gate PASSed there first (the load split between machines, ruled 14z-216; local evidence build/agent216/m24/psw216/)
+# TRACES: pilot:91fc3b7b = PILOT (Ubuntu 24.04), 14z-218: the rows whose scripts #310 and #349 changed, re-traced at snapshot 3 91fc3b7b (refs/scratch/t310s3, local) by tools/trace_controls.sh (static: JOBS=4, 2,147 s; emulator: audit_victim_parity, CMDS `- -`, CTL_TMO_MULT=2, --seccomp-bpf, 339 s), PILOT running nothing else; scored by the #349 scorer (a run counts only when tests/lib/classify.sh reads it HONOURED): 12 SAFE. Local evidence build/agent218/t310/rt218/ (driver build/agent218/t310/pilot_rt.sh).
+# TRACES: pilot:ae0b1ad5 = PILOT, 14z-218: test_controls_concurrent alone, re-traced after the crash sweep changed its modes and sections (snapshots 4 d526e68f and 5 ae0b1ad5, local; the last is the row's), SAFE under the #349 scorer; local evidence build/agent218/t310/pilot_rt4.sh, pilot_rt5.sh.
 # NOT listed, from the pilot:d1aed6a8 trace (SHARED): test_close_tools and test_emulator_staleness (their controls take the checkout's .git/modules/emu/{fbneo,mame}/index.lock); test_mister_mra_map (both controls use the one jtsim clone /tmp/vampire-saved-jtsim and its lock, 4,428 paths); test_release_asset_shape (four controls cut the same build/scratch/release_assets/<release>/ zips and lists).
 # OFF since 14z-216: test_applier_page — under strace on PILOT its controls no-member-check and flipped-member were killed at 2,400 s at the truncated-dump case (they took 74-82 s at pilot:bd004554), so they never reached the gate's FAIL and the trace certifies nothing; its controls run one after another.
 # OFF since 14z-210, still: test_applier_page_browser — snap Chromium refuses to start under strace on PILOT, both controls UNJUDGED again at pilot:d1aed6a8.
 audit_capture_matrix	ea689d0574f8d85962e6527b089e552ad14ac739	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 audit_mister_map_fit	e8f5996e347fa8bbe253b8487350bc946dff6a88	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_agent_defs	eefa59f4871955050c11a3d6502412f84b50d5e5	pilot:d1aed6a8	7 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_agent_extract	de86f14fc2defd379627c34ec2ff1fea64837904	pilot:d1aed6a8	14 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_agent_hooks	74a22f376bd6e8f9f05206362ae36fda5c37c8b9	pilot:d1aed6a8	10 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_agent_sweep	13d0a09826ae1b188924863519a50130afc7199e	pilot:d1aed6a8	4 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
+test_agent_extract	f9d0a92bff36d7d93fd921f66da0f7f59e656ec1	pilot:91fc3b7b	14 controls write-traced 14z-218 (#310/#349 re-trace at snapshot 3 91fc3b7b): none writes a path a sibling writes or reads
+test_agent_hooks	cffde30f850f28fcc07c221f5445c231b1b2eb94	pilot:91fc3b7b	10 controls write-traced 14z-218 (#310/#349 re-trace at snapshot 3 91fc3b7b): none writes a path a sibling writes or reads
+test_agent_sweep	5dcf15ae32e86384e567422586747a2e6c234875	pilot:91fc3b7b	4 controls write-traced 14z-218 (#310/#349 re-trace at snapshot 3 91fc3b7b): none writes a path a sibling writes or reads
 test_agent_worker	3218fa4079b0c330f092a60b5fd4d103c669adfc	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_air_attack_height	5f2a0e35cc2f3fc96208035ab901e2ee2e217e48	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_anim_signed_offsets	e6d5ac1e396e0e7d942cb46f4f09f522becf90bb	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
@@ -27,7 +29,7 @@ test_annotations_current	59f6f3a4fad779b05f49e96da32823e51116fb6f	pilot:d1aed6a8
 test_build_dirs	8d80a8158778c682b98c59a023b92c4ea40f3549	pilot:d1aed6a8	5 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_build_environment_entry	53d6e131f0360a44f768145a0fba28792d7144a9	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_build_retention	657b2cf1a5981fe745d68844062eb3bf1dcc993c	pilot:d1aed6a8	5 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_bundle_parsers	bc5190e01ed3516386c619f181ff084fea83d67a	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
+test_bundle_parsers	f43f517316e09415d35e960ed40c8bae90b2709c	pilot:91fc3b7b	3 controls write-traced 14z-218 (#310/#349 re-trace at snapshot 3 91fc3b7b): none writes a path a sibling writes or reads
 test_capture_kf_ownership	d5a9f525f80023049a3aa68d6b106f62cf257003	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_charid_names	27b5aba4b6fa4b2e98aee078462365e31081d6f7	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_charmap_current	3c7a52ec7a342754fa25ea555ccef16c4dd6657b	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
@@ -35,12 +37,12 @@ test_charmap_overrides	5b3532743a2016109132adcf968d75c818af26d9	pilot:d1aed6a8	3
 test_checkdocs	7dbaedaf5a361f99b016660585440761fd73b617	pilot:d1aed6a8	4 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_checkdocs_rom	086d3eb9c4c39677bd094d68d07c374c9bbb6ed6	pilot:d1aed6a8	6 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_checkskills	faa148aacb29fcac6ae39ed2c27c414af09056a1	pilot:d1aed6a8	11 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_claim_lint	64344389abc130cfdca075762d5f311ef0b5cc5e	pilot:d1aed6a8	4 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
+test_claim_lint	72bd52486c6f4ef0a9e0b25787c1346f9d64f3d3	pilot:91fc3b7b	4 controls write-traced 14z-218 (#310/#349 re-trace at snapshot 3 91fc3b7b): none writes a path a sibling writes or reads
 test_close_checks	dec808c3a4ce928e2df0bea4d115253df09cc6ec	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_close_loop_cost	35ed29b00b4d7d4f241129df2e60f4ca53d152a9	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_close_standing	8cb536d7173936a1ea04c12b16050cad49bf364d	pilot:d1aed6a8	9 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_control_classifier	ec487cf15ac2d0c50c86df90f166e8cfcfa2a877	pilot:d1aed6a8	4 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_controls_concurrent	b8d52712739095fa58fc964108304c7976c28fd7	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
+test_controls_concurrent	09fd7e66656872ebe53488f148dff35f7a89f362	pilot:ae0b1ad5	4 controls write-traced 14z-218 (re-traced after #310's crash-sweep fixes, snapshot 5 ae0b1ad5): none writes a path a sibling writes or reads
 test_controls_contract	698e30ea8b99ddacc2fd5d4590e454d8ee03999e	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_copy_flags	6233d72bdc5c1eeff69f1a967202ba98533e6458	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_crosscheck_229	210a1e59e391b1188eaa1b348a47c3a7f8fb04c4	pilot:d1aed6a8	8 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
@@ -52,7 +54,7 @@ test_doc_anchor_census	5a11fc1bbb4f9c6465f5259ee09fe8d78064c7b0	pilot:d1aed6a8	4
 test_docs_site	3c667923727fefa01aa3fbb8c28299aadbf0603f	pilot:d1aed6a8	5 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_docshape	75f5001bfeddcf48fb778acbbacc46a34459e39c	pilot:d1aed6a8	15 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_emu_run_compare	ceacb0bc049d1de5591bcbd200f7b1d3cf19f911	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_emulator_runner	f9a116f833fb95ec7911fb6b256e70909db9648d	pilot:d1aed6a8	17 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
+test_emulator_runner	7eba3992648b31a9e179af3502a7c63291e40197	pilot:91fc3b7b	20 controls write-traced 14z-218 (#310/#349 re-trace at snapshot 3 91fc3b7b): none writes a path a sibling writes or reads
 test_entropy_tripwire	031a181d7927a3e5917f4353ad43699535ba4977	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_expectation_provenance	b5f04141b82a2e57241ca9b901e848e2e24764f9	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_fbneo_boot_log	4b08e262cc64272f9f9665bd4416ca571710cd96	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
@@ -73,7 +75,7 @@ test_instr_align_unjudged	8c94e36f56f991bd8c122081bdb8423357ac7a8c	pilot:d1aed6a
 test_jtcores_twin	b405d372eb5fc04212df42acfa2da4dc12d0df4a	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_jtsim_scratch_heal	9b52a11f9a750fc526565256d1a1074cb90aa77c	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_lane_carry	df5f8df592635efe0efafa05a4c49b2299095c4b	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_latch_readers	68fe312f33bd465f05e63e8d8a21e7264fb28135	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
+test_latch_readers	822d9e0281ef81bd5dfbad7f6883ff3859997245	pilot:91fc3b7b	3 controls write-traced 14z-218 (#310/#349 re-trace at snapshot 3 91fc3b7b): none writes a path a sibling writes or reads
 test_ledger_page	dfe804781232419d30d42c60edce9bd6297eaf68	pilot:d1aed6a8	4 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_live_budget	303030d28b4f13aadc16b151d810aa366c889d59	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_mame_sandbox_log	51578b481c782971aa51981d40690950571e3751	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
@@ -91,7 +93,7 @@ test_packet_check	66a5438d75ada05160ced2d304641045eff33bc4	pilot:d1aed6a8	4 cont
 test_perframe_hook	de48554d502a916cc7939d33d75ed1d198feb133	pilot:d1aed6a8	6 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_plants_not_applied	0ec088234086cf0bc8d8cc2a7fae5506e864f9db	pilot:d1aed6a8	4 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_poke_readback	bcc6c3afcf2f6fa6f8d595802b41da22c23f52eb	pilot:d1aed6a8	4 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_poked_legs	dd4f334fcd7bdd898bdc48919c7aad47d91a2ded	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
+test_poked_legs	a1d224943075abd648cb81960dae06396f69d7eb	pilot:91fc3b7b	2 controls write-traced 14z-218 (#310/#349 re-trace at snapshot 3 91fc3b7b): none writes a path a sibling writes or reads
 test_power_decode	b8d0f4a21118dfd6c121e8aaaca50a798f417bde	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_promise_check	fa54463334e4914e361b002220ad27bf7648d55a	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_reaction_classes	47e97227a3fe08ac28146b7feec1790140ea04be	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
@@ -112,7 +114,7 @@ test_run_record	02af6e1e6d885e74c23a94dbd185439ff537430d	pilot:d1aed6a8	3 contro
 test_runner_collation	f8ddd4d35190eb038bd91b716afd2e8b9c0b99fa	pilot:d1aed6a8	5 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_same_data_p2	e9fa92805a09aedd69cdf67c6f8678ea014871eb	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_scratch_census	335581ff018dc7619368015fa8bbbe0dba6427be	pilot:d1aed6a8	7 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_session_close	b627370770a059834cbf976e3f542fdc85059406	pilot:d1aed6a8	5 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
+test_session_close	59b5c53a90a4162133dd6f0644f4eb86443e4e59	pilot:91fc3b7b	6 controls write-traced 14z-218 (#310/#349 re-trace at snapshot 3 91fc3b7b): none writes a path a sibling writes or reads
 test_session_metrics	b6c71388efcf9b16c0d87f0d517a3324ecf99690	pilot:d1aed6a8	13 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_sheet_census	e7c09d12416709081babda678d970cb55c25e718	pilot:d1aed6a8	7 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_shell_portability	90d9992766527599600367649b03854e922b70c2	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
@@ -125,6 +127,6 @@ test_submodule_pins	2b6b6efafe65bb7e805fad83099d6e05c3c4e7a7	pilot:d1aed6a8	2 co
 test_superseded_pins	5c79a05e78f77af8f53e123e772abdc4f9ff7f0e	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_tickets	e5009c0ad16af92fe2ce34188f8d9243f4c2d936	pilot:d1aed6a8	7 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
 test_tmp_hygiene	cd78b96d7d5689f71794be5df55d4c7b66fe8c14	pilot:d1aed6a8	7 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_trace_static_reads	fa4e401de3e0fb5f24fb168a0694aa0e52b8a553	pilot:d1aed6a8	6 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
+test_trace_static_reads	aa052a101c322c5592f97ecd1f92ed7ca893e018	pilot:91fc3b7b	6 controls write-traced 14z-218 (#310/#349 re-trace at snapshot 3 91fc3b7b): none writes a path a sibling writes or reads
 test_win_quote_decode	743654c5e99b7f2b93a7067620e5302ad92b03f7	pilot:d1aed6a8	2 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
-test_win_stdout_utf8	8781993056005877f8bd44fd735f0f4fb14990de	pilot:d1aed6a8	3 controls write-traced 14z-216 (the M24 freeze re-trace, fork RT216): none writes a path a sibling writes or reads
+test_win_stdout_utf8	893b063c7198798288e299a80b6a06a4ff6fa977	pilot:91fc3b7b	3 controls write-traced 14z-218 (#310/#349 re-trace at snapshot 3 91fc3b7b): none writes a path a sibling writes or reads

@@ -20,17 +20,13 @@ Say so at the opener. Never spawn any agent at `max`. A recommendation leans onl
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
 idle`). Its checkout `~/vampire-saved` sits detached at the M24 freeze commit `be40e6f3`: move it to `main` before other work.
-Deletable scratch: 14z-216's `~/rt216*` (12 GB, the re-trace), `~/m24_*`, `~/pilot_m24*.sh`, `~/pilot_emu*.sh`,
-`~/pilot_rows216.sh`, `~/rows216*`, `~/t216_*`; 14z-217's `~/proof_sheets/` (the host proof-sheet run), `/tmp/emu_p217_*.tgz`,
-and in `~/vampire-saved/build/`: `emu_p216_*`, `emu_p217_*`, `emu_p217_desk_fail1`, `desktop_release_fail1` (all copied to the Mac).
-**ERIS** (WSL2, 24 threads, 47 GB) runs the release shape; its checkout sits at `be40e6f3`. Deletable: 14z-216's `~/rt216*`,
-`~/psw216*`, `~/lad216*`, `~/e216*`, `~/eris_*216.sh`, `~/s5.bundle`, `~/freeze216.bundle`, `~/c329c.bundle`, `~/c333a.bundle`,
-`~/t215b.bundle`; 14z-217's `~/rel216_out`, `~/vampire-saved/build/emu_rel216_eris` (copied to the Mac), and on the Windows side
-`C:/Users/chaton/m22logs/{tree217.tgz,t217,emu_rel216_eris.tgz}`. Neither profile sets
-ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare commit-tree needs a temporary ref; delete
-it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS) or `ssh pilot 'bash -s' < script`,
-never as a quoted command line (Windows' shell splits it at a pipe and mangles quotes), and a remote `pkill -f <pattern>`
-matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
+Its 14z-216/217 scratch was cleared after the 14z-217 push (STATE 14z-217 CLOSE).
+**ERIS** (WSL2, 24 threads, 47 GB) runs the release shape; its checkout sits at `be40e6f3`; its 14z-216/217 scratch was
+cleared with PILOT's. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a
+bare commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s' <
+script` (ERIS) or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shell splits it at a pipe and
+mangles quotes), and a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s
+<sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
 STATE 14z-217's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
@@ -64,15 +60,17 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
+   **THE WORKING TREE CARRIES UNCOMMITTED RECORDS** written after the 14z-217 push: the CLOSE section's last lines, #355's
+   index row (and the regenerated ticket page and GitHub snapshot), the remote-scratch deletion's
+   lines, and this note. They ride the next close.
 1. **#310 — THE CRASH-INJECTION SWEEP** (the maintainer, 14z-215: **"Next session, first batch (Recommended)"**; it was
    item 2 behind the release at 14z-216 and 14z-217). Discovery ran over the 20 static gates at 14z-216 (STATE_HISTORY
    14z-216 (2), `build/agent216/t310/FINDINGS.md`, local: every runner mode PROVEN but one LIES; F1 `test_agent_hooks`'
    twins); the gate is not built. Its seed is `build/agent215/t310/rcmeas/measure.sh` (local). Then group 7's first batch.
-2. **Clear PILOT's and ERIS's scratch** (the lists above): deletions, so put the lists to the maintainer first.
-3. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
+2. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
    - bugs: #345 (Blizzard Sword overrun), #347 (`--stale --freeze` refuses NOTE-class names), #349 (REFUSED control runs
      read SAFE), #351 (`proof_sheets run --host` and freeze-tag control builds), #353 (`--log` on an existing directory
-     appends: the 14z-213 gotcha, paid again); evolution: #348 (no tracked-release-vs-build gate), #352 (the desktop gate's
+     appends: the 14z-213 gotcha, paid again); #355 (`close.py`'s re-run base after a plan-refused tier); evolution: #348 (no tracked-release-vs-build gate), #352 (the desktop gate's
      paused-FBNeo verdict), #354 (no gate on #294's dead span in the built image); cosmetic: #344 (Donovan's Dark Force
      colours), #346 (the Blizzard Sword ice streak); low: #310 (item 1).
    - parked: #123, #124, #125, #128.

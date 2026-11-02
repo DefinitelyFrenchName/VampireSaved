@@ -515,3 +515,5 @@ tests/audit_mizuumi_rows_c.sh	character-data
 tests/audit_anakaris_rows.sh	character-data
 tests/audit_mizuumi_finishes.sh	character-data
 tests/audit_tenant_cpu_ai.sh	tenant	MAME, vsav2 and a build dir, ~1 min at JOBS=5	14z-215 (#129)
+tests/test_crash_sweep.sh	runner
+tests/audit_crash_sweep_emu.sh	runner

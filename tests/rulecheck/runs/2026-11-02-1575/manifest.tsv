@@ -1,0 +1,5 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent218/t349/close/issue349.md	932c2a6eb370b20f2cee1e9e40865727ccc3044c
+build/agent218/t349/close/fix.diff	1d9d186f49e35aed4a3d79db122c14af10ccc3d7
+build/agent218/t349/close/evidence349.txt	2f4e50ec424b9b5cdcb3e6ef07a2fa77efb52c39
+build/agent218/t349/close/closing_349.md	d6991af2c3efe6bc53b0ee86336e9699ad79c598

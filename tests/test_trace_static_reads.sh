@@ -118,6 +118,9 @@ PY
 # no MISS line, which the modes read as the miss caught and the twins of section 5 read as the miss lost. scored <mode>:
 # true when $out carries the scorer's `MISSES n in m gates` summary; otherwise the copy's crash is surfaced and, under
 # <mode>, the run says it judged nothing.
+# shown_err: the current $out re-read for a crash (#310, 14z-218) — a section's FAIL printed $out indented or not at all,
+# so a crash there, beside a mode judged in another section, read HONOURED
+shown_err() { printf '%s\n' "$out" > "$W/shown_out.txt"; vs_ctl_show_err "$W/shown_out.txt" || true; }
 scored() {
     printf '%s\n' "$out" > "$W/scored_out.txt"
     grep >/dev/null '^MISSES [0-9]* in [0-9]* gates$' "$W/scored_out.txt" && return 0
@@ -130,13 +133,13 @@ echo "== 1. the clean traces: no miss"
 T1="$W/clean"; vs_ctl_is planted-miss && T1="$W/planted"
 out="$(python3 "$TOOL" score --root "$RR" --traces "$T1" --jobs 2 2>&1)"; rc=$?
 echo "$out" | sed 's/^/  /'
-if [ "$rc" = 0 ] && echo "$out" | grep >/dev/null '^MISSES 0 in 0 gates$'; then ok "every traced read flagged"; else bad "the clean traces scored a miss or failed (exit $rc)"; fi
+if [ "$rc" = 0 ] && echo "$out" | grep >/dev/null '^MISSES 0 in 0 gates$'; then ok "every traced read flagged"; else bad "the clean traces scored a miss or failed (exit $rc)"; shown_err; fi
 
 echo "== 2. a planted unnamed read: exactly one miss"
 out="$(python3 "$TOOL" score --root "$RR" --traces "$W/planted" --jobs 2 2>&1)"; rc=$?
 if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep >/dev/null '^MISS	g_named	docs/hidden.md$'; then
     ok "MISS g_named docs/hidden.md, exit 1"
-else bad "the planted read: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; fi
+else bad "the planted read: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; shown_err; fi
 
 echo "== 2b. the session scratch (N-D, #274): a dropped read is a miss, except in a whole-tree reader"
 SU="$RR/tools"; if vs_ctl_is scratch-unscored; then scratch_unscored "$W/tools_su"; SU="$W/tools_su"; fi
@@ -181,7 +184,7 @@ PY
 )"
 echo "$out" | sed 's/^/  /'
 if echo "$out" | grep >/dev/null '^verdicts [1-9][0-9]* disagreements 0$'; then ok "the scorer and predict() agree on every read"
-else bad "the scorer and predict() disagree (or nothing was scored)"; fi
+else bad "the scorer and predict() disagree (or nothing was scored)"; shown_err; fi
 
 echo "== 3. the over-narrowed control misses the build-template read"
 CT="$TOOL"; if vs_ctl_is no-narrowing; then no_narrowing "$W/tool_nn.py"; CT="$W/tool_nn.py"; fi
@@ -189,22 +192,25 @@ out="$(cd "$R/tools" && python3 "$CT" control --root "$RR" --traces "$W/clean" -
 echo "$out" | grep -v '^==\|^traces' | sed 's/^/  /'
 if [ "$rc" = 0 ] && echo "$out" | grep >/dev/null '^CONTROL FIRED: over-narrowed' && echo "$out" | grep >/dev/null '^MISS	g_tmpl	build/m1/out.txt$'; then
     ok "the control misses g_tmpl's build/m1/out.txt"
-else bad "the control did not miss (exit $rc)"; fi
+else bad "the control did not miss (exit $rc)"; shown_err; fi
 
 echo "== 4. the trace step refuses without strace"
 if command -v strace >/dev/null 2>&1; then ok "strace present on this host: the refusal is not exercised here"
 else
     out="$(python3 "$TOOL" trace --root "$RR" --out "$W/tr" 2>&1)"; rc=$?
-    [ "$rc" != 0 ] && echo "$out" | grep >/dev/null 'REFUSED: strace not found' && ok "REFUSED without strace" || bad "trace without strace: exit $rc"
+    [ "$rc" != 0 ] && echo "$out" | grep >/dev/null 'REFUSED: strace not found' && ok "REFUSED without strace" || { bad "trace without strace: exit $rc"; shown_err; }
 fi
 
 echo "== 4b. the named limits (#281): every one names its ticket and a gate of this tree, and score names it untraced"
-limit_unnamed() {   # the shadow: a copy of the tool whose first named limit lost its ticket number
+limit_unnamed() {   # the shadow: a copy of the tool whose first named limit lost its ticket number; prints that limit's name
     python3 - "$TOOL" "$1" <<'PY'
 import re, sys
 s = open(sys.argv[1], encoding="utf-8").read()
-t = re.sub(r'": "#\d+: ', '": "', s, count=1)
-sys.exit("the limit's ticket is not where limit-unnamed expects it") if t == s else open(sys.argv[2], "w", encoding="utf-8").write(t)
+m = re.search(r'": "#\d+: ', s)
+if not m:
+    sys.exit("the limit's ticket is not where limit-unnamed expects it")
+open(sys.argv[2], "w", encoding="utf-8").write(s[:m.start()] + '": "' + s[m.end():])
+print(re.search(r'"([^"\n]+)$', s[:m.start()]).group(1))   # the limit whose ticket was removed (#310 F2)
 PY
 }
 limits_named() {   # limits_named <tool copy>: every TRACE_LIMITS entry names a #ticket and a tests/<gate>.sh of this tree
@@ -216,14 +222,28 @@ print(f"  {len(m.TRACE_LIMITS)} named limit(s): {', '.join(sorted(m.TRACE_LIMITS
 sys.exit(1 if bad else 0)
 PY
 }
-LT="$TOOL"; if vs_ctl_is limit-unnamed; then limit_unnamed "$W/tool_lu.py" && LT="$W/tool_lu.py"; fi
-limits_named "$LT" && ok "every named limit names its ticket and a gate" || bad "a named limit names no ticket or no gate"
+# #310 F2 (14z-218): section 4b's failure counts only with limits_named's OWN finding (its "WITHOUT a ticket or a gate"
+# list); a loader that crashed names no limit, and its traceback is re-printed (the mode reads DIED, not HONOURED)
+LT="$TOOL"
+if vs_ctl_is limit-unnamed; then
+    if limit_unnamed "$W/tool_lu.py" > "$W/lu_key.txt"; then LT="$W/tool_lu.py"
+    else echo "NOT JUDGED: limit-unnamed — its shadow copy could not be made, so section 4b judged nothing"; fail=1; fi
+fi
+rc=0; limits_named "$LT" > "$W/limits.txt" 2>&1 || rc=$?
+grep '^  [0-9]* named limit' "$W/limits.txt" || true
+if [ "$rc" = 0 ]; then ok "every named limit names its ticket and a gate"
+else bad "a named limit names no ticket or no gate"
+    if ! grep -q 'WITHOUT a ticket or a gate: ' "$W/limits.txt"; then
+        vs_ctl_show_err "$W/limits.txt" || true
+        echo "NOT JUDGED: section 4b's check failed without naming a limit (exit $rc), so no limit was judged"
+    fi
+fi
 mkdir -p "$W/limited/st"; printf 'g_named\n' > "$W/limited/gates.txt"; echo fixture > "$W/limited/head.txt"
 echo "#281: fixture" > "$W/limited/st/g_named.limit"; printf 'g_named\tLIMIT\t0\n' > "$W/limited/done.tsv"
 out="$(python3 "$TOOL" score --root "$RR" --traces "$W/limited" --jobs 2 2>&1)"
 if echo "$out" | grep >/dev/null '^NOT TRACED (named limit)	g_named	#281: fixture$' && ! echo "$out" | grep >/dev/null 'non-zero under the trace'; then
     ok "score names the untraced gate and does not count it as a non-zero run"
-else bad "score did not name the limited gate: $(echo "$out" | tail -2 | tr '\n' ' ')"; fi
+else bad "score did not name the limited gate: $(echo "$out" | tail -2 | tr '\n' ' ')"; shown_err; fi
 
 if vs_ctl_is planted-miss || vs_ctl_is no-narrowing || vs_ctl_is scratch-unscored || vs_ctl_is split-unread || vs_ctl_is nf-change-unscored || vs_ctl_is limit-unnamed; then
     [ "$fail" = 1 ] && { echo "FAIL: test_trace_static_reads (control mode: caught as it must be)"; exit 1; }
@@ -252,9 +272,15 @@ out="$(cd "$R/tools" && python3 "$W/tool_nn.py" control --root "$RR" --traces "$
 if echo "$out" | grep >/dev/null '^CONTROL DEAD: over-narrowed'; then vs_ctl_fired no-narrowing "a control that narrows nothing reports itself dead"
 else vs_ctl_dead no-narrowing "a control narrowing nothing still claimed to fire"; fail=1; fi
 
-limit_unnamed "$W/tool_lu.py"
-if limits_named "$W/tool_lu.py" > /dev/null; then vs_ctl_dead limit-unnamed "a limit without its ticket number still passed"; fail=1
-else vs_ctl_fired limit-unnamed "a named limit whose ticket number is removed fails section 4b"; fi
+# #310 F2 (14z-218): the twin read ANY non-zero exit as its finding — a crash of limits_named's loader fired it, PASS.
+# It now needs the WITHOUT line naming the very limit the copy stripped.
+lu_key="$(limit_unnamed "$W/tool_lu.py")" || lu_key=""
+rc=0; limits_named "$W/tool_lu.py" > "$W/ctl_lu.txt" 2>&1 || rc=$?
+if [ -z "$lu_key" ]; then vs_ctl_dead limit-unnamed "its shadow copy could not be made, so the twin judged nothing"; fail=1
+elif [ "$rc" = 0 ]; then vs_ctl_dead limit-unnamed "a limit without its ticket number still passed"; fail=1
+elif grep -qF "WITHOUT a ticket or a gate: ['$lu_key']" "$W/ctl_lu.txt"; then vs_ctl_fired limit-unnamed "a named limit whose ticket number is removed ($lu_key) fails section 4b"
+else vs_ctl_show_err "$W/ctl_lu.txt" || true
+    vs_ctl_dead limit-unnamed "section 4b's check failed on the copy without naming $lu_key (exit $rc) — a crash is not the finding"; fail=1; fi
 
 [ "$fail" = 0 ] && echo "PASS: test_trace_static_reads" || echo "FAIL: test_trace_static_reads"
 exit "$fail"

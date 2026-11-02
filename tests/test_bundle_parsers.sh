@@ -397,8 +397,10 @@ if [ -z "${VS_CTL:-}" ]; then
     #     gate fails there. Here it is only reported.
     if run_bundler bundle_elf_libs.py fbneo silent "$W/ctl1" ; then
         vs_ctl_dead empty-closure "the linux bundler accepted an empty closure"; fail=1
-    else
+    elif grep -q 'REFUSING: the tools reported NO ' "$W/ctl1/out.txt"; then   # its OWN refusal, never any non-zero exit
         vs_ctl_fired empty-closure "both bundlers exit non-zero with 'REFUSING: the tools reported NO …' (section 2)"
+    else   # a crash (re-printed by run_bundler) or another failure is not the refusal (#310, 14z-218 crash sweep)
+        vs_ctl_dead empty-closure "the linux bundler failed for another reason: $(tail -1 "$W/ctl1/out.txt")" || true; fail=1
     fi
     # (2) unbundled-leftover: the check itself runs above (section 4c), in a mode too; here it is only reported.
     case "$_leftover" in

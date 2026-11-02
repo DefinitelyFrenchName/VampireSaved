@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: A gate with ANY control run that is not HONOURED — REFUSED, TIMEOUT, UNJUDGED, DIED, a SKIP, or a run with no exit status or no log — reads HOLLOW, never SAFE.  [build/agent218/t349/close/closing_349.md]
+  FLAG D-ABSOLUTE: No new verdict: a listed gate runs all its controls as concurrent pool jobs, so one uncertified run leaves every pair that includes it unverified, and the re...  [build/agent218/t349/close/closing_349.md]
+  FLAG D-ABSOLUTE: The existing all-SKIP case still reads HOLLOW and the clean traces still read SAFE.  [build/agent218/t349/close/closing_349.md]
+  FLAG D-ABSOLUTE: **In use:** 14z-218's PILOT re-trace of the 13 list rows its own work changed was scored by the fixed scorer: 12 static gates and 1 emulator gate SAFE, every...  [build/agent218/t349/close/closing_349.md]
+packet_check: 4 flag(s): D-ABSOLUTE 4

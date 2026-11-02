@@ -153,7 +153,9 @@ def run(*extra):
 res = {"fake": me, "tool": tool.pid, "tool_child": tool_child, "helper": helper.pid}
 res["r1"] = run()
 named = [int(l.split()[1]) for l in res["r1"]["out"].splitlines() if l.split()[:1] and l.split()[0] in ("ATTACHED", "ORPHAN")]
-res["declares"] = [run("--declare", str(p), "gate plant, killed at the end of the gate")["rc"] for p in named]
+_d = [run("--declare", str(p), "gate plant, killed at the end of the gate") for p in named]
+res["declares"] = [d["rc"] for d in _d]
+res["declares_out"] = [d["out"] for d in _d]   # kept: a crashed declare is re-printed by swept() like a phase (#310, 14z-218)
 res["r2"] = run()
 # kill every plant LEAVES FIRST, by its exact subtree: killing only a parent would orphan
 # its child (o2's tail, o6's python) and phase 3 would rightly name it
@@ -211,6 +213,8 @@ except Exception:
     print("SUMMARY mismatches 1"); sys.exit(0)
 for k in ("r1", "r2", "r3"):
     open(os.path.join(out, f"{k}.txt"), "w").write(res[k]["out"])
+for i, o in enumerate(res.get("declares_out", []), 1):
+    open(os.path.join(out, f"d{i}.txt"), "w").write(o)
 bad = []
 # the world itself must be what the gate says it is
 for k, pid in plants.items():
@@ -261,12 +265,14 @@ PY
 }
 
 # swept <world dir> — A SWEEP THAT CRASHED REPORTED NOTHING (#310 group 5, 14z-215): true when the sweep (or its copy)
-# reached its verdict line (SURVIVORS / CLEAN) in phase 1 and no phase crashed; a crash is re-printed at column 0 by
+# reached its verdict line (SURVIVORS / CLEAN) in phase 1 and no phase or --declare call crashed; a crash is re-printed at column 0 by
 # tests/lib/controls.sh vs_ctl_show_err. Every planted item mismatches on a crashed sweep, which the mode read as its
 # finding and the in-gate twin as the control firing.
 swept() {
     _sw_ok=0
-    for _sw_k in r1 r2 r3; do [ -f "$1/$_sw_k.txt" ] && { vs_ctl_show_err "$1/$_sw_k.txt" || _sw_ok=1; }; done
+    for _sw_f in "$1/r1.txt" "$1/r2.txt" "$1/r3.txt" "$1"/d*.txt; do   # the phases AND each --declare call (#310, 14z-218)
+        [ -f "$_sw_f" ] && { vs_ctl_show_err "$_sw_f" || _sw_ok=1; }
+    done
     grep -qE '^(SURVIVORS |CLEAN)' "$1/r1.txt" 2>/dev/null || _sw_ok=1
     return "$_sw_ok"
 }

@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-596 entries (49 game / 150 platform / 397 project), counted from the buckets at generation.
+600 entries (49 game / 153 platform / 398 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
@@ -74,7 +74,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A MOTION THAT LEAVES A NEUTRAL FRAME BETWEEN BACK AND DOWN-BACK IS TWO TAPS TOWARD BACK, AND A CHARACTER WITH A BACKDASH DASHES — the press then lands in the hop (paid: 14z-205, #229, forks F3 and P1)
 - THE GAME HAS ONE ROUND: A DOWN THAT ENDS THE MATCH IS NEVER FOLLOWED BY A ROUND 2, AND A KO POKED WITH HP ALONE ENDS THE MATCH WITH THE SPARE BAR UNUSED (paid: 14z-215, GitHub #343)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 150 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 153 entries
 
 - LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB; `/bin/sh` IS DASH; THE PINNED MAME'S VERBOSITY IS A BUILD FACT — three macOS facts the first Linux emulator tier paid for (paid: 2026-10-01, ERIS WSL2 Ubuntu, GitHub #201)
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
@@ -226,8 +226,11 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A SHELL'S WRITE-ERROR TEXT IS ITS OWN — bash says `write error: Broken pipe`, dash (Ubuntu's `sh`) `printf: I/O error` (paid: 14z-212, PILOT; #336)
 - ON GNOME 46, THE FIRST `xwininfo -tree` LINE NAMING A WINDOW IS ITS FRAME, OWNED BY `mutter-x11-frames` — focus that frame through Xlib and, since mutter 46.2-1ubuntu0.24.04.18, the client LOSES focus (FBNeo pauses) (paid: 14z-216, PILOT)
 - GNU `timeout` WITHOUT `--foreground` TAKES THE TERMINAL AWAY FROM ITS COMMAND — an ssh password prompt then never shows, the run hangs to the timeout and Ctrl+C does not reach it (paid: 14z-217, the Mac; `tools/publish_sheets.sh`)
+- A `trap '<cleanup>' EXIT INT TERM` WITH NO `exit` LETS A TERM'D SCRIPT RUN ON — the trap runs, then the script resumes after the interrupted command, its work directory already deleted (paid: 14z-218, the Mac and PILOT)
+- GNU `timeout` PUTS ITS COMMAND IN A PROCESS GROUP OF ITS OWN — `kill -- -<pgid>` of the caller's group does not reach it (paid: 14z-218, PILOT)
+- AN EXCEPTION RAISED IN `sitecustomize.py` DOES NOT CRASH PYTHON — `site.py` catches it, prints "Error in sitecustomize", and the program runs (paid: 14z-218, the Mac; `tests/lib/crash_sweep.sh`)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 397 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 398 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -626,3 +629,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A `timeout` ON A REMOTE RUNNER KILLS THE RUNNER, NOT ITS EMULATORS — three MAME legs spun 10 h on ERIS after their batch's bound (paid: 14z-215, #310)
 - A RE-POINT SWEEP REWRITES A QUOTED RULING — and an attribution window misses a pointer that straddles its end (paid: 14z-216, the M24 freeze)
 - A BYTE-PLANT CONTROL THAT WRITES A CONSTANT IS DEAD WHEREVER THE BYTE ALREADY HOLDS IT — a "one byte flipped" control read CONTROL DEAD on both Linux binary dirs (paid: 14z-216, the M24 freeze)
+- A PATH TRACING SHIM AROUND `sh` CHANGES A PROCESS-TREE GATE'S WORLD — `test_agent_sweep`'s plain run FAILS under it, with or without the `pyx` hook (paid: 14z-218, the Mac; #310)

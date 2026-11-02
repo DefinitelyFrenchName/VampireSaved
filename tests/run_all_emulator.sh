@@ -10,9 +10,12 @@
 #   exit through tests/lib/classify.sh and, under --controls, executing every declared
 #   must-fire control as a CONTROL=<name> mode; writes one results.tsv row per gate and per
 #   control, and the run's commit of record (commit.txt: HEAD, then the dirty tracked
-#   paths); --stale selects exactly the gates tools/audit_emulator_staleness.py names, and
-#   REFUSES by name any of them outside the selection; a selection matching no gate exits 1
-#   with no run directory written (14z-192, #211).
+#   paths); --stale selects exactly the gates tools/audit_emulator_staleness.py names (under
+#   --freeze, the names it judges at freeze cadence; under any --cadence, a name of another
+#   cadence is left out with a NOTE — #347), and REFUSES by name any of them outside the
+#   --lane/--scope/--only selection; a selection matching no gate exits 1 with no run directory
+#   written (14z-192, #211); a --log directory that already holds a run is REFUSED unless
+#   --resume continues it (#353).
 # EXPECTS: a readout PASS / SKIP / FAIL / TIMEOUT / MISSING with SKIP counted apart from
 #   PASS; at release scope (--scope all --lane all --strict --controls) anything but PASS is
 #   a hard fail. It asserts nothing about the romset itself — its verdict logic is what
@@ -97,12 +100,17 @@
 #                                                        7th column (seconds) overrides it (14z-134)
 #   ... --jobs N with --lane mister                      N Verilator runs at once, one scratch
 #                                                        clone per job slot (14z-134)
-#   ... --log DIR                                        default build/emu_sweep_<stamp>
-#   ... --resume                                         skip gates already in the log's results.tsv
+#   ... --log DIR                                        default build/emu_sweep_<stamp>; a fresh or empty directory —
+#                                                        one that already holds a run (commit.txt, identity.tsv, a
+#                                                        run record, or a results.tsv with a row) is REFUSED, exit 1
+#                                                        (#353): a re-run there would inherit its rows and its commit
+#   ... --resume                                         skip gates already in the log's results.tsv (the one way to
+#                                                        reuse a --log directory: it continues the run that wrote it)
 #   ... --strict                                         SKIP and UNREGISTERED are failures too
 #   ... --keep-going                                     do not stop when the prereq lane fails
 #   ... --stale                                          run exactly the gates tests/test_emulator_staleness.sh
-#                                                        names (a passed gate whose # FOLLOWS: path moved)
+#                                                        names (a passed gate whose # FOLLOWS: path moved); with
+#                                                        --freeze, the names it judges at freeze cadence (#347)
 #   ... --dry-run                                        print the resolved command per gate
 #   ... --reuse FREEZE_LOGDIR                            A RELEASE REUSES THE FREEZE'S ROWS (#316, 14z-208): when the
 #                                                        freeze run's identity (FREEZE_LOGDIR/identity.tsv, written by
@@ -211,7 +219,7 @@ while [ $# -gt 0 ]; do
     --order)   shift; ORDER="${1:?--order needs the results.tsv of an earlier run}"
                [ -f "$ORDER" ] || { echo "--order: no file $ORDER" >&2; exit 2; } ;;
     --list)    LIST=1 ;;
-    -h|--help) sed -n '2,82p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,85p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
     esac
     shift
@@ -248,11 +256,33 @@ rows() { sed 's/\r$//' "$REG" | awk -F'\t' 'NF>=3 && $0 !~ /^#/ && $1 != ""'; }
 # names — those that PASSED in the newest recorded run and have since had a declared
 # `# FOLLOWS:` path move. The names come from the one reader; an empty list is a
 # clean tree, not an error, and says so.
+# THE NAMES AT THIS RUN'S CADENCE (#347, 14z-218). Until then the audit was asked at its default
+# (session) cadence, so under --freeze every stale row a freeze does not run — an `ondemand` or `out`
+# row, a bitstream gate — fell outside the selection and the refusal below stopped the run (14z-216:
+# 22 such names, each `--skip`ped by hand). Under --freeze (= --cadence romset) the audit is asked at
+# `freeze` cadence and names only the gates it judges there (its FREEZE_SELECTS, the one definition);
+# under any --cadence, a name whose registry cadence is another is left out. Both say so with a NOTE,
+# by name. The refusal below still holds for --lane, --scope and --only.
 STALE_NAMES=""
 if [ "$STALE" = 1 ]; then
-    STALE_NAMES="$(python3 tools/audit_emulator_staleness.py --names 2>/dev/null || true)"
+    _sn_cad=""; [ "$CADENCE" = romset ] && _sn_cad="--cadence freeze"   # STALE-CADENCE
+    _sn_err="$(mktemp "${TMPDIR:-/tmp}/vs_stale_names.XXXXXX")"
+    # shellcheck disable=SC2086
+    STALE_NAMES="$(python3 tools/audit_emulator_staleness.py $_sn_cad --names 2>"$_sn_err" || true)"
+    grep '^NOTE: ' "$_sn_err" | sed 's/^/--stale: /' || :
+    rm -f "$_sn_err"
+    if [ "$CADENCE" != all ]; then   # STALE-CADENCE-DROP
+        _sn_kept=""; _sn_drop=""
+        for _n in $STALE_NAMES; do
+            _c="$(rows | awk -F'\t' -v g="$_n" '$1 == g {print $4; exit}')"
+            if [ -n "$_c" ] && [ "$_c" != "$CADENCE" ]; then _sn_drop="$_sn_drop $_n($_c)"
+            else _sn_kept="$_sn_kept $_n"; fi   # an unregistered name is kept: the refusal below names it
+        done
+        [ -z "$_sn_drop" ] || echo "--stale: NOTE: left out, a cadence other than --cadence $CADENCE:$_sn_drop"
+        STALE_NAMES="$(for _n in $_sn_kept; do printf '%s\n' "$_n"; done)"
+    fi
     if [ -z "$STALE_NAMES" ]; then
-        echo "--stale: no emulator gate is stale (nothing a passed gate follows moved since the"
+        echo "--stale: no emulator gate is stale${_sn_cad:+ at freeze cadence} (nothing a passed gate follows moved since the"
         echo "         newest recorded run, or no run under build/ carries commit.txt yet)."
         exit 0
     fi
@@ -324,13 +354,39 @@ if [ -z "$(selected | head -1)" ]; then
     exit 1
 fi
 
+# ── A --log DIRECTORY THAT HOLDS A RUN IS NOT A FRESH ONE (#353, 14z-218) ──────
+# results.tsv is created only when missing and commit.txt, identity.tsv and the start record are
+# written only when missing (below), so a run pointed at a directory an earlier run used APPENDED its
+# rows under that run's and kept that run's commit of record: 14z-213's #310 rerun on ERIS still
+# showed the LIES row it was run to clear, and 14z-217's desktop re-run on PILOT read NOT GREEN on
+# the old FAIL row beside its new PASS. The rule "every fresh run gets a fresh --log directory"
+# (docs/project/gotchas.md) failed twice as a thing to remember, so the runner enforces it: a
+# directory holding any of a run's records — or a results.tsv with a row (a dry run writes only the
+# header) — is REFUSED, before the ROM audit and before anything is written. An absent or empty
+# directory (one made with `mkdir -p` before the call) is fresh. --resume is the one way to reuse a
+# directory: it continues the run that wrote it.
+STAMP="$(date +%Y%m%d_%H%M%S)"
+[ -n "$LOGDIR" ] || LOGDIR="build/emu_sweep_$STAMP"
+if [ "$RESUME" = 0 ] && [ -d "$LOGDIR" ]; then   # LOG-FRESH
+    _held=""
+    for _f in commit.txt identity.tsv identity_end.tsv run_record_start.json run_record_end.json; do
+        [ ! -e "$LOGDIR/$_f" ] || _held="$_held $_f"
+    done
+    [ ! -f "$LOGDIR/results.tsv" ] || [ "$(awk 'NR > 1' "$LOGDIR/results.tsv" | wc -l | tr -d ' ')" = 0 ] \
+        || _held="$_held results.tsv($(awk 'NR > 1' "$LOGDIR/results.tsv" | wc -l | tr -d ' ') rows)"
+    if [ -n "$_held" ]; then
+        echo "REFUSED: --log $LOGDIR already holds a run:$_held"
+        echo "         a run there would append its rows to that run's results.tsv and keep its commit of record (#353)."
+        echo "         give a fresh --log directory, or --resume to continue that run; nothing was executed."
+        exit 1
+    fi
+fi
+
 # ── PRECONDITIONS ───────────────────────────────────────────────────────────
 : "${ROMDIR:?set ROMDIR — every gate here reads the reference set}"
 python3 tools/audit_roms.py "$ROMDIR" > /dev/null || {
     echo "ROM audit FAILED — stop (CLAUDE.md §3)"; exit 1; }
 
-STAMP="$(date +%Y%m%d_%H%M%S)"
-[ -n "$LOGDIR" ] || LOGDIR="build/emu_sweep_$STAMP"
 mkdir -p "$LOGDIR"
 RESULTS="$LOGDIR/results.tsv"
 [ -f "$RESULTS" ] || printf 'gate\tlane\tscope\tverdict\tseconds\tdetail\n' > "$RESULTS"

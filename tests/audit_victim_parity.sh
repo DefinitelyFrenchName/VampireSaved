@@ -243,9 +243,14 @@ PY
     OURS_IMG="$BUILD/verify_data.bin"
     if [ "$TENANT" = "$FIRST_T" ]; then
         # the chains-planted control: our data view with one valid chain's first node dur +1 must be REFUSED
-        $VP chains-plant "$EX" "$BUILD/verify_data.bin" "$BUILD/patch/placements.json" "$TENANT" "$W/planted_data.bin" > "$W/chains_plant.log" 2>&1 || bad "chains-plant could not build its copy: $(cat "$W/chains_plant.log")"
-        if $VP chains-identical "$EX" "$W/planted_data.bin" "$BUILD/patch/placements.json" "$TENANT" > "$W/chains_planted.txt" 2>&1; then vs_ctl_dead chains-planted "a node dur changed in our data view still reads identical in shape"; fail=1
-        else vs_ctl_fired chains-planted "$(cat "$W/chains_plant.log") — the identity check refuses it ($(grep -o '[0-9]* differ in shape: [^;]*' "$W/chains_planted.txt" | head -1))"; fi
+        _cp_ok=1; $VP chains-plant "$EX" "$BUILD/verify_data.bin" "$BUILD/patch/placements.json" "$TENANT" "$W/planted_data.bin" > "$W/chains_plant.log" 2>&1 \
+            || { _cp_ok=0; bad "chains-plant could not build its copy: $(tail -1 "$W/chains_plant.log")"; vs_ctl_show_err "$W/chains_plant.log" || true; }
+        if [ "$_cp_ok" = 0 ]; then vs_ctl_dead chains-planted "its planted copy could not be built — no refusal to judge (#310, 14z-218)" || true; fail=1
+        elif $VP chains-identical "$EX" "$W/planted_data.bin" "$BUILD/patch/placements.json" "$TENANT" > "$W/chains_planted.txt" 2>&1; then vs_ctl_dead chains-planted "a node dur changed in our data view still reads identical in shape"; fail=1
+        elif grep -q '[0-9]* differ in shape: ' "$W/chains_planted.txt"; then   # its OWN refusal, never any non-zero exit (#310, 14z-218)
+            vs_ctl_fired chains-planted "$(cat "$W/chains_plant.log") — the identity check refuses it ($(grep -o '[0-9]* differ in shape: [^;]*' "$W/chains_planted.txt" | head -1))"
+        else vs_ctl_show_err "$W/chains_planted.txt" || true
+            vs_ctl_dead chains-planted "the identity check failed on the planted copy without naming a shape difference: $(tail -1 "$W/chains_planted.txt")" || true; fail=1; fi
         if vs_ctl_is chains-planted; then OURS_IMG="$W/planted_data.bin"; echo "MODE: chains-planted — $(cat "$W/chains_plant.log")"; fi
     fi
     if $VP chains-identical "$EX" "$OURS_IMG" "$BUILD/patch/placements.json" "$TENANT" > "$W/chains_$TENANT.txt" 2>&1; then ok "chains identical in shape on our build and the vs2 extract: $(tr '\n' ';' < "$W/chains_$TENANT.txt")"
@@ -284,9 +289,14 @@ PY
     done; done
     if [ "$TENANT" = "$FIRST_T" ]; then
         p="${PARTS%% *}"
-        $VP plant-p1 "$W/${TENANT}_$p.ours.ft" "$BUILD/verify_data.bin" vsavj "$W/planted_ctl.ft" --same "$SAME" > "$W/plant_ctl.log" || bad "plant-p1 control could not be built"
-        if $VP p1check "$W/planted_ctl.ft" "$BUILD/verify_data.bin" vsavj "$ID" --same "$SAME" --from 2300 > "$W/p1_planted.txt" 2>&1; then vs_ctl_dead p1-planted "a P1 node planted in a differing Victor reaction chain passed the P1 check"; fail=1
-        else vs_ctl_fired p1-planted "$(cat "$W/plant_ctl.log"); the P1 check refuses it"; fi
+        _pp_ok=1; $VP plant-p1 "$W/${TENANT}_$p.ours.ft" "$BUILD/verify_data.bin" vsavj "$W/planted_ctl.ft" --same "$SAME" > "$W/plant_ctl.log" 2>&1 \
+            || { _pp_ok=0; bad "plant-p1 control could not be built"; vs_ctl_show_err "$W/plant_ctl.log" || true; }
+        if [ "$_pp_ok" = 0 ]; then vs_ctl_dead p1-planted "its planted trace could not be built — no refusal to judge (#310, 14z-218)" || true; fail=1
+        elif $VP p1check "$W/planted_ctl.ft" "$BUILD/verify_data.bin" vsavj "$ID" --same "$SAME" --from 2300 > "$W/p1_planted.txt" 2>&1; then vs_ctl_dead p1-planted "a P1 node planted in a differing Victor reaction chain passed the P1 check"; fail=1
+        elif grep -q '^FAIL: P1 entered ' "$W/p1_planted.txt"; then   # its OWN refusal, never any non-zero exit (#310, 14z-218)
+            vs_ctl_fired p1-planted "$(cat "$W/plant_ctl.log"); the P1 check refuses it ($(grep -m1 '^FAIL: P1 entered ' "$W/p1_planted.txt" | cut -c1-80))"
+        else vs_ctl_show_err "$W/p1_planted.txt" || true
+            vs_ctl_dead p1-planted "the P1 check failed on the planted trace without naming the planted chain: $(tail -1 "$W/p1_planted.txt")" || true; fail=1; fi
     fi
     echo "== 4. the contact lines, our node pointers translated"
     for p in $PARTS; do

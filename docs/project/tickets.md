@@ -11,12 +11,17 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**354 tickets** — status: open 11 · parked 4 · done 306 · declined 15 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 236 · cosmetic 19 · evolution 99 · **backfill debt: 0 rows**.
+**359 tickets** — status: open 16 · parked 4 · done 306 · declined 15 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 238 · cosmetic 22 · evolution 99 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#359](https://github.com/DefinitelyFrenchName/VampireSaved/issues/359) | bug | open | cleanup traps on EXIT INT TERM with no exit let a TERM'd gate keep running (210 scripts) | `tests/test_crash_sweep.sh` | none | `docs/platform/gotchas.md § A `trap '‹cleanup›' EXIT INT TERM` WITH NO `exit`` | none | 14z-218 |
+| [#358](https://github.com/DefinitelyFrenchName/VampireSaved/issues/358) | cosmetic | open | Phobos's Plasma Beam (ES) [PP] shows fewer visible effect pieces on our build than native vs2 (177 vs 240 piece-frames; lead from #356) | `tests/audit_move_parity.sh` | none | none | none | 14z-218 |
+| [#357](https://github.com/DefinitelyFrenchName/VampireSaved/issues/357) | cosmetic | open | Donovan's Ifrit Sword guard-cancel: native vs2 draws class-0x72 effect pieces our build lacks (lead from #356) | `tests/audit_move_parity.sh` | none | none | none | 14z-218 |
+| [#356](https://github.com/DefinitelyFrenchName/VampireSaved/issues/356) | cosmetic | open | speed-line effects native vs2 draws are missing on our build: Donovan's forward and back dash index vsavj's 12-row speed-line tables with vs2's rows 0x0C/0x0D | `tests/audit_move_parity.sh` · `tools/naming_pair_sheet.sh` | none | none | none | 14z-218 |
+| [#355](https://github.com/DefinitelyFrenchName/VampireSaved/issues/355) | bug | open | close.py red_base takes a plan-refused tier's header-only results file as the re-run's --confirm base | `tools/close.py` | none | none | none | 14z-217 |
 | [#354](https://github.com/DefinitelyFrenchName/VampireSaved/issues/354) | evolution | open | no gate checks what reaches #294's dead span PRG:0x024024 in the built image | `tests/test_dead_span.sh` · `tests/test_perframe_hook.sh` | none | none | none | 14z-217 |
 | [#353](https://github.com/DefinitelyFrenchName/VampireSaved/issues/353) | bug | open | run_all_emulator.sh --log on an existing directory appends to its results.tsv: a re-run inherits the earlier run's verdicts | `tests/run_all_emulator.sh` | none | none | `docs/project/gotchas.md § every fresh run gets a fresh `--log` directory` | 14z-217 |
 | [#352](https://github.com/DefinitelyFrenchName/VampireSaved/issues/352) | evolution | open | audit_release_linux_desktop reports a paused FBNeo window as missing mark and silence instead of NOT JUDGED: paused | `tests/audit_release_linux_desktop.sh` | none | none | none | 14z-217 |

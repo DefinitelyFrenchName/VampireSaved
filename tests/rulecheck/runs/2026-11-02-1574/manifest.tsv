@@ -1,0 +1,6 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent218/t355/close/issue355.md	7c3d5162da25acc32fba43fd009240358daa197f
+build/agent218/t355/close/fix.diff	c663f1b50d4943b373319b7380da9f5e327948eb
+build/agent218/t355/close/evidence355.txt	967ebd1ecb2cc81b4f49986afb451c6b813e6acb
+build/agent218/t355/close/repro.py	ea1491eb6d2846f8014b1bd3673b2d18c3d03d6f
+build/agent218/t355/close/closing_355.md	047d5300c44474488069a9562c0a3d22c6c5dec7

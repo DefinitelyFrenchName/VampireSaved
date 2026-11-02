@@ -246,3 +246,7 @@ test_map_table_readers
 # release from -version, the stock or WIDE build, the sha1 — and refuses another release or a non-MAME; stubs only,
 # one control. <1 s.
 test_mame_ident
+# test_crash_sweep.sh — #310 (14z-218): every call of tests/lib/controls.sh vs_ctl_show_err proven by a planted crash
+# (tests/expected/crash_sweep.tsv: per call site, the gate as it stands reads DIED/UNJUDGED/FAIL and, with the helper
+# neutered, HONOURED/PASS); three controls. ~7 min (78 static rows, 421 s measured 14z-218 on the Mac). Freeze cadence.
+test_crash_sweep

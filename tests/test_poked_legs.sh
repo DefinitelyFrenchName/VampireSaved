@@ -51,9 +51,10 @@ bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 echo "== 1. the two wheels"
 . "$REPO/tests/lib/decrypt_cache.sh"
 decrypt_view vsav2 "$W/vs2.op" "$W/vs2.data" || { echo "FAIL: decrypt_view vsav2 unavailable"; exit 1; }
-python3 "$REPO/tools/select_wheel.py" "$W/vs2.data" --set vsav2 --json "$W/wheel_vsav2.json" > "$W/w1.log" 2>&1 || { echo "FAIL: vsav2 wheel: $(tail -1 "$W/w1.log")"; exit 1; }
-python3 "$REPO/tools/select_wheel.py" "$WIDE_DATA" --set vsavj --json "$W/wheel_wide.json" > "$W/w2.log" 2>&1 || { echo "FAIL: WIDE wheel: $(tail -1 "$W/w2.log")"; exit 1; }
-python3 "$REPO/tools/select_paths.py" "$W/wheel_vsav2.json" --check > "$W/paths.log" 2>&1 || { echo "FAIL: the 14z-160 paths no longer resolve on vsav2's wheel: $(tail -1 "$W/paths.log")"; exit 1; }
+# #310 (14z-218): a tool that crashed here showed only `tail -1`, and a mode's exit read as its control caught — re-printed
+python3 "$REPO/tools/select_wheel.py" "$W/vs2.data" --set vsav2 --json "$W/wheel_vsav2.json" > "$W/w1.log" 2>&1 || { vs_ctl_show_err "$W/w1.log" || true; echo "FAIL: vsav2 wheel: $(tail -1 "$W/w1.log")"; exit 1; }
+python3 "$REPO/tools/select_wheel.py" "$WIDE_DATA" --set vsavj --json "$W/wheel_wide.json" > "$W/w2.log" 2>&1 || { vs_ctl_show_err "$W/w2.log" || true; echo "FAIL: WIDE wheel: $(tail -1 "$W/w2.log")"; exit 1; }
+python3 "$REPO/tools/select_paths.py" "$W/wheel_vsav2.json" --check > "$W/paths.log" 2>&1 || { vs_ctl_show_err "$W/paths.log" || true; echo "FAIL: the 14z-160 paths no longer resolve on vsav2's wheel: $(tail -1 "$W/paths.log")"; exit 1; }
 ok "vsav2 and WIDE wheels decoded; the measured P1/P2 paths resolve"
 
 # the fixture for the new-flavor-leg control: a native leg poking Phobos over Donovan's cell
@@ -72,6 +73,7 @@ if python3 "$REPO/tools/audit_poked_legs.py" --vsav2 "$W/wheel_vsav2.json" --wid
     ok "$(head -1 "$W/census.log")"
 else
     bad "the census reports an unaccepted CROSS-FLAVOR pairing: $(grep '^NEW' "$W/census.log" | head -3 | tr '\n' ' ')"
+    [ "$CONTROL" = new-flavor-leg ] || vs_ctl_show_err "$W/census.log" || true   # #310 (14z-218): a crash is re-printed
 fi
 if [ "$CONTROL" = new-flavor-leg ]; then
     # #310 group 5: a census that crashed reports no NEW line — its failure is not the fixture caught
@@ -94,12 +96,17 @@ if [ "${FREEZE:-0}" = 1 ]; then
     echo "  FROZE  $(basename "$EXPECT") ($(grep -vc '^#' "$EXPECT") rows) — VERIFY by re-running without FREEZE"; exit 0
 fi
 [ -f "$EXPECT" ] || { echo "FAIL: no frozen census at $EXPECT (FREEZE=1 to create it)"; exit 1; }
+[ -f "$W/got.tsv" ] || { echo "FAIL: the census wrote no table, so there is nothing to compare"; echo "FAIL: test_poked_legs"; exit 1; }
 grep -v '^#' "$EXPECT" > "$W/want.rows"; grep -v '^#' "$W/got.tsv" > "$W/got.rows"
+pre_fail="$fail"; dropped="$(sed -n 2p "$W/want.rows")"
 [ "$CONTROL" = dropped-row ] && sed -i.bak '2d' "$W/want.rows"
 if diff "$W/want.rows" "$W/got.rows" > "$W/diff.txt"; then ok "census as frozen ($(wc -l < "$W/got.rows" | tr -d ' ') rows)"
 else bad "census differs from the frozen file: $(grep -c '^[<>]' "$W/diff.txt") rows"; head -12 "$W/diff.txt" | sed 's/^/        /'; fi
 if [ "$CONTROL" = dropped-row ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: dropped-row — the census minus one row fails the comparison"; echo "FAIL: test_poked_legs (control mode)"; exit 1
+    # #310 (14z-218): the mode counts only ITS finding — the comparison naming the dropped row — and only when nothing
+    # failed before it (a census that crashed set the same fail flag, and read as the row caught)
+    if [ "$pre_fail" = 1 ]; then echo "NOT JUDGED: dropped-row — the gate failed before the comparison, so the dropped row was not judged"; echo "FAIL: test_poked_legs (control mode)"; exit 1
+    elif [ "$fail" = 1 ] && [ -n "$dropped" ] && grep -qxF "> $dropped" "$W/diff.txt"; then echo "CONTROL FIRED: dropped-row — the census minus one row fails the comparison"; echo "FAIL: test_poked_legs (control mode)"; exit 1
     else echo "CONTROL DEAD: dropped-row — a missing row went unseen"; echo "FAIL: test_poked_legs"; exit 1; fi
 fi
 

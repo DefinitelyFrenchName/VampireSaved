@@ -431,7 +431,7 @@ sheets get a web build for the community"; the clips and the site path ruled 14z
 OF THE RELEASE'S COMMIT, so the page names a tagged release and every gate it shows:
 
 ```sh
-ROMDIR=... python3 tools/proof_sheets.py run <the release commit> [--host pilot]   # the local run: build/sheets/<commit>/
+ROMDIR=... python3 tools/proof_sheets.py run <the release commit> [--host pilot]   # the local run: build/sheets/<commit>/ (--host: the bundle carries the control builds' freeze tags, #351)
 python3 tools/proof_sheets.py web build/sheets/<commit> --to build/sheets_web/<tag> --release <tag>
 tools/publish_sheets.sh --dry-run build/sheets_web/<tag>   # what would change on the site; changes nothing
 tools/publish_sheets.sh build/sheets_web/<tag>        # webcheck, then <DEPLOY_TARGET>vs-proof-sheets/, replacing it

@@ -157,6 +157,7 @@ if python3 "$TOOL" "$DUMP" --frame "$FRAME" --first-page 0x40000 > "$W/py_oob.tx
 elif grep -q "REFUSING" "$W/py_oob.err"; then
     vs_ctl_fired wrong-page-geometry "an impossible page offset is refused loudly (the mode gives the section-1 walk that offset, so it produces no records and section 1 disagrees)"
 else
+    vs_ctl_show_err "$W/py_oob.err" || true   # a crash is re-printed, not only read as the refusal missing (#310, 14z-218 crash sweep)
     vs_ctl_dead wrong-page-geometry "the tool failed but not with a REFUSING message" || fail=1
 fi
 

@@ -129,7 +129,7 @@ import sys; p = sys.argv[1]; s = open(p).read()
 a = '"control_verdict", "verdict", "violated"'
 assert s.count(a) == 1
 s = s.replace(a, '"verdict", "control_verdict", "violated"', 1)  # CONTROL misread-ledger
-open(p, 'w').write(s)
+open(p, 'w').write(s + '\n# CONTROL misread-ledger (the column tuple above is swapped)\n')
 PY
             ;;
         no-target-check)
@@ -142,6 +142,9 @@ open(p, 'w').write(s)
 PY
             ;;
     esac
+    # #310 F1 (14z-218): the copy is returned only when its perturbation is IN it — a crashed perturbation step
+    # left an empty path, and the twins replayed a hook that did not exist ("got=exit2" on every row) as FIRED
+    grep -rqF "CONTROL $1" "$W/$1/agent" || { echo "NOT JUDGED: make_copy $1 — the perturbation is not in the copy" >&2; return 1; }
     echo "$W/$1/agent"
 }
 
@@ -280,7 +283,8 @@ ok = got == want and known in want
 print(f"hook reads {len(got)} passing head(s), the rule-checker's reader {len(want)}; run 106's head {'present' if known in got else 'ABSENT'} -> {'AGREE' if ok else 'DISAGREE'}")
 PY
 sed 's/^/  real ledger: /' "$W/ledger.txt"
-grep -q -- '-> AGREE$' "$W/ledger.txt" || { echo "FAIL: the push hook reads the real ledger differently from the rule-checker"; fail=1; }
+# a crash here was printed only behind the "real ledger: " prefix, which no classifier reads (#310, 14z-218): re-printed
+grep -q -- '-> AGREE$' "$W/ledger.txt" || { echo "FAIL: the push hook reads the real ledger differently from the rule-checker"; fail=1; vs_ctl_show_err "$W/ledger.txt" || true; }
 
 # THE REFUSAL HINT (14z-192, GitHub #210): the sample procedure command the push hook prints
 # when it refuses must be one tools/rulecheck.py prepare accepts as printed — `--session`
@@ -298,8 +302,16 @@ for a, b in (("procedure --session <14z-N key> --subject", "procedure --subject"
 open(sys.argv[2], "w").write(s)
 PY
 }
-check_hint() {  # check_hint <hook.py> -> prints findings; exit 0 clean, 3 findings
-    python3 - "$1" "$(python3 tools/rulecheck.py prepare --help 2>&1)" <<'PY'
+check_hint() {  # check_hint <hook.py> -> prints findings; exit 0 clean, 3 findings, 4 prepare's --help unusable
+    # #310 (14z-218): the help text was read inline as `$(… --help 2>&1)`, so a crash of rulecheck.py became the list of
+    # accepted flags — every flag "not accepted", the hint STALE — and its traceback was never printed
+    _ch_rc=0; python3 tools/rulecheck.py prepare --help > "$W/prepare_help.txt" 2>&1 || _ch_rc=$?
+    if [ "$_ch_rc" != 0 ] || ! grep -q -- '--session' "$W/prepare_help.txt"; then
+        echo "  hint: tools/rulecheck.py prepare --help gave no usable flag list (exit $_ch_rc) — nothing was judged"
+        vs_ctl_show_err "$W/prepare_help.txt" && echo "NOT JUDGED: the flags rulecheck.py prepare accepts are unknown, so the hint was not checked"
+        return 4
+    fi
+    python3 - "$1" "$(cat "$W/prepare_help.txt")" <<'PY'
 import importlib.util, re, sys
 spec = importlib.util.spec_from_file_location("hook", sys.argv[1]); hook = importlib.util.module_from_spec(spec); spec.loader.exec_module(hook)
 accepted = set(re.findall(r"--[a-z][a-z-]*", sys.argv[2]))
@@ -325,43 +337,86 @@ cat "$W/hint.txt"
 [ "$rc" = 0 ] || { echo "FAIL: the push hook's refusal hint is not a command rulecheck.py prepare accepts (#210)"; fail=1; }
 
 # the census shares the classifier and its own selftest must hold
-python3 tools/agent/transcript_gaps.py --selftest | sed 's/^/  /'
-python3 tools/agent/transcript_gaps.py --selftest | grep -q 'PASS$' || { echo "FAIL: transcript_gaps selftest"; fail=1; }
+# ONE run, judged on its own output (#310, 14z-218): it ran twice — once shown, once grepped — so a crash of the shown run
+# printed a traceback beside a second run's PASS, and the plain run PASSED
+python3 tools/agent/transcript_gaps.py --selftest > "$W/gaps.txt" 2>&1 || true
+sed 's/^/  /' "$W/gaps.txt"
+grep -q 'PASS$' "$W/gaps.txt" || { echo "FAIL: transcript_gaps selftest"; fail=1; vs_ctl_show_err "$W/gaps.txt" || true; }
 
 # the controls, in-gate: each perturbed copy must produce mismatches on ITS side
+# #310 F1 (14z-218): A TWIN COUNTS ONLY ITS PERTURBATION'S OWN OUTCOME. Until then a copy that could not be made (its
+# perturbation step crashed: an empty path) replayed a hook that did not exist, every row `got=exit2`, and the twins
+# counted those as the copy's mismatches — `CONTROL FIRED: blind-classifier — 34 must-deny rows mismatched`, the plain run
+# PASS beside a traceback; the call-gate twin read "expect deny got exit2" the same way. Now a twin needs the copy
+# (ctl_copy), no `got=exit` / `got exit` case (ctl_crashed), and the perturbation's own answer: `got=allow` on a must-deny
+# row (`got=deny` on must-allow), `expect deny got allow`, `expect allow, got deny`; missing-lock needs its rule named.
+ctl_copy() {  # ctl_copy <name> -> CC = the copy's agent dir; a copy that could not be made is the twin DEAD (fail=1)
+    CC="$(make_copy "$1")" && [ -n "$CC" ] && [ -f "$CC/hooks/pre_bash.py" ] && return 0
+    vs_ctl_dead "$1" "its perturbed copy could not be made (make_copy failed), so the twin judged nothing" || fail=1
+    return 1
+}
+ctl_crashed() {  # ctl_crashed <name> <output> — a hook copy that crashed on any case: re-printed, the twin DEAD (fail=1)
+    grep -qE 'got[= ]exit[0-9]' "$2" || return 1
+    vs_ctl_show_err "$2" || true
+    vs_ctl_dead "$1" "the perturbed copy crashed on $(grep -cE 'got[= ]exit[0-9]' "$2") case(s) — a crash is not its finding" || fail=1
+    return 0
+}
 if [ -z "${VS_CTL:-}" ]; then
-    python3 - "$(make_copy misread-ledger)/hooks/pre_push.py" "$REPO" > "$W/ctl_ledger.txt" 2>&1 <<'PY' || true
+    if ctl_copy misread-ledger; then
+        python3 - "$CC/hooks/pre_push.py" "$REPO" > "$W/ctl_ledger.txt" 2>&1 <<'PY' || true
 import importlib.util, sys
 hook_path, repo = sys.argv[1:3]
 spec = importlib.util.spec_from_file_location("hook", hook_path); hook = importlib.util.module_from_spec(spec); spec.loader.exec_module(hook)
 print("heads", len(hook.passing_heads(repo)), "present" if "2652a538aa294c4635a2ceb4255d9b832c1f0654" in hook.passing_heads(repo) else "ABSENT")
 PY
-    if grep -q 'ABSENT' "$W/ctl_ledger.txt"; then vs_ctl_fired misread-ledger "a hook with two ledger columns swapped loses run 106's head ($(cat "$W/ctl_ledger.txt"))"
-    else vs_ctl_dead misread-ledger "a hook with swapped ledger columns still read run 106's head — the real-ledger check cannot see a misread" || fail=1; fi
-    python3 tests/lib/pre_push_cases.py "$(make_copy no-target-check)/hooks/pre_push.py" > "$W/ctl_target.txt" 2>&1 || true
-    k=$(grep -c '^  BAD .*other repo.*expect allow' "$W/ctl_target.txt" || true)
-    if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired no-target-check "$k other-repository pushes refused by a hook without the this-repository guard"
-    else vs_ctl_dead no-target-check "a hook without the guard still let other repositories through — the cases cannot see the defect" || fail=1; fi
-    python3 tests/lib/pre_agent_cases.py "$(make_copy open-agent-gate)/hooks/pre_agent.py" > "$W/ctl_agent.txt" 2>&1 || true
-    k=$(grep -c '^  BAD .*expect deny' "$W/ctl_agent.txt" || true)
-    if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired open-agent-gate "$k must-deny call cases let through by the perturbed copy"
-    else vs_ctl_dead open-agent-gate "the always-allow copy matched every call case — the cases cannot see an open gate" || fail=1; fi
-    python3 tests/lib/pre_push_cases.py "$(make_copy open-push-hook)/hooks/pre_push.py" > "$W/ctl_push.txt" 2>&1 || true
-    k=$(grep -c '^  BAD .*expect deny' "$W/ctl_push.txt" || true)
-    if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired open-push-hook "$k must-deny push cases let through by the perturbed copy"
-    else vs_ctl_dead open-push-hook "the always-allow copy matched every push case — the cases cannot see an open hook" || fail=1; fi
+        if grep -q '^heads [0-9]* ABSENT$' "$W/ctl_ledger.txt"; then vs_ctl_fired misread-ledger "a hook with two ledger columns swapped loses run 106's head ($(cat "$W/ctl_ledger.txt"))"
+        else vs_ctl_show_err "$W/ctl_ledger.txt" || true
+            vs_ctl_dead misread-ledger "a hook with swapped ledger columns still read run 106's head (or its reading crashed) — the real-ledger check cannot see a misread" || fail=1; fi
+    fi
+    if ctl_copy no-target-check; then
+        python3 tests/lib/pre_push_cases.py "$CC/hooks/pre_push.py" > "$W/ctl_target.txt" 2>&1 || true
+        k=$(grep -c '^  BAD .*other repo.*expect allow, got deny$' "$W/ctl_target.txt" || true)
+        if ctl_crashed no-target-check "$W/ctl_target.txt"; then :
+        elif [ "${k:-0}" -gt 0 ]; then vs_ctl_fired no-target-check "$k other-repository pushes refused by a hook without the this-repository guard"
+        else vs_ctl_show_err "$W/ctl_target.txt" || true
+            vs_ctl_dead no-target-check "a hook without the guard still let other repositories through — the cases cannot see the defect" || fail=1; fi
+    fi
+    if ctl_copy open-agent-gate; then
+        python3 tests/lib/pre_agent_cases.py "$CC/hooks/pre_agent.py" > "$W/ctl_agent.txt" 2>&1 || true
+        k=$(grep -c '^  BAD .*expect deny got allow$' "$W/ctl_agent.txt" || true)
+        if ctl_crashed open-agent-gate "$W/ctl_agent.txt"; then :
+        elif [ "${k:-0}" -gt 0 ]; then vs_ctl_fired open-agent-gate "$k must-deny call cases let through by the perturbed copy"
+        else vs_ctl_show_err "$W/ctl_agent.txt" || true
+            vs_ctl_dead open-agent-gate "the always-allow copy matched every call case — the cases cannot see an open gate" || fail=1; fi
+    fi
+    if ctl_copy open-push-hook; then
+        python3 tests/lib/pre_push_cases.py "$CC/hooks/pre_push.py" > "$W/ctl_push.txt" 2>&1 || true
+        k=$(grep -c '^  BAD .*expect deny, got allow$' "$W/ctl_push.txt" || true)
+        if ctl_crashed open-push-hook "$W/ctl_push.txt"; then :
+        elif [ "${k:-0}" -gt 0 ]; then vs_ctl_fired open-push-hook "$k must-deny push cases let through by the perturbed copy"
+        else vs_ctl_show_err "$W/ctl_push.txt" || true
+            vs_ctl_dead open-push-hook "the always-allow copy matched every push case — the cases cannot see an open hook" || fail=1; fi
+    fi
     stale_hint_copy "$W/pre_push_stale_ctl.py"
     rc=0; check_hint "$W/pre_push_stale_ctl.py" > "$W/ctl_hint.txt" 2>&1 || rc=$?
-    if [ "$rc" = 3 ]; then vs_ctl_fired stale-hint "$(head -1 "$W/ctl_hint.txt" | sed 's/^ *//')"
-    else vs_ctl_dead stale-hint "the pre-#210 hint passed the hint check (rc=$rc)" || fail=1; fi
+    if [ "$rc" = 3 ] && grep -q 'lacks --session' "$W/ctl_hint.txt"; then vs_ctl_fired stale-hint "$(head -1 "$W/ctl_hint.txt" | sed 's/^ *//')"
+    else cat "$W/ctl_hint.txt"   # a crash in it (the help, the check) prints at column 0
+        vs_ctl_dead stale-hint "the pre-#210 hint was not found stale for its missing --session (rc=$rc)" || fail=1; fi
     lock_copy "$W/settings_lock.json"
     if check_install "$W/settings_lock.json" > "$W/ctl_lock.txt" 2>&1; then vs_ctl_dead missing-lock "the installation check passed settings without Edit(tools/git-hooks/**)" || fail=1
-    else vs_ctl_fired missing-lock "$(grep -m1 'edit-lock rules missing' "$W/ctl_lock.txt" | sed 's/^FAIL: installation — //')"; fi
+    elif grep -qF "edit-lock rules missing: ['Edit(tools/git-hooks/**)']" "$W/ctl_lock.txt"; then
+        vs_ctl_fired missing-lock "$(grep -m1 'edit-lock rules missing' "$W/ctl_lock.txt" | sed 's/^FAIL: installation — //')"
+    else vs_ctl_show_err "$W/ctl_lock.txt" || true
+        vs_ctl_dead missing-lock "the installation check failed without naming Edit(tools/git-hooks/**) — a crash is not the rule missing" || fail=1; fi
     for c in blind-classifier blind-bypass greedy-heredoc no-heredoc-strip; do
-        replay "$(make_copy "$c")" "$W/ctl_$c.txt"
-        case "$c" in blind-classifier|blind-bypass|greedy-heredoc) side=deny;; no-heredoc-strip) side=allow;; esac
-        k=$(grep -c "^MISMATCH expect=$side " "$W/ctl_$c.txt" || true)
-        if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired "$c" "$k must-$side rows mismatched on the perturbed copy"
+        case "$c" in blind-classifier|blind-bypass|greedy-heredoc) side=deny; wrong=allow;; no-heredoc-strip) side=allow; wrong=deny;; esac
+        ctl_copy "$c" || continue
+        replay "$CC" "$W/ctl_$c.txt"
+        k=$(grep -c "^MISMATCH expect=$side got=$wrong " "$W/ctl_$c.txt" || true)
+        if ctl_crashed "$c" "$W/ctl_$c.txt"; then :
+        elif ! grep -q '^ROWS [0-9]* MISMATCHES [0-9]*$' "$W/ctl_$c.txt"; then vs_ctl_show_err "$W/ctl_$c.txt" || true
+            vs_ctl_dead "$c" "the replay of the perturbed copy printed no ROWS summary, so it judged nothing" || fail=1
+        elif [ "${k:-0}" -gt 0 ]; then vs_ctl_fired "$c" "$k must-$side rows answered $wrong on the perturbed copy"
         else vs_ctl_dead "$c" "the perturbed copy matched every must-$side row — the replay cannot see this failure" || fail=1; fi
     done
 fi

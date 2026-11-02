@@ -104,14 +104,18 @@ case "$got" in
         n0="${got#*runs_before=}"; n0="${n0%% *}"; n1="${got#*runs_after=}"; n1="${n1%% *}"
         [ "$n0" = "$n1" ] && echo "  ok    prepare REFUSES the untied packet (no run directory), PREPARES it with --untied-ok (meta.tsv records the reason)" \
             || { echo "  FAIL  the refused prepare changed the runs directory ($n0 -> $n1)"; fail=1; } ;;
-    *) echo "  FAIL  the wiring is not as required: $got"; fail=1 ;;
+    *) echo "  FAIL  the wiring is not as required: $got"; fail=1
+       for _l in "$W/root/bare.log" "$W/root/ok.log"; do vs_ctl_show_err "$_l" || true; done ;;   # a crashed prepare is re-printed, not read as the wiring (#310, 14z-218 crash sweep)
 esac
 
 if [ -z "${VS_CTL:-}" ]; then
     unwired "$W/rc_unwired.py"
     ug="$(wiring "$W/rc_unwired.py" "$W/root_unwired")"
     case "$ug" in
-        bare=PREPARED*) vs_ctl_fired lint-unwired "a rulecheck.py without the lint call prepares the untied packet ($ug)" ;;
+        bare=PREPARED*"untied_ok=PREPARED "*) vs_ctl_fired lint-unwired "a rulecheck.py without the lint call prepares the untied packet ($ug)" ;;
+        bare=PREPARED*)   # its --untied-ok prepare did not prepare: a crash or another failure, not the lint unwired (#310, 14z-218)
+           for _l in "$W/root_unwired/bare.log" "$W/root_unwired/ok.log"; do vs_ctl_show_err "$_l" || true; done
+           vs_ctl_dead lint-unwired "the unwired copy prepared the bare packet but its --untied-ok prepare did not: $ug" || fail=1 ;;
         *) vs_ctl_dead lint-unwired "the unwired copy still refuses: $ug" || fail=1 ;;
     esac
     for c in gap-ignored frequency-read possessive-quote; do

@@ -11,16 +11,30 @@ dirfd (`AT_FDCWD</dir>` or `N</dir>`), else by the same pid's last `AT_FDCWD</di
 written and listed apart, which reads SHARED. /dev, /proc, /sys, pipes
 and sockets are ignored; a path under a control's own mktemp directory (/tmp/tmp.*, /tmp/<name>.<6+ random>) differs
 per control and cannot collide; Python's bytecode caches (__pycache__/*.pyc) are written atomically and are already
-shared across gates, so they are set aside. A gate is HOLLOW when every one of its control runs printed a SKIP line:
-its trace wrote nothing a passing run writes, and it cannot earn a row from that trace.
-Verdicts, one line per gate: SAFE (may be listed), SHARED (keep its controls serial), HOLLOW (trace it where it runs).
-usage: controls_overlap.py <trace dir>... [--root DIR]   (--root for a done.tsv without its 5th column)"""
-import collections, os, re, sys
+shared across gates, so they are set aside.
+ONLY AN HONOURED RUN CERTIFIES (#349, 14z-218). Each control run is classified by tests/lib/classify.sh's
+vs_classify_control, the one classifier of this tree, from done.tsv's 3rd column (the exit status) and
+out/<gate>.<control>.out; a run with no done.tsv row or no .out is UNRECORDED. A gate is HOLLOW when ANY of its control
+runs is not HONOURED: a REFUSED, SKIPped (LIES/UNJUDGED), TIMEOUT or DIED run stopped short of the mode's real run, so
+its trace is not that control's write set, and a listed gate runs ALL its controls at once (tests/lib/static_job.sh,
+tests/run_all_emulator.sh), so one uncertified control leaves the whole row unsupported. Until #349 only a gate whose
+EVERY run printed a SKIP line read HOLLOW: on ERIS (14z-216) test_readme_recording's five controls were each REFUSED
+(exit 3, 0 s, no release MAME for the host), wrote nothing, and read SAFE.
+Verdicts, one line per gate: SAFE (may be listed), SHARED (keep its controls serial), HOLLOW (trace it where every
+control mode runs to its own FAIL).
+usage: controls_overlap.py <trace dir>... [--root DIR] [--classify FILE]   (--root for a done.tsv without its 5th
+column; --classify names tests/lib/classify.sh, default the one beside this tool)"""
+import collections, os, re, subprocess, sys, tempfile
 
 args = sys.argv[1:]
 default_root = None
 if "--root" in args:
     i = args.index("--root"); default_root = args[i + 1].rstrip("/") + "/"; del args[i:i + 2]
+classify_sh = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tests", "lib", "classify.sh")
+if "--classify" in args:
+    i = args.index("--classify"); classify_sh = os.path.abspath(args[i + 1]); del args[i:i + 2]
+if not os.path.isfile(classify_sh):
+    sys.exit("controls_overlap.py: no classifier at %s" % classify_sh)
 OPEN_RET = re.compile(r'^(\d+)\s+(?:open|openat|creat)\((.*)\)\s+=\s+(\d+)<([^>]*)>')
 RENAME = re.compile(r'^(\d+)\s+rename(?:at2?)?\((.*)\)\s+=\s+0')
 CWD = re.compile(r'AT_FDCWD<([^>]*)>')
@@ -77,13 +91,36 @@ def writes(path, root):
     return out, rel, rd
 
 
-by_gate = collections.defaultdict(dict); skipped = collections.defaultdict(list)
+CLASSIFY = r'''. "$1"; T="$(printf '\t')"; exec 3< "$2"
+while IFS="$T" read -r st log g c <&3; do
+    vs_classify_control "$st" "$log" "tests/$g.sh" "$c"; printf '%s\t%s\n' "$VS_CTL_EXEC" "$VS_CTL_EXEC_DETAIL"
+done'''
+
+
+def classify(runs):  # [(exit, log, gate, control)] -> [(class, detail)], through tests/lib/classify.sh in one shell
+    if not runs:
+        return []
+    with tempfile.NamedTemporaryFile("w", suffix=".tsv", delete=False) as f:
+        f.writelines("%s\t%s\t%s\t%s\n" % r for r in runs)
+    try:
+        env = dict(os.environ); env.pop("REPO", None)
+        out = subprocess.run(["sh", "-c", CLASSIFY, "classify", classify_sh, f.name], stdin=subprocess.DEVNULL,
+                             capture_output=True, text=True, env=env).stdout.splitlines()
+    finally:
+        os.unlink(f.name)
+    if len(out) != len(runs):
+        sys.exit("controls_overlap.py: the classifier answered %d line(s) for %d run(s)" % (len(out), len(runs)))
+    return [tuple((l.split("\t", 1) + [""])[:2]) for l in out]
+
+
+by_gate = collections.defaultdict(dict); klass = collections.defaultdict(dict); pending = {}
 for tr in args:
-    roots = {}
+    roots, exits = {}, {}
     for row in open(os.path.join(tr, "done.tsv")):
         f = row.rstrip("\n").split("\t")
         if len(f) >= 2:
             roots[(f[0], f[1])] = (f[4].rstrip("/") + "/") if len(f) >= 5 and f[4] else default_root
+            exits[(f[0], f[1])] = f[2] if len(f) >= 3 and re.fullmatch(r"[0-9]+", f[2]) else None
     st = os.path.join(tr, "st")
     for name in sorted(os.listdir(st)):
         if not name.endswith(".st"):
@@ -94,7 +131,12 @@ for tr in args:
             sys.exit("controls_overlap.py: no root for %s.%s (done.tsv has no 5th column; pass --root)" % (g, c))
         by_gate[g][c] = writes(os.path.join(st, name), root)
         o = os.path.join(tr, "out", g + "." + c + ".out")
-        skipped[g].append(os.path.exists(o) and any(l.startswith("SKIP") for l in open(o, errors="replace")))
+        if exits.get((g, c)) is None or not os.path.isfile(o) or "\t" in o:
+            klass[g][c] = ("UNRECORDED", "no exit status in done.tsv or no out/%s.%s.out" % (g, c)); pending.pop((g, c), None)
+        else:   # the run whose writes are scored is the run that is classified (a later trace dir replaces both)
+            pending[(g, c)] = (exits[(g, c)], o, g, c)
+for (_, _, g, c), k in zip(pending.values(), classify(list(pending.values()))):
+    klass[g][c] = k
 verdict = {}
 for g in sorted(by_gate):
     seen = collections.defaultdict(set); rel = collections.defaultdict(set); read = collections.defaultdict(set)
@@ -109,11 +151,15 @@ for g in sorted(by_gate):
     wr = {p: (seen[p], read[p] - seen[p]) for p in seen if read.get(p, set()) - seen[p] and keep(p)}
     shared = {p: cs for p, cs in seen.items() if len(cs) > 1 and keep(p)}
     rshared = {p: cs for p, cs in rel.items() if len(cs) > 1}
-    hollow = all(skipped[g])
+    uncert = [c for c in sorted(by_gate[g]) if klass[g][c][0] != "HONOURED"]   # HONOURED-ONLY (#349)
+    hollow = bool(uncert)
     verdict[g] = "HOLLOW" if hollow else ("SHARED" if shared or wr or rshared else "SAFE")
     print("== %s: %d controls traced, %d paths written by 2+ of them, %d written by one and read by another, "
           "%d relative rename targets shared%s -> %s" % (g, len(by_gate[g]), len(shared), len(wr), len(rshared),
-                                                         ", every control SKIPped" if hollow else "", verdict[g]))
+          ", %d of them not HONOURED (%s)" % (len(uncert), ", ".join(sorted(set(klass[g][c][0] for c in uncert))))
+          if hollow else "", verdict[g]))
+    for c in uncert[:8]:
+        print("   (not HONOURED) %s %s: %s" % (c, klass[g][c][0], klass[g][c][1][:100]))
     for p, (ws, rs) in sorted(wr.items())[:8]:
         print("   (write/read) %s  written by %s, read by %s" % (p, ",".join(sorted(ws)), ",".join(sorted(rs))))
     for p, cs in sorted(shared.items())[:12]:

@@ -175,8 +175,11 @@ done
 [ -z "$dead" ] && vs_ctl_fired list-minus-one "C1 failed on$got with libGL.so.1 dropped from the list" || { vs_ctl_dead list-minus-one "C1 passed (or its tool crashed) on:$dead" || fail=1; }
 # uninstalled-host-lib: one container without libasound2t64 (the FBNeo package)
 crun fbneo noasound "$(echo $PKGS | tr ' ' '\n' | grep -vx libasound2t64 | tr '\n' ' ')"
-judge fbneo noasound > "$OUT/fbneo.noasound/judge.txt"
-if [ "$C0_OK" = 0 ] && [ "$LDD_OK" = 0 ] && grep -q '^      C0 .*missing: libasound.so.2$' "$OUT/fbneo.noasound/judge.txt"; then vs_ctl_fired uninstalled-host-lib "without libasound2t64: $(grep '^      C0' "$OUT/fbneo.noasound/judge.txt" | sed 's/^ *//'); $(grep '^      LDD' "$OUT/fbneo.noasound/judge.txt" | sed 's/^ *//')"
+CRASH=0; judge fbneo noasound > "$OUT/fbneo.noasound/judge.txt"
+if [ "$CRASH" = 1 ]; then   # its judge's tool crashed: the crash is printed here, never hidden in judge.txt (#310, 14z-218 crash sweep)
+    cat "$OUT/fbneo.noasound/judge.txt"
+    vs_ctl_dead uninstalled-host-lib "tools/cleanhost_libs.py crashed on the container without libasound2t64 — not judged" || fail=1
+elif [ "$C0_OK" = 0 ] && [ "$LDD_OK" = 0 ] && grep -q '^      C0 .*missing: libasound.so.2$' "$OUT/fbneo.noasound/judge.txt"; then vs_ctl_fired uninstalled-host-lib "without libasound2t64: $(grep '^      C0' "$OUT/fbneo.noasound/judge.txt" | sed 's/^ *//'); $(grep '^      LDD' "$OUT/fbneo.noasound/judge.txt" | sed 's/^ *//')"
 else vs_ctl_dead uninstalled-host-lib "C0_OK=$C0_OK LDD_OK=$LDD_OK without libasound2t64" || fail=1; fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_release_linux_cleanhost"; else echo "FAIL: audit_release_linux_cleanhost"; exit 1; fi

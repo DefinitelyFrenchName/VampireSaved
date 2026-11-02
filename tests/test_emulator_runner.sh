@@ -1,6 +1,6 @@
 #!/bin/sh
 # test_emulator_runner.sh — ground truth for tests/run_all_emulator.sh
-# (14z-128). ROM-free, ~72 s (measured 14z-210 on the Mac; ~26 s at 14z-162, before sections 18-19).
+# (14z-128). ROM-free, ~85 s (measured 14z-218 on the Mac, sections 24-25 added; ~72 s at 14z-210; ~26 s at 14z-162, before sections 18-19).
 #
 # WHAT: tests/run_all_emulator.sh's verdicts mean what they say: PASS / FAIL / SKIP counted
 #   apart, SKIP-in-prose read as PASS, a non-executable registry row MISSING, a timeout
@@ -17,6 +17,10 @@
 #   died before writing its row is a FAIL of its own, never a GREEN on fewer rows (#321). Since 14z-215 (#310 group 3)
 #   the gate's own wall-clock checks (sections 9 and 18) count only in the plain run and under the mode they belong to,
 #   so a loaded host cannot turn another mode's run into its FAIL (section 23 holds the rule on known answers).
+#   Since 14z-218: a --log directory that already holds a run is REFUSED and left untouched, an empty one and a
+#   --resume are accepted (#353, section 24); --stale --freeze asks the audit for the names a freeze judges and runs
+#   them, NOTEing the rest, while a --stale name outside --lane or --scope is still REFUSED, and under any --cadence a
+#   name of another cadence is left out with a NOTE (#347, section 25).
 # HOW: a synthetic repository of stub gates with KNOWN verdicts is driven through the REAL
 #   runner by symlink (never a copy of its logic), with stub tools so the runner's own
 #   preconditions run; the controls run copies of the runner (and, for #323, of the two readers) with a piece removed
@@ -42,6 +46,9 @@
 # MUST-FIRE: shadow-tool: order-ignored — a copy of the runner whose ORDER-SORT step is disabled must start a pooled lane's gates in registry order under --order, and section 19 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
 # MUST-FIRE: shadow-tool: tmp-ignored — a copy of the runner whose DISK-TMPDIR test is always false must leave a gate with no TMPDIR from the caller writing its temp files in /tmp, and section 21 must FAIL (mode: that copy is the runner; #321, 14z-210)
 # MUST-FIRE: shadow-tool: lost-unread — a copy of the runner whose LOST-ROWS check is disabled must print GREEN for a pooled lane in which one gate's worker died before writing its row, and section 22 must FAIL (mode: that copy is the runner; #321, 14z-210: PILOT printed GREEN on PASS 1 of 3)
+# MUST-FIRE: shadow-tool: log-reused — a copy of the runner whose LOG-FRESH test is always false must append a second run's row to a log directory that already holds a run, and section 24 must FAIL (mode: that copy is the runner every section drives; #353, 14z-218)
+# MUST-FIRE: shadow-tool: stale-default-cadence — a copy of the runner whose STALE-CADENCE line never asks the audit at freeze cadence must REFUSE `--stale --freeze` on an ondemand name, and section 25 must FAIL (mode: that copy is the runner every section drives; #347, 14z-218)
+# MUST-FIRE: shadow-tool: stale-cadence-refused — a copy of the runner whose STALE-CADENCE-DROP test is always false must REFUSE `--stale --cadence bitstream` on a romset-cadence name, and section 25 must FAIL (mode: that copy is the runner every section drives; #347, 14z-218)
 # MUST-FIRE: perturbed-copy: row-not-executable — a farm of symlinks to the REAL scripts named by the REAL tests/ci_emulator.tsv, with ONE replaced by a non-executable copy, must make section 10b report it unrunnable (mode: that farm is what 10b checks; section 10b must fail)
 #
 # WHY A GATE FOR THE RUNNER, again. CLAUDE.md §4: "Verdict logic is itself
@@ -175,6 +182,14 @@ chmod +x "$T/runner_tmpoff.sh"
 sed 's@    if \[ "$DRY" = 0 \]; then   # LOST-ROWS@    if false; then   # LOST-ROWS disabled@' "$RUNNER" > "$T/runner_lostoff.sh"
 cmp -s "$RUNNER" "$T/runner_lostoff.sh" && fail "could not disable the lost-rows check — the LOST-ROWS line moved"
 chmod +x "$T/runner_lostoff.sh"
+# the fresh-log refusal disabled (#353); the stale names asked at the default cadence, and the cadence drop disabled (#347)
+sed 's@^if \[ "$RESUME" = 0 \] && \[ -d "$LOGDIR" \]; then   # LOG-FRESH$@if false; then   # LOG-FRESH disabled@' "$RUNNER" > "$T/runner_logreused.sh"
+cmp -s "$RUNNER" "$T/runner_logreused.sh" && fail "could not disable the fresh-log refusal — the LOG-FRESH line moved"
+sed 's@^    _sn_cad=""; \[ "$CADENCE" = romset \] && _sn_cad="--cadence freeze"   # STALE-CADENCE$@    _sn_cad=""   # STALE-CADENCE disabled@' "$RUNNER" > "$T/runner_stalecad.sh"
+cmp -s "$RUNNER" "$T/runner_stalecad.sh" && fail "could not disable the freeze-cadence names — the STALE-CADENCE line moved"
+sed 's@^    if \[ "$CADENCE" != all \]; then   # STALE-CADENCE-DROP$@    if false; then   # STALE-CADENCE-DROP disabled@' "$RUNNER" > "$T/runner_stalecaddrop.sh"
+cmp -s "$RUNNER" "$T/runner_stalecaddrop.sh" && fail "could not disable the cadence drop — the STALE-CADENCE-DROP line moved"
+chmod +x "$T/runner_logreused.sh" "$T/runner_stalecad.sh" "$T/runner_stalecaddrop.sh"
 chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh" "$T/runner_emptygreen.sh" "$T/runner_crashunread.sh" "$T/runner_lanevar.sh" "$T/runner_warmoff.sh" "$T/runner_ccoff.sh" "$T/runner_orderoff.sh"
 case "$VS_CTL" in
 empty-green)      ln -s "$T/runner_emptygreen.sh" "$FR/tests/run_all_emulator.sh" ;;
@@ -192,6 +207,9 @@ jobs-leak)        if [ "${VS_TEST_NOOP_MODE:-0}" = 1 ]; then ln -s "$RUNNER" "$F
 order-ignored)    ln -s "$T/runner_orderoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 tmp-ignored)      ln -s "$T/runner_tmpoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 lost-unread)      ln -s "$T/runner_lostoff.sh" "$FR/tests/run_all_emulator.sh" ;;
+log-reused)       ln -s "$T/runner_logreused.sh" "$FR/tests/run_all_emulator.sh" ;;
+stale-default-cadence) ln -s "$T/runner_stalecad.sh" "$FR/tests/run_all_emulator.sh" ;;
+stale-cadence-refused) ln -s "$T/runner_stalecaddrop.sh" "$FR/tests/run_all_emulator.sh" ;;
 *)                ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh" ;;
 esac
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
@@ -391,8 +409,14 @@ if ! vs_ctl_is lane-var-shared; then
     s5b run_all_emulator_lanevar.sh "$T/l7c"
     rm -f "$FR/tests/run_all_emulator_lanevar.sh" "$FR/tests/lib/controls.sh" "$FR/tests/lib/measures.sh"
     ln -s "$CTLLIB" "$FR/tests/lib/controls.sh"; ln -s "$MEASLIB" "$FR/tests/lib/measures.sh"
-    [ "$S5B" = bad ] && vs_ctl_fired lane-var-shared "with the lane loop and the readers sharing \`_l\` again, the green prereq gate un-stopped the run and the mame lane ran" \
-        || { vs_ctl_dead lane-var-shared "the copies sharing \`_l\` still stopped the run"; fail "lane-var-shared"; }
+    # its OWN evidence: the mame lane RAN (a g_pass row), never any S5B=bad — a shadow that crashed never prints STOP
+    # either (#310, 14z-218 crash sweep: the shadow's first call crashed and this twin read FIRED)
+    if awk -F'\t' 'NR>1 && $1=="g_pass"' "$T/l7c/results.tsv" 2>/dev/null | grep -q .; then
+        vs_ctl_fired lane-var-shared "with the lane loop and the readers sharing \`_l\` again, the green prereq gate un-stopped the run and the mame lane ran"
+    else
+        printf '%s\n' "$_o" > "$T/l7c.out"; vs_ctl_show_err "$T/l7c.out" - "tests/run_all_emulator_lanevar.sh" || :
+        vs_ctl_dead lane-var-shared "the copies sharing \`_l\` ran no mame lane (STOPPED, or did not run: $(printf '%s\n' "$_o" | tail -1 | cut -c1-80))" || :; fail "lane-var-shared"
+    fi
 fi
 
 echo "6. --scope all includes the out-of-release-scope rows"
@@ -676,9 +700,10 @@ printf '#!/bin/sh\necho "tests/g_shellcrash.sh: line 3: FOO: set FOO to a dir OU
 printf '#!/bin/sh\necho "PASS: the summary line"\necho "tests/g_segv.sh: line 64:  2444 Segmentation fault: 11  REPLAY=x"\nexit 0\n' > "$FR/tests/g_segv.sh"
 chmod +x "$FR/tests/g_shellcrash.sh" "$FR/tests/g_segv.sh"
 reg "$(row g_shellcrash mame release - '')" "$(row g_segv mame release - '')"
-run --lane mame --log "$T/l12" >/dev/null 2>&1 || true
-v12a="$(awk -F'\t' '$1=="g_shellcrash"{print $4}' "$T/l12/results.tsv" 2>/dev/null)"
-v12b="$(awk -F'\t' '$1=="g_segv"{print $4}' "$T/l12/results.tsv" 2>/dev/null)"
+# its own log directory: until 14z-218 this reused the pool section's $T/l12 and appended to its rows (#353 refuses that)
+run --lane mame --log "$T/l12s" >/dev/null 2>&1 || true
+v12a="$(awk -F'\t' '$1=="g_shellcrash"{print $4}' "$T/l12s/results.tsv" 2>/dev/null)"
+v12b="$(awk -F'\t' '$1=="g_segv"{print $4}' "$T/l12s/results.tsv" 2>/dev/null)"
 [ "$v12a" = FAIL ] && ok "a shell-error line with exit 0 is FAIL (was PASS before 14z-134)" \
                    || fail "shell-error crash classified '$v12a', expected FAIL"
 [ "$v12b" = PASS ] && ok "a MAME teardown segfault line after the summary stays PASS" \
@@ -1123,6 +1148,118 @@ if [ "$(_tf "" -)" = 1 ] && [ "$(_tf export-removed -)" = 0 ] && [ "$(_tf export
         && [ "$(_tf concurrent-off concurrent-off)" = 1 ]; then
     ok "timing_fail fails the plain run and its owner's mode, and leaves every other mode's rc alone"
 else fail "timing_fail: plain $(_tf "" -), another mode $(_tf export-removed -), owner $(_tf concurrent-off concurrent-off) (want 1 0 1)"; fi
+
+echo "24. a --log directory that already holds a run is REFUSED and left untouched; an empty one, a dry run's and --resume are accepted (#353, 14z-218)"
+# 14z-213 (#310's ERIS rerun) and 14z-217 (PILOT's desktop re-run): a run into an earlier run's directory appended its
+# rows under that run's and kept its commit.txt, so the re-run read the earlier run's verdicts as its own.
+reg "$(row g_pass mame release - '')"
+l24() {  # l24 <runner> <log> [args...] -> L24_RC, L24_OUT
+    _r="$1"; _l="$2"; shift 2; L24_RC=0
+    L24_OUT="$( (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh "tests/$_r" --lane mame --log "$_l" "$@" 2>&1) )" || L24_RC=$?
+}
+rows24() { awk 'NR > 1' "$1/results.tsv" 2>/dev/null | wc -l | tr -d ' '; }
+l24 run_all_emulator.sh "$T/l24"
+[ "$L24_RC" = 0 ] && [ "$(rows24 "$T/l24")" = 1 ] && ok "a first run into a fresh --log directory: exit 0, one row" \
+    || fail "the first run into $T/l24: exit $L24_RC, $(rows24 "$T/l24") rows"
+_ck24="$(cat "$T/l24/results.tsv" "$T/l24/commit.txt" 2>/dev/null | cksum)"
+l24 run_all_emulator.sh "$T/l24"
+if [ "$L24_RC" = 1 ] && printf '%s\n' "$L24_OUT" | grep >/dev/null "^REFUSED: --log $T/l24 already holds a run: commit.txt" \
+        && [ "$(cat "$T/l24/results.tsv" "$T/l24/commit.txt" 2>/dev/null | cksum)" = "$_ck24" ] && ! printf '%s\n' "$L24_OUT" | grep -q '^GREEN'; then
+    ok "a second run into the same directory: REFUSED (exit 1), its results.tsv and commit.txt untouched"
+else
+    fail "a second run into $T/l24: exit $L24_RC, $(rows24 "$T/l24") rows — $(printf '%s\n' "$L24_OUT" | grep -E '^REFUSED|^GREEN|^PASS ' | head -2 | tr '\n' ' ')"
+    vs_ctl_is log-reused && vs_ctl_fired log-reused "with the LOG-FRESH test disabled the second run wrote into $T/l24 ($(rows24 "$T/l24") rows)"
+fi
+mkdir -p "$T/l24b"
+l24 run_all_emulator.sh "$T/l24b"
+[ "$L24_RC" = 0 ] && [ "$(rows24 "$T/l24b")" = 1 ] && ok "an EMPTY directory made beforehand (mkdir -p) is fresh: accepted, one row" \
+    || fail "an empty pre-made --log directory: exit $L24_RC — $(printf '%s\n' "$L24_OUT" | grep -E '^REFUSED' | head -1)"
+l24 run_all_emulator.sh "$T/l24c" --dry-run
+l24 run_all_emulator.sh "$T/l24c"
+[ "$L24_RC" = 0 ] && [ "$(rows24 "$T/l24c")" = 1 ] && ok "a directory holding only a dry run's header is fresh: the real run after it is accepted" \
+    || fail "a real run after a dry run into $T/l24c: exit $L24_RC — $(printf '%s\n' "$L24_OUT" | grep -E '^REFUSED' | head -1)"
+l24 run_all_emulator.sh "$T/l24" --resume
+[ "$L24_RC" = 0 ] && [ "$(rows24 "$T/l24")" = 1 ] && printf '%s\n' "$L24_OUT" | grep >/dev/null 'resumed: already in results.tsv' \
+    && ok "--resume into the run's own directory is accepted and continues it (g_pass resumed, still one row)" \
+    || fail "--resume into $T/l24: exit $L24_RC, $(rows24 "$T/l24") rows"
+if ! vs_ctl_is log-reused; then
+    ln -s "$T/runner_logreused.sh" "$FR/tests/run_all_emulator_logreused.sh"
+    l24 run_all_emulator_logreused.sh "$T/l24"; rm -f "$FR/tests/run_all_emulator_logreused.sh"
+    [ "$(rows24 "$T/l24")" = 2 ] && vs_ctl_fired log-reused "a runner without the LOG-FRESH refusal appended a second g_pass row to $T/l24 — section 24 catches it" \
+        || { vs_ctl_dead log-reused "the runner without the refusal left $T/l24 at $(rows24 "$T/l24") rows (exit $L24_RC)"; fail "log-reused"; }
+fi
+
+echo "25. --stale --freeze runs the names a freeze judges; a name outside --scope or --lane is still REFUSED; any --cadence leaves another cadence's names out (#347, 14z-218)"
+# 14z-216 (the M24 freeze, ERIS): `--stale --freeze --scope all` was REFUSED on 22 ondemand names, because the audit was
+# asked at its default cadence; each was --skip'ped by hand. The stub audit answers as the real one does since #347: at
+# freeze cadence only the names a freeze judges ($S25_FREEZE), the others NOTEd on stderr; otherwise every name ($S25_ALL).
+mk g_mist 0 "a mister-lane stub"; mk g_bit 0 "a bitstream stub"
+reg "$(row g_pass mame release - '')" "$(row g_ond mame ondemand - 'pristine: a stub')" "$(row g_mist mister release - '')" \
+    "$(rowc g_bit mister release bitstream - 'a bitstream stub')"
+cat > "$FR/tools/audit_emulator_staleness.py" <<'PY'
+import os, sys
+if "--names" in sys.argv:
+    if "--cadence" in sys.argv and sys.argv[sys.argv.index("--cadence") + 1] == "freeze":
+        names = os.environ.get("S25_FREEZE", "").split()
+        left = [n for n in os.environ.get("S25_ALL", "").split() if n not in names]
+        if left:
+            sys.stderr.write("NOTE: left out, outside what a freeze runs (%d): %s\n" % (len(left), " ".join(left)))
+    else:
+        names = os.environ.get("S25_ALL", "").split()
+    print("\n".join(names))
+PY
+s25() {  # s25 <runner> <log> [args...] -> S25_RC, S25_OUT
+    _r="$1"; _l="$2"; shift 2; S25_RC=0
+    S25_OUT="$( (cd "$FR" && S25_ALL="$S25_ALL" S25_FREEZE="$S25_FREEZE" ROMDIR="$T/roms" MERGED=build/fake_merged \
+        sh "tests/$_r" --stale --log "$_l" "$@" 2>&1) )" || S25_RC=$?
+}
+names25() { awk -F'\t' 'NR > 1 {printf "%s ", $1}' "$1/results.tsv" 2>/dev/null; }
+S25_ALL="g_ond g_pass"; S25_FREEZE="g_pass"
+s25 run_all_emulator.sh "$T/l25a" --freeze
+if [ "$S25_RC" = 0 ] && [ "$(names25 "$T/l25a")" = "g_pass " ] \
+        && printf '%s\n' "$S25_OUT" | grep >/dev/null '^--stale: NOTE: left out, outside what a freeze runs (1): g_ond$'; then
+    ok "--stale --freeze: the audit asked at freeze cadence; g_pass ran, the ondemand g_ond NOTEd by name, exit 0"
+else
+    fail "--stale --freeze: exit $S25_RC, ran '$(names25 "$T/l25a")' — $(printf '%s\n' "$S25_OUT" | grep -E '^REFUSED|^--stale' | head -2 | tr '\n' ' ')"
+    vs_ctl_is stale-default-cadence && vs_ctl_fired stale-default-cadence "with the names asked at the default cadence, --stale --freeze: $(printf '%s\n' "$S25_OUT" | grep -E '^REFUSED' | head -1)"
+fi
+s25 run_all_emulator.sh "$T/l25b"
+printf '%s\n' "$S25_OUT" | grep >/dev/null 'REFUSED: --stale names gate(s) outside' && printf '%s\n' "$S25_OUT" | grep >/dev/null 'g_ond(lane mame)' \
+    && [ "$S25_RC" = 1 ] && [ ! -d "$T/l25b" ] \
+    && ok "--stale without --freeze still REFUSES the ondemand g_ond outside --scope release (exit 1, no run directory)" \
+    || fail "--stale at the default cadence on an ondemand name: exit $S25_RC — $(printf '%s\n' "$S25_OUT" | head -1)"
+S25_FREEZE="g_pass g_mist"
+s25 run_all_emulator.sh "$T/l25c" --freeze
+printf '%s\n' "$S25_OUT" | grep >/dev/null 'REFUSED: --stale names gate(s) outside' && printf '%s\n' "$S25_OUT" | grep >/dev/null 'g_mist(lane mister)' \
+    && [ "$S25_RC" = 1 ] && [ ! -d "$T/l25c" ] \
+    && ok "--stale --freeze still REFUSES a name outside the lanes (g_mist, mister lane): exit 1, no run directory" \
+    || fail "--stale --freeze on a mister-lane name: exit $S25_RC — $(printf '%s\n' "$S25_OUT" | head -1)"
+S25_ALL="g_pass g_bit"; S25_FREEZE=""
+s25 run_all_emulator.sh "$T/l25d" --cadence bitstream --lane mister
+if [ "$S25_RC" = 0 ] && [ "$(names25 "$T/l25d")" = "g_bit " ] \
+        && printf '%s\n' "$S25_OUT" | grep >/dev/null '^--stale: NOTE: left out, a cadence other than --cadence bitstream: g_pass(romset)$'; then
+    ok "--stale --cadence bitstream --lane mister: g_bit ran, the romset-cadence g_pass left out with a NOTE, exit 0"
+else
+    fail "--stale --cadence bitstream: exit $S25_RC, ran '$(names25 "$T/l25d")' — $(printf '%s\n' "$S25_OUT" | grep -E '^REFUSED|^--stale' | head -2 | tr '\n' ' ')"
+    vs_ctl_is stale-cadence-refused && vs_ctl_fired stale-cadence-refused "with the cadence drop disabled, --stale --cadence bitstream: $(printf '%s\n' "$S25_OUT" | grep -E '^REFUSED' | head -1)"
+fi
+if ! vs_ctl_is stale-default-cadence; then
+    ln -s "$T/runner_stalecad.sh" "$FR/tests/run_all_emulator_stalecad.sh"
+    S25_ALL="g_ond g_pass"; S25_FREEZE="g_pass"
+    s25 run_all_emulator_stalecad.sh "$T/l25e" --freeze; rm -f "$FR/tests/run_all_emulator_stalecad.sh"
+    printf '%s\n' "$S25_OUT" | grep >/dev/null 'g_ond(lane mame)' && [ "$S25_RC" = 1 ] \
+        && vs_ctl_fired stale-default-cadence "a runner that asks the audit at the default cadence REFUSES --stale --freeze on the ondemand g_ond — section 25 catches it" \
+        || { vs_ctl_dead stale-default-cadence "the runner asking at the default cadence: exit $S25_RC, ran '$(names25 "$T/l25e")'"; fail "stale-default-cadence"; }
+fi
+if ! vs_ctl_is stale-cadence-refused; then
+    ln -s "$T/runner_stalecaddrop.sh" "$FR/tests/run_all_emulator_stalecaddrop.sh"
+    S25_ALL="g_pass g_bit"; S25_FREEZE=""
+    s25 run_all_emulator_stalecaddrop.sh "$T/l25f" --cadence bitstream --lane mister; rm -f "$FR/tests/run_all_emulator_stalecaddrop.sh"
+    printf '%s\n' "$S25_OUT" | grep >/dev/null 'g_pass(lane mame)' && [ "$S25_RC" = 1 ] \
+        && vs_ctl_fired stale-cadence-refused "a runner without the cadence drop REFUSES --stale --cadence bitstream on the romset-cadence g_pass — section 25 catches it" \
+        || { vs_ctl_dead stale-cadence-refused "the runner without the drop: exit $S25_RC, ran '$(names25 "$T/l25f")'"; fail "stale-cadence-refused"; }
+fi
+rm -f "$FR/tests/g_mist.sh" "$FR/tests/g_bit.sh" "$FR/tools/audit_emulator_staleness.py"
 
 echo
 [ "$rc" = 0 ] && echo "PASS: run_all_emulator.sh classifies every ground-truth case correctly" \

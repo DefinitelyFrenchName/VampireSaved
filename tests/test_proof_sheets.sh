@@ -16,7 +16,9 @@
 #   or a tracked path in it, is refused; a built one keeps its own verdict), a build whose fingerprint is not the
 #   commit's frozen reference refuses the run, a checkout at another commit is refused for reuse, and an unknown
 #   --host is refused; and a CONTROL BUILD (#291 S4-A, 14z-206, Q5): a gate's `# SHEET-BUILD:` line is read (a
-#   malformed one refused), the freeze tag's own `program key` is read, and a control track built off it is refused;
+#   malformed one refused), the freeze tag's own `program key` is read, and a control track built off it is refused,
+#   and (#351) a --host run's bundle carries exactly the freeze tags its selected `legs` gates name, so the host resolves
+#   the tag, its program key and its commit (one off the commit's history) from the bundle alone;
 #   and a GATE-BUILT VARIANT (14z-206, ruled 2026-10-22): a gate's `# SHEET-VARIANT:` line is read (malformed ones
 #   refused), the variant is built in the checkout's build/ with its fingerprint stated as no frozen reference, and a
 #   builder that lands outside build/ or fails is refused;
@@ -53,7 +55,7 @@
 #   tools/setup_mame.sh emu/mame-patches/
 #   tests/lua/sheet_tap_capture.lua tests/lua/read_tap.lua build/manifest/ tests/audit_landing_sound.sh
 #   tests/lua/screen_state.lua docs/project/sheet_notes.md tests/test_tenant_select_records.sh
-#   tests/lib/ tools/build_donovan.sh
+#   tests/lib/ tools/build_donovan.sh tests/ci_emulator.tsv
 #
 # SHEET: none — the sheet tool's own ground truth on pristine vsavj; it compares no leg of ours against a reference set
 # MUST-FIRE: shadow-tool: cap-ignored — a copy of tools/proof_sheets.py that drops the capture's ACAP line must leave the capped sheet with no cap note, so the note rests on the line (in-gate: the shadow is run on the capped fixture; mode: the shadow is the tool under test and the gate FAILs)
@@ -62,6 +64,7 @@
 # MUST-FIRE: shadow-tool: build-blind — a copy of tools/proof_sheets.py whose commit check accepts any rom path must leave the ours leg that ran outside the clean checkout PROVEN, so S3's refusal rests on the check (in-gate: the shadow is run on the re-labelled sheet; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: fingerprint-blind — a copy of tools/proof_sheets.py whose build check never compares fingerprints must accept a track built off the commit's frozen reference, so the run's refusal rests on the comparison (in-gate: the shadow's check_builds on the mismatched set; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: tag-key-blind — a copy of tools/proof_sheets.py whose control check never compares the built track with the freeze tag's program key must accept a control build off its tag, so the refusal rests on the comparison (#291 S4-A; in-gate: the shadow's control_check on the mismatched key; mode: the shadow is the tool under test and the gate FAILs)
+# MUST-FIRE: shadow-tool: tags-dropped — a copy of tools/proof_sheets.py whose --host bundle carries no tags must leave the fixture's freeze tag unresolvable on the host side, so a --host run's control build rests on the tags the bundle carries (#351; in-gate: the shadow's host_units on the fixture repository; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: rompath-unresolved — a copy of tools/proof_sheets.py that keeps a leg's rom path as the gate wrote it must leave a relative element relative, so the capture's rom path rests on the resolve (#291 S4-A; in-gate: the shadow's read_sheet on a fixture leg with a relative element; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: fighters-blind — a copy of tools/proof_sheets.py whose fighters() always says yes must read the bare stage before the drop-in as showing the fighters, so the no-fighter strip rests on the measured predicate (#291 S4-B; in-gate: the shadow is run on the fighters fixture; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: intro-blind — a copy of tools/proof_sheets.py whose fighters() reads fp alone (S4-B's predicate, without the latched fighter-row count fv) must read the vs2 round intro, both fighters drawn, as showing none, so the intro's "yes" rests on fv (#291, 14z-207; in-gate: the shadow is run on the fighters fixture; mode: the shadow is the tool under test and the gate FAILs)
@@ -118,6 +121,10 @@ tag_key_blind() {  # tag_key_blind <out.py> — the shadow whose control check n
     sed -e 's/    if built != want:$/    if False:/' -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
     [ "$(command grep -c '    if False:$' "$1")" = 1 ] || { echo "the tag-key comparison was not found to drop" >&2; return 1; }
 }
+tags_dropped() {  # tags_dropped <out.py> — the shadow whose --host bundle carries no tags (#351)
+    sed -e 's/^    err = make_bundle(sha, path, needed, repo)$/    err = make_bundle(sha, path, (), repo)  # shadow/' -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
+    [ "$(command grep -c '# shadow$' "$1")" = 1 ] || { echo "the host bundle's tags were not found to drop" >&2; return 1; }
+}
 rompath_unresolved() {  # rompath_unresolved <out.py> — the shadow that keeps a leg's rom path as written
     sed -e 's/"rompath": abs_rompath(f\[5\])/"rompath": f[5]/' -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
     [ "$(command grep -c '"rompath": f\[5\]' "$1")" = 1 ] || { echo "the rom path resolve was not found to drop" >&2; return 1; }
@@ -169,6 +176,7 @@ if vs_ctl_is undefined-tag; then undefined_tag "$W/shadow.py" || shadow_refused;
 if vs_ctl_is no-split; then no_split "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
 if vs_ctl_is strip-ignored; then strip_ignored "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
 if vs_ctl_is rompath-unresolved; then rompath_unresolved "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is tags-dropped; then tags_dropped "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
 if vs_ctl_is tag-key-blind; then tag_key_blind "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
 if vs_ctl_is build-blind; then build_blind "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
 if vs_ctl_is fingerprint-blind; then fingerprint_blind "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
@@ -637,6 +645,51 @@ pu() { awk -v c="$1" '$1 == c {$1 = ""; sub(/^ /, ""); print}' "$W/page.txt"; }
 [ "$(pu who)" = True ] && ok "the index's gate row and the gate page name who plays whom, from the cells' reads" || nope "who lines: '$(pu who)'"
 [ "$(pu setup)" = True ] && ok "a section's Setup: line is the gate's setup, and stays out of its notes" || nope "setup line: '$(pu setup)'"
 
+echo "== 4d. #351: a --host bundle carries the control builds' freeze tags ($TOOL; a fixture repository, no host)"
+host_units() {  # host_units <tool> -> one line per case: <case> <True|False>
+    HT="$W/ht_$(basename "$1" .py)"; rm -rf "$HT"; mkdir -p "$HT/repo/tests" "$HT/host"
+    python3 - "$1" "$HT" "$REPO" <<'PYH'
+import importlib.util, os, subprocess, sys
+spec = importlib.util.spec_from_file_location("ps", sys.argv[1]); ps = importlib.util.module_from_spec(spec); spec.loader.exec_module(ps)
+ht, repo = sys.argv[2], sys.argv[3]; R = ht + "/repo"
+def git(*a, cwd=R):
+    return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t"] + list(a), cwd=cwd, capture_output=True, text=True, check=True).stdout.strip()
+legs = "# SHEET: legs ours,vsavj \u2014 moments: m \u2014 not comparable: n\n"
+open(R + "/tests/ci_emulator.tsv", "w").write("# registry\ng_ctl\tprereq\tondemand\ng_plain\tprereq\tondemand\ng_none\tprereq\tondemand\n")
+open(R + "/tests/g_ctl.sh", "w").write("#!/bin/sh\n" + legs + "# SHEET-BUILD: CTL_BUILD freeze/t-side MERGED \u2014 the control leg\nset -u\n")
+open(R + "/tests/g_plain.sh", "w").write("#!/bin/sh\n" + legs + "set -u\n")
+open(R + "/tests/g_none.sh", "w").write("#!/bin/sh\n# SHEET: none \u2014 no leg\n# SHEET-BUILD: CTL_BUILD freeze/t-other MERGED \u2014 not drawn\nset -u\n")
+git("init", "-q"); git("add", "tests"); git("commit", "-qm", "a")
+a = git("rev-parse", "HEAD")
+side = git("commit-tree", a + "^{tree}", "-p", a, "-m", "side")          # the tag's commit: NOT in the commit's history
+git("tag", "-a", "freeze/t-side", side, "-m", "freeze/t-side\n\nprogram key    " + "ab" * 20)
+git("tag", "-a", "freeze/t-other", a, "-m", "freeze/t-other\n\nprogram key    " + "cd" * 20)
+print("needed-all", ps.commit_control_tags(a, None, None, None, R) == ["freeze/t-side"])
+print("needed-one", ps.commit_control_tags(a, ["g_plain"], None, None, R) == [])
+print("needed-real", ps.commit_control_tags("HEAD", ["audit_landing_sound"], None, None, repo) == ["freeze/merged-m22"])
+b = ht + "/c.bundle"
+err, needed, carried = ps.host_bundle(a, None, None, None, b, R)
+print("carried", err is None and carried == {"freeze/t-side": git("rev-parse", "refs/tags/freeze/t-side")})
+# the host side: a checkout from the bundle alone, freeze tags resolved only from what it carried (cmd_run --bundle)
+ok = ps.make_checkout(a, ht + "/host/tree", b, False) is None
+ps.bundle_tag_source(ht + "/host/tree")
+c = ps.tag_commit("freeze/t-side")
+ok = ok and c == side and ps.tag_program_key("freeze/t-side") == "ab" * 20 and ps.make_checkout(side, ht + "/host/ctl", b, False) is None
+print("host", ok and git("rev-parse", "HEAD", cwd=ht + "/host/ctl") == side)
+print("host-only-sent", ps.tag_commit("freeze/t-other") == "" and ps.tag_program_key("freeze/t-other") is None)
+PYH
+}
+host_units "$TOOL" > "$W/host_units.txt" 2>&1
+hu() { awk -v c="$1" '$1 == c {print $2}' "$W/host_units.txt"; }
+[ "$(hu needed-all)" = True ] && [ "$(hu needed-one)" = True ] && [ "$(hu needed-real)" = True ] \
+    && ok "the tags a --host run needs are read from the commit: its legs gates' SHEET-BUILD tags, only the selected ones (audit_landing_sound at HEAD: freeze/merged-m22)" \
+    || nope "the needed tags: all '$(hu needed-all)', one gate '$(hu needed-one)', HEAD's audit_landing_sound '$(hu needed-real)' ($(tail -1 "$W/host_units.txt"))"
+[ "$(hu carried)" = True ] && ok "the --host bundle carries the freeze tag (its tag object), read back from the bundle" \
+    || nope "the bundle's tags: '$(hu carried)' ($(tail -1 "$W/host_units.txt"))"
+[ "$(hu host)" = True ] && [ "$(hu host-only-sent)" = True ] \
+    && ok "on the host side the tag, its program key and its commit (off the commit's history) resolve from the bundle alone; a tag not sent does not" \
+    || nope "the host side: resolved '$(hu host)', only what was sent '$(hu host-only-sent)'"
+
 echo "== 5. must-fire controls"
 if frame_blind "$W/fb.py"; then
     S2="$W/sheet2"; cp -R "$S" "$S2"; rm -rf "$S2/capture" "$S2/proof.json"
@@ -687,6 +740,13 @@ if rompath_unresolved "$W/rpu.py"; then
     if [ "$g" = "build/x/rompath;$ROMDIR" ]; then vs_ctl_fired rompath-unresolved "a tool keeping the rom path as written leaves '$g' relative"
     else vs_ctl_dead rompath-unresolved "the shadow read '$g'"; nope "control rompath-unresolved"; fi
 else vs_ctl_dead rompath-unresolved "the rom path resolve was not found to drop"; nope "control rompath-unresolved"; fi
+
+if tags_dropped "$W/tdr.py"; then
+    host_units "$W/tdr.py" > "$W/tdr.txt" 2>&1
+    g="$(awk '$1 == "carried" || $1 == "host" {printf "%s ", $2}' "$W/tdr.txt")"
+    if [ "$g" = "False False " ]; then vs_ctl_fired tags-dropped "a --host bundle without the tags leaves the freeze tag unresolvable on the host side"
+    else vs_ctl_dead tags-dropped "the shadow read carried/host '$g'"; nope "control tags-dropped"; fi
+else vs_ctl_dead tags-dropped "the host bundle's tags were not found to drop"; nope "control tags-dropped"; fi
 
 if tag_key_blind "$W/tkb.py"; then
     g="$(s3_units "$W/tkb.py" | awk '$1 == "ctl-off" {print $2}')"

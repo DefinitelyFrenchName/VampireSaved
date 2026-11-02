@@ -14,16 +14,17 @@ driver reads that table, so the order a close runs in cannot drift from the orde
   python3 tools/close.py run STEP [--run DIR]       re-runs one auto step (after a fix)
       A RED step whose command confirms on {PREV} and writes {RUN}/tier_results.tsv (the tier) is re-run with
       --confirm on THE RED RUN'S results, kept as {RUN}/tier_results.red-<utc>.tsv, not on the previous close's (#317):
-      the re-run re-runs what was not PASS there or changed since, and carries the rest
+      the re-run re-runs what was not PASS there or changed since, and carries the rest; a red run that judged no gate
+      (refused before its runner, or at its --confirm plan: a header-only results file, #355) leaves {PREV} standing
   python3 tools/close.py done STEP "EVIDENCE" [--run DIR]
       marks a manual step done, or passes a RED auto step by hand (shown as such); never a step not yet reached
   python3 tools/close.py status [--run DIR]         every step, its state, the commit it ran at, and NEXT
   python3 tools/close.py inputs [--run DIR]         the close-time input files exist (the `inputs` step)
   python3 tools/close.py check [--root DIR]         the table parses, its commands name only tools and tests that
       exist and only known placeholders, and the four live documents point to docs/project/session_close.md
-  python3 tools/close.py --selftest [--perturb verdict-ignored|red-base-ignored]
+  python3 tools/close.py --selftest [--perturb verdict-ignored|red-base-ignored|header-only-base]
       a synthetic table with known answers; the perturbed drivers (every exit read as 0; a re-run after a red based on
-      {PREV} again) must FAIL it
+      {PREV} again; a re-run after a plan-refused red based on its header-only results file) must FAIL it
 
 WITHOUT --run, the run directory is $CLOSE_RUN (which the driver sets for every command it runs), else the newest
 build/agent*/close/ holding a close_params.tsv.
@@ -151,8 +152,10 @@ def judge(verdict, rc, log):
 def red_base(run, row, state):
     """#317: the base a RED tier step is re-run on — the red run's own results, copied aside so the re-run's results
     file never overwrites the base it reads; None when the step is not a red confirming tier, or when the red run wrote
-    no results of its own (refused before its runner: the results file is older than the red run's log), and the
-    previous base then stands"""
+    no results of its own, and the previous base then stands. No results of its own is either (a) refused before its
+    runner: the results file is older than the red run's log, or (b) #355: refused inside its runner before any gate
+    was judged (its --confirm plan refused): tests/run_all_static.sh writes the header block, then exits 2 without a
+    gate row, so a results file with no gate row is no base — confirming on it carries nothing and runs every gate"""
     step, cmd = row[0], row[2]
     if PERTURB == "red-base-ignored":   # the known-bad driver: a re-run after a red confirms on {PREV} again
         return None
@@ -163,6 +166,8 @@ def red_base(run, row, state):
         return None
     m = re.match(r"# (\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ) ", open(logp, encoding="utf-8", errors="replace").readline())
     if not m or os.path.getmtime(res) < calendar.timegm(datetime.datetime.strptime(m.group(1), "%Y-%m-%dT%H:%M:%SZ").timetuple()):
+        return None
+    if not read_tsv(res) and PERTURB != "header-only-base":   # #355 (b): no gate row — the known-bad driver takes it
         return None
     keep = os.path.join(run, "tier_results.red-" + utc().replace(":", "") + ".tsv")
     shutil.copyfile(res, keep)
@@ -390,6 +395,22 @@ def selftest():
         walk(d, crun, crows)
         b4 = open(os.path.join(crun, "bases.txt")).read().split()[3:]
         say(b4 == ["previous-close"], f"a red run that wrote no results of its own leaves the previous base (read: {b4})")
+        # #355: a red run refused at its --confirm plan writes the results header and no gate row, AFTER its log
+        # (tests/run_all_static.sh); the re-run must not confirm on that header-only file, so {PREV} stands
+        open(os.path.join(d, DOC), "w").write(conf.replace(
+            "test -f {RUN}/go`", "test -f {RUN}/planrefuse && echo '# gate verdict' > {RUN}/tier_results.tsv; test -f {RUN}/go`"))
+        crows = steps(open(os.path.join(d, DOC)).read())
+        os.remove(os.path.join(crun, "go"))
+        open(os.path.join(crun, "planrefuse"), "w").write("")
+        st = read_tsv(os.path.join(crun, "close_state.tsv"))
+        st["tier"] = ["RED", utc(), "-", "by hand"]
+        write_state(crun, st, ["tier"])
+        walk(d, crun, crows)                       # the plan-refused red: based on the previous close, header only
+        hdr = read_tsv(os.path.join(crun, "tier_results.tsv")) == {} and os.path.getsize(os.path.join(crun, "tier_results.tsv")) > 0
+        walk(d, crun, crows)                       # its re-run
+        b5 = open(os.path.join(crun, "bases.txt")).read().split()[5:]
+        say(hdr and b5 == ["previous-close"],
+            f"a red run refused at its plan (a header-only results file, newer than its log) leaves the previous base (read: {b5}) (#355)")
         bad = ("<!-- CLOSE STEPS: x -->\n| step | kind | command | verdict | done when | from |\n|---|---|---|---|---|---|\n"
                "| one | auto | `echo {NOPE}` | exit 0 | a | r |\n"
                "| four | auto | `python3 tools/gone.py` | exit 0 | d | r |\n"

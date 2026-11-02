@@ -38,6 +38,23 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-218 — **(in progress) #310's crash-injection sweep gate built (`tests/test_crash_sweep.sh`); #347, #349, #351, #353, #355 fixed and gated; #345 analysed with captures; #356 filed and censused.**
+
+### opened with
+The 14z-217 close's opener; `python3 tools/agent/sweep.py` CLEAN. The maintainer: **"read handoff.md, state.md and
+docs/next_session.md"**, then **"Start on #310 and the bugs, use all machines"**. PILOT and ERIS moved to `main` `3e1a7091`
+by bundle. Working evidence: `build/agent218/` (local).
+
+### (1) #310 — THE CRASH-INJECTION SWEEP
+In progress; the record is written at the close.
+
+### (2) THE BUGS: #345, #347, #349, #351, #353, #355
+In progress; the record is written at the close.
+
+### (3) #356 FILED (the maintainer, on #345's sheet 3: *"This is a real gap I never caught and now I think we need to check
+everywhere these speed lines are, which includes but is not limited to dashing forward and backward"*)
+Census done (`build/agent218/tspeed/REPORT.md`, local); captures sent; the fix option is the maintainer's.
+
 ## Session 14z-217 — **M24 RELEASED (`freeze/merged-m24` on GitHub from `be40e6f3`, merged-m23's zips pruned) after every release gate GREEN on the Mac, ERIS and PILOT; the proof sheets published at alexrichard.org/vs-proof-sheets/; #127, #162, #294, #338 closed done on rule-checker runs -1566 and -1569; #350 found at the sheets' upload, fixed and gated, closed on run -1572; #351-#354 filed from the release's findings.**
 
 ### opened with
@@ -109,6 +126,24 @@ sections (this group; a pointer on 14z-216 (1b)); next-session (the 14z-216 open
 unclassed; five assets uploaded, `datasets` re-pointed: actions v6, costly v26, figures v26, rc_runs v26, tiers v27) — done.
 The records also carry the 14z-216 close's after-push lines and its opener note, uncommitted until now as they said. The
 tier's results: `build/agent217/close/tier_results.tsv`, the next close's `--prev`.
+- **Then:** the tier's first run was refused at its `--confirm` plan (`build/sheets_web`'s 23,429 files, not yet classed:
+  classed `scratch` in `tests/expected/build_dirs.tsv`); the driver then based the re-run on that run's header-only results
+  (#355, filed), so every gate ran: PASS 108, FAIL 3 (`test_gate_index_current`, `test_gate_coverage_current`: the gate pages
+  regenerated in a clean checkout of the staged tree after #350's header edit; `test_controls_concurrent`:
+  `test_proof_sheets_web` taken off `tests/controls_concurrent.txt` until the next freeze's re-trace). The third run GREEN,
+  PASS 111 (`build/agent217/close/tier_results.tsv`, tree `46daa883`); committed `3e1a7091`; pins and sweep clean; pushed
+  `main` `0e5a5bee..3e1a7091`; the ledger page published (`8997b737` on `gh-pages`; the own site skipped, no `DEPLOY_TARGET`).
+  #355 filed during the tier, its index row written after the push. These last lines and that row ride the next close,
+  uncommitted.
+- **Then, the remote scratch** (the maintainer: *"do it"*, to clearing the lists the opener carried): PILOT's 64 paths
+  (14z-216's re-trace `~/rt216*` and its scripts, `~/m24_*`, `~/t216_*`, 14z-217's `~/proof_sheets/`, `/tmp/emu_p217_*.tgz`,
+  `~/vampire-saved/build/emu_p216_*`, `emu_p217_*`, `desktop_release_fail1`) and ERIS's 38 (14z-216's `~/rt216*`,
+  `~/psw216*`, `~/lad216*`, `~/e216*`, its scripts and five bundles, `~/rel216_out`, `build/emu_rel216_eris`, the Windows
+  side's `tree217.tgz`, `t217`, `emu_rel216_eris.tgz`) deleted after a listing; none left, no job running; PILOT 48 to 65 GB
+  free. The opener's "all copied to the Mac" was WRONG for three PILOT dirs: `emu_p217_desk`, `emu_p217_desk_fail1` and
+  `desktop_release_fail1` (the Mac held 2 MB of that one's 57, as `build/agent217/release/desk_fail`). All three, the `.out`
+  files and ERIS's `rel216_out` were copied before the deletion (`build/agent217/release/pilot_copies/`, `eris_copies/`;
+  file counts equal: 13, 10, 67). Uncommitted, riding the next close.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
@@ -116,6 +151,7 @@ tier's results: `build/agent217/close/tier_results.tsv`, the next close's `--pre
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **#356 is built next session as Option 1 (a tenant-only copy of the speed-line effect with vs2's 14-row tables), with the raw allocator, and frozen as M25 (2026-11-02, 14z-218)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356".
 - **#345's rows may turn DIFF under a non-zero RNG; the parity gates keep the 0000 pin (2026-11-01, 14z-216):** `tools/rng_forms.py` exempts rows `after:` a SLOWDOWN root, by name — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #345's rows under a non-zero RNG".
 - **A new zero-pass frame native vs2 has too is accepted, frame by frame (2026-11-01, 14z-216, #294):** `audit_lag_budget`'s ACCEPTED list (today donovan_2:3094, vs2's 3098, checked against `pass_overrun.tsv`'s native row), re-confirmed on the captures as *"a tradeoff. #345 is there to fix it later"*; the no-new-lag rule stands for every other frame — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #294's lag frame" and "…re-confirmed on the captures".
 - **ERIS tiers skip parity; the Mac's parity run is the row of record (#321, 2026-10-26, 14z-209):** ERIS runs `--skip test_mame_parity` — `DECISIONS_HISTORY.md` "Ruled 2026-10-26 (14z-209) — #321 phase 2".

@@ -71,14 +71,20 @@ for t in $TOOLS; do
     fi
 done
 
+# THE IN-GATE TWINS RUN ONLY IN THE PLAIN RUN (#310, 14z-218): a mode runs the sections its perturbation reaches
+# (docs/project/must_fire_contract.md). Until then every mode ran all three twins too, so a twin's copy that crashed
+# (a CONTROL DEAD of ANOTHER control, its traceback never printed) gave a mode the exit 1 it read as HONOURED.
 # the must-fire control: the unfixed copy must write 0x97
-strip_reconfigure tools/bundle_win_dlls.py "$W/ctl.py"
-set -- $(counts "$W/ctl.py")
-if [ "$2" -ge 1 ]; then
-    echo "CONTROL FIRED: reconfigure-removed — the copy without the reconfigure lines wrote $2 cp1252 0x97 byte(s)"
-else
-    echo "CONTROL DEAD: reconfigure-removed — the copy without the reconfigure lines wrote no 0x97 byte (the stand-in no longer reproduces the pipe)"
-    fail=1
+if [ -z "${CONTROL:-}" ]; then
+    strip_reconfigure tools/bundle_win_dlls.py "$W/ctl.py"
+    set -- $(counts "$W/ctl.py")
+    if [ "$2" -ge 1 ]; then
+        echo "CONTROL FIRED: reconfigure-removed — the copy without the reconfigure lines wrote $2 cp1252 0x97 byte(s)"
+    else
+        vs_ctl_show_err "$W/out" || true
+        echo "CONTROL DEAD: reconfigure-removed — the copy without the reconfigure lines wrote no 0x97 byte (the stand-in no longer reproduces the pipe)"
+        fail=1
+    fi
 fi
 
 # ── THE APPLIER (#212) on a synthetic release: no ROM byte, no ROMDIR ──
@@ -127,13 +133,16 @@ else
     vs_ctl_show_err "$W/apply_cp1252.txt" || true   # the copy's cp1252 leg must write 0x97, not crash (#310 group 5)
 fi
 # the must-fire control: the unfixed applier must crash under cp932 after writing
-strip_reconfigure tools/apply_release.py "$W/apply_ctl.py"
-set -- $(apply "$W/apply_ctl.py" cp932)
-if [ "$1" -ne 0 ] && [ "$4" -ge 1 ]; then
-    echo "CONTROL FIRED: applier-reconfigure-removed — the copy without the reconfigure lines exited $1 with UnicodeEncodeError under cp932"
-else
-    echo "CONTROL DEAD: applier-reconfigure-removed — the copy without the reconfigure lines exited $1 with $4 UnicodeEncodeError line(s) (the synthetic run no longer reaches the dash)"
-    fail=1
+if [ -z "${CONTROL:-}" ]; then
+    strip_reconfigure tools/apply_release.py "$W/apply_ctl.py"
+    set -- $(apply "$W/apply_ctl.py" cp932)
+    if [ "$1" -ne 0 ] && [ "$4" -ge 1 ] && vs_ctl_show_err "$W/apply_cp932.txt" UnicodeEncodeError; then
+        echo "CONTROL FIRED: applier-reconfigure-removed — the copy without the reconfigure lines exited $1 with UnicodeEncodeError under cp932"
+    else
+        [ "$1" -ne 0 ] && [ "$4" -ge 1 ] || vs_ctl_show_err "$W/apply_cp932.txt" || true
+        echo "CONTROL DEAD: applier-reconfigure-removed — the copy without the reconfigure lines exited $1 with $4 UnicodeEncodeError line(s) (the synthetic run no longer reaches the dash)"
+        fail=1
+    fi
 fi
 
 # THE OLD-PYTHON CHECK (rule-checker run 2026-10-03-605): the applier promises "Python 3", and
@@ -167,16 +176,23 @@ if [ "$r" -eq 0 ] && [ -f "$W/out_oldpy/out.zip" ]; then
     echo "  ok: tools/apply_release.py — exit 0 and the set written with streams lacking reconfigure (Python < 3.7)"
 else
     echo "  FAIL: tools/apply_release.py — exit $r with streams lacking reconfigure (Python < 3.7): $(tail -1 "$W/out_oldpy.log")"; fail=1
+    # #310 (14z-218): under guard-removed the honoured end IS the unguarded copy's AttributeError; any other end, and any
+    # crash outside the mode, is re-printed (until then a crash here read as the mode's finding, its traceback cut to tail -1)
+    if [ "${CONTROL:-}" = "guard-removed" ]; then vs_ctl_show_err "$W/out_oldpy.log" AttributeError || true
+    else vs_ctl_show_err "$W/out_oldpy.log" || true; fi
 fi
-unguard tools/apply_release.py "$W/apply_unguarded.py"
-if grep -q 'hasattr(sys' "$W/apply_unguarded.py"; then
-    echo "CONTROL DEAD: guard-removed — the perturbation did not remove the guard"; fail=1
-else
-    r=$(oldpy "$W/apply_unguarded.py" "$W/out_unguarded")
-    if [ "$r" -ne 0 ] && grep -q "AttributeError" "$W/out_unguarded.log"; then
-        echo "CONTROL FIRED: guard-removed — the unguarded copy exited $r with AttributeError on streams lacking reconfigure"
+if [ -z "${CONTROL:-}" ]; then
+    unguard tools/apply_release.py "$W/apply_unguarded.py"
+    if grep -q 'hasattr(sys' "$W/apply_unguarded.py"; then
+        echo "CONTROL DEAD: guard-removed — the perturbation did not remove the guard"; fail=1
     else
-        echo "CONTROL DEAD: guard-removed — the unguarded copy exited $r (the wrapper no longer hides reconfigure)"; fail=1
+        r=$(oldpy "$W/apply_unguarded.py" "$W/out_unguarded")
+        if [ "$r" -ne 0 ] && grep -q "AttributeError" "$W/out_unguarded.log" && vs_ctl_show_err "$W/out_unguarded.log" AttributeError; then
+            echo "CONTROL FIRED: guard-removed — the unguarded copy exited $r with AttributeError on streams lacking reconfigure"
+        else
+            [ "$r" -ne 0 ] && grep -q "AttributeError" "$W/out_unguarded.log" || vs_ctl_show_err "$W/out_unguarded.log" || true
+            echo "CONTROL DEAD: guard-removed — the unguarded copy exited $r (the wrapper no longer hides reconfigure)"; fail=1
+        fi
     fi
 fi
 

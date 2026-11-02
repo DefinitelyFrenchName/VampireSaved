@@ -7560,6 +7560,9 @@ PILOT, where they run, one of them (`test_mister_mra_map`) has two controls writ
 `/tmp/vampire-saved-jtsim`. `tools/controls_overlap.py` now marks a gate whose every control SKIPped HOLLOW, never
 SAFE. Same family as "A TRACE TAKEN WHERE A GATE SKIPS SCORES THE SKIP, NOT THE GATE" (#286). **The rule:** a trace
 answers only for a gate that ran; trace each gate on a host where it runs, and say which host in the list.
+*(14z-218, #349: the scorer is stricter now — it certifies a gate only when every control run reads HONOURED under
+`tests/lib/classify.sh`; a gate with any run REFUSED, TIMEOUT, UNJUDGED or SKIP reads HOLLOW. The 14z-216 instance: ERIS's
+`test_readme_recording` controls all REFUSED, read SAFE.)*
 
 ## A STALE SUBMODULE `index.lock` MAKES EVERY `git status` RE-READ THE WHOLE SUBMODULE — and every snapshot copies it (paid: 14z-208, #317)
 
@@ -7820,6 +7823,11 @@ HEAD as the commit of record. 14z-213's #310 rerun on ERIS (the `audit_kill_poke
 `3117828a`) reused the first run's `build/emu_e213`: its `results.tsv` held the `0a1b9233` run's LIES row for
 `audit_kill_poke_shape@two-byte-flowed` beside the new run's honoured one, and its `commit.txt` still named `0a1b9233`. **The rule:** every fresh run gets a fresh `--log` directory (`build/emu_e213c` here);
 reuse a directory only to `--resume` the run that wrote it, and read `commit.txt` before trusting a results file.
+**Paid again 14z-217** (PILOT's `audit_release_linux_desktop` re-run into the red run's directory read NOT GREEN on
+the old FAIL row beside the new PASS), **and ENFORCED 14z-218 (#353):** `tests/run_all_emulator.sh` now REFUSES (exit 1,
+before the ROM audit, nothing written) a `--log` directory that already holds a run — `commit.txt`, `identity.tsv`,
+`identity_end.tsv`, a `run_record_*.json`, or a `results.tsv` with a row — unless `--resume` continues it; an absent or
+empty directory, or one holding only a dry run's header, is fresh (`tests/test_emulator_runner.sh` section 24).
 
 ## A GATE THAT REACHES AN EMULATOR THROUGH SOMETHING THE TIER CLASSIFIER DOES NOT NAME IS A DEAD ROW — every strict emulator run read NOT GREEN with every row PASS (paid: 14z-196 and 14z-213, #340)
 
@@ -7924,3 +7932,13 @@ unchanged and passed. Before reading DEAD as "the check is blind", the real file
 so the write had not reached them. **The rule:** a planted change INVERTS what is there (`b[i] ^= 0xFF`), never writes a
 constant; and a control that reads DEAD is first asked whether the plant changed anything (`cmp` the copy against the
 original). The fixed control is `build/agent216/m24/rc_freeze/relid/pilot_binaries.sh` (local); both dirs then read FIRED.
+
+## A PATH TRACING SHIM AROUND `sh` CHANGES A PROCESS-TREE GATE'S WORLD — `test_agent_sweep`'s plain run FAILS under it, with or without the `pyx` hook (paid: 14z-218, the Mac; #310)
+
+The crash sweep's tracer (`build/agent218/t310/trace_gate2.sh`) puts a `sh` shim first on PATH that logs and `exec`s the
+real shell. `test_agent_sweep` plants a process world and checks the tree the sweep reads; under the shim its plain run
+reads `MISMATCH phase 1: the tool shell's child was not listed under it` three times out of three, while the plain run
+and a run with only the `pyx` hook on PYTHONPATH pass. The planting shim (`tests/lib/crash_sweep.sh`) passes a `sh` call
+straight through unless the row plants `sh`, and its count-only runs of that gate PASS. **The rule:** a trace of a gate
+that inspects process trees is a candidate list, not a baseline; judge each row against the gate's count-only run under
+the PLANTING shim, never against a run under the tracer.

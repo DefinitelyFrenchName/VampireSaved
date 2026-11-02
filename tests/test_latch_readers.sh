@@ -102,17 +102,22 @@ python3 "$TOOL" "$W/vsav2.op" --label vs2 --selftest vs2 --tsv "$W/vs2.tsv" > "$
 python3 "$TOOL" "$W/vsavj.op" --label vsavj --selftest vsavj --tsv "$W/vsavj.tsv" > "$W/vsavj.log" 2>&1 || bad "vsavj census: $(grep -E '^(FAIL|  FAIL)' "$W/vsavj.log" | head -2 | tr '\n' ' ')"
 python3 "$TOOL" "$MERGED" --label merged --tsv "$W/merged.tsv" > "$W/merged.log" 2>&1 || bad "merged census failed: $(tail -1 "$W/merged.log")"
 if [ "$CONTROL" = nearest-decode ]; then
+    for _l in vs2 vsavj merged; do vs_ctl_show_err "$W/$_l.log" || true; done   # #310 (14z-218): a crash beside the finding is re-printed
     if grep -q '^  FAIL  control PRG:0x00712A' "$W/vs2.log"; then echo "CONTROL FIRED: nearest-decode — the pre-#197 scan misses the immediate store vs2 PRG:0x00712A"; echo "FAIL: test_latch_readers (control mode)"; exit 1
     else echo "CONTROL DEAD: nearest-decode — the pre-#197 scan found the immediate store"; echo "FAIL: test_latch_readers"; exit 1; fi
 fi
 if [ "$CONTROL" = blind-census ]; then
-    # #310 group 5: the shadow's failure counts only as a positive-control FAIL line; a crash prints none
+    # #310 group 5: the shadow's failure counts only as a positive-control FAIL line; a crash prints none — and a crash in
+    # one census beside another's FAIL line is re-printed (14z-218), not read as the shadow caught
+    for _l in vs2 vsavj merged; do vs_ctl_show_err "$W/$_l.log" || true; done
     if [ "$fail" = 1 ] && grep -q '^  FAIL  control ' "$W/vs2.log" "$W/vsavj.log"; then echo "CONTROL FIRED: blind-census — the shadow tool fails its positive controls"; echo "FAIL: test_latch_readers (control mode)"; exit 1
-    elif [ "$fail" = 1 ]; then for _l in vs2 vsavj merged; do vs_ctl_show_err "$W/$_l.log" || true; done
+    elif [ "$fail" = 1 ]; then
         echo "NOT JUDGED: blind-census — the shadow tool failed without a positive-control FAIL line, so nothing was judged"; echo "FAIL: test_latch_readers (control mode)"; exit 1
     else echo "CONTROL DEAD: blind-census — the shadow tool passed its positive controls"; echo "FAIL: test_latch_readers"; exit 1; fi
 fi
-[ "$fail" = 0 ] || { echo "FAIL: test_latch_readers"; exit 1; }
+# #310 (14z-218): a census that crashed showed only `tail -1` of its log, so under dropped-reader its exit here read as
+# the dropped row caught (HONOURED) though the comparison never ran — the crash is re-printed (DIED)
+[ "$fail" = 0 ] || { for _l in vs2 vsavj merged; do vs_ctl_show_err "$W/$_l.log" || true; done; echo "FAIL: test_latch_readers"; exit 1; }
 ok "positive controls: $(grep -c '^  ok    control' "$W/vs2.log") vs2 + $(grep -c '^  ok    control' "$W/vsavj.log") vsavj known sites found with their class"
 
 # the measured inventory: image, addr, offset, what, class, width, mnemonic, operands
@@ -137,19 +142,21 @@ import struct, sys
 w = [0x4e71]*4 + [0x13fc, 0x0001, 0x00ff, 0x87bd] + [0x4e71]*2 + [0x13c0, 0x00ff, 0x8bc2] + [0x4e71]*2 + [0x1d7c, 0x0005, 0x03e0] + [0x4e71]*4
 open(sys.argv[1], "wb").write(struct.pack(f">{len(w)}H", *w))
 PY
-planted_rows() { python3 "$1" "$W/planted.op" --label planted --tsv "$2" > /dev/null 2>&1; grep '^0x' "$2" | cut -f1,2,4 | tr '\t' ' ' | tr '\n' '|'; }
+# the tool's output is kept beside the table (<tsv>.log): a crash there is re-printed, never read as rows missed (#310, 14z-218)
+planted_rows() { python3 "$1" "$W/planted.op" --label planted --tsv "$2" > "$2.log" 2>&1; grep '^0x' "$2" 2>/dev/null | cut -f1,2,4 | tr '\t' ' ' | tr '\n' '|'; }
 want='0x000008 0x3BD write|0x000014 0x3C2 write|0x00001E 0x3E0 write|'
-got="$(planted_rows "$TOOL" "$W/planted.tsv")"
+got="$(planted_rows "$TOOL" "$W/planted.tsv")" || got="(the tool failed)"   # set -e: a crash ended the gate silently (#310)
 [ "$got" = "$want" ] && ok "every planted form found: abs.l immediate, abs.l register, (d16,An) immediate" \
-    || bad "the planted image reads [$got], not [$want]"
+    || { bad "the planted image reads [$got], not [$want]"; vs_ctl_show_err "$W/planted.tsv.log" || true; }
 echo "== 3. the frozen inventory"
 if [ "${FREEZE:-0}" = 1 ]; then
     cp "$W/got.tsv" "$EXPECT"; echo "  FROZE  $(basename "$EXPECT") — VERIFY by re-running without FREEZE"; exit 0
 fi
 [ -f "$EXPECT" ] || { echo "FAIL: no frozen inventory at $EXPECT (FREEZE=1 to create it)"; exit 1; }
-WANT="$EXPECT"
+WANT="$EXPECT"; pre_fail="$fail"; dropped=""
 if [ "$CONTROL" = dropped-reader ]; then
     first="$(awk -F'\t' '!/^#/ && $1=="vs2" && $5=="read" {print NR; exit}' "$EXPECT")"
+    dropped="$(sed -n "${first}p" "$EXPECT")"
     awk -v n="$first" 'NR!=n' "$EXPECT" > "$W/perturbed.tsv"; WANT="$W/perturbed.tsv"
 fi
 grep -v '^#' "$WANT" > "$W/want.rows"; grep -v '^#' "$W/got.tsv" > "$W/got.rows"
@@ -160,7 +167,10 @@ else
     head -20 "$W/diff.txt"
 fi
 if [ "$CONTROL" = dropped-reader ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: dropped-reader — the inventory minus one vs2 read row fails the comparison"; echo "FAIL: test_latch_readers (control mode)"; exit 1
+    # #310 (14z-218): the mode counts only ITS finding — the comparison naming the dropped row — and only when nothing
+    # failed before the comparison (a whole-run fail flag read a crash in section 2b as the row caught)
+    if [ "$pre_fail" = 1 ]; then echo "NOT JUDGED: dropped-reader — the gate failed before the comparison, so the dropped row was not judged"; echo "FAIL: test_latch_readers (control mode)"; exit 1
+    elif [ "$fail" = 1 ] && [ -n "$dropped" ] && grep -qxF "> $dropped" "$W/diff.txt"; then echo "CONTROL FIRED: dropped-reader — the inventory minus one vs2 read row fails the comparison"; echo "FAIL: test_latch_readers (control mode)"; exit 1
     else echo "CONTROL DEAD: dropped-reader — a missing row went unnoticed"; echo "FAIL: test_latch_readers"; exit 1; fi
 fi
 
@@ -181,10 +191,11 @@ if python3 "$W/nearest_tool.py" "$W/vsav2.op" --selftest vs2 > "$W/nearest.log" 
     echo "CONTROL DEAD: nearest-decode — the pre-#197 scan passed its positive controls"; fail=1
 elif grep -q '^  FAIL  control PRG:0x00712A' "$W/nearest.log"; then
     echo "CONTROL FIRED: nearest-decode — $(grep '^  FAIL  control PRG:0x00712A' "$W/nearest.log" | sed 's/^ *//')"
-    pr="$(planted_rows "$W/nearest_tool.py" "$W/planted_nearest.tsv")"
+    pr="$(planted_rows "$W/nearest_tool.py" "$W/planted_nearest.tsv")" || pr="(the tool failed)"
     [ "$pr" = "0x000014 0x3C2 write|" ] && echo "  ok    nearest-decode on the planted image: only the register form found ($pr) — both immediate forms missed" \
-        || { echo "  FAIL  nearest-decode on the planted image reads [$pr]"; fail=1; }
-else echo "CONTROL DEAD: nearest-decode — the copy failed, but not on the immediate store: $(grep -m1 FAIL "$W/nearest.log")"; fail=1; fi
+        || { echo "  FAIL  nearest-decode on the planted image reads [$pr]"; fail=1; vs_ctl_show_err "$W/planted_nearest.tsv.log" || true; }
+else vs_ctl_show_err "$W/nearest.log" || true
+    echo "CONTROL DEAD: nearest-decode — the copy failed, but not on the immediate store: $(grep -m1 FAIL "$W/nearest.log")"; fail=1; fi
 # dropped-reader: the frozen file minus one read row must differ from itself
 first="$(awk -F'\t' '!/^#/ && $1=="vs2" && $5=="read" {print NR; exit}' "$EXPECT")"
 grep -v '^#' "$EXPECT" > "$W/full.rows"; awk -v n="$first" 'NR!=n' "$EXPECT" | grep -v '^#' > "$W/minus.rows"

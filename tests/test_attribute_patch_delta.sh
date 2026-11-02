@@ -51,7 +51,8 @@ if [ "$rc" = 0 ] && grep -q '^NOTE: no .*gen.log' "$W/solo.txt" && grep -q '^ali
 else
     echo "  FAIL: rc=$rc"; tail -3 "$W/solo.txt" | sed 's/^/      /'; fail=1
     # #310 group 5: under the mode the honoured outcome IS the copy's FileNotFoundError; any other end is NOT JUDGED
-    if vs_ctl_is gen-log-required; then vs_ctl_show_err "$W/solo.txt" FileNotFoundError || true; fi
+    if vs_ctl_is gen-log-required; then vs_ctl_show_err "$W/solo.txt" FileNotFoundError || true
+    else vs_ctl_show_err "$W/solo.txt" || true; fi
 fi
 
 echo "-- 2. the merged pair $MRG_OLD -> $MRG_NEW (gen.log present)"
@@ -60,6 +61,7 @@ if [ "$rc" = 0 ] && ! grep -q '^NOTE: no ' "$W/merged.txt" && grep -q '^aligned 
     echo "  ok: exit 0, gen.log read (no NOTE)"
 else
     echo "  FAIL: rc=$rc"; tail -3 "$W/merged.txt" | sed 's/^/      /'; fail=1
+    vs_ctl_show_err "$W/merged.txt" || true   # #310 (14z-218): a crash here, beside a mode, is re-printed — not a mode's finding
 fi
 
 if [ -z "${VS_CTL:-}" ]; then
