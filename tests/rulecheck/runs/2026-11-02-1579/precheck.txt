@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: On the host, a tag is looked up only among the ones the bundle carried.  [build/agent218/t351/close/closing_351.md]
+  FLAG D-ABSOLUTE: - the bundle carries each one, read back from the bundle;  [build/agent218/t351/close/closing_351.md]
+  FLAG D-ABSOLUTE: - on the host side each one resolves from the bundle alone, and a tag that was not sent does not.  [build/agent218/t351/close/closing_351.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

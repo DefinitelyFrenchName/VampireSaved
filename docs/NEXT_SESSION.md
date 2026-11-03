@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-217 CLOSE, 2026-11-02)
+# NEXT SESSION — orientation (rewritten at the 14z-218 CLOSE, 2026-11-02)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -19,17 +19,19 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
-idle`). Its checkout `~/vampire-saved` sits detached at the M24 freeze commit `be40e6f3`: move it to `main` before other work.
-Its 14z-216/217 scratch was cleared after the 14z-217 push (STATE 14z-217 CLOSE).
-**ERIS** (WSL2, 24 threads, 47 GB) runs the release shape; its checkout sits at `be40e6f3`; its 14z-216/217 scratch was
-cleared with PILOT's. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a
+idle`). Its checkout `~/vampire-saved` sits at `3e1a7091` (14z-217's close): move it to `main` before other work.
+It still holds 14z-218's scratch `~/rt218` (1.9 GB: the re-trace clones and the runner-gate mode runs; their results are
+copied to the Mac under `build/agent218/`).
+**ERIS** (WSL2, 24 threads, 47 GB) runs the release shape; its checkout sits at `3e1a7091`; it still holds 14z-218's crash
+sweep scratch `~/t310p3b`, `~/t310r`, `~/t310s`, `~/t310u` (results on the Mac, `build/agent218/t310/`). Delete both
+hosts' 14z-218 scratch only on the maintainer's word, after a listing. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a
 bare commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s' <
 script` (ERIS) or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shell splits it at a pipe and
 mangles quotes), and a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s
 <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-217's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-218's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
@@ -60,19 +62,27 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-   **THE WORKING TREE CARRIES UNCOMMITTED RECORDS** written after the 14z-217 push: the CLOSE section's last lines, #355's
-   index row (and the regenerated ticket page and GitHub snapshot), the remote-scratch deletion's
-   lines, and this note. They ride the next close.
-1. **#310 — THE CRASH-INJECTION SWEEP** (the maintainer, 14z-215: **"Next session, first batch (Recommended)"**; it was
-   item 2 behind the release at 14z-216 and 14z-217). Discovery ran over the 20 static gates at 14z-216 (STATE_HISTORY
-   14z-216 (2), `build/agent216/t310/FINDINGS.md`, local: every runner mode PROVEN but one LIES; F1 `test_agent_hooks`'
-   twins); the gate is not built. Its seed is `build/agent215/t310/rcmeas/measure.sh` (local). Then group 7's first batch.
-2. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
-   - bugs: #345 (Blizzard Sword overrun), #347 (`--stale --freeze` refuses NOTE-class names), #349 (REFUSED control runs
-     read SAFE), #351 (`proof_sheets run --host` and freeze-tag control builds), #353 (`--log` on an existing directory
-     appends: the 14z-213 gotcha, paid again); #355 (`close.py`'s re-run base after a plan-refused tier); evolution: #348 (no tracked-release-vs-build gate), #352 (the desktop gate's
-     paused-FBNeo verdict), #354 (no gate on #294's dead span in the built image); cosmetic: #344 (Donovan's Dark Force
-     colours), #346 (the Blizzard Sword ice streak); low: #310 (item 1).
+1. **#356 — BUILD THE SPEED-LINE COPY** (ruled 14z-218, `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356": the
+   maintainer, *"ideally Option 1 (new copy of the effect, using vs2 effect)"*, then **"Yes, next session (Recommended)"** and
+   **"Raw allocator (Recommended)"**). A tenant-only copy of effect class 0x0F with vs2's 14-row tables (Donovan's dash subs
+   0x0C and 0x0D), spawned with the raw allocator; legacy class 0x0F untouched by construction. The census and the
+   feasibility study: `build/agent218/tspeed/REPORT.md`, `build/agent218/tspeed/feas/REPORT.md` (local). Gate it, capture
+   it against native vs2 for the maintainer, then the M25 freeze.
+2. **#345 — OPTION A** (ruled 14z-218, `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #345": the maintainer,
+   **"A first, B held (Recommended)"**). Donovan's class-0x72 trail pieces take vs2's no-draw form (format 10), which also
+   removes #346's ice streak (its source measured 14z-218, `docs/game/engine_internals.md`). FIRST the class-0x72 legacy
+   census (#357: vs2 DRAWS class-0x72 pieces on Ifrit Sword's guard-cancel) and A's plan, put to the maintainer before
+   anything is built; then re-measure the lost frames under all three RNG forms and compare A's build against native vs2 on
+   screen. B (a cheaper slot-clearing wrapper) waits for A's measurement. The recommendation and its evidence:
+   `build/agent218/t345/rec/` (local), and #345's 14z-218 comment.
+3. **#310 — GROUP 7, in batches** (the crash-injection sweep is built: `tests/test_crash_sweep.sh`; #310's 14z-218 progress
+   comment holds what it found and its stated limits).
+4. **Captures for #357 and #358** (the #356 census's leads), before any mechanism theory.
+5. **#359** (cleanup traps on `EXIT INT TERM` with no `exit`: a TERM'd gate keeps running; 210 scripts).
+6. **Ask the maintainer for the order of the rest.** Open tickets (GitHub severity labels):
+   - bugs: #345 (item 2); evolution: #348 (no tracked-release-vs-build gate), #352 (the desktop gate's paused-FBNeo verdict),
+     #354 (no gate on #294's dead span in the built image); cosmetic: #344 (Donovan's Dark Force colours), #346 (the ice
+     streak: #345's option A), #356 (item 1), #357, #358; test-integrity: #310 (item 3), #359 (item 5).
    - parked: #123, #124, #125, #128.
 
 ## PARKED (not open work)
@@ -82,21 +92,28 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **GNU `timeout` without `--foreground` takes the terminal from its command** (`docs/platform/gotchas.md`): an ssh
-  password prompt never shows and Ctrl+C does not reach it. A bounded command that may prompt runs under `--foreground`.
-- **FBNeo's SDL build pauses when its window loses focus** (`emu/fbneo/src/burner/sdl/run.cpp:456`): a desktop run on a
-  session the maintainer is using can go red with PAUSE on every capture (#352). Re-run on a quiet session.
-- **`gh issue view N --comments` prints only the comments**: for an issue with none it prints nothing. Save an issue's text
-  for a packet with `gh issue view N` (rule-checker run `2026-11-02-1570`).
-- **A release closure's packet needs the published bytes, not the tree's**: download the assets back and compare them
-  with the freeze commit, apply EVERY package to the dumps, and list in each closing comment every NOT COVERED item and
-  frozen-blind census part of each gate it cites (rule-checker runs `2026-11-02-1561` to `-1566`, six rounds).
-- **A control that fires on an early failure is dead**: #350's first `no-foreground` copy failed before reaching its
-  upload and still read FIRED; a control now has to show it reached the code it perturbs.
+- **A cleanup trap on `EXIT INT TERM` with no `exit` lets a TERM'd script carry on** after its cleanup, its work directory
+  gone (`docs/platform/gotchas.md`; #359). Kill a stuck driver with KILL, and give a new script's trap `'exit 143' INT TERM`.
+- **GNU `timeout` runs its command in a process group of its own** (`docs/platform/gotchas.md`): killing the driver's session
+  leaves it running; end the group, and stop a podman container by name.
+- **`sitecustomize` swallows an exception raised inside it** (`docs/platform/gotchas.md`): a planted crash there prints a
+  traceback and calls `os._exit(1)`.
+- **A PATH tracing shim makes `test_agent_sweep` fail** (`docs/project/gotchas.md`): a tracer artefact, not a finding.
+- **The Bash tool's zsh command-substitutes backticks inside a double-quoted argument**: a rule-checker `--claim` with
+  `` `name` `` in it loses the name (run `2026-11-02-1582`). Write the claim to a file and pass `--claim "$(cat FILE)"`.
+- **A call whose output is a list must not read its failure as an empty list** (`docs/project/gotchas.md`):
+  `run_all_emulator.sh --stale` took a crashed staleness audit for "no gate is stale" until 14z-218 (fixed, section 25g).
+  `test_emulator_runner` is OFF `tests/controls_concurrent.txt` until the next freeze's re-trace; re-trace it then.
+- **A caller census needs the unfiltered grep, its lines classed, and a known caller as its control**: a pattern-filtered
+  grep missed the `ROMDIR=… tests/…` call form (rule-checker run `2026-11-02-1582`).
+- **A one-frame OBJ suppression tap is a clean A/B; a format-word read tap is not**: moving a piece's OBJ entries off
+  screen as they are written leaves work RAM identical, while making the drawer skip the piece shortens the pass and
+  moves the frame (`build/agent218/t345/streak/REPORT.md`, local).
 
-## WHAT CLOSED THIS SITTING (14z-217)
+## WHAT CLOSED THIS SITTING (14z-218)
 
-- **Released:** M24, `freeze/merged-m24` on GitHub from `be40e6f3` (9 assets; merged-m23's pruned); the proof sheets at
-  alexrichard.org/vs-proof-sheets/.
-- **Closed done:** #127, #162, #294 (rule-checker run `2026-11-02-1566`), #338 (`-1569`), #350 (`-1572`).
-- **Filed:** #350, #351, #352, #353, #354.
+- **Built:** #310's crash-injection sweep gate (`tests/test_crash_sweep.sh`, `tests/audit_crash_sweep_emu.sh`): 88 rows for
+  96 call sites; crash-hiding paths fixed in 18 gates.
+- **Closed done:** #355 (rule-checker run `2026-11-02-1574`), #349 (`-1575`), #351 (`-1579`), #347 and #353 (`2026-11-03-1588`; the closure found and fixed the runner reading a failed staleness audit as an empty list).
+- **Ruled:** #356 (Option 1, next session, the raw allocator); #345 (option A first, B held; runs `-1576` to `-1585`).
+- **Filed:** #356, #357, #358, #359.

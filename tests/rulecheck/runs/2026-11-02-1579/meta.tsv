@@ -1,0 +1,12 @@
+decision	recommendation
+subject	#351 closed done: a proof_sheets.py --host bundle carries the freeze tags the selected gates' SHEET-BUILD control builds name, resolved on the host from the bundle alone; gated by test_proof_sheets section 4d and its tags-dropped control; run for real on PILOT (14z-218)
+session	14z-218
+model	rule-checker@163e4ce9cf7b
+claim	#351 can close done with closing_351.md. The issue (issue351.md): a --host run could not run audit_landing_sound, whose control build is freeze/merged-m22, because the bundle carried no tags. The fix (fix_committed.diff) makes the bundle carry the tags the selected gates' SHEET-BUILD lines name and resolves tags on the host from the bundle only. The repro: old code refuses the tag, new code carries tag object 78bd198f and resolves it (evidence351.txt E1). test_proof_sheets section 4d passes on the plain run and FAILs under CONTROL=tags-dropped (E2, E2b, E3, E3b). Run for real on PILOT on commit 94e9d47a: the bundle carried freeze/merged-m22, the control build was built in a second clean checkout and its MERGED 110467a7 equals f3e32bd5b3b5's frozen reference and program key, audit_landing_sound PASSED with pre-swap-build fired, exit 0 (E4-E7). NOT TESTED: a full release --host run of every gate (only audit_landing_sound names a freeze-tag control build at this commit), and a host that already has the tags.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	3 flag(s): D-ABSOLUTE 3
+deliverables	build/agent218/t351/close/closing_351.md
+action	2026-11-02-1579

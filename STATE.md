@@ -38,112 +38,95 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-218 — **(in progress) #310's crash-injection sweep gate built (`tests/test_crash_sweep.sh`); #347, #349, #351, #353, #355 fixed and gated; #345 analysed with captures; #356 filed and censused.**
+## Session 14z-218 — **#310's crash-injection sweep built (`tests/test_crash_sweep.sh`: 88 rows for 96 call sites; crash-hiding paths fixed in 18 gates); #347, #349, #351, #353, #355 fixed, gated and closed on their rule-checker runs (#347's closure found and fixed the runner reading a failed staleness audit as an empty list); #345 analysed, #346's streak traced to the class-0x72 trail pieces, option A ruled; #356 ruled (Option 1, next session); #356-#359 filed.**
 
 ### opened with
 The 14z-217 close's opener; `python3 tools/agent/sweep.py` CLEAN. The maintainer: **"read handoff.md, state.md and
 docs/next_session.md"**, then **"Start on #310 and the bugs, use all machines"**. PILOT and ERIS moved to `main` `3e1a7091`
 by bundle. Working evidence: `build/agent218/` (local).
 
-### (1) #310 — THE CRASH-INJECTION SWEEP
-In progress; the record is written at the close.
+### (1) #310 — THE CRASH-INJECTION SWEEP (the maintainer's first batch: built and gated; #310 stays open for group 7)
+`tests/test_crash_sweep.sh` (static tier, freeze cadence) and `tests/audit_crash_sweep_emu.sh` (its emulator and linux rows,
+`tests/ci_emulator.tsv`) prove every call of `tests/lib/controls.sh` `vs_ctl_show_err`: for each call site
+(`tools/crash_sweep.py sites`, keyed `<first argument>#<k>`) a row of `tests/expected/crash_sweep.tsv` plants a crash in one
+call the gate makes (`tests/lib/crash_sweep.sh`: PATH shims for `python3`/`sh`/`bash`, and a `sitecustomize` hook, `pyx`, for
+any Python process), counted first (nth 0) and planted one call at a time. The gate as it stands must read DIED/UNJUDGED, the
+copy with the helper neutered HONOURED. `tools/crash_sweep.py check` is the static half: every site covered or exempted with
+its reason. The table: 88 rows for 96 call sites in 25 gates, 1 exempt gate, 6 exempt sites (`crash_sweep check`: 0 problems).
+Measured on the Mac: static tier 78 rows, 421 s, PASS, 3 of 3 controls fired and HONOURED; emulator tier 9 rows, 315 s, PASS.
+- **What it found, fixed and re-planted:** crash-hiding paths in 18 gates (the list: #310's 14z-218 progress comment), among
+  them twins that took any non-zero exit as the refusal they named (`test_bundle_parsers`, `test_controls_concurrent`,
+  `audit_victim_parity`), copies whose crash was invisible (`test_agent_sweep`, `test_agent_extract`, `test_claim_lint`), and
+  `audit_release_linux_cleanhost`'s judge. Crashes beside a mode whose own control fired were left as they are, named.
+- **Stated limits:** the runner gates planted at their first plantable call per mode; `test_agent_hooks`' pyx rows sampled at
+  calls 1-2; `audit_victim_parity`'s 92 calls sampled; `audit_release_linux_cleanhost` swept to call 36 of 43 before its fix.
+- **The 13 changed concurrent-controls rows** re-traced on PILOT (`pilot:91fc3b7b`; `test_controls_concurrent` again at
+  `pilot:ae0b1ad5`).
+- **Found on the way:** #359 (cleanup traps that do not exit on TERM, 210 scripts); three platform gotchas
+  (`docs/platform/gotchas.md`: the TERM trap, `timeout`'s own process group, `sitecustomize` swallowing an exception) and the
+  project gotcha on PATH tracing shims (`test_agent_sweep` fails under one).
 
-### (2) THE BUGS: #345, #347, #349, #351, #353, #355
-In progress; the record is written at the close.
+### (2) THE BUGS: #347, #349, #351, #353, #355 FIXED, GATED AND CLOSED; #345 ANALYSED
+All five fixed in `94e9d47a`, each closed on its own rule-checker run before the close:
+- **#355** (`tools/close.py` `red_base` took a header-only red results file as the re-run's base): runs -1573 (no real-rows
+  case), -1574 OK.
+- **#349** (`tools/controls_overlap.py` certified a gate whose control runs were all REFUSED): HONOURED-only; runs -1575 OK.
+- **#351** (`proof_sheets.py run --host` could not run a gate whose control build is a freeze tag): the bundle carries the
+  selected gates' freeze tags; `test_proof_sheets` section 4d, control `tags-dropped`; run for real on PILOT on `94e9d47a`
+  (`audit_landing_sound` PASS, the control build `110467a7` equal to `f3e32bd5b3b5`'s frozen reference, exit 0). Run -1579 OK.
+- **#347 and #353** (`run_all_emulator.sh --stale --freeze` asked the audit at the default cadence; `--log` on a directory
+  holding a run appended to it): `test_emulator_runner` sections 24-25, `test_emulator_staleness` section 2i, controls
+  `log-reused`, `stale-default-cadence`, `stale-cadence-refused`, `names-unfiltered`; on PILOT on the commit's tree both gates
+  PASS with every control mode HONOURED (20 and 11). Rule-checker runs -1578 (a third untested item left out; the real-tree
+  repro was a dry run), -1581 and -1582 (the `--log` caller check had no artifact, then a pattern-filtered grep: rebuilt
+  unfiltered with a known-caller control), -1584 (the census's markdown exclusion unstated), -1586 (a dry run into a held
+  directory untested: measured, refused; and a REAL DEFECT: the runner read a failing staleness audit as an empty list,
+  `|| true`, so a freeze's `--stale` would have run nothing — fixed at this close: REFUSED on any non-zero exit,
+  `test_emulator_runner` section 25g, control `audit-crash-swallowed`, PASS 21/21 with every mode HONOURED on the Mac and on PILOT;
+  the gate taken off `tests/controls_concurrent.txt` until the next freeze's re-trace), -1587 (the runner-calling gates not re-run on the fixed tree: re-run, all PASS), -1588 OK; both closed.
+- **#345** (Blizzard Sword's lost frames): analysed (`build/agent218/t345/`, local): a frame loses its logic pass when the
+  second pass ends inside a narrow window before vblank (not pinned: between 370 and 1,202 cycles), and ours' passes are longer from two Donovan-only sources, the class-0x72
+  trail pieces in pool `RAM:$FFB800` (+458 cycles per piece per drawing pass) and `alloc_wrap` (+1,062 per pass), measured
+  under the parity rig's 0000 RNG pin. Capture sheets sent; the maintainer: *"I confirm your conclusions on the position
+  difference of the snowflake"*. **#346's streak IS those pieces**, tested: taking only their OBJ entries off screen as they
+  are written removes the streak with work RAM identical and 0 pixels changed elsewhere; the positive control (the
+  snowflake's entries) removes the snowflake and keeps the streak; sheet sent. The maintainer on #346: *"I've confirmed that
+  VS2 doesn't show the ice streak with the snowflake"*. The recommendation (A first, B held): runs -1576, -1577 (the streak
+  link untested: then tested), -1580 (the format-10 arm's unexplained pixels), -1583 (the window's width; the sheet's send
+  unrecorded), -1585 OK. Put to the maintainer: **"A first, B held (Recommended)"** (`DECISIONS_HISTORY.md` "Ruled
+  2026-11-02 (14z-218) — #345"; a standing line above). The streak's source is recorded in `docs/game/engine_internals.md`
+  (#346's section) and on #346; the recommendation and ruling on #345.
 
-### (3) #356 FILED (the maintainer, on #345's sheet 3: *"This is a real gap I never caught and now I think we need to check
-everywhere these speed lines are, which includes but is not limited to dashing forward and backward"*)
-Census done (`build/agent218/tspeed/REPORT.md`, local); captures sent; the fix option is the maintainer's.
+### (3) #356 FILED, CENSUSED AND RULED; #357, #358 FILED
+(the maintainer, on #345's sheet 3: *"This is a real gap I never caught and now I think we need to check everywhere these
+speed lines are, which includes but is not limited to dashing forward and backward"*). The cause: vs2 widened the speed-line
+effect class 0x0F's tables from 12 rows to 14 (Donovan's dash subs 0x0C and 0x0D); ours indexes vsavj's 12-row tables, so the
+positions are junk. Feasibility: vs2's art is pixel-identical to vsavj's (FEASIBLE-WITH). Ruled (`DECISIONS_HISTORY.md`
+"Ruled 2026-11-02 (14z-218) — #356"): *"ideally Option 1 (new copy of the effect, using vs2 effect)"*, then *"Yes, next
+session (Recommended)"* and *"Raw allocator (Recommended)"*. The census's two leads, *"Yes, ticket them"*: #357 (Ifrit Sword
+guard-cancel pieces), #358 (Phobos's Plasma Beam ES [PP] pieces).
 
-## Session 14z-217 — **M24 RELEASED (`freeze/merged-m24` on GitHub from `be40e6f3`, merged-m23's zips pruned) after every release gate GREEN on the Mac, ERIS and PILOT; the proof sheets published at alexrichard.org/vs-proof-sheets/; #127, #162, #294, #338 closed done on rule-checker runs -1566 and -1569; #350 found at the sheets' upload, fixed and gated, closed on run -1572; #351-#354 filed from the release's findings.**
+### (4) THE TIERS
+Tier of record for `94e9d47a`: `build/agent218/tier3/results.tsv` (tree `8834baab`, PASS 120, GREEN). Tier 1 was NOT GREEN:
+the new gate scripts not executable, the new expectation's provenance class, the census reading the wrapper header-only, the
+description and follows freezes; and `test_static_runner` and `test_emulator_runner` FAILED under the `--jobs 8` load (both
+passed on the next tier; their failing sections were not captured). Tier 2: `test_rule_checker` red on unstaged run
+directories -1573..-1575, staged. Tier 3 GREEN.
 
-### opened with
-The 14z-216 close's opener; `python3 tools/agent/sweep.py` CLEAN; ERIS's release emulator tier still running, as left. The
-maintainer: **"read handoff.md, state.md and docs/next_session.md"**, then **"yes"** (the sweep and ERIS's tier), then
-**"yes and you can also go through all the release process unless at some point you need my input"**. Working evidence:
-`build/agent217/` (local); the release's evidence file `build/agent217/release/closures_evidence.txt`.
-
-### (1) THE M24 RELEASE, ON THE FREEZE COMMIT `be40e6f3`
-- **ERIS's release emulator tier** (started 14z-216, `--controls --jobs 6`, no reuse): ended 2026-11-02 01:05 UTC, PASS 441,
-  SKIP 4 (`test_readme_recording`, `test_release_binaries`, `audit_release_linux_desktop`, `audit_release_linux_cleanhost`:
-  host-bound), FAIL 0, 248 control rows; copied to the Mac as `build/emu_rel216_eris` (tarball sha256 equal both ends).
-- **The Mac's host rows**, each on a snapshot of `be40e6f3` with `--controls`: `test_mame_parity` (1 control),
-  `test_release_binaries` (4), `test_readme_recording` (5), and the MiSTer lane at `--jobs 4` (8 gates, 4 controls, 4 h 10
-  min): all GREEN (`build/emu_rel217_mac_*`, `build/emu_rel217_mister`).
-- **PILOT** at `be40e6f3`: `audit_release_linux_cleanhost` GREEN (2 controls). `audit_release_linux_desktop` needed the
-  maintainer's session unlocked (**"it is now unlocked."**); run under `gnome-session-inhibit`. Its first run went red on
-  FBNeo alone: every capture showed PAUSE from 9 s, before any key (FBNeo pauses on focus loss,
-  `emu/fbneo/src/burner/sdl/run.cpp:456`); the cause of the focus loss is NOT measured (no window-manager package changed on
-  PILOT since 2026-09-14; #352). A re-run into the SAME `--log` directory appended to the red run's `results.tsv` and read
-  NOT GREEN (#353: the 14z-213 gotcha "a fresh run pointed at an old `--log` directory", paid again); the run of record is a fresh directory, `build/emu_p217_desk2`: GREEN, 3 controls. After rule-checker run
-  -1561, PILOT also ran the Linux binaries' `test_release_binaries` and `test_readme_recording` with controls: both GREEN.
-- **The Windows half of `test_release_launcher_bat`** on ERIS at `be40e6f3`: PASS, 8 controls fired, `first-found` FAILs as
-  a mode (`build/agent217/release/bat217*.log`).
-- **The static release tier of record** (snapshot of `be40e6f3`, `--reuse` of the freeze run S5 on the same tree
-  `9a1fe8b8`): PASS 236, SKIP 1 (that launcher's Windows half), FAIL 0
-  (`build/agent217/release/static_rel_record.tsv`). The maintainer, asked: **"Accept (Recommended)"**.
-- **Published** on the maintainer's **"Publish now (Recommended)"**: `tools/upload_release_assets.sh freeze/merged-m24
-  --prune` created the release, uploaded and re-verified 9 assets, pruned merged-m23's 9 zips; the 15 `BINARY.txt`
-  asset lines moved to merged-m24 (in this close's commit).
-- **The published zips are the commit's release**, measured after rule-checker runs -1561..-1563: all 308 files of the 9
-  zips downloaded back equal `be40e6f3`'s (tracked files byte for byte, binaries by their `BINARY.txt` rows); every one of
-  the 9 packages applied to the dumps builds merged-m24 `43505a12`, one set (sha256 `01e9445b`), whose 25 members equal
-  `build/m3b_merged32`, the build the gates judged; each comparator with must-fail controls
-  (`build/agent217/release/close/`).
-- **The proof sheets**: local run of `be40e6f3` (58 gates, exit 0, a clean checkout) drawn with `web` (102 pages, 23,174
-  tiles, 152 clips; webcheck PASS). `--host pilot` could not run a gate whose control build is a freeze tag (#351).
-  `tools/publish_sheets.sh` hung at the ssh password prompt (#350, item 3); the maintainer uploaded by hand (**"manual
-  upload done successfully"**, **"https://alexrichard.org/vs-proof-sheets/"**); the site checked by
-  `build/agent217/release/close/served_check.sh`: 285 files (every page, every clip, 30 pictures) equal, 3 controls fired.
-
-### (2) THE RELEASE'S CLOSURES: #127, #162, #294, #338
-Each through the rule-checker before closing (no action held for the close). #127, #162 and #294: runs -1561 to -1566,
-every VIOLATED round a real gap resolved by work (the zips tied to the commit; the Linux binaries' gates; all 9 packages
-applied; the comparators' controls; each gate's NOT COVERED items and frozen-blind census parts in the comments; #354,
-no gate on what reaches #294's dead span in the built image, named), -1566 OK; closed with their comments. #338: runs
--1567 to -1569 (the site check's fetch path and controls, the run's whole provenance, every clip compared), -1569 OK;
-closed. `docs/game/engine_internals.md` still said (M) "is not built" and the census had one differing site: both marked
-superseded (every site SAME at the release). `docs/project/tickets.tsv` rows updated.
-
-### (3) #350 — `publish_sheets.sh` HUNG AT THE SSH PASSWORD PROMPT
-GNU `timeout` without `--foreground` takes the terminal from rsync/ssh (measured under a pty: `build/agent217/t350/repro.txt`).
-Fixed with `timeout --foreground`; `tests/test_proof_sheets_web.sh` section 2b drives the publisher under a pseudo-terminal
-with a stub rsync that prompts on `/dev/tty`: the answer reaches it and Ctrl+C ends it within 5 s; the new control
-`no-foreground` loses the answer and survives Ctrl+C (both of the maintainer's symptoms). The control's first version fired
-without reaching the upload and was fixed before it was trusted. Rule-checker runs -1570, -1571 (Ctrl+C untested), -1572 OK;
-closed. Gotcha: `docs/platform/gotchas.md` (GNU `timeout` WITHOUT `--foreground`).
-
-### (4) TICKETS FILED: #350-#354
-#350 (item 3); #351 (`proof_sheets run --host` and freeze-tag control builds); #352 (the desktop gate's paused-FBNeo verdict);
-#353 (`run_all_emulator.sh --log` appends to an existing directory); #354 (no gate on #294's dead span in the built image).
-
-### CLOSE (14z-217, 2026-11-02)
-Driver `build/agent217/close/` (`--prev build/agent216/close/tier_results.tsv`, the 14z-216 close's run of record). Steps:
-sections (this group; a pointer on 14z-216 (1b)); next-session (the 14z-216 opener moved VERBATIM to the top of
-`docs/NEXT_SESSION_HISTORY.md`, checked by un-quoting it; `docs/NEXT_SESSION.md` rewritten: #310 first); rollover (the
-14z-216 group, 172 lines, to `STATE_HISTORY.md` with its ledger line; every committed line of it found in the archive; no
-`STATE.md §` citation pointed into it); indexes (regenerated by the driver); dashboard (14z-163..14z-217, 3,356 figures, 0
-unclassed; five assets uploaded, `datasets` re-pointed: actions v6, costly v26, figures v26, rc_runs v26, tiers v27) — done.
-The records also carry the 14z-216 close's after-push lines and its opener note, uncommitted until now as they said. The
-tier's results: `build/agent217/close/tier_results.tsv`, the next close's `--prev`.
-- **Then:** the tier's first run was refused at its `--confirm` plan (`build/sheets_web`'s 23,429 files, not yet classed:
-  classed `scratch` in `tests/expected/build_dirs.tsv`); the driver then based the re-run on that run's header-only results
-  (#355, filed), so every gate ran: PASS 108, FAIL 3 (`test_gate_index_current`, `test_gate_coverage_current`: the gate pages
-  regenerated in a clean checkout of the staged tree after #350's header edit; `test_controls_concurrent`:
-  `test_proof_sheets_web` taken off `tests/controls_concurrent.txt` until the next freeze's re-trace). The third run GREEN,
-  PASS 111 (`build/agent217/close/tier_results.tsv`, tree `46daa883`); committed `3e1a7091`; pins and sweep clean; pushed
-  `main` `0e5a5bee..3e1a7091`; the ledger page published (`8997b737` on `gh-pages`; the own site skipped, no `DEPLOY_TARGET`).
-  #355 filed during the tier, its index row written after the push. These last lines and that row ride the next close,
-  uncommitted.
-- **Then, the remote scratch** (the maintainer: *"do it"*, to clearing the lists the opener carried): PILOT's 64 paths
-  (14z-216's re-trace `~/rt216*` and its scripts, `~/m24_*`, `~/t216_*`, 14z-217's `~/proof_sheets/`, `/tmp/emu_p217_*.tgz`,
-  `~/vampire-saved/build/emu_p216_*`, `emu_p217_*`, `desktop_release_fail1`) and ERIS's 38 (14z-216's `~/rt216*`,
-  `~/psw216*`, `~/lad216*`, `~/e216*`, its scripts and five bundles, `~/rel216_out`, `build/emu_rel216_eris`, the Windows
-  side's `tree217.tgz`, `t217`, `emu_rel216_eris.tgz`) deleted after a listing; none left, no job running; PILOT 48 to 65 GB
-  free. The opener's "all copied to the Mac" was WRONG for three PILOT dirs: `emu_p217_desk`, `emu_p217_desk_fail1` and
-  `desktop_release_fail1` (the Mac held 2 MB of that one's 57, as `build/agent217/release/desk_fail`). All three, the `.out`
-  files and ERIS's `rel216_out` were copied before the deletion (`build/agent217/release/pilot_copies/`, `eris_copies/`;
-  file counts equal: 13, 10, 67). Uncommitted, riding the next close.
+### CLOSE (14z-218, 2026-11-03)
+Driver `build/agent218/close/` (`--prev build/agent217/close/tier_results.tsv`, the 14z-217 close's run of record; `--row -`,
+this group has no findings section). Steps: sections (this group, sections (1)-(4) and this one); next-session (the 14z-217
+opener moved VERBATIM to the top of `docs/NEXT_SESSION_HISTORY.md`, checked by un-quoting it; `docs/NEXT_SESSION.md`
+rewritten: #356's build and M25 first, then #345's option A); rollover (the 14z-217 group, 89 lines, to `STATE_HISTORY.md`
+with its ledger line; every committed line of it found in the archive; the two `STATE 14z-217` citations were in the
+rewritten opener). On GitHub before the close: #351, #347 and #353 closed with their comments; #345's recommendation and
+ruling, #346's streak finding and #310's progress comment posted.
+Then: indexes (regenerated by the driver); dashboard (14z-163..14z-218, 3,428 figures, 0 unclassed; five assets uploaded,
+`datasets` re-pointed: figures v27, rc_runs v27, tiers v28, costly v27, actions v7) — done. Uncommitted at the 14z-218
+commit and riding this close: #347's second fix (the runner refuses a failed staleness audit, `test_emulator_runner`
+section 25g; the gate off `tests/controls_concurrent.txt`), the ticket rows for #345-#355, the rule-checker runs -1576 to
+-1588, the #345 ruling, #346's `engine_internals.md` record and the list-failure gotcha. The tier's results:
+`build/agent218/close/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
@@ -152,6 +135,7 @@ tier's results: `build/agent217/close/tier_results.tsv`, the next close's `--pre
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
 - **#356 is built next session as Option 1 (a tenant-only copy of the speed-line effect with vs2's 14-row tables), with the raw allocator, and frozen as M25 (2026-11-02, 14z-218)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356".
+- **#345 goes on with option A first (the tenant's class-0x72 trail pieces take vs2's no-draw form), starting with a class-0x72 legacy census and a plan put to the maintainer before anything is built; B held until A is measured (2026-11-02, 14z-218)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #345".
 - **#345's rows may turn DIFF under a non-zero RNG; the parity gates keep the 0000 pin (2026-11-01, 14z-216):** `tools/rng_forms.py` exempts rows `after:` a SLOWDOWN root, by name — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #345's rows under a non-zero RNG".
 - **A new zero-pass frame native vs2 has too is accepted, frame by frame (2026-11-01, 14z-216, #294):** `audit_lag_budget`'s ACCEPTED list (today donovan_2:3094, vs2's 3098, checked against `pass_overrun.tsv`'s native row), re-confirmed on the captures as *"a tradeoff. #345 is there to fix it later"*; the no-new-lag rule stands for every other frame — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #294's lag frame" and "…re-confirmed on the captures".
 - **ERIS tiers skip parity; the Mac's parity run is the row of record (#321, 2026-10-26, 14z-209):** ERIS runs `--skip test_mame_parity` — `DECISIONS_HISTORY.md` "Ruled 2026-10-26 (14z-209) — #321 phase 2".

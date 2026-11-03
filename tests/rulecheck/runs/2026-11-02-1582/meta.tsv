@@ -1,0 +1,13 @@
+decision	recommendation
+subject	#347 and #353 closed done: run_all_emulator.sh --stale --freeze asks the staleness audit at freeze cadence (audit_emulator_staleness.py --names honours --cadence), and a --log directory that already holds a run is refused; gated by test_emulator_runner sections 24-25 and test_emulator_staleness section 2i with controls log-reused, stale-default-cadence, stale-cadence-refused, names-unfiltered (14z-218), after runs 2026-11-02-1578 and 1581
+session	14z-218
+model	rule-checker@163e4ce9cf7b
+claim	#347 and #353 can close done with closing_347.md and closing_353.md. #353 (issue353.md): a --log directory holding a run was appended to; the fixed runner refuses it (fix_committed.diff, run_all_emulator.sh), and on the real 14z-217 directory it prints REFUSED and exits 1 with every file's content hash unchanged (evidence_347_353.txt E3, E3c). The refusal breaks no caller per evidence_347_353.txt E8/E8b/E8c: the tracked callers are listed by git grep, and the gates that invoke the runner ( included) were executed and PASSED in the strict static tier on the commit's tree 8834baab; --resume, the documented reuse, is held by  section 24. #347 (issue347.md): --stale --freeze refused ondemand names because --names ignored --cadence; on the committed tree the old tool prints the same 45 names with and without --cadence freeze, the fixed tool 16 with a NOTE for 29 and its default output byte-identical (E7); the runner now asks at freeze cadence, and a --dry-run of --stale --freeze on the real tree reads old exit 1 REFUSED, new exit 0 (E4: selection only, no gate executed). The new sections fail against the code before the fix (E5, E6). On PILOT, on a clone of the commit's tree, test_emulator_runner PASS 20/20 controls fired and all 20 modes HONOURED, test_emulator_staleness PASS 11/11 and all 11 modes HONOURED (E2). NOT TESTED: a real (not dry) --stale --freeze run, whose first real use is the next freeze's emulator tier; two runs that start in the same second without --log share a stamped default directory and the second is refused; two runs racing past the --log check at the same instant; and a plain --stale (no --cadence) still refuses when an ondemand row is stale, left undecided. The closing comments name all four.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	0 flag(s)
+deliverables	build/agent218/t353/close/closing_353.md build/agent218/t347/close/closing_347.md
+action	2026-11-02-1578
+redoes	2026-11-02-1581

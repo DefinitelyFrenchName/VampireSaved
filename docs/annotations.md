@@ -23,12 +23,12 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3816 |
-| named by a document or manifest only | 2339 |
+| distinct program-space addresses named | 3818 |
+| named by a document or manifest only | 2341 |
 | named by both a document/manifest and code | 979 |
 | named by CODE ONLY (the gap list below) | 498 |
 | carried by atlas | 821 |
-| carried by engine_internals | 862 |
+| carried by engine_internals | 864 |
 | carried by other docs | 1078 |
 | carried by manifests | 1894 |
 | carried by code | 1477 |
@@ -674,6 +674,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01ABFC` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25); tests/audit_mask_window_ff42a2.sh |
 | `PRG:0x01AC40` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25); tests/audit_mask_window_ff42a2.sh |
 | `PRG:0x01AC68` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25); docs/game/engine_internals.md — OBJ (sprite) pipeline — the R2 answer (session 14, static decode); tools/obj_records.py |
+| `PRG:0x01ADDA` | docs/game/engine_internals.md — Blizzard Sword's snowflake: ours draws an ice streak behind it that native vs2 does not (seen 14z-216, #346; its source measured 14z-218: the class-0x72 trail pieces) |
 | `PRG:0x01AE14` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x01AE6E` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) [vs2]; docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; tools/gen_donovan_patch.py |
 | `PRG:0x01AF9E` | docs/game/engine_internals.md — OBJ (sprite) pipeline — the R2 answer (session 14, static decode); tools/obj_records.py |
@@ -685,6 +686,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01AFB4` | docs/project/operations.md — From HANDOFF.md: «Running a CPS-2 WIDE build» — merged-m1 and the older merged builds |
 | `PRG:0x01AFBA` | docs/game/atlas/sprite_lists.md — 1. The drawer; docs/game/engine_internals.md — OBJ (sprite) pipeline — the R2 answer (session 14, static decode); docs/game/engine_internals.md — The chain, end to end; build/manifest/huitzil.toml — beam_effect_class31; tests/audit_effect_class_rows.sh; tests/lua/obj_record_full_trace.lua; +2 more |
 | `PRG:0x01AFC6` | docs/game/atlas/sprite_lists.md — Handler targets; docs/project/gotchas.md — Per-record BANK attribution: the effect-tail triage has no bank column; tests/lua/obj_record_bank_trace.lua; tests/lua/obj_record_full_trace.lua; tools/obj_records.py |
+| `PRG:0x01B0B4` | docs/game/engine_internals.md — Blizzard Sword's snowflake: ours draws an ice streak behind it that native vs2 does not (seen 14z-216, #346; its source measured 14z-218: the class-0x72 trail pieces) |
 | `PRG:0x01B234` | docs/game/atlas/sprite_lists.md — Handler targets; docs/game/engine_internals.md — OBJ (sprite) pipeline — the R2 answer (session 14, static decode); docs/project/gotchas.md — Per-record BANK attribution: the effect-tail triage has no bank column; tests/lua/obj_record_bank_trace.lua; tests/lua/obj_record_full_trace.lua; tools/obj_records.py |
 | `PRG:0x01B2BC` | docs/game/engine_internals.md — (14z-70, maintainer-endorsed; use this FIRST); docs/game/engine_internals.md — The 214+P grenade explosion — the uncopied-tile class, and the rigs it took (fixed 14z-70f, verified 14z-123) |
 | `PRG:0x01B300` | docs/game/engine_internals.md — Per-tenant win-screen checklist |

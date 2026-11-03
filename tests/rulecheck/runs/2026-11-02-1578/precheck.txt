@@ -1,0 +1,3 @@
+  FLAG D-FIGURE: 41  [build/agent218/t347/close/closing_347.md]
+  FLAG D-FIGURE: 31  [build/agent218/t347/close/closing_347.md]
+packet_check: 2 flag(s): D-FIGURE 2

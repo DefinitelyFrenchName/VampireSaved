@@ -1,0 +1,5 @@
+  FLAG ATTRIB: The captures were put to the maintainer before this recommendation and the maintainer confirmed the position reading in their own words (issue345_comments.md...
+  FLAG D-ABSOLUTE: - **Before building A:** a feasibility and legacy census, as for #356 — every legacy user of effect class 0x72 found, and the change scoped to the tenant's s...  [build/agent218/t345/rec/recommendation_345.md]
+  FLAG D-ABSOLUTE: Matching native's lost frames needs ours' second pass within ~310 cycles of native's at the critical pass, so A alone is not guaranteed to line them up (the ...  [build/agent218/t345/rec/recommendation_345.md]
+  FLAG D-ABSOLUTE: **Not measured:** the analysis under a non-zero RNG (forms B and C: every figure above is under the 0000 pin, and the two-source attribution could differ the...  [build/agent218/t345/rec/recommendation_345.md]
+packet_check: 4 flag(s): ATTRIB 1, D-ABSOLUTE 3

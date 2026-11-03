@@ -1,0 +1,6 @@
+  FLAG ATTRIB: The captures were put to the maintainer before this recommendation and the maintainer confirmed the position reading in their own words (issue345_comments.md...
+  FLAG D-ABSOLUTE: - **Before building A:** a feasibility and legacy census, as for #356 — every legacy user of effect class 0x72 found, and the change scoped to the tenant's s...  [build/agent218/t345/rec/recommendation_345.md]
+  FLAG D-ABSOLUTE: Matching native's lost frames needs ours' second pass within ~310 cycles of native's at the critical pass, so A alone is not guaranteed to line them up (the ...  [build/agent218/t345/rec/recommendation_345.md]
+  FLAG D-ABSOLUTE: - **B (a cheaper slot-clearing wrapper) is held** until A is measured: the clear exists for the round-2 stale-byte class ([VSE-23]) and is shared by every te...  [build/agent218/t345/rec/recommendation_345.md]
+  FLAG D-ABSOLUTE: **Not measured:** direct collisions in the shifted frames (only geometry: P2 stands more than 100 px beyond the box in these rigs); FBNeo and MiSTer, where t...  [build/agent218/t345/rec/recommendation_345.md]
+packet_check: 5 flag(s): ATTRIB 1, D-ABSOLUTE 4

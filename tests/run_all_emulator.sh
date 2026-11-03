@@ -267,8 +267,18 @@ STALE_NAMES=""
 if [ "$STALE" = 1 ]; then
     _sn_cad=""; [ "$CADENCE" = romset ] && _sn_cad="--cadence freeze"   # STALE-CADENCE
     _sn_err="$(mktemp "${TMPDIR:-/tmp}/vs_stale_names.XXXXXX")"
+    # THE AUDIT'S FAILURE IS NOT AN EMPTY LIST (14z-218, #347's rule-checker run 2026-11-02-1586). `--names` exits 0
+    # on every list it prints, empty included; any other exit is the audit failing (a crash, a bad registry), and
+    # until 14z-218 `|| true` read that as "no emulator gate is stale" and exited 0, so a freeze's --stale ran nothing.
+    _sn_rc=0
     # shellcheck disable=SC2086
-    STALE_NAMES="$(python3 tools/audit_emulator_staleness.py $_sn_cad --names 2>"$_sn_err" || true)"
+    STALE_NAMES="$(python3 tools/audit_emulator_staleness.py $_sn_cad --names 2>"$_sn_err")" || _sn_rc=$?
+    if [ "$_sn_rc" != 0 ]; then   # STALE-AUDIT-RC
+        echo "REFUSED: --stale: tools/audit_emulator_staleness.py${_sn_cad:+ $_sn_cad} --names exited $_sn_rc, so there is no stale list:"
+        tail -n 20 "$_sn_err" | sed 's/^/         /'
+        echo "         nothing was executed."
+        rm -f "$_sn_err"; exit 1
+    fi
     grep '^NOTE: ' "$_sn_err" | sed 's/^/--stale: /' || :
     rm -f "$_sn_err"
     if [ "$CADENCE" != all ]; then   # STALE-CADENCE-DROP

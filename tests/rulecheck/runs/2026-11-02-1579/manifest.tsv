@@ -1,0 +1,5 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent218/t351/close/issue351.md	e98c0f58e3d522f8352f8d592b7825987ba599f0
+build/agent218/t351/close/fix_committed.diff	5152a3e3e7111cf631e5c22e8c958691540cc0e4
+build/agent218/t351/close/evidence351.txt	ee36ef2f76444554255a5b333ce281f9ea720a65
+build/agent218/t351/close/closing_351.md	38c19d344556e45a51f32f74bc23012926d06b3c

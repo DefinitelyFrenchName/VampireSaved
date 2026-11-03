@@ -1,0 +1,4 @@
+  FLAG ATTRIB: The position and timing captures were put to the maintainer before this recommendation and the maintainer confirmed the position reading in their own words (...
+  FLAG D-ABSOLUTE: - **Before building A:** a feasibility and legacy census, as for #356 — every legacy user of effect class 0x72 found, and the change scoped to the tenant's s...  [build/agent218/t345/rec/recommendation_345.md]
+  FLAG D-ABSOLUTE: A alone is therefore not guaranteed to line the lost frames up (the analysis predicts A+B lands within about -300 to +700 cycles per pass); that is measured ...  [build/agent218/t345/rec/recommendation_345.md]
+packet_check: 3 flag(s): ATTRIB 1, D-ABSOLUTE 2

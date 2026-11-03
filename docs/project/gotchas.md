@@ -7942,3 +7942,15 @@ and a run with only the `pyx` hook on PYTHONPATH pass. The planting shim (`tests
 straight through unless the row plants `sh`, and its count-only runs of that gate PASS. **The rule:** a trace of a gate
 that inspects process trees is a candidate list, not a baseline; judge each row against the gate's count-only run under
 the PLANTING shim, never against a run under the tracer.
+
+## A CALL WHOSE OUTPUT IS A LIST MUST NOT READ ITS FAILURE AS AN EMPTY LIST — `run_all_emulator.sh --stale` took a crashed staleness audit for "no emulator gate is stale" and exited 0 (paid: 14z-218, #347's rule-checker run 2026-11-02-1586)
+
+The runner read the audit's names as `STALE_NAMES="$(python3 tools/audit_emulator_staleness.py … --names 2>… || true)"`
+(before #347, `2>/dev/null || true`). A crash printed no name, so the list was empty, and an empty list is the runner's
+"clean tree" answer: it printed `--stale: no emulator gate is stale` and exited 0. A freeze's `--stale` would have run
+nothing and read as done. #347's own fix made the call run more code (the registry read and the cadence filter now run
+before `--names` returns), and only the closure's rule-checker read the `|| true`. **The rule:** a producer that exits 0
+on every list it prints is judged by its exit status first; `|| true` (or `2>/dev/null`) around a call whose EMPTY output
+means "nothing to do" turns its failure into a pass. Now the runner refuses on any non-zero exit with the audit's stderr
+(`tests/test_emulator_runner.sh` section 25g, control `audit-crash-swallowed`). The crash sweep (#310) proves only
+`vs_ctl_show_err` sites, so a call like this one is outside it.

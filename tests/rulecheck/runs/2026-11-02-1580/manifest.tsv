@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent218/t345/rec/issue345.md	961d9d5178877eb7c13d200ba1d803e6f4e47cb6
+build/agent218/t345/rec/issue345_comments.md	d132714ddb939f4f081575e1a87b7b7dd81cbf69
+build/agent218/t345/rec/issue346.md	7e4bc820a85dfe842fcc116edbcae70128fa6e03
+build/agent218/t345/rec/analysis_REPORT.md	63ea0e24211f365ddd7e895aab306a733564fde3
+build/agent218/t345/rec/sheets_REPORT.md	343c94fff98e962a3b23d871b3249a18e222704a
+build/agent218/t345/rec/streak_REPORT.md	47be60edc9a5c74666a155b1159f8a3797b21a83
+build/agent218/t345/rec/analyze.out	cdbd72d28733e95c8bed19925d4aa3ecc0b7b7de
+build/agent218/t345/rec/ramcheck.out	fa3f0896352bc63df779da2e60d971ea642a522b
+build/agent218/t345/rec/recommendation_345.md	e85e0698cadda584b59191c617caf6a751a34555

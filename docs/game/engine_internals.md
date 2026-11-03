@@ -1457,14 +1457,26 @@ in its handler (above); the type's handler is `pool_table[type]` through
 the walker's LONG table ([VSE-18]), and the projectile hit-class map of
 "The projectile-pool HIT-CLASS map" is indexed by these same types.
 
-### Blizzard Sword's snowflake: ours draws an ice streak behind it that native vs2 does not (seen 14z-216, #346)
+### Blizzard Sword's snowflake: ours draws an ice streak behind it that native vs2 does not (seen 14z-216, #346; its source measured 14z-218: the class-0x72 trail pieces)
 
 On the #345 comparative sheets (native vs2 above merged-m24, the same frames, `tools/naming_pair_sheet.sh` on the move-parity
 rig) our snowflake drags a long blue ice streak and native's does not: donovan_2's Blizzard Sword [HP] about f3097-3102, and
 every frame of donovan_11's Blizzard Sword [LP] blocked from f4574 into the shatter (about f4587). The maintainer read it
-so (*"indeed there is a blue ice streak"*). What draws it is NOT measured — an effect object, a frame of the snowflake's own
-animation, a palette or a priority difference — nor whether merged-m23 shows it. Fighter-state parity cannot see it (it
-compares the fighter, not effect objects). [M: the captures, `build/agent216/s345/` (local); no gate]
+so (*"indeed there is a blue ice streak"*), and on native: *"I've confirmed that VS2 doesn't show the ice streak with the
+snowflake"* (14z-218). Fighter-state parity cannot see it (it compares the fighter, not effect objects). [M: the captures,
+`build/agent216/s345/` (local); no gate]
+
+**What draws it (measured 14z-218; at 14z-216 this read "NOT measured — an effect object, a frame of the snowflake's own
+animation, a palette or a priority difference").** Donovan's class-0x72 trail pieces in the effect pool `RAM:$FFB800` —
+the pieces vs2 gives a no-draw record (format 10, a bare `rts`) and ours draws with vsavj's class-0x72 content (format 0,
+one tile each, codes `GFX:tile 0x7BFD`-`0x7C02` in bank 0x4000, written by the format-0 handler at `CPU:$01B0B4`). On
+donovan_2 under the parity rig's pins, moving only those pieces' OBJ entries off screen as the CPU writes them removes the
+streak on every frame 3098-3118, with work RAM identical to the untouched run on all 41 frames 3080-3120 and 0 pixels
+changed outside the pieces' screen cells; the same suppression on the snowflake's own entries (`RAM:$FF9600`, type 0x3E)
+removes the snowflake and keeps the streak. The same pieces are most of #345's extra pass cost (+458 cycles per piece per
+drawing pass). `$3C` = FF on a slot is NOT a no-draw: the drawer's `bmi` at `CPU:$01ADDA` still draws the object and skips
+only its companion links. Not measured: donovan_11, merged-m23, FBNeo, MiSTer. [M: `build/agent218/t345/streak/` (local),
+the capture sheet sent to the maintainer; no gate]
 
 ### Every `$FF9400` type's parameters, decoded and measured (14z-121)
 

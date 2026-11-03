@@ -48,6 +48,7 @@
 # MUST-FIRE: shadow-tool: lost-unread — a copy of the runner whose LOST-ROWS check is disabled must print GREEN for a pooled lane in which one gate's worker died before writing its row, and section 22 must FAIL (mode: that copy is the runner; #321, 14z-210: PILOT printed GREEN on PASS 1 of 3)
 # MUST-FIRE: shadow-tool: log-reused — a copy of the runner whose LOG-FRESH test is always false must append a second run's row to a log directory that already holds a run, and section 24 must FAIL (mode: that copy is the runner every section drives; #353, 14z-218)
 # MUST-FIRE: shadow-tool: stale-default-cadence — a copy of the runner whose STALE-CADENCE line never asks the audit at freeze cadence must REFUSE `--stale --freeze` on an ondemand name, and section 25 must FAIL (mode: that copy is the runner every section drives; #347, 14z-218)
+# MUST-FIRE: shadow-tool: audit-crash-swallowed — a copy of the runner whose STALE-AUDIT-RC test is always false must read a crashing staleness audit as "no emulator gate is stale" and exit 0, and section 25g must FAIL (mode: that copy is the runner every section drives; #347's rule-checker run 2026-11-02-1586, 14z-218)
 # MUST-FIRE: shadow-tool: stale-cadence-refused — a copy of the runner whose STALE-CADENCE-DROP test is always false must REFUSE `--stale --cadence bitstream` on a romset-cadence name, and section 25 must FAIL (mode: that copy is the runner every section drives; #347, 14z-218)
 # MUST-FIRE: perturbed-copy: row-not-executable — a farm of symlinks to the REAL scripts named by the REAL tests/ci_emulator.tsv, with ONE replaced by a non-executable copy, must make section 10b report it unrunnable (mode: that farm is what 10b checks; section 10b must fail)
 #
@@ -189,7 +190,9 @@ sed 's@^    _sn_cad=""; \[ "$CADENCE" = romset \] && _sn_cad="--cadence freeze" 
 cmp -s "$RUNNER" "$T/runner_stalecad.sh" && fail "could not disable the freeze-cadence names — the STALE-CADENCE line moved"
 sed 's@^    if \[ "$CADENCE" != all \]; then   # STALE-CADENCE-DROP$@    if false; then   # STALE-CADENCE-DROP disabled@' "$RUNNER" > "$T/runner_stalecaddrop.sh"
 cmp -s "$RUNNER" "$T/runner_stalecaddrop.sh" && fail "could not disable the cadence drop — the STALE-CADENCE-DROP line moved"
-chmod +x "$T/runner_logreused.sh" "$T/runner_stalecad.sh" "$T/runner_stalecaddrop.sh"
+sed 's@^    if \[ "$_sn_rc" != 0 \]; then   # STALE-AUDIT-RC$@    if false; then   # STALE-AUDIT-RC disabled@' "$RUNNER" > "$T/runner_auditswallowed.sh"
+cmp -s "$RUNNER" "$T/runner_auditswallowed.sh" && fail "could not disable the audit-failure refusal — the STALE-AUDIT-RC line moved"
+chmod +x "$T/runner_logreused.sh" "$T/runner_stalecad.sh" "$T/runner_stalecaddrop.sh" "$T/runner_auditswallowed.sh"
 chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh" "$T/runner_emptygreen.sh" "$T/runner_crashunread.sh" "$T/runner_lanevar.sh" "$T/runner_warmoff.sh" "$T/runner_ccoff.sh" "$T/runner_orderoff.sh"
 case "$VS_CTL" in
 empty-green)      ln -s "$T/runner_emptygreen.sh" "$FR/tests/run_all_emulator.sh" ;;
@@ -209,6 +212,7 @@ tmp-ignored)      ln -s "$T/runner_tmpoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 lost-unread)      ln -s "$T/runner_lostoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 log-reused)       ln -s "$T/runner_logreused.sh" "$FR/tests/run_all_emulator.sh" ;;
 stale-default-cadence) ln -s "$T/runner_stalecad.sh" "$FR/tests/run_all_emulator.sh" ;;
+audit-crash-swallowed) ln -s "$T/runner_auditswallowed.sh" "$FR/tests/run_all_emulator.sh" ;;
 stale-cadence-refused) ln -s "$T/runner_stalecaddrop.sh" "$FR/tests/run_all_emulator.sh" ;;
 *)                ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh" ;;
 esac
@@ -1198,6 +1202,8 @@ reg "$(row g_pass mame release - '')" "$(row g_ond mame ondemand - 'pristine: a 
     "$(rowc g_bit mister release bitstream - 'a bitstream stub')"
 cat > "$FR/tools/audit_emulator_staleness.py" <<'PY'
 import os, sys
+if os.environ.get("S25_CRASH"):
+    raise RuntimeError("S25 planted audit crash")
 if "--names" in sys.argv:
     if "--cadence" in sys.argv and sys.argv[sys.argv.index("--cadence") + 1] == "freeze":
         names = os.environ.get("S25_FREEZE", "").split()
@@ -1210,7 +1216,7 @@ if "--names" in sys.argv:
 PY
 s25() {  # s25 <runner> <log> [args...] -> S25_RC, S25_OUT
     _r="$1"; _l="$2"; shift 2; S25_RC=0
-    S25_OUT="$( (cd "$FR" && S25_ALL="$S25_ALL" S25_FREEZE="$S25_FREEZE" ROMDIR="$T/roms" MERGED=build/fake_merged \
+    S25_OUT="$( (cd "$FR" && S25_ALL="$S25_ALL" S25_FREEZE="$S25_FREEZE" S25_CRASH="${S25_CRASH:-}" ROMDIR="$T/roms" MERGED=build/fake_merged \
         sh "tests/$_r" --stale --log "$_l" "$@" 2>&1) )" || S25_RC=$?
 }
 names25() { awk -F'\t' 'NR > 1 {printf "%s ", $1}' "$1/results.tsv" 2>/dev/null; }
@@ -1259,6 +1265,27 @@ if ! vs_ctl_is stale-cadence-refused; then
         && vs_ctl_fired stale-cadence-refused "a runner without the cadence drop REFUSES --stale --cadence bitstream on the romset-cadence g_pass — section 25 catches it" \
         || { vs_ctl_dead stale-cadence-refused "the runner without the drop: exit $S25_RC, ran '$(names25 "$T/l25f")'"; fail "stale-cadence-refused"; }
 fi
+# 25g (14z-218, #347's rule-checker run 2026-11-02-1586): an audit that FAILS is not an empty stale list. Until then the
+# runner read `|| true`: a crashed audit printed nothing, the runner said "no emulator gate is stale" and exited 0.
+S25_ALL="g_pass"; S25_FREEZE="g_pass"; S25_CRASH=1
+s25 run_all_emulator.sh "$T/l25g" --freeze
+if [ "$S25_RC" = 1 ] && [ ! -d "$T/l25g" ] \
+        && printf '%s\n' "$S25_OUT" | grep >/dev/null '^REFUSED: --stale: tools/audit_emulator_staleness.py --cadence freeze --names exited 1' \
+        && printf '%s\n' "$S25_OUT" | grep >/dev/null 'S25 planted audit crash' \
+        && ! printf '%s\n' "$S25_OUT" | grep >/dev/null 'no emulator gate is stale'; then
+    ok "--stale --freeze on a crashing audit: REFUSED with the audit's traceback, exit 1, no run directory"
+else
+    fail "--stale --freeze on a crashing audit: exit $S25_RC, dir $([ -d "$T/l25g" ] && echo made || echo none) — $(printf '%s\n' "$S25_OUT" | grep -E '^REFUSED|^--stale' | head -2 | tr '\n' ' ')"
+    vs_ctl_is audit-crash-swallowed && vs_ctl_fired audit-crash-swallowed "with the audit's exit ignored, a crashing audit: exit $S25_RC, $(printf '%s\n' "$S25_OUT" | grep -E '^--stale' | head -1)"
+fi
+if ! vs_ctl_is audit-crash-swallowed; then
+    ln -s "$T/runner_auditswallowed.sh" "$FR/tests/run_all_emulator_auditswallowed.sh"
+    s25 run_all_emulator_auditswallowed.sh "$T/l25h" --freeze; rm -f "$FR/tests/run_all_emulator_auditswallowed.sh"
+    [ "$S25_RC" = 0 ] && printf '%s\n' "$S25_OUT" | grep >/dev/null 'no emulator gate is stale' \
+        && vs_ctl_fired audit-crash-swallowed "a runner that ignores the audit's exit reads a crashing audit as 'no emulator gate is stale', exit 0 — section 25g catches it" \
+        || { vs_ctl_dead audit-crash-swallowed "the runner ignoring the audit's exit: exit $S25_RC — $(printf '%s\n' "$S25_OUT" | head -1)"; fail "audit-crash-swallowed"; }
+fi
+S25_CRASH=""
 rm -f "$FR/tests/g_mist.sh" "$FR/tests/g_bit.sh" "$FR/tools/audit_emulator_staleness.py"
 
 echo

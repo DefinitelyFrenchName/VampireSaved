@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: On the Mac and on PILOT the gate PASSES with 21 of 21 controls fired and every one of its 21 modes reads HONOURED.  [build/agent218/t347/close/closing_347.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1
