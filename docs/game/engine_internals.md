@@ -1478,6 +1478,33 @@ drawing pass). `$3C` = FF on a slot is NOT a no-draw: the drawer's `bmi` at `CPU
 only its companion links. Not measured: donovan_11, merged-m23, FBNeo, MiSTer. [M: `build/agent218/t345/streak/` (local),
 the capture sheet sent to the maintainer; no gate]
 
+### The speed-line effect (class 0x0F): vs2 widened its tables from 12 subs to 14 for Donovan's dashes (measured 14z-218, #356)
+
+The dash speed lines are effect-pool pieces (`RAM:$FFB800`, 32 x `$80`) of type 0x0F, handler vsavj `PRG:0x061C42` / vs2
+`PRG:0x06E1D2`. Their spawner (vsavj `PRG:0x061ED4` / vs2 `PRG:0x06E4A6`) allocates four pieces with the RAW allocator
+(vsavj `PRG:0x016FBA`), stamps type 0x0F at `+0x02`, the caller's sub (d0) at `+0x03`, the piece index 3..0 at `+0x38`
+and the owner at `+0x30`. The handler's init indexes two PC-relative tables BY SUB — the facing-EOR bytes (vsavj
+`PRG:0x061D44`, 12 bytes; vs2 `PRG:0x06E2D4`, 14) and the offsets, 32 bytes per sub (vsavj `PRG:0x061D54`, subs
+0x00-0x0B; vs2 `PRG:0x06E2E6`, 0x00-0x0D) — and on every frame picks one of each piece's two offset pairs by the parity of
+`$B4(A5)+$B5(A5)` (A5 = `$FF8000`). Rows 0x00-0x0B are identical in the two games; vs2's two added rows are Donovan's,
+sub 0x0C for his forward dash and 0x0D for his back dash (vs2's dash handler `PRG:0x05A81A`). Handler and spawner are
+otherwise byte-identical between the games but for five displacement bytes (the longer EOR table) and the bank word
+(vsavj `#$0`, vs2 `#$4000` at `+0x2C`): vs2 draws the same art, pixel-identical on all four pieces, from bank 0x4000.
+Legacy users measured on the 16 legacy dash cells (subs 0x00-0x09): Bulleta, Victor, Anakaris, Bishamon, Lei-Lei, Lilith; Phobos and Pyron
+never spawn it on vs2. A sub past the twelfth reads past both of vsavj's tables into its spawner's code: junk positions,
+every piece culled (what ours draws for Donovan through M24; the port's fix, a tenant-only copy as effect type 124, is
+`docs/project/patch_notes.md` 14z-219, staged for the M25 freeze). [M: `build/agent218/tspeed/REPORT.md` and `feas/REPORT.md` (local, the census
+and the static comparison); `tests/audit_don_speed_lines.sh` (the records against native vs2, 14z-219)]
+
+**Why vs2 draws nothing there (measured 14z-219, the class-0x72 census, #345).** The trail pieces (class 0x72, sub 0x00 —
+Blizzard Sword's snowflake machine, vs2 `PRG:0x06712C`) take their animation from the SHARED effect anim table, vs2
+`PRG:0x1D7428` / vsavj `PRG:0x1F3FD2` (vhunt2 `PRG:0x1DE55A`): the same 116-row index, the same nodes and the same
+durations, flags and links in all three games, 403 pointer fields at the same offsets. vs2's 384 record pointers all
+reach its own two format-10 (no-draw) records — vs2 BLANKED the table — while vsavj's and vhunt2's nodes reach drawing
+records (vsavj: 212 format 2, 23 format 0, 1 format 10). vsavj's is live legacy content: Sasquatch reads its rows 0x0B,
+0x33-0x44 and 0x5D; rows 2-5, the trail pieces', were read by no legacy rig of the census. vsavj has no class 0x72 at all
+(its effect walker table ends at type 0x71). [M: `build/agent219/t345/CENSUS.md` (local)]
+
 ### Every `$FF9400` type's parameters, decoded and measured (14z-121)
 
 `tools/projectile_params.py` decodes the init block of a type handler

@@ -630,6 +630,32 @@ def main():
         fixed_len = int(parts[1], 0) if len(parts) > 1 and parts[1] else None
         forced_twin = None
         is_data = len(parts) > 3 and parts[3] == "d"
+        # `:dp` (14z-219, #345 A1b) — a DATA region whose pointer fields are SELF-POINTERS only: every 2-aligned long
+        # whose SOURCE value lies inside [root, root+len) is an internal ref, nothing else is. For a table the oracle
+        # twin cannot classify because the twin's pointers go ELSEWHERE (vs2's blanked effect anim table 0x1D7428:
+        # every node points at its own two no-draw records, vhunt2's at distinct records ~0x7000 past its copy). The
+        # set is printed and its count asserted by the caller's tests; a value that only LOOKS internal is the risk,
+        # checked for 0x1D7428 against vsavj's twin table (403 of 403 offsets, 14z-219).
+        is_selfptr = len(parts) > 3 and parts[3] == "dp"
+        if is_selfptr:
+            sh_name = f"x{root:06x}"
+            if fixed_len is None:
+                fail.append(f"extra root {root:#x}: `:dp` needs a length")
+                continue
+            if len(parts) > 2 and parts[2].startswith("t"):
+                forced_twin = int(parts[2][1:], 0)
+            shifts[sh_name] = (forced_twin if forced_twin is not None else root) - root
+            xrefs = []
+            for off in range(0, fixed_len - 3, 2):
+                tgt = int.from_bytes(src.data[root + off:root + off + 4], "big")
+                if root <= tgt < root + fixed_len:
+                    xrefs.append({"off": off, "width": 32, "target": tgt, "shift": sh_name, "class": "internal"})
+            regions[sh_name] = {"src": root, "orc": forced_twin if forced_twin is not None else root,
+                                "len": fixed_len, "kind": "data", "shift": sh_name, "pre_classified": True,
+                                "refs": xrefs, "variant_sites": [], "selfptr_only": True}
+            report.append(f"extra region {sh_name}: DATA, SELF-POINTERS ONLY (`:dp`), len 0x{fixed_len:X}, "
+                          f"{len(xrefs)} pointer fields (every 2-aligned long whose value lies inside the region)")
+            continue
         # `:f` — FORCE the declared length (14z-69). Normally fixed_len is a
         # CAP and the sibling oracle decides where the region ends, which is
         # right for code: unvalidated bytes are not worth copying. It is

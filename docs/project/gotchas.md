@@ -7954,3 +7954,26 @@ on every list it prints is judged by its exit status first; `|| true` (or `2>/de
 means "nothing to do" turns its failure into a pass. Now the runner refuses on any non-zero exit with the audit's stderr
 (`tests/test_emulator_runner.sh` section 25g, control `audit-crash-swallowed`). The crash sweep (#310) proves only
 `vs_ctl_show_err` sites, so a call like this one is outside it.
+
+## THE ALLOCATOR'S GAP-FIT IGNORES A REGION'S ASSIGNED SPACE — a small region named in `region_space` landed in a hole_a gap and moved every later small allocation (paid: 14z-219, the Mac; #356)
+
+`tools/gen_donovan_patch.py`'s `alloc()` tried the layout-group gaps (`gap_free`) FIRST, whatever space the caller asked
+for. `region_space = "…,x06e1d2=wide_ext"` asked for the extension, and #356's 0x2FE speed-line copy went instead into a
+gap inside Donovan's code layout group at `PRG:0x0C9430` (the crypt hole): every later gap-fit allocation (the alloc
+wrappers, the farm stubs, the tripwires) moved by 0x300, 100 ops of the solo build changed against `build/don_m28`, all of
+them relocations. It still ran — the handler's tables are read PC-relatively, through the opcode view, so the crypt hole
+reads them right — which is why nothing failed. `x101aca`, the only earlier `region_space` row, was too large for any gap
+and so never showed it. **The rule:** a region the manifest assigns to a space skips gap-fit (`alloc(…, gapfit=False)`,
+14z-219); after any placement change diff the build's op set against its predecessor (`build/agent219/t356/opdiff.py`,
+local) before reading the result — an allocation that went somewhere unexpected shows as a cascade of relocated operands.
+
+## A `:d` DATA ROOT WHOSE TWIN POINTS ELSEWHERE CLASSES NO POINTER — and copies every node's source address verbatim (paid: 14z-219, the Mac; #345 A1b)
+
+The segmented data oracle (`tools/extract_char.py` `segmented_data_refs`) classes a pointer field only when BOTH siblings'
+values fall inside their own region's window. vs2's effect anim table `0x1D7428` points every node at its OWN two no-draw
+records; vhunt2's twin points at distinct drawing records about 0x7000 past its copy, outside the window. The root
+`0x1d7428:0x1308:t0x1de55a:d` extracted cleanly and reported `0 pointer fields, 2 segments, 1 dead zones (0x1208 bytes
+unaligned)` — a placed copy would have carried 403 raw vs2 addresses into the vsavj image. Nothing failed. **The rule:** a
+DATA root's report line is read before its build — "0 pointer fields" on a table of nodes is a classification failure,
+not a fact; check the twin's pointers against the source's by hand, and when the twin cannot class them use `:dp`
+(self-pointers only), cross-checked against the third sibling's table (403 of 403 offsets for `0x1D7428`).

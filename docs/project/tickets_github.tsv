@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 359
+# issues: 360
 number	state	reason	closed	labels	title
+360	OPEN	-	-	bug,cosmetic	In Dark Force, two of Donovan's dash speed lines alternate one frame out of phase with native vs2
 359	OPEN	-	-	bug,test-integrity	Cleanup traps on EXIT INT TERM with no exit let a TERM'd gate keep running (210 scripts)
 358	OPEN	-	-	bug,cosmetic	Phobos's Plasma Beam (ES) [PP]: fewer visible effect pieces on our build than native vs2 (177 vs 240 piece-frames; lead from #356)
 357	OPEN	-	-	bug,cosmetic	Donovan's Ifrit Sword guard-cancel: native vs2 draws class-0x72 effect pieces our build lacks (lead from #356)

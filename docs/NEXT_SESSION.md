@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-218 CLOSE, 2026-11-02)
+# NEXT SESSION — orientation (rewritten at the 14z-219 CLOSE, 2026-11-03)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -19,19 +19,15 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
-idle`). Its checkout `~/vampire-saved` sits at `3e1a7091` (14z-217's close): move it to `main` before other work.
-It still holds 14z-218's scratch `~/rt218` (1.9 GB: the re-trace clones and the runner-gate mode runs; their results are
-copied to the Mac under `build/agent218/`).
-**ERIS** (WSL2, 24 threads, 47 GB) runs the release shape; its checkout sits at `3e1a7091`; it still holds 14z-218's crash
-sweep scratch `~/t310p3b`, `~/t310r`, `~/t310s`, `~/t310u` (results on the Mac, `build/agent218/t310/`). Delete both
-hosts' 14z-218 scratch only on the maintainer's word, after a listing. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a
-bare commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s' <
-script` (ERIS) or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shell splits it at a pipe and
-mangles quotes), and a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s
-<sid>`), from a stdin script.
+idle`). It was back at the end of 14z-219, idle; its checkout `~/vampire-saved` still sits at `3e1a7091`: move it to `main`
+before other work. **ERIS** (WSL2, 24 threads, 47 GB) runs the release shape; it was powering up at the 14z-219 close, its
+checkout at `3e1a7091`. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
+commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS)
+or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shell splits it at a pipe and mangles quotes), and
+a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-218's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-219's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
@@ -62,28 +58,32 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **#356 — BUILD THE SPEED-LINE COPY** (ruled 14z-218, `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356": the
-   maintainer, *"ideally Option 1 (new copy of the effect, using vs2 effect)"*, then **"Yes, next session (Recommended)"** and
-   **"Raw allocator (Recommended)"**). A tenant-only copy of effect class 0x0F with vs2's 14-row tables (Donovan's dash subs
-   0x0C and 0x0D), spawned with the raw allocator; legacy class 0x0F untouched by construction. The census and the
-   feasibility study: `build/agent218/tspeed/REPORT.md`, `build/agent218/tspeed/feas/REPORT.md` (local). Gate it, capture
-   it against native vs2 for the maintainer, then the M25 freeze.
-2. **#345 — OPTION A** (ruled 14z-218, `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #345": the maintainer,
-   **"A first, B held (Recommended)"**). Donovan's class-0x72 trail pieces take vs2's no-draw form (format 10), which also
-   removes #346's ice streak (its source measured 14z-218, `docs/game/engine_internals.md`). FIRST the class-0x72 legacy
-   census (#357: vs2 DRAWS class-0x72 pieces on Ifrit Sword's guard-cancel) and A's plan, put to the maintainer before
-   anything is built; then re-measure the lost frames under all three RNG forms and compare A's build against native vs2 on
-   screen. B (a cheaper slot-clearing wrapper) waits for A's measurement. The recommendation and its evidence:
-   `build/agent218/t345/rec/` (local), and #345's 14z-218 comment.
-3. **#310 — GROUP 7, in batches** (the crash-injection sweep is built: `tests/test_crash_sweep.sh`; #310's 14z-218 progress
-   comment holds what it found and its stated limits).
-4. **Captures for #357 and #358** (the #356 census's leads), before any mechanism theory.
-5. **#359** (cleanup traps on `EXIT INT TERM` with no `exit`: a TERM'd gate keeps running; 210 scripts).
-6. **Ask the maintainer for the order of the rest.** Open tickets (GitHub severity labels):
-   - bugs: #345 (item 2); evolution: #348 (no tracked-release-vs-build gate), #352 (the desktop gate's paused-FBNeo verdict),
-     #354 (no gate on #294's dead span in the built image); cosmetic: #344 (Donovan's Dark Force colours), #346 (the ice
-     streak: #345's option A), #356 (item 1), #357, #358; test-integrity: #310 (item 3), #359 (item 5).
-   - parked: #123, #124, #125, #128.
+1. **THE M25 FREEZE — #356 AND #345 A1b** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356" — *"Yes, next
+   session (Recommended)"* — and "Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted" — **"Accept, freeze
+   A1b (Recommended)"**; the maintainer at the 14z-219 close: *"let's close and freeze next session"*). Both are built and
+   STAGED as `build/manifest/staged/356_345a1b.patch` — `git apply` it first; patch_notes 14z-219 lists what the freeze then
+   re-freezes (the close tier's eight reds with the patch applied) and that `build/m5_wide/extract` must be re-extracted on
+   purpose; the scratch builds `build/agent219/t356/mg1` (#356 alone) and `build/agent219/t345a/mg` (both) are local. Until
+   M25 the two new gates, `tests/audit_don_speed_lines.sh` and `tests/audit_don_trail_nodraw.sh`, FAIL on merged-m24 at their
+   precondition, by design. The freeze: the six tracks rebuilt with mark M25 (`build/don_m29`, `hui63`, `pyron48`, `m3b_merged33`; the
+   stock twin and the stage-4 image measured unchanged at 14z-219), the registry rows, the four sets
+   (`tools/freeze_expectation_set.py`), the byte diff, the re-point sweep, the freeze-cadence static tier, the emulator
+   battery (`--freeze`, Mac + PILOT + ERIS), the concurrent-controls re-trace on PILOT (`test_emulator_runner` is OFF
+   `tests/controls_concurrent.txt` since 14z-218, and the two new gates' scripts are new), the MiSTer tail,
+   `release/merged-m25`, the freeze rule-checker run, the tags. **What A1b moves, each re-frozen through its own rule-checker
+   run:** `tests/expected/pass_overrun.tsv` (ours' donovan_2 3094 -> none), `audit_lag_budget`'s ACCEPTED `donovan_2:3094`
+   (stale: the gate says so), `tests/expected/move_parity_events.tsv` (donovan_2 events 2-25: 3-25 IDENT -> DIFF `after:2`),
+   `audit_rng_forms`' rows; expect the usual relocations (placed addresses, the walker copy `0x4C23B0` -> about `0x4C39C0`, the
+   renumbered tenant types +1). Then #346 (the streak) is fixed: comment it `done unshipped`; #345 and #356 likewise.
+2. **#357 and #358 — attribute** (the captures read: *"Yes, the guard orbs"*, *"Yes, that figure"*; `DECISIONS_HISTORY.md`
+   "Ruled 2026-11-03 (14z-219) — #357 and #358"). #357: native spawns the orbs (class 0x72 sub 0x16) from vs2 `PRG:0x090FF4`,
+   a span no tenant region ports (`build/agent219/t345/CENSUS.md`, local). #358: the figure's x and pose
+   (`build/agent219/t357/`, local). A fix needs the maintainer's green light.
+3. **#310 — GROUP 7, in batches** (the crash-injection sweep: `tests/test_crash_sweep.sh`).
+4. **#359** (cleanup traps on `EXIT INT TERM` with no `exit`; 210 scripts).
+5. **Ask the maintainer for the order of the rest.** Open tickets (GitHub severity labels): bugs: #345 (freezes with M25);
+   evolution: #348, #352, #354; cosmetic: #344, #346, #356, #357, #358, #360 (#356's Dark Force phase); test-integrity:
+   #310, #359. Parked: #123, #124, #125, #128.
 
 ## PARKED (not open work)
 
@@ -92,28 +92,25 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A cleanup trap on `EXIT INT TERM` with no `exit` lets a TERM'd script carry on** after its cleanup, its work directory
-  gone (`docs/platform/gotchas.md`; #359). Kill a stuck driver with KILL, and give a new script's trap `'exit 143' INT TERM`.
-- **GNU `timeout` runs its command in a process group of its own** (`docs/platform/gotchas.md`): killing the driver's session
-  leaves it running; end the group, and stop a podman container by name.
-- **`sitecustomize` swallows an exception raised inside it** (`docs/platform/gotchas.md`): a planted crash there prints a
-  traceback and calls `os._exit(1)`.
-- **A PATH tracing shim makes `test_agent_sweep` fail** (`docs/project/gotchas.md`): a tracer artefact, not a finding.
-- **The Bash tool's zsh command-substitutes backticks inside a double-quoted argument**: a rule-checker `--claim` with
-  `` `name` `` in it loses the name (run `2026-11-02-1582`). Write the claim to a file and pass `--claim "$(cat FILE)"`.
-- **A call whose output is a list must not read its failure as an empty list** (`docs/project/gotchas.md`):
-  `run_all_emulator.sh --stale` took a crashed staleness audit for "no gate is stale" until 14z-218 (fixed, section 25g).
-  `test_emulator_runner` is OFF `tests/controls_concurrent.txt` until the next freeze's re-trace; re-trace it then.
-- **A caller census needs the unfiltered grep, its lines classed, and a known caller as its control**: a pattern-filtered
-  grep missed the `ROMDIR=… tests/…` call form (rule-checker run `2026-11-02-1582`).
-- **A one-frame OBJ suppression tap is a clean A/B; a format-word read tap is not**: moving a piece's OBJ entries off
-  screen as they are written leaves work RAM identical, while making the drawer skip the piece shortens the pass and
-  moves the frame (`build/agent218/t345/streak/REPORT.md`, local).
+- **The allocator's gap-fit ignored an assigned space** (`docs/project/gotchas.md`): a `region_space` region now skips it;
+  after any placement change, diff the op set against the predecessor (relocation cascades show at once).
+- **A `:d` DATA root whose sibling twin points elsewhere classes no pointer** (`docs/project/gotchas.md`): read a data root's
+  report line before its build; `:dp` takes self-pointers only, checked against the third sibling.
+- **`[[ref_pin]]`** pins one pointer field of a placed region (patch_index): for the placed-region-wins rule and a mapped
+  target that must bypass `alloc_wrap`.
+- **Whole-screen and OBJ-RAM identity are blind to a lost frame** here (the stage, the HUD and OBJ RAM change every frame);
+  P1's anim node and a pixel count under rows 40-224 separate the legs, but a pixel HOLD also fires on still frames
+  (`build/agent219/t345/rec/REC_lostframes.md`, local).
+- **A comparison gate judging after the legs' match diverged compares two matches**: `audit_don_speed_lines` judges a dash
+  group only while P1's state agrees through it.
+- **The rule-checker took eight runs on one recommendation** (`2026-11-03-1591`..`-1598`): each caught a real overclaim — a
+  single RNG form presented as general, a ranking that two measures order differently, an attribution resting on an
+  uncontrolled diff. Scope every on-screen claim to its form, window and instrument before the first prepare.
+- **Resolve, then prepare** — run `-1596` was prepared seconds before `-1595`'s resolve was accepted (an order slip).
 
-## WHAT CLOSED THIS SITTING (14z-218)
+## WHAT CLOSED THIS SITTING (14z-219)
 
-- **Built:** #310's crash-injection sweep gate (`tests/test_crash_sweep.sh`, `tests/audit_crash_sweep_emu.sh`): 88 rows for
-  96 call sites; crash-hiding paths fixed in 18 gates.
-- **Closed done:** #355 (rule-checker run `2026-11-02-1574`), #349 (`-1575`), #351 (`-1579`), #347 and #353 (`2026-11-03-1588`; the closure found and fixed the runner reading a failed staleness audit as an empty list).
-- **Ruled:** #356 (Option 1, next session, the raw allocator); #345 (option A first, B held; runs `-1576` to `-1585`).
-- **Filed:** #356, #357, #358, #359.
+- **Built (not frozen):** #356 (the speed-line copy) and #345 A1b (the no-draw table); gates `tests/audit_don_speed_lines.sh`,
+  `tests/audit_don_trail_nodraw.sh`.
+- **Ruled:** #356's look and its Dark Force phase (#360); #345 A1b and its timing; #357's and #358's captures.
+- **Filed:** #360.

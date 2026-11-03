@@ -1577,15 +1577,21 @@ def main():
     gap_free = []  # (start, end) inside already-claimed group spans
     # pcrel_far_tramps / dc_tables are per-tenant memos — bound in the loop.
 
-    def alloc(hole, size, what, fallback=True):
+    def alloc(hole, size, what, fallback=True, gapfit=True):
         """Place `size` bytes, returning the destination address.
 
         `hole` names a space ("a"/"b" are the legacy aliases). On overflow the
         space's declared `fallback` chain is followed, so growing the address
         space is a manifest edit rather than a code edit.
+
+        `gapfit=False` (14z-219, #356): skip the layout-group gap recycling —
+        a region the manifest ASSIGNED to a space (`region_space`) lands in
+        that space. Gap-fit ignores the space, and a small assigned region
+        taking a hole_a gap moved every later small allocation (measured on
+        #356's 0x2FE speed-line copy: 100 changed ops, 0x0C9430 onward).
         """
         # gap-fit first: reuse dead space inside layout-group spans
-        for gi, (gs, ge) in enumerate(gap_free):
+        for gi, (gs, ge) in enumerate(gap_free if gapfit else ()):
             if ge - gs >= size:
                 gap_free[gi] = ((gs + size + 0xF) & ~0xF, ge)
                 return gs
@@ -1775,8 +1781,12 @@ def main():
             _stab = _int(_ph["src_table"])
             _n_van = _int(_ph["vanilla_entries"])
             _n_src = _int(_ph["src_entries"])
+            # 14z-219 (#356): the COUNT honours the same only_variant_slot /
+            # only_base_slot gate as the emission loop below — the renumbered
+            # rows start after the authored rows that are actually EMITTED.
             _next = _n_src + len([e for e in port.get("obj_hook_extra", [])
-                                  if _int(e["site"]) == RENUMBER_SITE])
+                                  if _int(e["site"]) == RENUMBER_SITE
+                                  and row_applies(e, owner_of(e))])
             # stamps per (type, tenant), from the frozen inventory
             _stamps_by = {}
             for _row in _inv:
@@ -2158,7 +2168,8 @@ def main():
                 if name in grouped or name in near_map:
                     continue
                 r = regions[name]
-                d = alloc(space_of(name), r["len"], f"region {name}")
+                d = alloc(space_of(name), r["len"], f"region {name}",
+                          gapfit=name not in region_space)
                 if d is not None:
                     placed[name] = d
                     fragments.append((d, r["len"], "VS2",
@@ -2483,6 +2494,21 @@ def main():
                     blob[toff:toff + len(rows)] = bytes(rows)
                     notes.append(f"# {name}+{toff:#x}: table_fix {len(rows)} "
                                  f"bytes ({tf['note']})")
+                # [[ref_pin]] (14z-219, #356): pin one pointer field of a placed
+                # region to a fixed vsavj address — the case a placed region's
+                # "always wins" rule gets wrong (vs2's anim-table operand into
+                # the tenant's copy of vs2 records whose tile words are not
+                # ours) or a mapped target must bypass its wrapper (the raw
+                # allocator the ruling chose over alloc_wrap). Gated by the
+                # owner's slot track like any row; a row that matches no ref
+                # is a build error.
+                _pins = {}
+                for _rp in tenant_rows("ref_pin"):
+                    if (_rp["region"] != name
+                            or args.stage < _int(_rp.get("stage", 0))
+                            or not row_applies(_rp, owner_of(_rp))):
+                        continue
+                    _pins[(name, _int(_rp["off"]))] = _rp
                 # [[region_fix]] (14z-27): guarded byte patches inside an
                 # extractor region blob (old-verified against the extracted
                 # source bytes) — for value-level porting decisions the
@@ -2533,11 +2559,31 @@ def main():
                                      f"{host}@{tgt_abs:#x} (disp {disp_src:#x} -> "
                                      f"{disp & 0xFFFF:#x} after placement)")
                         continue
-                    newt = relocate_target(ref, f"{name}+{ref['off']:#x}")
+                    _pin = _pins.get((name, ref["off"]))
+                    if _pin is not None:
+                        # [[ref_pin]] (14z-219, #356): this ONE operand takes a
+                        # fixed vsavj address instead of its resolved target —
+                        # the source target is verified, never assumed.
+                        _pin["_hit"] = True
+                        if ref["target"] != _int(_pin["target"]):
+                            fail.append(f"ref_pin {name}+{ref['off']:#x}: source "
+                                        f"target {ref['target']:#x} is not the "
+                                        f"row's {_int(_pin['target']):#x}")
+                            continue
+                        newt = _int(_pin["pin"])
+                        notes.append(f"# {name}+{ref['off']:#x}: ref_pin "
+                                     f"{ref['target']:#x} -> {newt:#x} "
+                                     f"({_pin.get('note', '')})")
+                    else:
+                        newt = relocate_target(ref, f"{name}+{ref['off']:#x}")
                     if newt is None:
                         continue
                     span = ref["width"] // 8
                     blob[ref["off"]:ref["off"] + span] = newt.to_bytes(span, "big")
+                for (_pn, _po), _rp in _pins.items():
+                    if not _rp.pop("_hit", False):
+                        fail.append(f"ref_pin {_pn}+{_po:#x}: no pointer field at "
+                                    f"that offset in the region's refs")
                 # ported code carries the source game's char id in immediates —
                 # src_char there, dst_slot here (scan-confirmed sites only; the
                 # literal was 0x13 until 14z-65, silently missing any other
@@ -3951,8 +3997,16 @@ def main():
             # is not the next index is a build error, because the engine indexes
             # this table by type*4 and a hole would dispatch to whatever the
             # allocator left there.
+            # 14z-219 (#356): an authored row is gated by its OWNER's slot track
+            # (row_applies): `only_variant_slot` keeps a WIDE-only type off the
+            # stock twin, whose walker table must stay byte-identical.
             for ex in [e for e in engine_rows("obj_hook_extra")
                        if _int(e["site"]) == site]:
+                if not row_applies(ex, owner_of(ex)):
+                    notes.append(f"#   obj_hook authored type {_int(ex['index'])}: "
+                                 f"SKIPPED (gated off for its owner's slot "
+                                 f"track; {ex.get('note', '')})")
+                    continue
                 idx = _int(ex["index"])
                 cur = len(table) // 4
                 if idx != cur:

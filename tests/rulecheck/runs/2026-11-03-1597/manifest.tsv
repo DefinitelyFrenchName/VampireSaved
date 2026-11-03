@@ -1,0 +1,21 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent219/t345/rec/REC_lostframes.md	d022082840336f7f5d65bf5f928dee5e65ab1fc6
+build/agent219/t345/after/lost/zero_pass.txt	af8fbba7515ecaa9516ce9e091c9331604945bd8
+build/agent219/t345/after/cyc/perframe_d2.txt	6d205a06b3097558a96a583cde519bbd66d6e830
+build/agent219/t345/after/cyc/perframe_d11.txt	527615f4fdd4e47973c9bfeb9b41ded5b89558a4
+build/agent219/t345/rec/sprite_holds_d2.txt	3aceda4e0d299d9539b23721e7d45281d65b2bd3
+build/agent219/t345/rec/sprite_holds_forms.txt	82c975489bb5f44229c01fedea697063956886a8
+build/agent219/t345/rec/pass_overrun.log	21c3931601bac17e41a69667254a3ab8f9c23f3e
+build/agent219/t345/rec/lag_budget.log	13d3d72bd87c0e298acfdee2e2fb7b663e65680e
+build/agent219/t345/rec/rng_forms.log	504ee3b0d65115bf018271d132ee38e9a8345e21
+build/agent219/t345/rec/move_parity.log	36eac04010591eb703ed90777495aab115c1fcf1
+build/agent219/t345/rec/mp_d2_got.tsv	4bbf0050b6ffc2683143306dd6ef3959b0500a81
+build/agent219/t345/rec/tn2.log	6aee220f8d40fbc308dce0c1623b941c2b93ad9b
+build/agent219/t345/rec/lag_budget_356only.log	286778205ede6c687dee466ce027c676edd67798
+build/agent219/t345/rec/speed_lines_356only.log	5600a8a22911989e72fb6b80d11a92d6c147d4e8
+build/agent219/t345/rec/move_parity_d2_356only.log	bbe4f2a01ff35e5349a180d21d4a83191d9087cd
+build/agent219/t345/rec/mp_d2_got_356only.tsv	8eacd94cefe0b3aba98a3077bafcecbbcf2aac1c
+build/agent219/t345/rec/build_delta_mg1_mg.txt	1b0a6247ea9c453ee7f14be49b9d41ecca4efb5e
+build/agent219/t345/rec/speed_lines_a1b.log	8a4f6319769180a9c5813ef5bfc6fd1b9d57fe1d
+DECISIONS_HISTORY.md.lines-9580-9649 (lines 9580-9649 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-01 (14z-216) — #294's lag frame: a zero-pass frame native vs2 has too is accepted", and the entries after it up to line 9649)	4c7137e0bd91420d0842b20f0bde8ddc10d16541
+DECISIONS_HISTORY.md.lines-9740-9754 (lines 9740-9754 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-03 (14z-219) — #345: option A is built as A1b (a Donovan-only, WIDE-only copy of vs")	a8e84a86f1c80f4573cafa7558a1a35ec9bc0677

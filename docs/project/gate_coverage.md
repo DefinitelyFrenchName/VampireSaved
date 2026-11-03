@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**508 of 508 gates described.**
+**510 of 510 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 88 | 88 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 106 | 106 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 108 | 108 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2810,7 +2810,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 106 of 106 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 108 of 108 described.
 
 ### `audit_air_dash_height.sh` — audit, emulator
 
@@ -3011,6 +3011,22 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** three legs per rig on MAME under tests/lua/pal_rows_tap.lua (non-debug; P1's rows 0x0A-0x0D dumped every frame): native vsav2, OURS (BUILD), and BAD — the same build with the per-frame table's row 0x13 put back to vsavj's default word in the emulator's decrypted-opcode share (OPATCH 02ae12:0040, nothing built: the table is read PC-relatively, from the opcode view). A precondition reads BUILD's opcode image: row 0x13 must give the dead span.
 
 **EXPECTS:** every leg complete (END), P1 id 0x13 from 2500 on every leg, R1 and R3 0 differing frames on ours. MEASURED, not asserted: rows 0x0A, 0x0B, 0x0D native vs ours. Not covered: Donovan as P2; FBNeo and MiSTer; how it LOOKS (a capture sheet goes to the maintainer before the ticket is reported done).
+
+### `audit_don_speed_lines.sh` — audit, emulator
+
+**WHAT:** vs2 widened the speed-line effect (class 0x0F) from 12 subs to 14 for Donovan's two dashes (forward sub 0x0C, back sub 0x0D); ours sent his dash to vsavj's 12-row spawner, whose handler read past both its tables: junk positions, every piece culled. The fix places vs2's handler, tables and spawner as Donovan's own effect type 124 (0x7C; donovan.toml [[obj_hook_extra]], the root x06e1d2). This gate requires, on two naming parts (donovan_1: the forward and back dash; donovan_2: three back dashes before Blizzard Sword and two forward dashes before Sword Grapple), every speed-line piece record on ours — type 0x7C — to equal native vs2's type-0x0F record of the same frame: sub, piece index, position RELATIVE TO DONOVAN, and the on-screen flag; and no type-0x0F piece of Donovan's on ours. A LEGACY leg (Lilith's two dashes, vsavj's own class 0x0F) must be identical on vsavj and ours. OUT OF SCOPE, measured 14z-219: inside Dark Force (donovan_6) two of the four pieces alternate one frame out of phase with native (28 of 49 records equal native's at the adjacent frame) — the part is not judged here.
+
+**HOW:** MAME, tests/lua/speed_line_tap.lua (non-debug, every frame): native vsav2, OURS (BUILD), and BAD — the same build with Donovan's dash `jmp` operand put back to vsavj's spawner PRG:0x061ED4 in the emulator's decrypted-opcode share (OPATCH, nothing built). A precondition reads BUILD's opcode image: the relocated walker's row 124 is the copy, the copy's spawner stamps 0x7C and calls the raw allocator PRG:0x016FBA, exactly one `jmp` and one `jsr` reach the spawner copy, and the legacy row 15 is still vsavj's PRG:0x061C42. Legs: the parity gate's protocol (real cursor picks, speed level pinned 6 from f2000, RNG 0000 from f2363).
+
+**EXPECTS:** every leg complete (END), P1 id 0x13 from 2500 on the Donovan legs and 0x0E on the legacy legs; ours' records equal native's in every dash group JUDGED — a group is judged only while P1's state agrees on both legs through it, else VOID and printed; donovan_1's two and donovan_2's first three groups (before f3098, native's own lost frame) must be judged (frozen native counts from the 14z-219 build build/agent219/t356/mg1: donovan_1 97, donovan_2 242); 0 type-0x0F pieces owned by P1 on ours; the legacy leg's S and T lines identical vsavj vs ours. Not covered: Donovan as P2; Dark Force (above); FBNeo and MiSTer; pixels (the 14z-219 capture sheets).
+
+### `audit_don_trail_nodraw.sh` — audit, emulator
+
+**WHAT:** Blizzard Sword's trail pieces (class 0x72, sub 0x00) pick their animation from the shared effect anim table, vs2 PRG:0x1D7428 / vsavj PRG:0x1F3FD2. vs2's copy reaches only no-draw records (format 10); vsavj's reaches drawing ones and is live legacy content (Sasquatch). Ours resolved the operand to vsavj's, so the pieces drew (#346's streak) and cost #345's extra pass time. A1b places vs2's whole table as a Donovan-only, WIDE-only region (the root x1d7428, the `:dp` form) and the class's operand resolves into it. This gate requires, on the build: the operand names a WIDE copy whose 403 pointer fields all point into the copy and whose other bytes equal vs2's, vsavj's table bytes equal pristine vsavj's; and, under the move-parity rig, on donovan_2 (Blizzard Sword [LP]/[MP]/[HP]) and donovan_11 (Blizzard Sword [LP] blocked), every live sub-0 piece on ours reads a format-10 record through a node inside the copy, as on native vs2 (whose sub-0 pieces are all format 10 too, the basis).
+
+**HOW:** MAME, tests/lua/class72_tap.lua (non-debug, every frame): native vsav2, OURS (BUILD), and BAD — the same build with the class's operand put back to vsavj's PRG:0x1F3FD2 in the emulator's decrypted-opcode share (OPATCH, nothing built). A precondition reads BUILD's images (verify_op.bin / verify_data.bin) and the pristine vsav2/vsavj data views. Legs: the parity gate's protocol (real cursor picks, speed level 6 from f2000, RNG 0000 from f2363).
+
+**EXPECTS:** every leg complete (END), P1 0x13 on Donovan's legs; ours' and native's sub-0 piece-frames all format 10, ours' nodes inside the copy, ours' sub-0 piece-frame counts at least the frozen floor below (14z-219, build build/agent219/t345a/mg); BAD's include non-format-10 records. MEASURED, not asserted: the other sub-types' counts. Not covered: pixels (the 14z-219 capture sheets), the lost-frame timing (tests/audit_pass_overrun.sh, tests/audit_lag_budget.sh), legacy (tests/audit_merged_legacy.sh; by construction here: vsavj's table unchanged), Donovan as P2, FBNeo and MiSTer.
 
 ### `audit_entrance_draw.sh` — audit, emulator
 

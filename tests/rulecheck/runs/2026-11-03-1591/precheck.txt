@@ -1,0 +1,9 @@
+  FLAG D-FIGURE: 142  [build/agent219/t345/rec/REC_lostframes.md]
+  FLAG D-ABSOLUTE: | donovan_2, A | 3098 | 3094 | none |  [build/agent219/t345/rec/REC_lostframes.md]
+  FLAG D-ABSOLUTE: | donovan_2, B | none | 3107 | none |  [build/agent219/t345/rec/REC_lostframes.md]
+  FLAG D-ABSOLUTE: | donovan_11, A | 4580 | none | none |  [build/agent219/t345/rec/REC_lostframes.md]
+  FLAG D-ABSOLUTE: | donovan_3/6/9/10 all forms; donovan_2, donovan_11 form C | none | none | none |  [build/agent219/t345/rec/REC_lostframes.md]
+  FLAG D-ABSOLUTE: The build loses no frame on any of these parts.  [build/agent219/t345/rec/REC_lostframes.md]
+  FLAG D-ABSOLUTE: ## The consequences on the frozen gates (all measured on the build)  [build/agent219/t345/rec/REC_lostframes.md]
+  FLAG D-ABSOLUTE: **Freeze #356 alone in M25**, A1b kept unfrozen while native's frame loss is studied further (e.g. whether matching it is wanted at all).  [build/agent219/t345/rec/REC_lostframes.md]
+packet_check: 8 flag(s): D-ABSOLUTE 7, D-FIGURE 1

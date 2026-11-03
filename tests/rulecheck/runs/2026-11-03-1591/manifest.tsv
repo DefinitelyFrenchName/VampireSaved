@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent219/t345/rec/REC_lostframes.md	00248c183ff00524b96cf4ec6fd2a0988ca99fad
+build/agent219/t345/after/lost/zero_pass.txt	af8fbba7515ecaa9516ce9e091c9331604945bd8
+build/agent219/t345/after/cyc/perframe_d2.txt	6d205a06b3097558a96a583cde519bbd66d6e830
+build/agent219/t345/after/cyc/perframe_d11.txt	527615f4fdd4e47973c9bfeb9b41ded5b89558a4
+build/agent219/t345/rec/pass_overrun.log	21c3931601bac17e41a69667254a3ab8f9c23f3e
+build/agent219/t345/rec/lag_budget.log	13d3d72bd87c0e298acfdee2e2fb7b663e65680e
+build/agent219/t345/rec/rng_forms.log	504ee3b0d65115bf018271d132ee38e9a8345e21
+build/agent219/t345/rec/mp_d2_got.tsv	4bbf0050b6ffc2683143306dd6ef3959b0500a81
+build/agent219/t345/rec/tn2.log	6aee220f8d40fbc308dce0c1623b941c2b93ad9b
+DECISIONS_HISTORY.md.lines-9580-9649 (lines 9580-9649 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-01 (14z-216) — #294's lag frame: a zero-pass frame native vs2 has too is accepted", and the entries after it up to line 9649)	4c7137e0bd91420d0842b20f0bde8ddc10d16541

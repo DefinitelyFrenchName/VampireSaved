@@ -39,6 +39,8 @@ declares	audit_don_ko_writer
 declares	audit_don_lilith_ko
 declares	audit_don_row0b
 declares	audit_don_row0c
+declares	audit_don_speed_lines
+declares	audit_don_trail_nodraw
 declares	audit_don_vs_cpu
 declares	audit_down_attack
 declares	audit_edge_cases

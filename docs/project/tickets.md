@@ -11,15 +11,16 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**359 tickets** — status: open 11 · parked 4 · done 311 · declined 15 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 238 · cosmetic 22 · evolution 99 · **backfill debt: 0 rows**.
+**360 tickets** — status: open 12 · parked 4 · done 311 · declined 15 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 238 · cosmetic 23 · evolution 99 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#360](https://github.com/DefinitelyFrenchName/VampireSaved/issues/360) | cosmetic | open | in Dark Force two of Donovan's four dash speed lines alternate one frame out of phase with native vs2 (found by #356's fix; 28 of 49 records on donovan_6, each equal to native's at the adjacent frame) | `tests/audit_don_speed_lines.sh` | none | `docs/game/engine_internals.md § The speed-line effect (class 0x0F)` | none | 14z-219 |
 | [#359](https://github.com/DefinitelyFrenchName/VampireSaved/issues/359) | bug | open | cleanup traps on EXIT INT TERM with no exit let a TERM'd gate keep running (210 scripts) | `tests/test_crash_sweep.sh` | none | `docs/platform/gotchas.md § A `trap '‹cleanup›' EXIT INT TERM` WITH NO `exit`` | none | 14z-218 |
-| [#358](https://github.com/DefinitelyFrenchName/VampireSaved/issues/358) | cosmetic | open | Phobos's Plasma Beam (ES) [PP] shows fewer visible effect pieces on our build than native vs2 (177 vs 240 piece-frames; lead from #356) | `tests/audit_move_parity.sh` | none | none | none | 14z-218 |
-| [#357](https://github.com/DefinitelyFrenchName/VampireSaved/issues/357) | cosmetic | open | Donovan's Ifrit Sword guard-cancel: native vs2 draws class-0x72 effect pieces our build lacks (lead from #356) | `tests/audit_move_parity.sh` | none | none | none | 14z-218 |
+| [#358](https://github.com/DefinitelyFrenchName/VampireSaved/issues/358) | cosmetic | open | Phobos's Plasma Beam (ES) [PP]: the small figure at his lower left sits about 50 px further left on ours, in another pose, and leaves the screen early (the maintainer, 2026-11-03: "Yes, that figure"; lead from #356's census) | `tests/audit_move_parity.sh` | none | none | none | 14z-218 |
+| [#357](https://github.com/DefinitelyFrenchName/VampireSaved/issues/357) | cosmetic | open | Donovan's guard: native vs2 draws eight red class-0x72 orb pieces (sub 0x16) around the fighters for about 14 frames, ours none (the maintainer, 2026-11-03: "Yes, the guard orbs"; first seen on Ifrit Sword guard-cancels, lead from #356) | `tests/audit_move_parity.sh` | none | none | none | 14z-218 |
 | [#356](https://github.com/DefinitelyFrenchName/VampireSaved/issues/356) | cosmetic | open | speed-line effects native vs2 draws are missing on our build: Donovan's forward and back dash index vsavj's 12-row speed-line tables with vs2's rows 0x0C/0x0D | `tests/audit_move_parity.sh` · `tools/naming_pair_sheet.sh` | none | none | none | 14z-218 |
 | [#354](https://github.com/DefinitelyFrenchName/VampireSaved/issues/354) | evolution | open | no gate checks what reaches #294's dead span PRG:0x024024 in the built image | `tests/test_dead_span.sh` · `tests/test_perframe_hook.sh` | none | none | none | 14z-217 |
 | [#352](https://github.com/DefinitelyFrenchName/VampireSaved/issues/352) | evolution | open | audit_release_linux_desktop reports a paused FBNeo window as missing mark and silence instead of NOT JUDGED: paused | `tests/audit_release_linux_desktop.sh` | none | none | none | 14z-217 |

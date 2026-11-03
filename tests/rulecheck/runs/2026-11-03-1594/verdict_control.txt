@@ -1,0 +1,6 @@
+Q1: VIOLATED — the claim says "Not tested: nothing further", yet it rests on an actor field. issue_151_timeline.txt:2 says "the sessions and the maintainer shared ONE GitHub account (DefinitelyFrenchName)", so who the actor is was assumed, not shown.
+Q2: N-A — the claim draws no conclusion about how anything plays for a player; it is about recording a ticket closure.
+Q3: N-A — nothing is compared in two legs; the claim rests on a single close event.
+Q4: VIOLATED — nothing checks whether the close was the session's own commit auto-closing the issue rather than a manual close, and the claim does not name that gap. issue_151_timeline.txt:5 shows "2026-09-17T00:17:08Z closed actor=DefinitelyFrenchName commit=afff693875340868f0aaf63362a6773535ef8a73". That is the 14z-161 session-close commit at git_log.txt:3, "2026-09-17 02:17:05 +0200" (00:17:05Z), pushed "within seconds of its timestamp" (git_log.txt:1). The issue closed 3 seconds later.
+Q5: VIOLATED — the closure is credited to the maintainer only from the actor field ("the close event is in the issue's timeline with the maintainer's account as its actor"). No statement from the maintainer is quoted in any artifact, and issue_151_timeline.txt:2 shows that account was shared with the sessions.
+VERDICT: VIOLATED

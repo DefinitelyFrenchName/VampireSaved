@@ -421,6 +421,8 @@ tests/audit_column_flash.sh	character-data
 tests/audit_column_flash_cause.sh	character-data
 tests/audit_don_row0b.sh	character-data
 tests/audit_don_row0c.sh	character-data
+tests/audit_don_speed_lines.sh	character-data
+tests/audit_don_trail_nodraw.sh	character-data
 tests/audit_phobos_dmg_residual.sh	character-data
 tests/audit_dmg_legacy_sweep.sh	character-data
 tests/test_df_field_readers.sh	character-data

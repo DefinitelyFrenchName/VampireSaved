@@ -15,6 +15,7 @@ declares	audit_column_flash
 declares	audit_column_flash_cause
 declares	audit_column_shock
 declares	audit_command_throws
+declares	audit_crash_sweep_emu
 declares	audit_crouch_flag
 declares	audit_dead_span_exec
 declares	audit_defense_row_reads
@@ -31,6 +32,8 @@ declares	audit_dispatch_census
 declares	audit_dmg_legacy_sweep
 declares	audit_don_row0b
 declares	audit_don_row0c
+declares	audit_don_speed_lines
+declares	audit_don_trail_nodraw
 declares	audit_edge_cases
 declares	audit_effect_class_rows
 declares	audit_entrance_draw
@@ -153,6 +156,7 @@ declares	test_controls_concurrent
 declares	test_controls_contract
 declares	test_copy_flags
 declares	test_crash_guard
+declares	test_crash_sweep
 declares	test_crosscheck_229
 declares	test_ctl_show_err
 declares	test_dead_exit_census
@@ -305,5 +309,3 @@ declares	test_wheel_bank5
 declares	test_wide_profile
 declares	test_win_quote_decode
 declares	test_win_stdout_utf8
-declares	test_crash_sweep
-declares	audit_crash_sweep_emu

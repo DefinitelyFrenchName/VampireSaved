@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent219/t345/CENSUS.md	ef1e958d89a8808de23d269e47796344710af109
+build/agent219/t345/legacy_summary.txt	ff3320dc5b8e8fd17c255fa3f1a09e515494664e
+build/agent219/t345/analysis_tenant.txt	5dd8d759b6a87794d06253d64c142045d7f6f1a7
+build/agent219/t345/stamps_vsavj_72.txt	1652235a8b5d140723ac87339df61e2b12b4f92b
+build/agent219/t345/stamps_vsavj_0f_control.txt	89807a8728501fa41529581cd9bfce3e1a187f41
+build/agent219/t345/stamps_vs2_72.txt	bcf046e76a52904ae18797b941321a64445650c4
+build/agent219/t345/copydiff_x088512_class72.txt	42e853c10c339cf0a5e418050b5207d03745a878
+build/agent219/t345/nodecmp8.out	41cc8ca350944ca58488c974c090b330c6a03bcd
+build/agent219/t345/walker_vsavj.txt	5597df62c682c80680e8779a98877125594193b3
+build/agent219/t345/refs_ours_1f3fd2.txt	48d63e748483bd24454c06011ab84e10b04cf54f
+build/agent219/t345/struct_eq.out	08ad05ac3c7e467704de46a14143ac858e3350c1
+build/agent219/t345/closure.out	2210cbb7d5ea0837aa51b67538915b104bfb4936
+DECISIONS_HISTORY.md.lines-9718-9736 (lines 9718-9736 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-02 (14z-218) — #345: option A first (the tenant's class-0x72 trail pieces take vs2'")	73eaa2c7433d629f527e9cdd0af0760ede9dd893

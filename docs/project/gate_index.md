@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**508 scripts** — 154 ci_portable, 96 ci_static, 258 emulator-tier (run by name).
+**510 scripts** — 154 ci_portable, 96 ci_static, 260 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 88 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 106 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 108 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -455,6 +455,8 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_dmg_legacy_sweep.sh` | audit | emulator | MAME, FBNeo, a build dir | DEMITRI'S 2HK/5HP/623HP TAKE MORE HP ON VSAVJ THAN ON VSAV2 FROM ALMOST EVERY LEGACY VICTIM, with no port in the loop, BECAUSE VS2 LOWERED HIS OWN ATTACK RECORDS (10/14/20 -> 9/13/18) — each game given the other's records takes the other's… | 14z-187b |
 | `tests/audit_don_row0b.sh` | audit | emulator | MAME, FBNeo, a build dir, ~10 min | DONOVAN'S PALETTE ROW 0x0B EQUALS NATIVE vs2 ON EVERY FRAME: #127's black foot and #162's orange flash, both fixed by (M) — vs2's mask bit 0x13 at PRG:0x02ADB4 (14z-216; the maintainer, 2026-11-01: "1. | 14z-216 |
 | `tests/audit_don_row0c.sh` | audit | emulator | MAME, FBNeo, a build dir | DONOVAN'S WEAPON PALETTE ROW 0x0C EQUALS NATIVE vs2 ON EVERY FRAME: #294's red sword, fixed by porting vs2's per-frame palette routine ([perframe_hook]; the maintainer, 2026-11-01: | 2026-11-01 |
+| `tests/audit_don_speed_lines.sh` | audit | emulator | MAME, FBNeo, a build dir | DONOVAN'S DASH SPEED LINES EQUAL NATIVE vs2's, PIECE FOR PIECE: #356, fixed by a tenant-only copy of vs2's speed-line effect (the maintainer, 2026-11-02: | 2026-11-02 |
+| `tests/audit_don_trail_nodraw.sh` | audit | emulator | MAME, FBNeo, a build dir | DONOVAN'S CLASS-0x72 TRAIL PIECES TAKE vs2's NO-DRAW RECORDS, THROUGH HIS OWN COPY OF vs2's TABLE: #345 option A1b, which also removes #346's ice streak (the maintainer, 2026-11-03: "A1b (Recommended)"; | 2026-11-03 |
 | `tests/audit_entrance_draw.sh` | audit | emulator | MAME, a build dir, ~15 s | PHOBOS'S ROUND-START ENTRANCE IS DRAWN FROM THE SAME THREE VARIANTS ON OUR BUILD AS ON vsav2 (14z-168, GitHub #136): the legs of #136's guard-cancel rigs drew different entrances because the draw follows each game's RNG state at character l… | 14z-168 |
 | `tests/audit_es_ex.sh` | audit | emulator | MAME, FBNeo, a build dir | THE VSAVJ ES SPECIALS AND EX SUPERS, NAMED BY WHAT THE ENGINE DID: for the community cross-check (GitHub #229, 14z-205, fork F3 of the parallel run). | 14z-205 |
 | `tests/audit_ex_refused.sh` | audit | emulator | MAME, a build dir | WHAT THE TENANTS' vs2 EX INPUT DOES WHEN THE MODE IS REFUSED, on native vsav2 and on our merged build, frozen AS MEASURED (14z-169; since 14z-170 the ruled EX-route fix's gate): | 14z-169 |

@@ -38,95 +38,78 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-218 — **#310's crash-injection sweep built (`tests/test_crash_sweep.sh`: 88 rows for 96 call sites; crash-hiding paths fixed in 18 gates); #347, #349, #351, #353, #355 fixed, gated and closed on their rule-checker runs (#347's closure found and fixed the runner reading a failed staleness audit as an empty list); #345 analysed, #346's streak traced to the class-0x72 trail pieces, option A ruled; #356 ruled (Option 1, next session); #356-#359 filed.**
+## Session 14z-219 — **#356 built (Donovan's dash speed lines: a tenant-only copy of vs2's effect, type 124) and #345 option A1b built (his trail pieces read a WIDE-only copy of vs2's blanked effect anim table; the ice streak #346 gone), both on scratch builds, their timing and looks ruled, the M25 freeze put to the next session; #357 and #358 captured and read; #360 filed; two generator facilities (`[[ref_pin]]`, the extractor's `:dp`) and two gates.**
 
 ### opened with
-The 14z-217 close's opener; `python3 tools/agent/sweep.py` CLEAN. The maintainer: **"read handoff.md, state.md and
-docs/next_session.md"**, then **"Start on #310 and the bugs, use all machines"**. PILOT and ERIS moved to `main` `3e1a7091`
-by bundle. Working evidence: `build/agent218/` (local).
+The 14z-218 close's opener; `python3 tools/agent/sweep.py` CLEAN; `main` = `origin/main` at `79a376ef`. The maintainer:
+**"read handoff.md, state.md and docs/next_session.md"**, then, told only the Mac was available, agreed to **"start on #356
+now and take it as far as the freeze. Meanwhile, run #345's census and the #357/#358 captures. -> agreed"**. PILOT came back
+late in the sitting (*"Btw pilot is accessible"*), ERIS was powering up. Working evidence: `build/agent219/` (local).
 
-### (1) #310 — THE CRASH-INJECTION SWEEP (the maintainer's first batch: built and gated; #310 stays open for group 7)
-`tests/test_crash_sweep.sh` (static tier, freeze cadence) and `tests/audit_crash_sweep_emu.sh` (its emulator and linux rows,
-`tests/ci_emulator.tsv`) prove every call of `tests/lib/controls.sh` `vs_ctl_show_err`: for each call site
-(`tools/crash_sweep.py sites`, keyed `<first argument>#<k>`) a row of `tests/expected/crash_sweep.tsv` plants a crash in one
-call the gate makes (`tests/lib/crash_sweep.sh`: PATH shims for `python3`/`sh`/`bash`, and a `sitecustomize` hook, `pyx`, for
-any Python process), counted first (nth 0) and planted one call at a time. The gate as it stands must read DIED/UNJUDGED, the
-copy with the helper neutered HONOURED. `tools/crash_sweep.py check` is the static half: every site covered or exempted with
-its reason. The table: 88 rows for 96 call sites in 25 gates, 1 exempt gate, 6 exempt sites (`crash_sweep check`: 0 problems).
-Measured on the Mac: static tier 78 rows, 421 s, PASS, 3 of 3 controls fired and HONOURED; emulator tier 9 rows, 315 s, PASS.
-- **What it found, fixed and re-planted:** crash-hiding paths in 18 gates (the list: #310's 14z-218 progress comment), among
-  them twins that took any non-zero exit as the refusal they named (`test_bundle_parsers`, `test_controls_concurrent`,
-  `audit_victim_parity`), copies whose crash was invisible (`test_agent_sweep`, `test_agent_extract`, `test_claim_lint`), and
-  `audit_release_linux_cleanhost`'s judge. Crashes beside a mode whose own control fired were left as they are, named.
-- **Stated limits:** the runner gates planted at their first plantable call per mode; `test_agent_hooks`' pyx rows sampled at
-  calls 1-2; `audit_victim_parity`'s 92 calls sampled; `audit_release_linux_cleanhost` swept to call 36 of 43 before its fix.
-- **The 13 changed concurrent-controls rows** re-traced on PILOT (`pilot:91fc3b7b`; `test_controls_concurrent` again at
-  `pilot:ae0b1ad5`).
-- **Found on the way:** #359 (cleanup traps that do not exit on TERM, 210 scripts); three platform gotchas
-  (`docs/platform/gotchas.md`: the TERM trap, `timeout`'s own process group, `sitecustomize` swallowing an exception) and the
-  project gotcha on PATH tracing shims (`test_agent_sweep` fails under one).
+### (1) #356 — BUILT (not frozen)
+As ruled (Option 1, the raw allocator): vs2's speed-line handler, its two 14-row tables and its spawner (`PRG:0x06E1D2`, one
+span 0x2FE, vhunt2 twin `0x06E346`) as a WIDE-only extraction root, placed in `wide_ext` and reached as Donovan's own effect
+type 124 (`[[obj_hook_extra]]`, its first shipped use, now gated by its owner's slot track); two `port_patch` rows (the
+stamp, vsavj's bank word), two new `[[ref_pin]]` rows (vsavj's anim table `0x283690`; the raw allocator `0x016FBA`), a recon
+row in Donovan's overlay; patch_notes 14z-219. Found on the way: the allocator's gap-fit ignored an assigned space and moved
+100 later ops (fixed: `region_space` regions skip gap-fit; `docs/project/gotchas.md`). `build/m5_wide/extract` regenerated
+for the root (one new region; two call sites re-classed; reverted at the close, the rows staged: see CLOSE). Scratch merged `build/agent219/t356/mg1` `fd98f45c`; stock twin
+`a3910ded` and Phobos/Pyron solo programs UNCHANGED. Measured: 24 of 24 spawn groups and 1,114 of 1,114 piece records equal
+native vs2 outside Dark Force; inside it (`donovan_6`) two pieces one frame out of phase (#360); the 16 legacy dash cells
+identical to vsavj; `audit_merged_legacy` PASS; `audit_lag_budget` PASS. New gate `tests/audit_don_speed_lines.sh` (tap
+`tests/lua/speed_line_tap.lua`, legacy rig `tests/replays/don/356_legacy_lilith_dash.rpl`; a dash group is judged only while
+the match agrees). The maintainer on the before/after sheets: **"Yes, they match"**; on the Dark Force phase: **"Accept,
+ticket it (Recommended)"** (`DECISIONS_HISTORY.md` "Ruled 2026-11-03 (14z-219) — #356"). Comment posted on #356.
 
-### (2) THE BUGS: #347, #349, #351, #353, #355 FIXED, GATED AND CLOSED; #345 ANALYSED
-All five fixed in `94e9d47a`, each closed on its own rule-checker run before the close:
-- **#355** (`tools/close.py` `red_base` took a header-only red results file as the re-run's base): runs -1573 (no real-rows
-  case), -1574 OK.
-- **#349** (`tools/controls_overlap.py` certified a gate whose control runs were all REFUSED): HONOURED-only; runs -1575 OK.
-- **#351** (`proof_sheets.py run --host` could not run a gate whose control build is a freeze tag): the bundle carries the
-  selected gates' freeze tags; `test_proof_sheets` section 4d, control `tags-dropped`; run for real on PILOT on `94e9d47a`
-  (`audit_landing_sound` PASS, the control build `110467a7` equal to `f3e32bd5b3b5`'s frozen reference, exit 0). Run -1579 OK.
-- **#347 and #353** (`run_all_emulator.sh --stale --freeze` asked the audit at the default cadence; `--log` on a directory
-  holding a run appended to it): `test_emulator_runner` sections 24-25, `test_emulator_staleness` section 2i, controls
-  `log-reused`, `stale-default-cadence`, `stale-cadence-refused`, `names-unfiltered`; on PILOT on the commit's tree both gates
-  PASS with every control mode HONOURED (20 and 11). Rule-checker runs -1578 (a third untested item left out; the real-tree
-  repro was a dry run), -1581 and -1582 (the `--log` caller check had no artifact, then a pattern-filtered grep: rebuilt
-  unfiltered with a known-caller control), -1584 (the census's markdown exclusion unstated), -1586 (a dry run into a held
-  directory untested: measured, refused; and a REAL DEFECT: the runner read a failing staleness audit as an empty list,
-  `|| true`, so a freeze's `--stale` would have run nothing — fixed at this close: REFUSED on any non-zero exit,
-  `test_emulator_runner` section 25g, control `audit-crash-swallowed`, PASS 21/21 with every mode HONOURED on the Mac and on PILOT;
-  the gate taken off `tests/controls_concurrent.txt` until the next freeze's re-trace), -1587 (the runner-calling gates not re-run on the fixed tree: re-run, all PASS), -1588 OK; both closed.
-- **#345** (Blizzard Sword's lost frames): analysed (`build/agent218/t345/`, local): a frame loses its logic pass when the
-  second pass ends inside a narrow window before vblank (not pinned: between 370 and 1,202 cycles), and ours' passes are longer from two Donovan-only sources, the class-0x72
-  trail pieces in pool `RAM:$FFB800` (+458 cycles per piece per drawing pass) and `alloc_wrap` (+1,062 per pass), measured
-  under the parity rig's 0000 RNG pin. Capture sheets sent; the maintainer: *"I confirm your conclusions on the position
-  difference of the snowflake"*. **#346's streak IS those pieces**, tested: taking only their OBJ entries off screen as they
-  are written removes the streak with work RAM identical and 0 pixels changed elsewhere; the positive control (the
-  snowflake's entries) removes the snowflake and keeps the streak; sheet sent. The maintainer on #346: *"I've confirmed that
-  VS2 doesn't show the ice streak with the snowflake"*. The recommendation (A first, B held): runs -1576, -1577 (the streak
-  link untested: then tested), -1580 (the format-10 arm's unexplained pixels), -1583 (the window's width; the sheet's send
-  unrecorded), -1585 OK. Put to the maintainer: **"A first, B held (Recommended)"** (`DECISIONS_HISTORY.md` "Ruled
-  2026-11-02 (14z-218) — #345"; a standing line above). The streak's source is recorded in `docs/game/engine_internals.md`
-  (#346's section) and on #346; the recommendation and ruling on #345.
+### (2) #345 — THE CLASS-0x72 CENSUS, A1b RULED, BUILT, ITS TIMING RULED
+The census (a worker, `build/agent219/t345/CENSUS.md`, local): vsavj has no class 0x72 (0 stamps in seven forms, control 7;
+0 slot-frames on 84 legacy rigs on vsavj and merged-m24); what the trail pieces share with legacy is DATA, the effect anim
+table vsavj `PRG:0x1F3FD2` / vs2 `PRG:0x1D7428`, which vs2 BLANKED (every node a no-draw record) and Sasquatch reads live on
+vsavj (`docs/game/engine_internals.md`, #346's section). Rule-checker `2026-11-03-1589` VIOLATED (Q1, fixed), `-1590` OK; the
+maintainer: **"A1b (Recommended)"**. Built: the table as a WIDE-only DATA root — `:d` classed none of its pointers (vhunt2's
+nodes point elsewhere; gotcha), so a new extractor form `:dp` (self-pointers only; 403 of 403 offsets equal vsavj's twin);
+two `[[ref_pin]]` rows keep Donovan's unreached operands on vsavj's table. Scratch merged `build/agent219/t345a/mg` `a24aa560`
+(with #356). Measured: every trail piece format 10 through the copy; the streak gone on the sheets; legacy PASS; draw cost
+per piece native 390, merged-m24 848, A1b 532 cycles. New gate `tests/audit_don_trail_nodraw.sh` (tap
+`tests/lua/class72_tap.lua`). **The timing:** ours has no zero-pass frame in Blizzard Sword where native has f3098/f4580; on
+screen one held picture remains a frame earlier and ours runs one frame ahead, donovan_2's parity events 3-25 turn DIFF;
+`pass_overrun`, `audit_lag_budget` (its ACCEPTED 3094 now stale), `move_parity`, `rng_forms` red on the build until
+re-frozen. The recommendation (`build/agent219/t345/rec/REC_lostframes.md`) went through runs `-1591` to `-1597`, each
+VIOLATED on a real overclaim and fixed (the on-screen counts form A only, then all three forms; the 24th row; the
+attribution to A1b, settled by `audit_move_parity` on the #356-only build), `-1598` OK; an order slip recorded in `-1595`'s
+resolve. The maintainer: **"Accept, freeze A1b (Recommended)"** (`DECISIONS_HISTORY.md` "Ruled 2026-11-03 (14z-219) — #345:
+the built A1b's timing is accepted"). Comments posted on #345.
 
-### (3) #356 FILED, CENSUSED AND RULED; #357, #358 FILED
-(the maintainer, on #345's sheet 3: *"This is a real gap I never caught and now I think we need to check everywhere these
-speed lines are, which includes but is not limited to dashing forward and backward"*). The cause: vs2 widened the speed-line
-effect class 0x0F's tables from 12 rows to 14 (Donovan's dash subs 0x0C and 0x0D); ours indexes vsavj's 12-row tables, so the
-positions are junk. Feasibility: vs2's art is pixel-identical to vsavj's (FEASIBLE-WITH). Ruled (`DECISIONS_HISTORY.md`
-"Ruled 2026-11-02 (14z-218) — #356"): *"ideally Option 1 (new copy of the effect, using vs2 effect)"*, then *"Yes, next
-session (Recommended)"* and *"Raw allocator (Recommended)"*. The census's two leads, *"Yes, ticket them"*: #357 (Ifrit Sword
-guard-cancel pieces), #358 (Phobos's Plasma Beam ES [PP] pieces).
+### (3) #357, #358 — CAPTURED AND READ; #360 FILED
+A worker's sheets (`build/agent219/t357/sheets/`, local), sent: #357 is eight red class-0x72 orbs at Donovan's GUARD that ours
+lacks (the issue's "Ifrit Sword" wording superseded; title edited), #358 the small figure at Phobos's lower left placed ~50 px
+left and posed differently on ours. The maintainer: **"Yes, the guard orbs"**, **"Yes, that figure"**. #360 filed (#356's Dark
+Force phase). Comments posted on #357 and #358.
 
-### (4) THE TIERS
-Tier of record for `94e9d47a`: `build/agent218/tier3/results.tsv` (tree `8834baab`, PASS 120, GREEN). Tier 1 was NOT GREEN:
-the new gate scripts not executable, the new expectation's provenance class, the census reading the wrapper header-only, the
-description and follows freezes; and `test_static_runner` and `test_emulator_runner` FAILED under the `--jobs 8` load (both
-passed on the next tier; their failing sections were not captured). Tier 2: `test_rule_checker` red on unstaged run
-directories -1573..-1575, staged. Tier 3 GREEN.
-
-### CLOSE (14z-218, 2026-11-03)
-Driver `build/agent218/close/` (`--prev build/agent217/close/tier_results.tsv`, the 14z-217 close's run of record; `--row -`,
-this group has no findings section). Steps: sections (this group, sections (1)-(4) and this one); next-session (the 14z-217
-opener moved VERBATIM to the top of `docs/NEXT_SESSION_HISTORY.md`, checked by un-quoting it; `docs/NEXT_SESSION.md`
-rewritten: #356's build and M25 first, then #345's option A); rollover (the 14z-217 group, 89 lines, to `STATE_HISTORY.md`
-with its ledger line; every committed line of it found in the archive; the two `STATE 14z-217` citations were in the
-rewritten opener). On GitHub before the close: #351, #347 and #353 closed with their comments; #345's recommendation and
-ruling, #346's streak finding and #310's progress comment posted.
-Then: indexes (regenerated by the driver); dashboard (14z-163..14z-218, 3,428 figures, 0 unclassed; five assets uploaded,
-`datasets` re-pointed: figures v27, rc_runs v27, tiers v28, costly v27, actions v7) — done. Uncommitted at the 14z-218
-commit and riding this close: #347's second fix (the runner refuses a failed staleness audit, `test_emulator_runner`
-section 25g; the gate off `tests/controls_concurrent.txt`), the ticket rows for #345-#355, the rule-checker runs -1576 to
--1588, the #345 ruling, #346's `engine_internals.md` record and the list-failure gotcha. The tier's results:
-`build/agent218/close/tier_results.tsv`, the next close's `--prev`.
+### CLOSE (14z-219, 2026-11-03)
+Driver `build/agent219/close/` (`--prev build/agent218/close/tier_results.tsv`, the 14z-218 close's run of record; `--row -`).
+The freeze (M25: #356 + A1b) goes to the next session (the maintainer: *"Eris is powering up but let's close and freeze next
+session"*). Riding this close and uncommitted until now: the 14z-218 close's post-commit lines in STATE/NEXT_SESSION; (1)-(3)'s tree
+changes, the build-changing ones as the staged patch. The tier's results:
+`build/agent219/close/tier_results.tsv`, the next close's `--prev`.
+Steps: sections (this group, (1)-(3) and this section); next-session (the 14z-218 opener moved VERBATIM to the top of
+`docs/NEXT_SESSION_HISTORY.md`, checked by un-quoting it; `docs/NEXT_SESSION.md` rewritten: the M25 freeze first); rollover
+(the 14z-218 group, 96 lines, to `STATE_HISTORY.md` with its ledger line; every line found in the archive; no `STATE`
+citation into it); indexes (regenerated by the driver); dashboard (14z-163..14z-219, 3,454 figures, 0 unclassed; five assets
+uploaded, `datasets` re-pointed: actions v8, costly v28, figures v28, rc_runs v28, tiers v29). On GitHub before the close:
+#360 filed; comments on #345 (twice), #356, #357 (its title corrected), #358. A slip at the rollover, found by `test_state_open_lists` before
+the tier: the 14z-218 group went in at the first "## Session 14z-217" string, a line of STATE_HISTORY's generated INDEX, and
+the indexes step regenerated it away; restored from HEAD's STATE.md plus its five post-commit lines, below the INDEX (94
+lines, none missing after a second index regeneration).
+Tier 1 (staged tree `727def25`): NOT GREEN, PASS 132 FAIL 8 — the tree no longer reproduced the frozen M24 builds
+(`test_m3a_reproducible`, `test_freeze_artifacts_current`) and the counts the change moves (`test_manifest_merge`,
+`test_rule5_census`, `test_region_overlap` and its control, `test_charmap_current`), plus `test_recurrence_alarm` on
+#345's hold figures recurring across runs `-1580`, `-1592`..`-1596` (acknowledged under #345 in
+`tests/rulecheck/recurrence.tsv`). Fix, by the 14z-188 precedent: the build-changing rows staged as
+`build/manifest/staged/356_345a1b.patch` and reverted to HEAD (the pinned extract and `build/merged1` too); the seven reds
+then PASS on the main tree, `test_m3a_reproducible` rebuilding every frozen reference bit-exactly with the committed
+generator and extractor facilities, which are therefore inert; what the freeze re-freezes with the patch applied is in
+patch_notes 14z-219. Tier 2 on the red run's results (#317).
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
@@ -134,8 +117,8 @@ section 25g; the gate off `tests/controls_concurrent.txt`), the ticket rows for 
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
-- **#356 is built next session as Option 1 (a tenant-only copy of the speed-line effect with vs2's 14-row tables), with the raw allocator, and frozen as M25 (2026-11-02, 14z-218)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356".
-- **#345 goes on with option A first (the tenant's class-0x72 trail pieces take vs2's no-draw form), starting with a class-0x72 legacy census and a plan put to the maintainer before anything is built; B held until A is measured (2026-11-02, 14z-218)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #345".
+- **#356 is built as Option 1 (a tenant-only copy of the speed-line effect with vs2's 14-row tables), with the raw allocator, and frozen as M25 as built; its one-frame Dark Force phase is accepted and is #360 (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356" and "Ruled 2026-11-03 (14z-219) — #356".
+- **#345's option A1b is built and its timing ACCEPTED: it freezes in M25 with #356 — ours loses no logic frame in Blizzard Sword where native does; the moved expectations (pass_overrun, the stale lag exemption, donovan_2's parity and RNG-form rows) re-freeze at the freeze, each through its own rule-checker run; vsavj's table PRG:0x1F3FD2 is never touched; B stays held (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #345", "Ruled 2026-11-03 (14z-219) — #345: option A is built as A1b" and "… the built A1b's timing is accepted".
 - **#345's rows may turn DIFF under a non-zero RNG; the parity gates keep the 0000 pin (2026-11-01, 14z-216):** `tools/rng_forms.py` exempts rows `after:` a SLOWDOWN root, by name — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #345's rows under a non-zero RNG".
 - **A new zero-pass frame native vs2 has too is accepted, frame by frame (2026-11-01, 14z-216, #294):** `audit_lag_budget`'s ACCEPTED list (today donovan_2:3094, vs2's 3098, checked against `pass_overrun.tsv`'s native row), re-confirmed on the captures as *"a tradeoff. #345 is there to fix it later"*; the no-new-lag rule stands for every other frame — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #294's lag frame" and "…re-confirmed on the captures".
 - **ERIS tiers skip parity; the Mac's parity run is the row of record (#321, 2026-10-26, 14z-209):** ERIS runs `--skip test_mame_parity` — `DECISIONS_HISTORY.md` "Ruled 2026-10-26 (14z-209) — #321 phase 2".

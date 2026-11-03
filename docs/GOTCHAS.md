@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-601 entries (49 game / 153 platform / 399 project), counted from the buckets at generation.
+603 entries (49 game / 153 platform / 401 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
@@ -230,7 +230,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - GNU `timeout` PUTS ITS COMMAND IN A PROCESS GROUP OF ITS OWN — `kill -- -<pgid>` of the caller's group does not reach it (paid: 14z-218, PILOT)
 - AN EXCEPTION RAISED IN `sitecustomize.py` DOES NOT CRASH PYTHON — `site.py` catches it, prints "Error in sitecustomize", and the program runs (paid: 14z-218, the Mac; `tests/lib/crash_sweep.sh`)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 399 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 401 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -631,3 +631,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A BYTE-PLANT CONTROL THAT WRITES A CONSTANT IS DEAD WHEREVER THE BYTE ALREADY HOLDS IT — a "one byte flipped" control read CONTROL DEAD on both Linux binary dirs (paid: 14z-216, the M24 freeze)
 - A PATH TRACING SHIM AROUND `sh` CHANGES A PROCESS-TREE GATE'S WORLD — `test_agent_sweep`'s plain run FAILS under it, with or without the `pyx` hook (paid: 14z-218, the Mac; #310)
 - A CALL WHOSE OUTPUT IS A LIST MUST NOT READ ITS FAILURE AS AN EMPTY LIST — `run_all_emulator.sh --stale` took a crashed staleness audit for "no emulator gate is stale" and exited 0 (paid: 14z-218, #347's rule-checker run 2026-11-02-1586)
+- THE ALLOCATOR'S GAP-FIT IGNORES A REGION'S ASSIGNED SPACE — a small region named in `region_space` landed in a hole_a gap and moved every later small allocation (paid: 14z-219, the Mac; #356)
+- A `:d` DATA ROOT WHOSE TWIN POINTS ELSEWHERE CLASSES NO POINTER — and copies every node's source address verbatim (paid: 14z-219, the Mac; #345 A1b)

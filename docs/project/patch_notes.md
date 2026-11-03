@@ -1,5 +1,83 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-219 — #345 OPTION A1b: DONOVAN'S TRAIL PIECES TAKE vs2's NO-DRAW TABLE (BUILT AND STAGED for the M25 freeze with #356)
+
+**WHAT IT IS.** Ruled 2026-11-03 (`DECISIONS_HISTORY.md` "Ruled 2026-11-03 (14z-219) — #345"): **"A1b (Recommended)"**, after
+the class-0x72 legacy census (`build/agent219/t345/CENSUS.md`, local; rule-checker run `2026-11-03-1590` OK). The table and
+why vs2 draws nothing: `docs/game/engine_internals.md` (#346's section, "Why vs2 draws nothing there").
+
+**THE CHANGE.**
+- `tools/build_donovan.sh`: a WIDE-only DATA root `0x1d7428:0x1308:t0x1de55a:dp` — vs2's whole shared effect anim table.
+  `:dp` is new (`tools/extract_char.py`, patch_index): the `:d` oracle classed 0 of its pointers, because vhunt2's nodes
+  reach its own drawing records ~0x7000 past its copy; `:dp` takes the 403 longs whose source value lies inside the
+  region, the same 403 offsets as vsavj's twin table's pointers. `build/m5_wide/extract` regenerated: one new region and
+  Donovan's three operands naming the table (`x088512+0xAE`, `x05c800+0x5C76`, `x0905ae+0x2FC`) re-classed internal.
+- `build/manifest/donovan.toml`: `region_space` adds `x1d7428=wide_ext`; two `[[ref_pin]]` rows (`only_variant_slot`)
+  keep `x05c800+0x5C76` and `x0905ae+0x2FC` on vsavj's `PRG:0x1F3FD2` (no rig reached them); the class's operand
+  `x088512+0xAE` (`CPU:$0D021E`) resolves into the copy.
+- vsavj's table `PRG:0x1F3FD2` and its records are untouched; Phobos's and Pyron's copies of the class keep vsavj's table.
+
+**THE BUILDS (scratch, `build/agent219/t345a/`, local; both carry #356).** Merged `mg` fingerprint `a24aa560`: 855 ops
+(854 + the region's data op; `test_tenant_loop` re-frozen), the copy at `CPU:$4013E0` (+0x1308) — all 403 pointer fields
+relocated into it, every other byte equal to vs2's — and the later `wide_ext` placements +0x1310 (the relocated walker
+`0x4C26B0` -> `0x4C39C0`). Solo Donovan `don` `63447128`. Stock twin `a3910ded` UNCHANGED.
+
+**MEASURED:** see the 14z-219 STATE group (the census on the build, the lost-frame re-measure, the capture sheets).
+
+## 14z-219 — #356: DONOVAN'S DASH SPEED LINES, A TENANT-ONLY COPY OF vs2's EFFECT (BUILT AND STAGED for the M25 freeze)
+
+**STAGED (14z-219 close, this entry and the A1b one above):** the rows that change build output — `tools/build_donovan.sh`'s two
+WIDE roots, `build/manifest/donovan.toml`'s rows, `reconciliation_donovan.toml`'s row, `tests/test_tenant_loop.sh`'s counts —
+are `build/manifest/staged/356_345a1b.patch` (`git apply` at the freeze; the 14z-188 precedent), so the committed tree still
+reproduces the M24 builds (`test_m3a_reproducible` PASS). The generator and extractor facilities below (`[[ref_pin]]`, the
+authored row's gate, gap-fit, `:dp`) are committed live: inert without the staged rows. At the freeze, after the patch:
+re-extract `build/m5_wide/extract` deliberately (it is present, so `tools/ensure_merged_inputs.sh` would not), re-freeze
+`test_manifest_merge`'s port_patch counts (donovan 25, merged 105), classify `[[obj_hook_extra]].src` and the `[[ref_pin]]`
+keys in `tools/audit_rule5.py` (`test_rule5_census`), re-freeze `test_region_overlap`'s unique count (17), and let
+`audit_merged_legacy` rebuild `build/merged1` (`test_freeze_artifacts_current`) — the 14z-219 close tier's eight reds.
+
+**WHAT IT IS.** Ruled 2026-11-02 (`DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356"): the maintainer, *"ideally
+Option 1 (new copy of the effect, using vs2 effect)"*, then *"Yes, next session (Recommended)"* and *"Raw allocator
+(Recommended)"*. The mechanism (vs2 widened the speed-line class 0x0F from 12 subs to 14 for Donovan's two dashes) is in
+`docs/game/engine_internals.md` "The speed-line effect (class 0x0F)".
+
+**THE CHANGE.**
+- `tools/build_donovan.sh`: a WIDE-only extraction root `0x6e1d2:0x2fe:t0x6e346` for Donovan — vs2's handler, its two
+  14-row tables and its spawner in one span (vhunt2 twin at +0x174). The pinned merged input `build/m5_wide/extract` is
+  REGENERATED for it (`regions.json`/`report.txt`): one new region, and the code region's two calls of vs2 `0x06E4A6`
+  (offsets `0x13E6`, `0x1B46`) re-classed from engine refs to internal refs of the new region; every other region file
+  byte-identical.
+- `build/manifest/donovan.toml` (all `only_variant_slot`): `region_space` puts `x06e1d2` in `wide_ext`;
+  `[[obj_hook_extra]]` makes it effect type 124 on the `0x05E542` walker; two `port_patch` rows (the spawner's stamp
+  `#$0F` -> `#$7C`; the handler's bank word `#$4000` -> `#$0`, vsavj's own); two `[[ref_pin]]` rows (the anim-table
+  operand -> vsavj's `0x283690`, pixel-identical art; the spawner's allocator call -> vsavj's raw `0x016FBA`, the ruled
+  raw allocator, past `alloc_wrap`). `reconciliation_donovan.toml`: vs2 `0x013786` -> vsavj `0x015092` (0x60 bytes
+  identical, vsavj's own handler's call).
+- `tools/gen_donovan_patch.py`: `[[ref_pin]]`; `[[obj_hook_extra]]` rows gated by `row_applies` in the emission loop and
+  in the renumber count; a `region_space` region skips gap-fit (`docs/project/gotchas.md`, the gap-fit gotcha).
+- Donovan's two calls now reach the copy's spawner: the dash `jmp` (`PRG:0x0C0A84`) and the sub-4 `jsr` (`PRG:0x0C11E4`,
+  vs2's own path too). Phobos's and Pyron's copies of the call stay on vsavj's spawner. The shared row 15 and legacy
+  class 0x0F are untouched.
+
+**THE BUILDS (scratch, `build/agent219/t356/`, local).** Merged `mg1` fingerprint `fd98f45c`: 854 ops (853 + the region's
+code op; `test_tenant_loop` re-frozen), the copy at `PRG:0x400010` (+0x2FE), walker row 124 -> it, the renumbered types
+124-135 -> 125-136, and every later `wide_ext` placement +0x300 (the AI-script block `x101aca` `0x400010` -> `0x400310`,
+the relocated walker `0x4C23B0` -> `0x4C26B0`): 320 ops moved, 216 changed, all relocations. Solo Donovan `don2`
+`ab818e44`: the copy at `0x400010`, 59 changed ops, all relocations (the solo walker stays at `0x3FF9B0`). Stock twin
+`a3910ded` UNCHANGED (0 changed ops; the authored row SKIPPED). Phobos `cc9c4b68` and Pyron `9d135e7b` solo program
+fingerprints UNCHANGED (0 changed ops).
+
+**MEASURED (14z-219, the Mac).** On the parity rig (level 6, RNG 0000) over Donovan's ten dash-bearing naming parts, every
+one of native's 24 speed-line spawn groups has ours' twin at the same frame, sub, count and lifetime, every piece on
+screen; 1,135 of 1,163 piece records equal native's (frame, sub, piece, position relative to Donovan, on-screen flag).
+The other 28 are donovan_6, Blizzard Sword [LP] in Dark Force: pieces 0 and 1 run their two-offset alternation one frame
+out of phase with native (each equals native's at the adjacent frame; the counter's parity agrees at every frame end).
+Legacy: the 16 legacy dash cells' type-0x0F records and pool lines identical vsavj vs ours (cell 0x0B reaches a different
+character on the two wheels, as at 14z-218), Lilith's and Bulleta's 104 snapshots pixel-identical. Gate:
+`tests/audit_don_speed_lines.sh` (PASS on `mg1`, both controls fired and both modes FAIL; on merged-m24 its precondition
+fails). Capture sheets sent to the maintainer: `build/agent219/t356/rig/sheets/356_after_sheet{1,2,3}_*.png` (local).
+Not measured: FBNeo, MiSTer, Donovan as P2, the lost-frame budget (`audit_lag_budget`) on the new build.
+
 ## 14z-216 — #294: DONOVAN'S PER-FRAME PALETTE ROUTINE (FROZEN as M24 at 14z-216: donovan-m28 / merged-m24)
 
 **WHAT IT IS.** Ruled 2026-11-01 (`DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #294"): the maintainer, *"indeed if
