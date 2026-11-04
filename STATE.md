@@ -38,83 +38,82 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-219 — **#356 built (Donovan's dash speed lines: a tenant-only copy of vs2's effect, type 124) and #345 option A1b built (his trail pieces read a WIDE-only copy of vs2's blanked effect anim table; the ice streak #346 gone), both on scratch builds, their timing and looks ruled, the M25 freeze put to the next session; #357 and #358 captured and read; #360 filed; two generator facilities (`[[ref_pin]]`, the extractor's `:dp`) and two gates.**
+## Session 14z-220 — **M25 FROZEN at `91bde83b` (#356, Donovan's dash speed lines, and #345 option A1b; tags donovan-m29, huitzil-m36, pyron-m30, merged-m25) after freeze rule-checker run -1631 OK and the static freeze tier on that tree (PASS 237, its one red confirmed GREEN); the S6 tier's five relocation-moved expectations re-frozen (run -1614); pass_overrun's re-freeze re-checked to OK (run -1629); #361 and #362 filed; the jtcores fork's M25 catalogue commit pushed.**
 
 ### opened with
-The 14z-218 close's opener; `python3 tools/agent/sweep.py` CLEAN; `main` = `origin/main` at `79a376ef`. The maintainer:
-**"read handoff.md, state.md and docs/next_session.md"**, then, told only the Mac was available, agreed to **"start on #356
-now and take it as far as the freeze. Meanwhile, run #345's census and the #357/#358 captures. -> agreed"**. PILOT came back
-late in the sitting (*"Btw pilot is accessible"*), ERIS was powering up. Working evidence: `build/agent219/` (local).
 
-### (1) #356 — BUILT (not frozen)
-As ruled (Option 1, the raw allocator): vs2's speed-line handler, its two 14-row tables and its spawner (`PRG:0x06E1D2`, one
-span 0x2FE, vhunt2 twin `0x06E346`) as a WIDE-only extraction root, placed in `wide_ext` and reached as Donovan's own effect
-type 124 (`[[obj_hook_extra]]`, its first shipped use, now gated by its owner's slot track); two `port_patch` rows (the
-stamp, vsavj's bank word), two new `[[ref_pin]]` rows (vsavj's anim table `0x283690`; the raw allocator `0x016FBA`), a recon
-row in Donovan's overlay; patch_notes 14z-219. Found on the way: the allocator's gap-fit ignored an assigned space and moved
-100 later ops (fixed: `region_space` regions skip gap-fit; `docs/project/gotchas.md`). `build/m5_wide/extract` regenerated
-for the root (one new region; two call sites re-classed; reverted at the close, the rows staged: see CLOSE). Scratch merged `build/agent219/t356/mg1` `fd98f45c`; stock twin
-`a3910ded` and Phobos/Pyron solo programs UNCHANGED. Measured: 24 of 24 spawn groups and 1,114 of 1,114 piece records equal
-native vs2 outside Dark Force; inside it (`donovan_6`) two pieces one frame out of phase (#360); the 16 legacy dash cells
-identical to vsavj; `audit_merged_legacy` PASS; `audit_lag_budget` PASS. New gate `tests/audit_don_speed_lines.sh` (tap
-`tests/lua/speed_line_tap.lua`, legacy rig `tests/replays/don/356_legacy_lilith_dash.rpl`; a dash group is judged only while
-the match agrees). The maintainer on the before/after sheets: **"Yes, they match"**; on the Dark Force phase: **"Accept,
-ticket it (Recommended)"** (`DECISIONS_HISTORY.md` "Ruled 2026-11-03 (14z-219) — #356"). Comment posted on #356.
+**"read handoff.md, state.md and docs/next_session.md"**; told the next opener's first item was the M25 freeze and asked whether
+PILOT and ERIS were up, the maintainer: **"all are up"**.
 
-### (2) #345 — THE CLASS-0x72 CENSUS, A1b RULED, BUILT, ITS TIMING RULED
-The census (a worker, `build/agent219/t345/CENSUS.md`, local): vsavj has no class 0x72 (0 stamps in seven forms, control 7;
-0 slot-frames on 84 legacy rigs on vsavj and merged-m24); what the trail pieces share with legacy is DATA, the effect anim
-table vsavj `PRG:0x1F3FD2` / vs2 `PRG:0x1D7428`, which vs2 BLANKED (every node a no-draw record) and Sasquatch reads live on
-vsavj (`docs/game/engine_internals.md`, #346's section). Rule-checker `2026-11-03-1589` VIOLATED (Q1, fixed), `-1590` OK; the
-maintainer: **"A1b (Recommended)"**. Built: the table as a WIDE-only DATA root — `:d` classed none of its pointers (vhunt2's
-nodes point elsewhere; gotcha), so a new extractor form `:dp` (self-pointers only; 403 of 403 offsets equal vsavj's twin);
-two `[[ref_pin]]` rows keep Donovan's unreached operands on vsavj's table. Scratch merged `build/agent219/t345a/mg` `a24aa560`
-(with #356). Measured: every trail piece format 10 through the copy; the streak gone on the sheets; legacy PASS; draw cost
-per piece native 390, merged-m24 848, A1b 532 cycles. New gate `tests/audit_don_trail_nodraw.sh` (tap
-`tests/lua/class72_tap.lua`). **The timing:** ours has no zero-pass frame in Blizzard Sword where native has f3098/f4580; on
-screen one held picture remains a frame earlier and ours runs one frame ahead, donovan_2's parity events 3-25 turn DIFF;
-`pass_overrun`, `audit_lag_budget` (its ACCEPTED 3094 now stale), `move_parity`, `rng_forms` red on the build until
-re-frozen. The recommendation (`build/agent219/t345/rec/REC_lostframes.md`) went through runs `-1591` to `-1597`, each
-VIOLATED on a real overclaim and fixed (the on-screen counts form A only, then all three forms; the 24th row; the
-attribution to A1b, settled by `audit_move_parity` on the #356-only build), `-1598` OK; an order slip recorded in `-1595`'s
-resolve. The maintainer: **"Accept, freeze A1b (Recommended)"** (`DECISIONS_HISTORY.md` "Ruled 2026-11-03 (14z-219) — #345:
-the built A1b's timing is accepted"). Comments posted on #345.
+### (1) THE M25 FREEZE — COMMITTED `91bde83b`, TAGGED
 
-### (3) #357, #358 — CAPTURED AND READ; #360 FILED
-A worker's sheets (`build/agent219/t357/sheets/`, local), sent: #357 is eight red class-0x72 orbs at Donovan's GUARD that ours
-lacks (the issue's "Ifrit Sword" wording superseded; title edited), #358 the small figure at Phobos's lower left placed ~50 px
-left and posed differently on ours. The maintainer: **"Yes, the guard orbs"**, **"Yes, that figure"**. #360 filed (#356's Dark
-Force phase). Comments posted on #357 and #358.
+The staged patch `build/manifest/staged/356_345a1b.patch` applied and removed; the mark M25; the six builds made on the Mac and,
+independently from snapshot S0 `a252b89e`, on ERIS: program and whole-set key field-for-field equal on both (the zip containers
+differ, member manifests equal; cause not measured). Registry rows donovan-m29 `20672b01` (program `63447128`), huitzil-m36
+`815488af` and pyron-m30 `930ce568` (the mark only, programs unchanged), merged-m25 `add7bc1a` (program `a24aa560`); stock twin
+and stage-4 unchanged. The four expectation sets frozen on the Mac and on ERIS at S1: 454 files equal. Every region placed after
+M25's two new head regions (`x06e1d2` at `0x400010`, `x1d7428` at `0x4013E0`) moved `+0x1610`: the re-point sweep (m3b_merged33,
+don_m29, hui63, pyron48, m5_stock24) and the relocation re-freezes, each through its own rule-checker run (-1607..-1612, OK at
+-1612); A1b's accepted timing re-frozen (rng_forms -1601, the lag-budget exemption removed -1604, donovan_2's parity rows -1606,
+pass_overrun -1629 — see (3)). The freeze battery on ERIS at S3 (PASS 183, SKIP 4 host-only); the 17 gates the freeze-cadence
+staleness audit then named re-run at S7 (ERIS 14, the Mac's MiSTer lane 3, all PASS); the Linux desktop and clean-host rows on
+PILOT at S6 (PASS; the provisional PILOT tag deleted after); the Mac's parity and the release rows. Both concurrent-controls lists
+re-traced: static at S2 on PILOT (631 runs; test_gate_descriptions, test_crash_sweep, test_emulator_runner and the HOLLOW ones
+kept off); emulator 45 rows at S3, S4 and S6 split between PILOT and ERIS. The MiSTer tail: fork commit `930818f5` (doc/mame.xml,
+the CRC catalogue), patch 0041 mirrored, the pin moved; pushed to the fork at the close. release/merged-m25 packaged and identical
+to a fresh package of build/m3b_merged33 (a control build differing). The classifier dead row fixed (`audit_crash_sweep_emu`,
+#361). Static freeze tier on snapshot S8 `c48bcc87` = the commit's tree: PASS 237, FAIL 1 — `test_emulator_staleness`,
+`test_don_sound`'s row stale on `docs/project/gotchas.md`, which the freeze's own gotcha moved after S7; `test_don_sound` re-run
+at S8 through the runner (PASS), then `--strict --confirm` on the freeze run: GREEN, PASS 170. Freeze rule-checker run -1631 OK.
+Tags `freeze/donovan-m29`, `freeze/huitzil-m36`, `freeze/pyron-m30`, `freeze/merged-m25` re-cut on `91bde83b` (the S1 scratch
+tags replaced, never pushed). Evidence local under `build/agent220/m25/` (packet `rc/freeze/`).
 
-### CLOSE (14z-219, 2026-11-03)
-Driver `build/agent219/close/` (`--prev build/agent218/close/tier_results.tsv`, the 14z-218 close's run of record; `--row -`).
-The freeze (M25: #356 + A1b) goes to the next session (the maintainer: *"Eris is powering up but let's close and freeze next
-session"*). Riding this close and uncommitted until now: the 14z-218 close's post-commit lines in STATE/NEXT_SESSION; (1)-(3)'s tree
-changes, the build-changing ones as the staged patch. The tier's results:
-`build/agent219/close/tier_results.tsv`, the next close's `--prev`.
-Steps: sections (this group, (1)-(3) and this section); next-session (the 14z-218 opener moved VERBATIM to the top of
-`docs/NEXT_SESSION_HISTORY.md`, checked by un-quoting it; `docs/NEXT_SESSION.md` rewritten: the M25 freeze first); rollover
-(the 14z-218 group, 96 lines, to `STATE_HISTORY.md` with its ledger line; every line found in the archive; no `STATE`
-citation into it); indexes (regenerated by the driver); dashboard (14z-163..14z-219, 3,454 figures, 0 unclassed; five assets
-uploaded, `datasets` re-pointed: actions v8, costly v28, figures v28, rc_runs v28, tiers v29). On GitHub before the close:
-#360 filed; comments on #345 (twice), #356, #357 (its title corrected), #358. A slip at the rollover, found by `test_state_open_lists` before
-the tier: the 14z-218 group went in at the first "## Session 14z-217" string, a line of STATE_HISTORY's generated INDEX, and
-the indexes step regenerated it away; restored from HEAD's STATE.md plus its five post-commit lines, below the INDEX (94
-lines, none missing after a second index regeneration).
-Tier 1 (staged tree `727def25`): NOT GREEN, PASS 132 FAIL 8 — the tree no longer reproduced the frozen M24 builds
-(`test_m3a_reproducible`, `test_freeze_artifacts_current`) and the counts the change moves (`test_manifest_merge`,
-`test_rule5_census`, `test_region_overlap` and its control, `test_charmap_current`), plus `test_recurrence_alarm` on
-#345's hold figures recurring across runs `-1580`, `-1592`..`-1596` (acknowledged under #345 in
-`tests/rulecheck/recurrence.tsv`). Fix, by the 14z-188 precedent: the build-changing rows staged as
-`build/manifest/staged/356_345a1b.patch` and reverted to HEAD (the pinned extract and `build/merged1` too); the seven reds
-then PASS on the main tree, `test_m3a_reproducible` rebuilding every frozen reference bit-exactly with the committed
-generator and extractor facilities, which are therefore inert; what the freeze re-freezes with the patch applied is in
-patch_notes 14z-219. Tier 2 on the red run's results (#317).
-After the commit (these lines ride the next close): tier 2 on the staged tree `1c0dbd26`, strict, `--jobs 8`, `--confirm` on
-the red run: PASS 138, FAIL 0, SKIP 0, GREEN; committed `d19546c7` (the pre-commit green guard read that row); pins OK; sweep
-CLEAN; nothing new on `origin` at the fetch; pushed `79a376ef..d19546c7`, origin/main equal to HEAD; ledger page published on
-`gh-pages` (`1453a3a9` → `ab09c137`, 357 sessions); the maintainer's own site SKIPPED, `DEPLOY_TARGET` not set
-(`build/agent219/close/ledger.out`). Every step of the close is done.
+### (2) THE S6 STATIC TIER'S FINDS — RE-FROZEN AND FIXED (run -1614)
+
+The first freeze tier, on S6, read PASS 228, FAIL 10. Five static expectations read placed addresses and had not been re-frozen
+(`latch_readers`, `df_field_readers`, `reaction_classes`, `escape_triage`, `donovan.md`): every changed line attributed, +0x1610
+or a header, the build row, or the two new regions (`build/agent220/m25/rc/r_s6fix/attribution.txt`, its matcher with a
+planted control). `test_jtcores_twin`: patch 0041 needed its `PATCH_NAMES` entry, and its mirror had been written with plain
+`format-patch` (a signature trailer); regenerated `--no-signature`, as `tools/setup_jtcores.sh` does. `test_recurrence_alarm`:
+Q1 3094 + 3098, cited in three packets of #345's timing, acknowledged under #345. Rule-checker run -1613 VIOLATED (the three
+other reds' causes asserted without logs; the ruling the acknowledgement cites, unquoted), resolved, -1614 OK. The order lesson
+is a gotcha (`docs/project/gotchas.md`, "A FREEZE'S STATIC EXPECTATIONS ARE NOT ONLY THE ONES THE BATTERY NAMES").
+
+### (3) THE FREEZE'S RULE-CHECKER — RUNS -1615 TO -1631, AND WHAT THEY CAUGHT
+
+The freeze check took runs -1615 to -1631 (-1615, -1616, -1617, -1620, -1626 and -1630 withdrawn unspawned on packet-check
+flags or a wording slip; -1618, -1619, -1621 to -1625 and -1627 VIOLATED, each resolved; -1631 OK; -1628, withdrawn, and
+-1629 are pass_overrun's re-check, below). Real defects it found, each
+fixed in the tree or named untested in the claim: `build/agent220/m25/edit_classes.py` silently skipped the length-changing EDIT
+ops (the relocated walker), rewritten as `edit_classes2.py` with an EDIT-count check and a dropped-op control; a fact measured
+before the S6-tier fixes cited after them; the stock twin, stage-4 and the control build's program asserted, not measured;
+"the .rbf is unchanged" asserted (the fork's change is doc/mame.xml only, measured); two counters of `test_mister_prg_window`'s
+red not attributed (named). And a misattribution carried from run -1602's own resolve: it cited "the 14z-209 ruling" for closing a
+Q1 finding in writing, but that ruling is scoped to #229's freezes, and 14z-163's option C covers Q3 and Q4; pass_overrun's
+re-freeze was therefore re-checked afresh, run -1629 OK. Two slips of mine, both corrected in the records: twice a checker's
+verdict ran its Q4 over several lines; once (run -1625) I joined the lines myself before recording, then had the checker restate
+its own six lines and replaced `verdict_real.txt` with them (the resolve says so); and run -1631's claim says the final tier would
+run with `--confirm` on S6's results — the runner refuses `--confirm` at freeze cadence, so it ran in full, stricter than stated.
+
+### (4) TICKETS AND COMMENTS
+
+Filed #361 (the classifier missed `audit_crash_sweep_emu`'s emulator call; fixed in `91bde83b`, open until its closure check)
+and #362 (`test_crash_sweep` writes its perturbed copies into the live `tests/`; `test_gate_descriptions`' modes do not refuse a
+vanished target). Comments posted on #345, #346 and #356: done, awaiting release (`91bde83b`, its gates, closes with the release
+that ships M25).
+
+### CLOSE (14z-220, 2026-11-04)
+
+Driver `build/agent220/close/` (`--prev build/agent220/m25/static_confirm_results_s8.tsv`, the freeze's confirm run on S8 —
+the most recent run of record, on the freeze commit's own tree; `--row -`). Committed before this close: the freeze `91bde83b`
+(tags re-cut on it). Riding this close: STATE's 14z-220 group (14z-219 rolled), the opener, the ticket rows for #361 and #362,
+the regenerated indexes; the jtcores fork commit `930818f5` pushed to `DefinitelyFrenchName/jtcores` before the pins check
+(`8d527341..930818f5`). Steps: sections (this group); next-session (the 14z-219 opener moved VERBATIM to the top of
+`docs/NEXT_SESSION_HISTORY.md`, 0 lines missing; `docs/NEXT_SESSION.md` rewritten: #361's closure check first); rollover (the
+14z-219 group, 77 lines, to `STATE_HISTORY.md` below its HISTORY INDEX with its ledger line; 0 lines missing); indexes (by the
+driver); dashboard (14z-163..14z-220, 3,529 figures, 0 unclassed; five assets uploaded, `datasets` re-pointed: actions v9,
+costly v29, figures v29, rc_runs v29, tiers v30). On GitHub before the close: #361 and #362 filed; done-awaiting-release
+comments on #345, #346, #356. The tier's results: `build/agent220/close/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
@@ -122,10 +121,10 @@ CLEAN; nothing new on `origin` at the fetch; pushed `79a376ef..d19546c7`, origin
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
-- **#356 is built as Option 1 (a tenant-only copy of the speed-line effect with vs2's 14-row tables), with the raw allocator, and frozen as M25 as built; its one-frame Dark Force phase is accepted and is #360 (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356" and "Ruled 2026-11-03 (14z-219) — #356".
-- **#345's option A1b is built and its timing ACCEPTED: it freezes in M25 with #356 — ours loses no logic frame in Blizzard Sword where native does; the moved expectations (pass_overrun, the stale lag exemption, donovan_2's parity and RNG-form rows) re-freeze at the freeze, each through its own rule-checker run; vsavj's table PRG:0x1F3FD2 is never touched; B stays held (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #345", "Ruled 2026-11-03 (14z-219) — #345: option A is built as A1b" and "… the built A1b's timing is accepted".
+- **#356 is built as Option 1 (a tenant-only copy of the speed-line effect with vs2's 14-row tables), with the raw allocator, and frozen as M25 as built (frozen 14z-220, `91bde83b`); its one-frame Dark Force phase is accepted and is #360 (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356" and "Ruled 2026-11-03 (14z-219) — #356".
+- **#345's option A1b is built and its timing ACCEPTED: frozen in M25 with #356 (14z-220, `91bde83b`) — ours loses no logic frame in Blizzard Sword where native does; the moved expectations (pass_overrun, the stale lag exemption, donovan_2's parity and RNG-form rows) re-frozen at the freeze, each through its own rule-checker run; vsavj's table PRG:0x1F3FD2 is never touched; B stays held (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #345", "Ruled 2026-11-03 (14z-219) — #345: option A is built as A1b" and "… the built A1b's timing is accepted".
 - **#345's rows may turn DIFF under a non-zero RNG; the parity gates keep the 0000 pin (2026-11-01, 14z-216):** `tools/rng_forms.py` exempts rows `after:` a SLOWDOWN root, by name — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #345's rows under a non-zero RNG".
-- **A new zero-pass frame native vs2 has too is accepted, frame by frame (2026-11-01, 14z-216, #294):** `audit_lag_budget`'s ACCEPTED list (today donovan_2:3094, vs2's 3098, checked against `pass_overrun.tsv`'s native row), re-confirmed on the captures as *"a tradeoff. #345 is there to fix it later"*; the no-new-lag rule stands for every other frame — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #294's lag frame" and "…re-confirmed on the captures".
+- **A new zero-pass frame native vs2 has too is accepted, frame by frame (2026-11-01, 14z-216, #294):** `audit_lag_budget`'s ACCEPTED list (empty since the M25 freeze, 14z-220: A1b took the frame donovan_2:3094 away and the stale entry was removed, run 2026-11-04-1604; an entry is checked against `pass_overrun.tsv`'s native row), re-confirmed on the captures as *"a tradeoff. #345 is there to fix it later"*; the no-new-lag rule stands for every other frame — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #294's lag frame" and "…re-confirmed on the captures".
 - **ERIS tiers skip parity; the Mac's parity run is the row of record (#321, 2026-10-26, 14z-209):** ERIS runs `--skip test_mame_parity` — `DECISIONS_HISTORY.md` "Ruled 2026-10-26 (14z-209) — #321 phase 2".
 - **ROM content in the tree (2026-10-18, 14z-205):** addresses and discrete values are fine; a whole graphic or sound, or a whole algorithm, is not ([VSP-8]; the four quoted sound-driver bytes stay) — `DECISIONS_HISTORY.md` "Ruled 2026-10-18 (14z-205) — the no-ROM-bytes rule: …".
 - **#291's last 22 gates (2026-10-18, 14z-205):** the tap gates prove by an EVENT-PROVEN basis (D2), groups 3-5 take a `no-picture` declaration kind (D4), D4 first — `DECISIONS_HISTORY.md` "Ruled 2026-10-18 (14z-205) — #291 S2: …".
