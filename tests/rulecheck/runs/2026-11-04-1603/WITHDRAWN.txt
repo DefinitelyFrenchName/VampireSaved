@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-220): the packet check's QUOTE flag — the claim quoted the A1b ruling as "audit_lag_budget's now-stale ACCEPTED donovan_2:3094" without the ruling's backticks; re-prepared with the exact quote.

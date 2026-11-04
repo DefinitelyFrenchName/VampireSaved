@@ -58,7 +58,7 @@ cd "$REPO"
 # it reported PASS about three builds nobody ships. Section 5 adds the CURRENT
 # trio. Both are true at once; neither replaces the other.
 HIST_BUILDS="build/m5_wide build/hui30 build/pyron21"
-CUR_BUILDS="build/don_m28 build/hui62 build/pyron47"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+CUR_BUILDS="build/don_m29 build/hui63 build/pyron48"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 BUILDS="${*:-$HIST_BUILDS}"
 
 # Presence is two-tier. An UNBUILT tree (no build dir has placements.json at
@@ -101,7 +101,7 @@ d = run([])
 print("== 1: the three span classes are frozen ==")
 eq("shared spans", len(d["shared"]), 17)
 eq("name collisions", len(d["name_clash"]), 8)
-eq("unique to one tenant", len(d["unique"]), 15)   # 14z-111: +2 in this section's view = x100e3c (pyron) + x101aca (donovan), the CPU AI script blocks (x100000 shows in the second run's list)
+eq("unique to one tenant", len(d["unique"]), 17)   # RE-FROZEN 14z-220 (M25, was 15): +2 = x06e1d2 (#356, the speed-line copy) + x1d7428 (#345 A1b, the table copy), both Donovan-only WIDE roots  # 14z-111: +2 in this section's view = x100e3c (pyron) + x101aca (donovan), the CPU AI script blocks (x100000 shows in the second run's list)
 # The name collisions are TWO kinds wanting opposite treatment.
 clash = {e["name"]: e["spans"] for e in d["name_clash"]}
 generic = sorted(n for n, sp in clash.items()
@@ -112,7 +112,7 @@ eq("generic per-tenant names (need NAMESPACING)", generic,
    ["anim", "aux0_0", "aux0_1", "aux0_2", "code", "hitbox", "hitbox_proj"])
 eq("same start, different EXTENT", extent, ["x088512"])
 if not bad:
-    print("  ok: 17 shared / 8 collisions (7 generic + x088512's extent) / 15 unique")
+    print("  ok: 17 shared / 8 collisions (7 generic + x088512's extent) / 17 unique")
 
 print("== 2: shared spans CONFLICT — they cannot be placed once by dedup ==")
 FROZEN = {"x026142": (68, 54), "x028122": (45, 50),
@@ -192,7 +192,7 @@ if [ $# -eq 0 ]; then
 # — the shared regions' tenant copies differ in placement-dependent bytes,
 # so the 1-differs counts and the totals move (2089 / 7604). The control's
 # superseded trio still measures 2000 and is still rejected.
-echo "== 5: the CURRENT trio — don_m28 / hui62 / pyron47 (label re-pointed 14z-117) =="  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+echo "== 5: the CURRENT trio — don_m29 / hui63 / pyron48 (label re-pointed 14z-117) =="  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
     for b in $CUR_BUILDS; do
         [ -f "$b/patch/placements.json" ] || {
             echo "FAIL: current build $b has no patch/placements.json"; exit 1; }
@@ -214,7 +214,7 @@ def eq(what, got, want):
 d = run([])
 eq("shared spans", len(d["shared"]), 17)
 eq("name collisions", len(d["name_clash"]), 8)
-eq("unique to one tenant", len(d["unique"]), 17)
+eq("unique to one tenant", len(d["unique"]), 19)
 # The span figures MOVED from the 14z-77 trio, and that movement is the point:
 # 2000 -> 2033 at 14z-103 (2012 at 14z-90), spans shifting. A gate frozen only
 # on the old trio could not see this.
@@ -222,13 +222,18 @@ eq("unique to one tenant", len(d["unique"]), 17)
 # changed (160 bytes: the x2b7ef4 placeholder repair, patch_notes 14z-170; Phobos's and
 # Pyron's copies byte-identical to M18), so fewer bytes are his alone; conflict 1582 and
 # the 2089 total unchanged.
-FROZEN_CUR = {"x026142": (38, 69), "x028122": (36, 53),
-              "x05c800": (444, 385), "x2b7ef4": (878, 1582)}
+# RE-FROZEN 14z-220 (the M25 freeze): x026142 (38,69) -> (32,75), x05c800 (444,385) -> (429,400), total 2089 -> 2110,
+# unique 17 -> 19. Donovan's four shared copies are RAW byte-identical to M24 (cmp, build/agent220/m25/ro_diff.py) and the
+# un-normalised total is unchanged (7604): the moved bytes are words the normaliser reads as pointers (0x0040xxxx
+# immediates) that now land in M25's new placed ranges (x06e1d2 at 0x400010, x1d7428 at 0x4013E0) instead of x101aca's
+# old 0x400010 range or none, so they un-relocate to different sources. The +2 unique are those two regions.
+FROZEN_CUR = {"x026142": (32, 75), "x028122": (36, 53),
+              "x05c800": (429, 400), "x2b7ef4": (878, 1582)}
 for n, (solo, conf) in FROZEN_CUR.items():
     v = d["blobs"].get(n, {})
     eq("%s (1-differs, conflict)" % n, (v.get("solo"), v.get("conflict")),
        (solo, conf))
-eq("total conflicting bytes", d["total_conflict"], 2089)
+eq("total conflicting bytes", d["total_conflict"], 2110)
 und = sorted(n for n, v in d["blobs"].items() if v.get("undecidable"))
 eq("two-tenant spans reported undecidable", len(und), 13)
 
@@ -243,14 +248,14 @@ if bad:
     print("  FAIL (current trio):")
     for b in bad: print("    " + b)
 else:
-    print("  ok: 2089 conflicting bytes over the same 4 spans (7604 raw);")
-    print("      17 shared / 8 collisions / 14 unique / 13 undecidable —")
+    print("  ok: 2110 conflicting bytes over the same 4 spans (7604 raw);")
+    print("      17 shared / 8 collisions / 19 unique / 13 undecidable —")
     print("      the SHAPE is unchanged from 14z-77, the figures moved")
 sys.exit(1 if bad else 0)
 PY
 fi
 
 echo "PASS: region overlap frozen — 17 shared spans; 2000 conflicting bytes on"
-echo "      the 14z-77 trio and 2089 on the shipped trio, both asserted; the"
+echo "      the 14z-77 trio and 2110 on the shipped trio, both asserted; the"
 echo "      space demand per-tenant copies would create; and the normalisation"
 echo "      control that makes those numbers real"

@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent220/m25/rc/r_overrun/pass_overrun.tsv.diff	aa8957aced27ea1993c269081395b8e7c04923eb
+build/agent220/m25/rc/r_overrun/overrun_219_vs_m25.txt	91246d6164e10d588f44913df992ccea97750cef
+build/agent220/m25/rc/r_overrun/programs.txt	0794df64e4d603361973b45220562c710215d3b5
+build/agent220/m25/rc/r_overrun/audit_pass_overrun.log	7695461aa59973000aed7d79b11adeae8e5f822f
+build/agent220/m25/rc/r_overrun/verify_audit_pass_overrun.log	ae86ef6b343c3b18bd092551fe383be859d883d2
+build/agent220/m25/rc/r_overrun/verify_row.tsv	282872a4c7ea914b5fe3f52066d555520b2b38a5
+build/agent220/m25/rc/r_overrun/REC_lostframes.md	eae63856ccdb5e4e9962d9328b6f3db8f7eaa5f2
+DECISIONS_HISTORY.md.lines-9769-9786 (lines 9769-9786 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted; A1b freezes in M25 with #3")	c15347f627bace1e49be1f450c69538826c6c811

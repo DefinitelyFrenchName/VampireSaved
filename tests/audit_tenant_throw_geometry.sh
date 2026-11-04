@@ -157,7 +157,7 @@
 # LK 4, MK 5, HK 6 — imported, not copied). An undeclared victim that never holds is still VOID, as before.
 #
 # 126 cells x 2 legs + 21 control legs; ~2.5 min on ERIS at JOBS=10 for Phobos's 108 legs alone.
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [THROWERS="10 11 13"] [VICTIMS="..."] [JOBS=6]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged33] [THROWERS="10 11 13"] [VICTIMS="..."] [JOBS=6]
 #        tests/audit_tenant_throw_geometry.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -177,7 +177,7 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 # DUMPS and the liveness check reported "held frames ours=0". First seen on
 # the M16 freeze sweep, the gate's first run under the runner.
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged32}"
+BUILD="${BUILD:-build/m3b_merged33}"
 # THE THROWERS (#230, 14z-193): Phobos 0x10 with his three throws, Pyron 0x11 and Donovan 0x13 with the
 # standard throw (the throw `audit_pyron_capture_block` and `audit_throw_tech` run, one cell each until now).
 THROWERS="${THROWERS:-10 11 13}"

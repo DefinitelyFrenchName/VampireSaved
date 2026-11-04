@@ -1,0 +1,18 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: M25: pass_overrun.tsv re-frozen for #345 A1b's accepted timing
+Claim (the working agent's sentence): Re-freeze tests/expected/pass_overrun.tsv on merged-m25, build/m3b_merged33 (its registry row, measured key and program: build_identity.txt) (pass_overrun.tsv.diff): only ours rows move, donovan_2's overrun 3094 -> none and six idle rows (donovan_2 events 0, 1 and 2, donovan_10 events 0 and 1, donovan_11 event 12; their zero and mean figures); no native row changes; and the four header lines the gate writes, which now name merged-m25's build and say ours overruns on none of the three parts while native does on donovan_2 (3098) and donovan_11 (4580) — tests/audit_pass_overrun.sh's FREEZE text was rewritten for that (audit_pass_overrun.sh.diff, comment text only), after rule-checker run 2026-11-04-1599 found the M24 sentence in the header. The moved rows equal, line for line, the ones measured on the 14z-219 scratch build build/agent219/t345a/mg (overrun_219_vs_m25.txt), whose program a24aa560 is merged-m25's (programs.txt); that build's timing was put to the maintainer and accepted, "Accept, freeze A1b (Recommended)" (DECISIONS_HISTORY.md "Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted", REC_lostframes.md). The rows were written by FREEZE=1 on ERIS at snapshot S3 (S3_freeze_audit_pass_overrun.log) and verified there (S3_verify_audit_pass_overrun.log); the header was rewritten by FREEZE=1 on the Mac (mac_freeze_audit_pass_overrun.log) with the rows unchanged (rows_eris_vs_mac.txt) and verified on the Mac (mac_verify_audit_pass_overrun.log: every row as frozen, the overrun-planted control fired, PASS). NOT tested: none of the six idle-row moves was put to the maintainer (REC_lostframes.md reports zero-pass frames and held pictures, not idle means); the build's identity rests on the registry row and the measured key; FBNeo and MiSTer were not measured.
+Artifacts (read every one, in full):
+  - build/agent220/m25/rc/r_overrun2/pass_overrun.tsv.diff
+  - build/agent220/m25/rc/r_overrun2/audit_pass_overrun.sh.diff
+  - build/agent220/m25/rc/r_overrun2/build_identity.txt
+  - build/agent220/m25/rc/r_overrun2/overrun_219_vs_m25.txt
+  - build/agent220/m25/rc/r_overrun2/programs.txt
+  - build/agent220/m25/rc/r_overrun2/S3_freeze_audit_pass_overrun.log
+  - build/agent220/m25/rc/r_overrun2/S3_verify_audit_pass_overrun.log
+  - build/agent220/m25/rc/r_overrun2/mac_freeze_audit_pass_overrun.log
+  - build/agent220/m25/rc/r_overrun2/rows_eris_vs_mac.txt
+  - build/agent220/m25/rc/r_overrun2/mac_verify_audit_pass_overrun.log
+  - build/agent220/m25/rc/r_overrun2/REC_lostframes.md
+  - DECISIONS_HISTORY.md.lines-9769-9786 (lines 9769-9786 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted; A1b freezes in M25 with #3")

@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff	dcff4d57ccdbfe4653e8272bdd25d51e0f6ce2ee
+build/agent220/m25/rc/r_lag/battery_S2_audit_lag_budget.log	389e20868750e8376205d770c356a925a376e873
+build/agent220/m25/rc/r_lag/S3_audit_lag_budget.log	0a375ef0703d6ac7ad007acd603c8895096e3752
+build/agent220/m25/rc/r_lag/S3_mode_native-basis-moved.log	d079047be9b1118a54f9825e024cbcc51caa1b17
+build/agent220/m25/rc/r_lag/verify_audit_lag_budget.log	d278f5e45e3d0c2de8b96ee40a03586dd91482e6
+build/agent220/m25/rc/r_lag/verify_row.tsv	4721df44d10d87fe783b75c2409a4d6f70769cd5
+build/agent220/m25/rc/r_lag/mac_audit_lag_budget.log	276b98d6491c7306cc1f114f7f24d86a4b5bf8e7
+build/agent220/m25/rc/r_lag/mac_mode_native-basis-moved.log	043175e1239b6164ed437760426aa068b98f89d2
+build/agent220/m25/rc/r_lag/pass_overrun.tsv	012283b1c36735248304ed3db6ad5dbf61e65516
+build/agent220/m25/rc/r_lag/build_identity.txt	bdb25a0dc66b227025c07b780603ca480d761c32
+DECISIONS_HISTORY.md.lines-9582-9598 (lines 9582-9598 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-01 (14z-216) — #294's lag frame: a zero-pass frame native vs2 has too is accepted")	30d3b78650e9d348f6062457769f731d62fc6e95
+DECISIONS_HISTORY.md.lines-9769-9786 (lines 9769-9786 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted; A1b freezes in M25 with #3")	c15347f627bace1e49be1f450c69538826c6c811

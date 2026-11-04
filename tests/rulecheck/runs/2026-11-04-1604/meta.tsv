@@ -1,0 +1,12 @@
+decision	expectation
+subject	M25: audit_lag_budget's stale ACCEPTED donovan_2:3094 removed, its basis control kept live
+session	14z-220
+model	rule-checker@163e4ce9cf7b
+claim	Remove audit_lag_budget's only ACCEPTED entry donovan_2:3094:3098 (the list is now empty) and keep its native-basis-moved control live with a control-only entry, CTL_ENTRY=donovan_2:-:3098, that is never an exemption (audit_lag_budget.sh.diff, which also generalises the basis-check message and carries the M25 re-point sweep's change of the default BUILD from build/m3b_merged32 to build/m3b_merged33; each run cited below names the build it measured on its own line). On merged-m25, build/m3b_merged33 (build_identity.txt), the freeze battery at S2 read the entry stale, "the ACCEPTED frame 3094 is no longer a new zero-pass frame — a stale exemption, remove it" (battery_S2_audit_lag_budget.log); the rule that created the list says an accepted frame no longer measured fails as stale (DECISIONS_HISTORY.md "Ruled 2026-11-01 (14z-216) — #294's lag frame", the maintainer: "Accept: native lags too (Recommended)"), and the A1b ruling names "`audit_lag_budget`'s now-stale ACCEPTED donovan_2:3094" among the expectations re-frozen at the M25 freeze (DECISIONS_HISTORY.md "Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted", the maintainer: "Accept, freeze A1b (Recommended)"). After the change the gate PASSes on merged-m25 with none listed and both controls fired, at S3 on ERIS (S3_audit_lag_budget.log; the S3 battery's row verify_row.tsv and verify_audit_lag_budget.log) and on the Mac after the message change (mac_audit_lag_budget.log), and the native-basis-moved mode FAILs on its own perturbation both times (S3_mode_native-basis-moved.log, mac_mode_native-basis-moved.log). NOT tested: the control is new in shape — with no accepted frame left it judges its own synthetic entry against native's measured donovan_2 overrun (3098 in pass_overrun.tsv), so it proves the basis check works on that native frame, not on any accepted frame (there is none); the no-new-lag check itself is unchanged and reads no new zero-pass frame on any part; the build's identity rests on the registry row and the measured key; FBNeo and MiSTer were not measured.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	13 flag(s): D-ABSOLUTE 8, D-FIGURE 5
+deliverables	build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff
+action	2026-11-04-1604

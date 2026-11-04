@@ -105,7 +105,7 @@
 #      shapes and must simply produce an action without a stock spend
 #      (measured 14z-104 (4)); Phobos and Pyron fire theirs.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [JOBS=5]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged33] [JOBS=5]
 #        tests/audit_edge_cases.sh          (~17 legs x ~1 min, JOBS at a time)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -123,7 +123,7 @@ export MAME_BIN
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 JOBS="${JOBS:-5}"
-BUILD="${BUILD:-build/m3b_merged32}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged33}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)" || { echo "FAIL: audit_edge_cases — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 FIELDS="ff8450:w:p1hp,ff8850:w:p2hp,ff8120:b:perfect,ff810e:b:rounds,ff8509:b:stk,ff8406:b:p1seq,ff8105:b:side05"

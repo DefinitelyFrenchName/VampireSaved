@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-220): D-ABSOLUTE flags on the deliverable's UNCHANGED / mark-only wording for huitzil-m36 and pyron-m30: hui_pyr_unchanged.txt added (programs of the M24 and M25 builds, the manifests' only change the mark, the M25 rows' only_variant_slot); re-prepared.

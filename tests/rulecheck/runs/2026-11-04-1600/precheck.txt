@@ -1,0 +1,10 @@
+  FLAG D-FIGURE: 57  [build/agent220/m25/rc/r_parity/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 401  [build/agent220/m25/rc/r_parity/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 200  [build/agent220/m25/rc/r_parity/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 260  [build/agent220/m25/rc/r_parity/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 240  [build/agent220/m25/rc/r_parity/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 140  [build/agent220/m25/rc/r_parity/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 120  [build/agent220/m25/rc/r_parity/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 511  [build/agent220/m25/rc/r_parity/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 300  [build/agent220/m25/rc/r_parity/move_parity_events.tsv.diff]
+packet_check: 9 flag(s): D-FIGURE 9

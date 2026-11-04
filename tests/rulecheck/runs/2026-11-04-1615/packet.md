@@ -1,0 +1,59 @@
+THE PACKET
+
+Decision kind: freeze
+Subject: M25 freeze: registry rows donovan-m29 huitzil-m36 pyron-m30 merged-m25 and the evidence behind them
+Claim (the working agent's sentence): Freeze M25 (#356 and #345 option A1b, both ruled, rulings.txt): the four registry rows in registry_rows.txt (donovan-m29, huitzil-m36, pyron-m30, merged-m25) are the builds' measured keys, reproduced on two machines — the six builds' program fingerprint and whole-set key are field-for-field the same on the Mac and on ERIS's independent build from snapshot S0 (fingerprints_mac.txt, fingerprints_eris.txt, fingerprints_compare.txt; the zip containers differ, a difference whose cause is not measured, while every zip member's name, CRC and size agree, zipmani_mac.txt = zipmani_eris.txt but for the stage-4 directory's name, zipmani.py.txt); the tree still builds them: build/manifest changed after S0 only by the re-point sweep's build names in pcrel_escapes.toml and the staged patch's removal (manifest_since_s0.diff), and test_m3a_reproducible, which rebuilds from the tree and is pinned to donovan-m29's and merged-m25's programs 63447128 and a24aa560 (m3a_pins.txt), PASSed in the S6 tier (static_s6_results.tsv); the four expectation sets are file-for-file equal between the Mac and ERIS's independent freeze at S1 (sets_sha1_mac.txt, sets_sha1_eris.txt: 454 files each, sets_mac_vs_eris.diff empty); every fixed site of the merged and donovan byte diff is explained (bytediff_fixed_review.txt: UNEXPLAINED 0, its classifier bytediff_review.py.txt; bytediff_head.txt the frozen record's head); the freeze's re-frozen expectations went through their own rule-checker runs and each ended OK or with its finding resolved in writing (refreeze_runs.tsv: rng_forms -1601 OK; pass_overrun -1599 and -1602 VIOLATED on Q1 only, -1602's premise named in writing and no fresh run required by the 14z-209 ruling; the lag-budget exemption -1604 OK; donovan_2's parity rows -1606 OK; the relocation, build-row and static re-freezes -1607 to -1611 VIOLATED, each finding corrected, -1612 OK; -1603 and -1605 withdrawn unspawned); the freeze battery on ERIS at snapshot S3 after those re-freezes reads PASS 183, SKIP 4, FAIL 0 (S3_battery_results.tsv), and every one of the 196 release-scope emulator rows is accounted for (release_scope_accounting.txt): the 4 SKIPs are host-only rows run elsewhere — test_readme_recording and test_release_binaries PASS on the Mac at S5 (mac_S5_release_rows_results.tsv), audit_release_linux_desktop and audit_release_linux_cleanhost through the emulator runner on PILOT at S6 (pilot_rows/: desk_commit.txt and clean_commit.txt 4617659f, desk_results.tsv and clean_results.tsv PASS, runner_desk.log and runner_clean.log each GREEN; the desktop gate's three controls fired and it read mark M25, window and sound on both prebuilt Linux emulators, audit_release_linux_desktop.log; the clean-host applier printed set key 36dd4398, the applied_set_key of release_identity.txt, audit_release_linux_cleanhost.log; the zips' untracked Linux emulators were copied from release/merged-m24, whose tracked BINARY.txt files are byte-identical to merged-m25's, and every file matches its row of merged-m25's tracked BINARY.txt, every file a row and every row a file, a one-byte inversion in a copy failing the check on both dirs, and the asset cutter's dry run verifying both dirs, pilot_binaries.txt, pilot_rows220.sh.txt; neither gate's FOLLOWS changed from S6 to the working tree, whose only tracked content changes since S6 are the two submodule entries and tests/controls_concurrent_emu.txt, and every file S6 adds is on disk byte-equal to its S6 blob, 645 checked, 0 differing, pilot_rows/follows.txt); test_mame_parity and the three MiSTer romset rows ran on the Mac at S2 (mac_S2_parity_results.tsv, mac_S2_mister_results.tsv; test_mister_prg_window FAILed and was re-frozen with --freeze, then PASS); the five bitstream rows are not run at a freeze (the .rbf is unchanged); the release tested is the frozen build and the one the freeze commit carries: every platform dir of S6's tracked release/merged-m25 (fbneo, mame, mister) has a manifest and apply_release.py byte-identical to a fresh package of merged-m25's build build/m3b_merged33 and all 20 of its patches identical, while the same packaging of build/agent219/t345a/mg (merged-m25's program, a different set) differs on build_fingerprint and both applied set keys, each platform dir's manifest and 2 of its 20 patches differing from it (release_identity.txt, printed by release_identity.sh.txt); release/merged-m25 is untracked in the working tree, so the script's two git-diff counts of 91 list every path as absent and are not content differences: measured directly, every one of S6's 91 tracked blobs equals the working-tree file, and the 61 other files on disk are git-ignored release binaries, the same 91 + 61 shape as M24 (release_identity.txt, NOTE); both concurrent-controls lists are re-traced and test_controls_concurrent PASSes on the tree (test_controls_concurrent.log; traces/: static at S2 on PILOT, 631 runs, 115 SAFE, 4 SHARED kept off, 3 HOLLOW kept off — test_gate_descriptions LIES, test_annotations_current and test_applier_page_browser UNJUDGED — static_overlap.txt and static_classes_summary.txt, and test_crash_sweep and test_emulator_runner kept off uncertified, the reasons in the list's own OFF lines, static_list_header_lines.txt; emulator: 7 rows at S3 on PILOT, 20 runs, 7 SAFE; 28 rows at S4 on ERIS, 96 runs, 28 SAFE, 27 written; 10 rows at S4 on PILOT, 48 runs, 10 SAFE; audit_move_parity_attribution, whose script changed after S4, alone at S6 on ERIS, 2 runs, SAFE (attr_eris_*); every emulator run HONOURED, each tracing machine running nothing else); the static freeze tier on snapshot S6 (4617659f) read PASS 228, FAIL 10 (static_s6_results.tsv): five relocation-moved static expectations re-frozen, patch 0041 named in tools/setup_jtcores.sh and regenerated without its signature, and #345's recurring Q1 finding acknowledged, all cleared by rule-checker run 2026-11-04-1614 OK after -1613 VIOLATED and resolved (s6fix_runs.tsv); of the other three, test_controls_concurrent now PASSes (test_controls_concurrent.log), test_rule_checker's only finding was the four registry rows with no OK freeze run, which is this run, and test_emulator_staleness at freeze cadence on a snapshot of S7 371504563 named 17 gates (stale_at_s7.txt): the 14 non-MiSTer ones re-ran through the runner on ERIS at S7, PASS 14, FAIL 0, GREEN (eris_s7_results.tsv, eris_s7_commit.txt). What this rests on that is NOT tested: (1) nothing was run on hardware (the MiSTer .rbf is unchanged), no release is published, and the bitstream-cadence and release-cadence gates are not part of a freeze; (2) the byte-diff classifier behind bytediff_fixed_review.txt has no planted control: its classes were written against this diff (UNEXPLAINED fell to 0 as they were), so "every fixed site is explained" rests on the review's reading of each class; (3) no gate compares a tracked release with a fresh package of its build (release_identity is a direct check, run once for this freeze, as at M24); (4) A1b's timing is a ruled acceptance, not parity (rulings.txt: "Accept, freeze A1b (Recommended)"), and #356's one-frame Dark Force phase is accepted and ticketed (#360), not fixed; (5) the zip-container difference between the Mac and ERIS is not explained, only shown not to reach any member's content or either key; (6) the provisional tag freeze/merged-m25 on PILOT exists only for the two Linux rows (pilot_rows220.sh.txt); the real tags are cut on the freeze commit on the Mac; (7) the three MiSTer romset rows the staleness audit names at S7 (test_mister_gfxc_fetch, test_mister_prg_window, test_mister_sdram_census) are running on the Mac at S7 and have not reported; the final static freeze tier runs after this check on a snapshot of the commit's tree (S6's tier was red as above, its fixes are in the tree), with --confirm on S6's results; neither has run; (8) that the merged-m24 and merged-m25 Linux binary records are byte-identical was measured on the Mac (cmp of the two tracked BINARY.txt per emulator), not on PILOT, where the copied files were checked against merged-m25's record only.
+Artifacts (read every one, in full):
+  - build/agent220/m25/rc/freeze/S3_battery_results.tsv
+  - build/agent220/m25/rc/freeze/bytediff_fixed_review.txt
+  - build/agent220/m25/rc/freeze/bytediff_head.txt
+  - build/agent220/m25/rc/freeze/bytediff_review.py.txt
+  - build/agent220/m25/rc/freeze/eris_s7_commit.txt
+  - build/agent220/m25/rc/freeze/eris_s7_results.tsv
+  - build/agent220/m25/rc/freeze/fingerprints_compare.txt
+  - build/agent220/m25/rc/freeze/fingerprints_eris.txt
+  - build/agent220/m25/rc/freeze/fingerprints_mac.txt
+  - build/agent220/m25/rc/freeze/m3a_pins.txt
+  - build/agent220/m25/rc/freeze/mac_S2_mister_results.tsv
+  - build/agent220/m25/rc/freeze/mac_S2_parity_results.tsv
+  - build/agent220/m25/rc/freeze/mac_S5_release_rows_results.tsv
+  - build/agent220/m25/rc/freeze/manifest_since_s0.diff
+  - build/agent220/m25/rc/freeze/pilot_rows/audit_release_linux_cleanhost.log
+  - build/agent220/m25/rc/freeze/pilot_rows/audit_release_linux_desktop.log
+  - build/agent220/m25/rc/freeze/pilot_rows/clean_commit.txt
+  - build/agent220/m25/rc/freeze/pilot_rows/clean_results.tsv
+  - build/agent220/m25/rc/freeze/pilot_rows/desk_commit.txt
+  - build/agent220/m25/rc/freeze/pilot_rows/desk_results.tsv
+  - build/agent220/m25/rc/freeze/pilot_rows/follows.txt
+  - build/agent220/m25/rc/freeze/pilot_rows/pilot_binaries.txt
+  - build/agent220/m25/rc/freeze/pilot_rows/pilot_rows220.sh.txt
+  - build/agent220/m25/rc/freeze/pilot_rows/pilot_status.txt
+  - build/agent220/m25/rc/freeze/pilot_rows/runner_clean.log
+  - build/agent220/m25/rc/freeze/pilot_rows/runner_desk.log
+  - build/agent220/m25/rc/freeze/refreeze_runs.tsv
+  - build/agent220/m25/rc/freeze/registry_rows.txt
+  - build/agent220/m25/rc/freeze/release_identity.sh.txt
+  - build/agent220/m25/rc/freeze/release_identity.txt
+  - build/agent220/m25/rc/freeze/release_scope_accounting.txt
+  - build/agent220/m25/rc/freeze/rulings.txt
+  - build/agent220/m25/rc/freeze/s6fix_runs.tsv
+  - build/agent220/m25/rc/freeze/sets_mac_vs_eris.diff
+  - build/agent220/m25/rc/freeze/sets_sha1_eris.txt
+  - build/agent220/m25/rc/freeze/sets_sha1_mac.txt
+  - build/agent220/m25/rc/freeze/stale_at_s7.txt
+  - build/agent220/m25/rc/freeze/static_s6_results.tsv
+  - build/agent220/m25/rc/freeze/test_controls_concurrent.log
+  - build/agent220/m25/rc/freeze/traces/attr_eris_classes.tsv
+  - build/agent220/m25/rc/freeze/traces/attr_eris_overlap.txt
+  - build/agent220/m25/rc/freeze/traces/emu_s3_pilot_classes.tsv
+  - build/agent220/m25/rc/freeze/traces/emu_s3_pilot_overlap.txt
+  - build/agent220/m25/rc/freeze/traces/emu_s4_eris_classes.tsv
+  - build/agent220/m25/rc/freeze/traces/emu_s4_eris_overlap.txt
+  - build/agent220/m25/rc/freeze/traces/emu_s4_pilot_classes.tsv
+  - build/agent220/m25/rc/freeze/traces/emu_s4_pilot_overlap.txt
+  - build/agent220/m25/rc/freeze/traces/static_classes_summary.txt
+  - build/agent220/m25/rc/freeze/traces/static_list_header_lines.txt
+  - build/agent220/m25/rc/freeze/traces/static_overlap.txt
+  - build/agent220/m25/rc/freeze/zipmani.py.txt
+  - build/agent220/m25/rc/freeze/zipmani_eris.txt
+  - build/agent220/m25/rc/freeze/zipmani_mac.txt

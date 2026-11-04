@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: The x028122 meter adder copies, the one reader RESIDUAL ADDED: # static.  [build/agent220/m25/rc/r_s6fix/attribution.txt]
+packet_check: 1 flag(s): D-ABSOLUTE 1

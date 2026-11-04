@@ -4,7 +4,7 @@
 # WHAT: Phobos survives an 11,000-frame input-chaos soak across round transitions on the
 #   REAL packed set, with both satellites alive in round 2 (the pod-lifecycle regression
 #   tripwire).
-# HOW: on build/hui62 (a self-built stage-4 build until 14z-197; one can be given), forces id 0x10
+# HOW: on build/hui63 (a self-built stage-4 build until 14z-197; one can be given), forces id 0x10
 #   through the vanilla select flow and runs 70_hui_mash guarded on MAME on the set the build packed
 #   (a vsavj-set run against a WIDE build is the pristine ROM: false green).
 # EXPECTS: guard clean end to end and both satellite pointers non-zero at f6000 (round 1) and at
@@ -33,9 +33,9 @@
 #   3. run on the set the build actually packed (vsavjw when wide_ext is
 #      used — a vsavj-set run against it is the PRISTINE ROM: false green).
 #
-# Usage: ROMDIR=... tests/test_hui_soak.sh [builddir]   (default build/hui62)
+# Usage: ROMDIR=... tests/test_hui_soak.sh [builddir]   (default build/hui63)
 #
-# THE BUILD IS build/hui62 BY DEFAULT since 14z-197 (maintainer-ruled 2026-10-11, DECISIONS_HISTORY.md): on the
+# THE BUILD IS build/hui63 BY DEFAULT since 14z-197 (maintainer-ruled 2026-10-11, DECISIONS_HISTORY.md): on the
 # replays' own timing the fresh stage-4 build LEAVES THE MATCH on this rig: both pods are set over f2900-4650, then the
 # state words at $FF8000 zero between f4650 and f4700 and the game never returns to the match (state 0x0004) — the same
 # unexplained stage-4 reset as the 2P rigs, recorded not root-caused — so it has no pods at f6000; build/hui61 keeps the
@@ -58,7 +58,7 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-B="${1:-build/hui62}"   # re-pointed 14z-197 (was: a fresh stage-4 build) — see THE BUILD above
+B="${1:-build/hui63}"   # re-pointed 14z-197 (was: a fresh stage-4 build) — see THE BUILD above
 case "$B" in /*) ;; *) B="$REPO/$B" ;; esac
 [ -d "$B/rompath" ] || { echo "FAIL: no $B/rompath"; exit 1; }
 SET=vsavj

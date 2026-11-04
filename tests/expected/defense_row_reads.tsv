@@ -1,6 +1,6 @@
 # tests/expected/defense_row_reads.tsv — every read of a fighter's +0x382 by the two defense reads (PRG:0x018C10 the curve,
 # 0x018C78 the rally threshold) and the attacker-side combo read (0x018C40), by the victim's identity (its hitbox base +0x60
-# named by roster_pairings/bases.tsv) and the index value read; legs victim / attacker / suite on m3b_merged32, vsavj on
+# named by roster_pairings/bases.tsv) and the index value read; legs victim / attacker / suite on m3b_merged33, vsavj on
 # pristine vsavj (tests/audit_defense_row_reads.sh; tests/lua/read_tap.lua with RPCS). Evidence class: in-emulator.
 # Frozen 14z-169 with FREEZE=1. Columns: <leg> <pc> <read> <identity> <value read> <reads> <runs>.
 # The ours rows follow the build: re-freeze at every freeze, reviewing the diff.

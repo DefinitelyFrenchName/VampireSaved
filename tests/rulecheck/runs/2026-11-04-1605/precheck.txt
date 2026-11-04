@@ -1,0 +1,12 @@
+  FLAG QUOTE: First frozen 14z-168 (GitHub #136); this freeze with FREEZE=1 on <build>
+  FLAG QUOTE: Frozen 14z-168 with FREEZE=1 on m3b_merged33
+  FLAG D-FIGURE: 57  [build/agent220/m25/rc/r_parity2/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 401  [build/agent220/m25/rc/r_parity2/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 200  [build/agent220/m25/rc/r_parity2/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 260  [build/agent220/m25/rc/r_parity2/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 240  [build/agent220/m25/rc/r_parity2/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 140  [build/agent220/m25/rc/r_parity2/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 120  [build/agent220/m25/rc/r_parity2/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 511  [build/agent220/m25/rc/r_parity2/move_parity_events.tsv.diff]
+  FLAG D-FIGURE: 300  [build/agent220/m25/rc/r_parity2/move_parity_events.tsv.diff]
+packet_check: 11 flag(s): D-FIGURE 9, QUOTE 2

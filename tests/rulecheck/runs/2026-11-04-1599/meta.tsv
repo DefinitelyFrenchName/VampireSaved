@@ -1,0 +1,12 @@
+decision	expectation
+subject	M25: pass_overrun.tsv re-frozen for #345 A1b's accepted timing
+session	14z-220
+model	rule-checker@163e4ce9cf7b
+claim	Re-freeze tests/expected/pass_overrun.tsv on merged-m25 (pass_overrun.tsv.diff): only ours rows move, donovan_2's overrun 3094 -> none and seven idle rows of donovan_2, donovan_10 and donovan_11 (their zero and mean figures), plus the build named in the header line; no native row changes. The moved lines equal, line for line, the ones measured on the 14z-219 scratch build build/agent219/t345a/mg (overrun_219_vs_m25.txt), whose program a24aa560 is merged-m25's (programs.txt); that build's timing was put to the maintainer and accepted, "Accept, freeze A1b (Recommended)" (DECISIONS_HISTORY.md "Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted", REC_lostframes.md). The file was written by FREEZE=1 on ERIS at snapshot S3 (audit_pass_overrun.log) and verified by the S3 battery's plain run (verify_audit_pass_overrun.log: every row as frozen, the overrun-planted control fired; verify_row.tsv PASS). NOT tested: the idle-row moves on donovan_10 and donovan_11 were not put to the maintainer one by one (REC_lostframes.md reports zero-pass frames and held pictures, not idle means); FBNeo and MiSTer were not measured.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	2 flag(s): D-ABSOLUTE 1, D-FIGURE 1
+deliverables	build/agent220/m25/rc/r_overrun/pass_overrun.tsv.diff
+action	2026-11-04-1599

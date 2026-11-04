@@ -9,8 +9,8 @@
 #   tenant parts through the merged wheel's path, level and RNG pinned), the build's
 #   zero-pass frame set checked as a subset of the reference's; a leg that does not complete
 #   is VOID and fails; the control removes one frame's pass advance from a build trace.
-# EXPECTS: no new zero-pass frame on any part but the ACCEPTED native-matched ones (one since 2026-11-01: donovan_2
-#   frame 3094, #294 — vs2 overruns there at 3098), each still measured; the planted frame is caught. NOT covered:
+# EXPECTS: no new zero-pass frame on any part but the ACCEPTED native-matched ones (none since 2026-11-04, the M25
+#   freeze: #345 A1b took donovan_2's frame 3094 away; 2026-11-01 to M24 it was #294's, vs2 overruns there at 3098), each still measured; the planted frame is caught. NOT covered:
 #   content outside the naming corpus and the idle-time margin short of a lost pass.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua tests/expected/pass_overrun.tsv
 #   tests/replays/naming/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
@@ -19,7 +19,7 @@
 # SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
 #
 # MUST-FIRE: perturbed-copy: lag-planted — a copy of each part's trace on the build under test with the midpoint frame's whole pass-counter advance removed (a zero-pass frame planted where the reference has none) must FAIL the subset check, so "no new zero-pass frame" is read from the build's own pass counter (in-gate: the planted copy of the first part must be caught; mode: every part's build trace is planted before the check and the gate FAILs)
-# MUST-FIRE: perturbed-copy: native-basis-moved — a copy of tests/expected/pass_overrun.tsv whose native row no longer lists an ACCEPTED entry's native frame must FAIL the basis check, so an accepted frame cannot outlive native's own overrun (mode: the check reads that copy)
+# MUST-FIRE: perturbed-copy: native-basis-moved — a copy of tests/expected/pass_overrun.tsv whose native row no longer lists an ACCEPTED entry's native frame must FAIL the basis check, so an accepted frame cannot outlive native's own overrun (mode: the check reads that copy; with the list empty, since 14z-220, both legs judge the control's own entry CTL_ENTRY, native's measured donovan_2 overrun)
 #
 # WHY. The maintainer, of the 2026-09-18 fix rulings (DECISIONS_HISTORY.md, the defense-row entry):
 # "when I say no frame cost I don't mean " no cost at all", I mean "a total cost that doesn't end up
@@ -41,14 +41,14 @@
 # battery's oracles cover legacy content); the idle-time margin short of a zero-pass frame (a slower
 # frame that still completes a pass is not lag by this definition); FBNeo and the MiSTer core.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [REF=build/m3b_merged26] [JOBS=6] [PARTS="donovan_1 pyron_2"] tests/audit_lag_budget.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged33] [REF=build/m3b_merged26] [JOBS=6] [PARTS="donovan_1 pyron_2"] tests/audit_lag_budget.sh
 #   emulator tier, MAME; 84 field-trace runs — measured 14z-170 on this MacBook at JOBS=6: see ci_emulator.tsv
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged32}"
+BUILD="${BUILD:-build/m3b_merged33}"
 REF="${REF:-build/m3b_merged26}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 case "$REF" in /*) ;; *) REF="$REPO/$REF" ;; esac
@@ -131,16 +131,22 @@ echo "== 2. the zero-pass frames, part by part"
 # (tests/expected/pass_overrun.tsv). An accepted frame no longer measured FAILS as stale: the list never outlives its reason.
 # Re-confirmed on the #345 captures the same day: "Still accepted but as a tradeoff. #345 is there to fix it later"
 # (DECISIONS_HISTORY.md "#294's lag frame re-confirmed on the captures") — when #345 is fixed this entry goes stale.
-ACCEPTED="donovan_2:3094:3098"   # part:our frame:NATIVE frame (the native overrun this one reproduces)
+# EMPTIED 14z-220 (the M25 freeze): #345 A1b, ruled 2026-11-03 (DECISIONS_HISTORY.md "Ruled 2026-11-03 (14z-219) — #345: the built
+# A1b's timing is accepted"), leaves ours no zero-pass frame in donovan_2's Blizzard Sword, so 3094 read STALE on merged-m25
+# (the freeze battery, build/agent220/m25/battery/audit_lag_budget.log) and is removed, as the rule above requires.
+ACCEPTED=""   # part:our frame:NATIVE frame (the native overrun this one reproduces); was "donovan_2:3094:3098" to M24
+# The basis control's own entry: a synthetic part:-:native-frame naming native's measured donovan_2 overrun (3098 in
+# tests/expected/pass_overrun.tsv), so the control bites while the list is empty. It is never an exemption.
+CTL_ENTRY="donovan_2:-:3098"
 # THE BASIS (rule-checker run 2026-11-01-1551 Q4): an accepted frame stands only while NATIVE's overrun it reproduces is
 # measured — tests/expected/pass_overrun.tsv's native row, which tests/audit_pass_overrun.sh re-measures on native vs2
 # every run (a moved native frame turns that gate red); a basis no longer there fails here.
-basis_check() {  # basis_check <pass_overrun.tsv>
+basis_check() {  # basis_check <pass_overrun.tsv> [entries — default the ACCEPTED list]
     _bf=0
-    for a in $ACCEPTED; do
+    for a in ${2-$ACCEPTED}; do
         _ap="${a%%:*}"; _nf="${a##*:}"
         _row="$(awk -F'\t' -v p="$_ap" '$1=="overrun" && $2==p && $3=="native" {print $4}' "$1")"
-        case " $(echo "$_row" | tr ',' ' ') " in *" $_nf "*) ;; *) echo "  FAIL  $_ap: the ACCEPTED entry's native frame $_nf is not native's overrun in $(basename "$1") (native: '${_row:-none}') — the basis moved"; _bf=1 ;; esac
+        case " $(echo "$_row" | tr ',' ' ') " in *" $_nf "*) ;; *) echo "  FAIL  $_ap: the entry's native frame $_nf (an ACCEPTED entry's, or the basis control's own) is not native's overrun in $(basename "$1") (native: '${_row:-none}') — the basis moved"; _bf=1 ;; esac
     done
     return $_bf
 }
@@ -148,11 +154,14 @@ OVR="$REPO/tests/expected/pass_overrun.tsv"
 if [ "$MODE" = native-basis-moved ]; then
     awk -F'\t' 'BEGIN{OFS="\t"} $1=="overrun" && $2=="donovan_2" && $3=="native" {$4="none"} {print}' "$OVR" > "$W/ovr_moved.tsv"; OVR="$W/ovr_moved.tsv"
 fi
-if basis_check "$OVR"; then ok "every ACCEPTED frame's native basis is native's measured overrun (tests/expected/pass_overrun.tsv)"
+if [ "$MODE" = native-basis-moved ]; then
+    basis_check "$OVR" "${ACCEPTED:-$CTL_ENTRY}" || fail=1
+elif basis_check "$OVR"; then ok "every ACCEPTED frame's native basis is native's measured overrun (tests/expected/pass_overrun.tsv; ${ACCEPTED:-none listed})"
 else fail=1; fi
 if [ "$MODE" != native-basis-moved ]; then
     awk -F'\t' 'BEGIN{OFS="\t"} $1=="overrun" && $2=="donovan_2" && $3=="native" {$4="none"} {print}' "$REPO/tests/expected/pass_overrun.tsv" > "$W/ovr_ctl.tsv"
-    if basis_check "$W/ovr_ctl.tsv" > /dev/null; then echo "CONTROL DEAD: native-basis-moved — a copy without native's overrun still passed the basis check"; fail=1
+    if ! basis_check "$REPO/tests/expected/pass_overrun.tsv" "${ACCEPTED:-$CTL_ENTRY}" > /dev/null; then echo "CONTROL DEAD: native-basis-moved — the control's entry fails the basis check on the real file, so the copy proves nothing"; fail=1
+    elif basis_check "$W/ovr_ctl.tsv" "${ACCEPTED:-$CTL_ENTRY}" > /dev/null; then echo "CONTROL DEAD: native-basis-moved — a copy without native's overrun still passed the basis check"; fail=1
     else echo "CONTROL FIRED: native-basis-moved — a copy of pass_overrun.tsv without native's donovan_2 overrun fails the basis check"; fi
 fi
 new_total=0; zb_total=0; zr_total=0

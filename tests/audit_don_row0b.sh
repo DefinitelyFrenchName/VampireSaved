@@ -30,14 +30,14 @@
 #
 # SHEET: none — the maintainer read the captures before the ruling (sheet_127_pod_hit.png, sheet_127_pod_unhit_tail.png, the #162 sheets); this gate judges palette words only
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged32] [JOBS=6] tests/audit_don_row0b.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged33] [JOBS=6] tests/audit_don_row0b.sh
 #   emulator tier, MAME; 51 runs (17 rigs x 3 legs), ~10 min on the MacBook at JOBS=6
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged32}"
+BUILD="${BUILD:-build/m3b_merged33}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] && [ -f "$BUILD/verify_op.bin" ] || { echo "SKIP: no WIDE build with verify_op.bin at $BUILD"; exit 0; }

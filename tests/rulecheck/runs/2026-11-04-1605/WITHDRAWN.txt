@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-220): two QUOTE flags — the gate's new FREEZE text quoted with <build> for $(basename "$BUILD"), and the old header quoted as it read in run 2026-11-04-1600's packet, a text no artifact of this one holds; re-prepared with the exact text and no quote of the old header.

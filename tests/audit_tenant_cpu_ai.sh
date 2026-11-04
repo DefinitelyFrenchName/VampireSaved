@@ -1,6 +1,6 @@
 #!/bin/sh
 # audit_tenant_cpu_ai.sh — THE TENANT CPU-AI DECISION POINTS, COUNTED AT THEIR BREAKPOINTS: PHOBOS'S CONTINUATION GUARD
-# (BEHAVIOUR A), HIS PORTED CALLER 0x4170d2, AND VS2'S LOW-ATTACK CROUCH TEST (BEHAVIOUR B), OURS AGAINST NATIVE VSAV2
+# (BEHAVIOUR A), HIS PORTED CALLER 0x4186e2, AND VS2'S LOW-ATTACK CROUCH TEST (BEHAVIOUR B), OURS AGAINST NATIVE VSAV2
 # (GitHub #129, 14z-215; promoted from the capture worker's ERIS scripts, build/agent215/t129/scripts/, by [VSP-18])
 #
 # WHAT: the two CPU-AI differences (Behaviour A and Behaviour B) that docs/game/engine_internals.md "The CPU AI action-script system" names, measured as counts
@@ -9,11 +9,11 @@
 #   against native vsav2, both on the WIDE MAME build. Per leg it freezes:
 #   A  the class-0x10 continuation-check calls (vs2 PRG:0x2CB50 / vsavj PRG:0x2D374, conditional on +0x382 == 0x10), those
 #      with +0x1BC != 0, native's refusals at the guard (stops at vs2 PRG:0x2CB7A with +0x1BC != 0), the checks returning
-#      1 with +0x1BC != 0 (the return sites vs2 0x025AA6 / 0x056E68, ours 0x41E1CC / 0x4170d8), and the continuations
+#      1 with +0x1BC != 0 (the return sites vs2 0x025AA6 / 0x056E68, ours 0x41E1CC / 0x4186e8), and the continuations
 #      taken (vs2 0x026B50, ours 0x41EFDE) by +0x1BC before the increment — so ours' +0x1BC 1 -> 2 is the `01` bucket;
 #      asserted besides: on native every call with +0x1BC != 0 is refused and no continuation starts at +0x1BC = 1;
 #   R  the CPU's entries into state family +0x06 = 0x14 (per-frame trace) and the reaches of the ported caller ours
-#      PRG:0x4170d2 / native PRG:0x056E62 (the `jsr` in the state's handler), with +0x1BC at each reach and d0 at its
+#      PRG:0x4186e2 / native PRG:0x056E62 (the `jsr` in the state's handler), with +0x1BC at each reach and d0 at its
 #      return; asserted besides: both sides reach it on the CONF=1702 pair, every reach at +0x1BC = 0;
 #   B  on every native leg, the Lua copy of vs2 PRG:0x2CD38 (tests/lua/tenant_ai_tap.lua) evaluated at the routine's entry
 #      against the routine's RETURN as its callers read it: 0x2CD38 returns its answer in the Z flag, and each of its six
@@ -77,7 +77,7 @@
 #   any difficulty but the default, any ladder rung but the first; FBNeo and MiSTer; frame-level comparison (the legs
 #   diverge from the first random draw by construction).
 #
-# Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [BUILD=build/m3b_merged32] [JOBS=5] [FREEZE=1] [KEEP=<dir>]
+# Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [BUILD=build/m3b_merged33] [JOBS=5] [FREEZE=1] [KEEP=<dir>]
 #        tests/audit_tenant_cpu_ai.sh
 #   emulator tier, MAME; 12 legs of 22,880 frames (one of 3,000), JOBS at once; ~1 min on the Mac (M2 Pro) at JOBS=5
 set -u
@@ -87,7 +87,7 @@ export ROMDIR
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"
 cd "$REPO"
-BUILD="${BUILD:-build/m3b_merged32}"
+BUILD="${BUILD:-build/m3b_merged33}"
 FRAMES=22880
 JOBS="${JOBS:-5}"
 # MAME_BIN is PINNED (test_mame_bin_pinned): the WIDE build, which also runs native vsav2 (the soak's choice)
@@ -144,7 +144,10 @@ nat_sites() { echo "2cb50@b@(a6+382)==10|$1|25aa6@b@(a6+382)==10|26b50@b@(a6+382
 # 14z-216 (M24): the seven ours sites re-derived +0xDC0 — #294's records block ahead of Phobos's regions (code@huitzil
 # 0x414140 -> 0x414F00, x02592a and x026142 likewise); each new address holds the old one's opcode bytes (M23: 41d40c,
 # 41e21e, 416234, 4162cc, 4162d4, 416312, 416318; build/agent216/m24/eris_reds/). A placement constant follows the romset.
-OURS_SITES="2d374@b@(a6+382)==10|41e1cc|41efde|416ff4|41708c|417094|4170d2|4170d8|23068|2313e|231c4|23998|24ac8"
+# 14z-220 (M25): the seven ours sites re-derived +0x1610 — #356's speed-line copy and #345 A1b's table copy at the
+# wide_ext head (0x400010, 0x4013E0) push every later placement; each new address holds the old one's opcode bytes
+# (M24: 41e1cc, 41efde, 416ff4, 41708c, 417094, 4170d2, 4170d8). A placement constant follows the romset.
+OURS_SITES="2d374@b@(a6+382)==10|41f7dc|4205ee|418604|41869c|4186a4|4186e2|4186e8|23068|2313e|231c4|23998|24ac8"
 OURS_SHADOW="23068,2313e,231c4,23998,24ac8"
 leg() { # name tenant cond side conf adapt guard drop set frames
     _n=$1; _t=$2; _c=$3; _s=$4; _cf=$5; _ad=$6; _g=$7; _dr=$8; _set=$9; _fr=${10}; _d="$W/$_n"; rm -rf "$_d"; mkdir -p "$_d"
@@ -254,7 +257,7 @@ def live(L):
     return True, end, ""
 def A(L):
     nat = L["side"] == "native"
-    entry, ret, cont = ("02cb50", "025aa6", "026b50") if nat else ("02d374", "41e1cc", "41efde")
+    entry, ret, cont = ("02cb50", "025aa6", "026b50") if nat else ("02d374", "41f7dc", "4205ee")
     S = L["S"]
     calls = [s for s in S if s["pc"] == entry]
     nz = sum(1 for s in calls if s["c1bc"] != "00")
@@ -262,7 +265,7 @@ def A(L):
     r1 = 0; last = None
     for s in S:
         if s["pc"] == entry: last = s
-        elif s["pc"] in (ret, "056e68", "4170d8") and last is not None:
+        elif s["pc"] in (ret, "056e68", "4186e8") and last is not None:
             if (int(s["d0"], 16) & 0xff) and last["c1bc"] != "00": r1 += 1
             last = None
     cc = Counter(s["c1bc"] for s in S if s["pc"] == cont)
@@ -270,7 +273,7 @@ def A(L):
     return dict(calls=len(calls), nz=nz, refused="-" if refused is None else refused, ret1nz=r1, cont=dict(sorted(cc.items())), cont1=c1)
 def R(L):
     nat = L["side"] == "native"
-    site, rsite = ("056e62", "056e68") if nat else ("4170d2", "4170d8")
+    site, rsite = ("056e62", "056e68") if nat else ("4186e2", "4186e8")
     ent = []; prev = None
     for f in sorted(L["F"]):
         if f < 2900: continue
@@ -374,7 +377,7 @@ say(all(not a[n]["cont1"] and a[n]["ret1nz"] == 0 for n in natA),
 say(sum(len(a[n]["cont1"]) for n in oursA) > 0,
     "A ours: continuations with +0x1BC 1 -> 2: " + ", ".join(f"{n} {len(a[n]['cont1'])} at {a[n]['cont1']}" for n in oursA))
 say(r["p2_native"]["reach"] > 0 and r["p2_ours"]["reach"] > 0 and all(set(r[n]["c1bc"]) <= {"00"} for n in r),
-    "R the ported caller reached on both sides of the CONF=1702 pair (native 0x056E62 %d, ours 0x4170d2 %d), +0x1BC 0 at every reach; soak pair %d / %d"
+    "R the ported caller reached on both sides of the CONF=1702 pair (native 0x056E62 %d, ours 0x4186e2 %d), +0x1BC 0 at every reach; soak pair %d / %d"
     % (r["p2_native"]["reach"], r["p2_ours"]["reach"], r["pa_native"]["reach"], r["pa_ours"]["reach"]))
 natB = [n for n in b if legs[n]["side"] == "native"]
 say(all(b[n]["unread"] == 0 for n in natB),
@@ -463,5 +466,5 @@ if [ -n "$MODE" ]; then   # the mode's verdict is the gate's own: it must FAIL
     [ "$fail" = 1 ] && { echo "FAIL: audit_tenant_cpu_ai (control mode $MODE)"; exit 1; }
     vs_ctl_left_green "$MODE" "FAIL: audit_tenant_cpu_ai (control mode $MODE left it green)"
 fi
-[ "$fail" = 0 ] && { echo "PASS: audit_tenant_cpu_ai — Behaviour A (native refuses every class-0x10 continuation at +0x1BC != 0, ours continues), the ported caller 0x4170d2 reached on both sides, the 0x2CD38 copy agrees on every native call, each adaptive leg's own B event count, all as frozen"; exit 0; }
+[ "$fail" = 0 ] && { echo "PASS: audit_tenant_cpu_ai — Behaviour A (native refuses every class-0x10 continuation at +0x1BC != 0, ours continues), the ported caller 0x4186e2 reached on both sides, the 0x2CD38 copy agrees on every native call, each adaptive leg's own B event count, all as frozen"; exit 0; }
 echo "FAIL: audit_tenant_cpu_ai"; exit 1

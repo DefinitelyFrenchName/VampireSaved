@@ -35,8 +35,8 @@ W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/pooldrop.XXXXXX")}"
 [ -n "$W" ] && mkdir -p "$W" && W="$(cd "$W" && pwd)" && [ -n "$W" ] || { echo "FAIL: audit_pool_drop — no work directory (mktemp or OUT failed)"; exit 2; }
 [ -n "${OUT:-}" ] || trap 'rm -rf "$W"' EXIT
 fail=0
-MERGED="${MERGED:-build/m3b_merged32}"; DON="${DON:-build/don_m28}"; HUI="${HUI:-build/hui62}"
-PYR="${PYR:-build/pyron47}"; STOCK="${STOCK:-build/m5_stock23}"
+MERGED="${MERGED:-build/m3b_merged33}"; DON="${DON:-build/don_m29}"; HUI="${HUI:-build/hui63}"
+PYR="${PYR:-build/pyron48}"; STOCK="${STOCK:-build/m5_stock24}"
 expand() {  # expand <string> — tests/run_all_emulator.sh's %PLACEHOLDER% vocabulary, the same defaults
     printf '%s' "$1" \
       | sed -e "s|%MERGED_RP%|$MERGED/rompath|g" -e "s|%MERGED%|$MERGED|g" \

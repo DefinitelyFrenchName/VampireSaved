@@ -63,14 +63,14 @@
 # (0x007254 / vsavj 0x008A86) are the pre-match readers and are excluded by the
 # frame floor.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [LEGS="..."] [FREEZE=1] [JOBS=N] tests/audit_latch_reads.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged33] [LEGS="..."] [FREEZE=1] [JOBS=N] tests/audit_latch_reads.sh
 #   emulator tier, MAME; ~3 min for the nine legs (two tap runs each).
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged32}"
+BUILD="${BUILD:-build/m3b_merged33}"
 EXPECT="$REPO/tests/expected/latch_reads.tsv"
 CONTROL="${CONTROL:-}"
 LEGS="${LEGS:-phobos-real phobos-over-donovan phobos-over-demitri donovan-over-demitri donovan-victim donovan-pod-hit donovan-pod-nohit pyron-over-demitri ours-phobos}"

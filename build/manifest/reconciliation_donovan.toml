@@ -68,3 +68,9 @@ kind = "engine_sub"
 status = "verified"
 note = "x05c800 tail-escape twin (14z-67 census find): subq.b #1,$149(a4) + jmp engine — UNIQUE vsavj pattern match, jmp targets twin-verified (vs2 0x15770 / vsavj 0x17028, 60/64 bytes, diffs = A5-operand drift); carried for donovan 14z-98"
 
+[[map]]
+vsav2 = 0x013786
+vsavj = 0x015092
+kind = "engine_sub"
+status = "verified"
+note = "14z-219 #356: the speed-line handler's jsr (vs2 0x06E230); 0x60 bytes identical; vsavj's own twin handler calls 0x015092 (0x061CA0) — the twin pairing; the other prefix hit 0x05FA0A differs at +0x25"

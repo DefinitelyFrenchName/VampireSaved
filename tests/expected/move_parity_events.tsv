@@ -57,30 +57,30 @@ donovan_1	28	Killshread Surf [j.2MK]	IDENT	-	-	150	-	0
 donovan_1	29	Killshread Dive [j.2HK]	IDENT	-	-	401	-	2
 donovan_2	0	Blizzard Sword [LP]	IDENT	-	-	220	-	0
 donovan_2	1	Blizzard Sword [MP]	IDENT	-	-	220	-	2
-donovan_2	2	Blizzard Sword [HP]	DIFF	+54	cnt	220	-	0
-donovan_2	3	Ifrit Sword [LP]	IDENT	-	-	200	after:2	2
-donovan_2	4	Ifrit Sword [MP]	IDENT	-	-	200	after:2	0
-donovan_2	5	Ifrit Sword [HP]	IDENT	-	-	200	after:2	2
-donovan_2	6	Lightning Sword [LP]	IDENT	-	-	260	after:2	0
-donovan_2	7	Lightning Sword [MP]	IDENT	-	-	260	after:2	2
-donovan_2	8	Lightning Sword [HP]	IDENT	-	-	260	after:2	2
-donovan_2	9	Killshread [LK]	IDENT	-	-	200	after:2	0
-donovan_2	10	Killshread Lightning [LP]	IDENT	-	-	240	after:2	2
-donovan_2	11	Killshread Summon [LK]	IDENT	-	-	220	after:2	0
-donovan_2	12	Killshread [HK]	IDENT	-	-	200	after:2	2
-donovan_2	13	Killshread Summon [j.214K]	IDENT	-	-	220	after:2	0
-donovan_2	14	walk-in	IDENT	-	-	240	after:2	2
-donovan_2	15	Sharirum Luna [6MP]	IDENT	-	-	260	after:2	2
-donovan_2	16	walk-in	IDENT	-	-	140	after:2	0
-donovan_2	17	Sharirum Luna [6HP]	IDENT	-	-	260	after:2	2
-donovan_2	18	walk-in	IDENT	-	-	140	after:2	0
-donovan_2	19	Sword Grapple [MP]	IDENT	-	-	260	after:2	2
-donovan_2	20	walk-in	IDENT	-	-	140	after:2	0
-donovan_2	21	Sword Grapple [HP]	IDENT	-	-	260	after:2	2
-donovan_2	22	walk-in	IDENT	-	-	120	after:2	0
-donovan_2	23	Foot Stab [8P]	IDENT	-	-	260	after:2	2
-donovan_2	24	walk-in	IDENT	-	-	120	after:2	0
-donovan_2	25	Foot Stab [8K]	IDENT	-	-	511	after:2	2
+donovan_2	2	Blizzard Sword [HP]	DIFF	+58	cnt,node	220	-	0
+donovan_2	3	Ifrit Sword [LP]	DIFF	+2	cnt,x	200	after:2	2
+donovan_2	4	Ifrit Sword [MP]	DIFF	+0	x	200	after:2	0
+donovan_2	5	Ifrit Sword [HP]	DIFF	+0	x	200	after:2	2
+donovan_2	6	Lightning Sword [LP]	DIFF	+0	cnt	260	after:2	0
+donovan_2	7	Lightning Sword [MP]	DIFF	+0	cnt	260	after:2	2
+donovan_2	8	Lightning Sword [HP]	DIFF	+0	cnt,x	260	after:2	2
+donovan_2	9	Killshread [LK]	DIFF	+0	cnt,sub,x	200	after:2	0
+donovan_2	10	Killshread Lightning [LP]	DIFF	+0	cnt,sub	240	after:2	2
+donovan_2	11	Killshread Summon [LK]	DIFF	+2	cnt,node	220	after:2	0
+donovan_2	12	Killshread [HK]	DIFF	+0	cnt,sub	200	after:2	2
+donovan_2	13	Killshread Summon [j.214K]	DIFF	+2	cnt,node,sub	220	after:2	0
+donovan_2	14	walk-in	DIFF	+0	cnt,x	240	after:2	2
+donovan_2	15	Sharirum Luna [6MP]	DIFF	+2	cnt,node	260	after:2	2
+donovan_2	16	walk-in	DIFF	+2	cnt,x	140	after:2	0
+donovan_2	17	Sharirum Luna [6HP]	DIFF	+0	cnt	260	after:2	2
+donovan_2	18	walk-in	DIFF	+0	cnt,x	140	after:2	0
+donovan_2	19	Sword Grapple [MP]	DIFF	+0	cnt	260	after:2	2
+donovan_2	20	walk-in	DIFF	+0	cnt,x	140	after:2	0
+donovan_2	21	Sword Grapple [HP]	DIFF	+2	cnt	260	after:2	2
+donovan_2	22	walk-in	DIFF	+2	cnt,x	120	after:2	0
+donovan_2	23	Foot Stab [8P]	DIFF	+0	cnt	260	after:2	2
+donovan_2	24	walk-in	DIFF	+0	cnt	120	after:2	0
+donovan_2	25	Foot Stab [8K]	DIFF	+0	cnt	511	after:2	2
 donovan_3	0	Blizzard Sword (ES)	IDENT	-	-	240	-	1
 donovan_3	1	Ifrit Sword (ES)	IDENT	-	-	220	-	3
 donovan_3	2	Lightning Sword (ES)	IDENT	-	-	300	-	3

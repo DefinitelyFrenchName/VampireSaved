@@ -1,0 +1,15 @@
+  FLAG QUOTE: audit_lag_budget's now-stale ACCEPTED donovan_2:3094
+  FLAG D-FIGURE: 100755  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-FIGURE: 84  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-FIGURE: 16  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-FIGURE: 131  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-FIGURE: 154  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-ABSOLUTE: -# EXPECTS: no new zero-pass frame on any part but the ACCEPTED native-matched ones (one since 2026-11-01: donovan_2 -# frame 3094, #294 — vs2 overruns there...  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-ABSOLUTE: NOT covered: +# EXPECTS: no new zero-pass frame on any part but the ACCEPTED native-matched ones (none since 2026-11-04, the M25 +# freeze: #345 A1b took don...  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-ABSOLUTE: # SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-ABSOLUTE: # "when I say no frame cost I don't mean " no cost at all", I mean "a total cost that doesn't end up @@ -41,14 +41,14 @@  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-ABSOLUTE: An accepted frame no longer measured FAILS as stale: the list never outlives its reason.  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-ABSOLUTE: It is never an exemption.  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-ABSOLUTE: # THE BASIS (rule-checker run 2026-11-01-1551 Q4): an accepted frame stands only while NATIVE's overrun it reproduces is  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+  FLAG D-ABSOLUTE: # every run (a moved native frame turns that gate red); a basis no longer there fails here.  [build/agent220/m25/rc/r_lag/audit_lag_budget.sh.diff]
+packet_check: 14 flag(s): D-ABSOLUTE 8, D-FIGURE 5, QUOTE 1

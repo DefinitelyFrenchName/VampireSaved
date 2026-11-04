@@ -86,16 +86,16 @@
 # An OS this gate does not know still FAILS, naming what must be added — never
 # a silent pass.
 #
-# Usage: ROMDIR=... [MERGED=build/m3b_merged32] [RELEASE_EMULATORS=release/emulators]
+# Usage: ROMDIR=... [MERGED=build/m3b_merged33] [RELEASE_EMULATORS=release/emulators]
 #        tests/test_release_binaries.sh
-#   defaults build/m3b_merged32 (M24, the current freeze). SKIPs when no resource
+#   defaults build/m3b_merged33 (M25, the current freeze). SKIPs when no resource
 #   dir exists for this host's os-arch (tools/build_release_emulators.sh builds one).
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="$(cd "$ROMDIR" && pwd)"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-MERGED="${MERGED:-build/m3b_merged32}"
+MERGED="${MERGED:-build/m3b_merged33}"
 ROOT="${RELEASE_EMULATORS:-release/emulators}"
 # The os-arch spelling MUST match tools/build_release_emulators.sh's, or this
 # gate looks in a directory that builder never wrote (and SKIPs, reading as

@@ -4,7 +4,7 @@
   "anim_nodes": 3722,
   "anim_nodes_differ_unattributed": 0,
   "bank_fields_unattributed": 1,
-  "code_bytes_differ_out_of_scope": 67383,
+  "code_bytes_differ_out_of_scope": 67398,
   "dispatch_unattributed": 0,
   "physics_rows_ported": true,
   "region_bytes_unattributed": 558,
@@ -12,20 +12,20 @@
  },
  "inputs": {
   "bank_map.toml": "414f66951fee3a2ca94932baeb8d3189c1c03aee",
-  "manifest": "2eabe8e7a196b1a701df98082c4521ed2eb8744e",
+  "manifest": "ab5fb4e08a07123d50cb2aa5f138d7862ae91cf3",
   "overrides": "72b9812942192bf348508ddf7473cbb37b2d5275",
-  "placements.json": "74b756174c2eac1a4e41919145114e2498d11082",
+  "placements.json": "01bf2c6a76a6bbc6368d26bbf278d371afff4878",
   "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
-  "reconciliation_donovan.toml": "242368518282f41a728d879e0714380f621aaf49",
-  "regions.json": "a819047aa0b2491e3bc5e72149608639854a813d",
-  "verify_data.bin": "757bf91872755051fa80c24e5bf8b031c5ce29ba"
+  "reconciliation_donovan.toml": "4a8a07afe4a3a35f85e62c5e3ac50577eacf872f",
+  "regions.json": "23c3b49328a88e1c98fb0a51002457ca48d1025c",
+  "verify_data.bin": "3bf7af1c86176dc80fe245db81ea78e118a782cc"
  },
  "overrides": [],
  "schema": 1,
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/don_m28"
+   "set": "build/don_m29"
   },
   "vh": null,
   "vs2": {
@@ -194111,9 +194111,9 @@
      "fields": {
       "ptr": {
        "diff": false,
-       "expected_placed": "0x400010",
+       "expected_placed": "0x400310",
        "fmt": "addr",
-       "ours": "0x400010",
+       "ours": "0x400310",
        "ours_source": "relocated",
        "vh": null,
        "vs2": "0x101aca"
@@ -194131,9 +194131,9 @@
      "fields": {
       "ptr": {
        "diff": false,
-       "expected_placed": "0x40010e",
+       "expected_placed": "0x40040e",
        "fmt": "addr",
-       "ours": "0x40010e",
+       "ours": "0x40040e",
        "ours_source": "relocated",
        "vh": null,
        "vs2": "0x101bc8"
@@ -194151,9 +194151,9 @@
      "fields": {
       "ptr": {
        "diff": false,
-       "expected_placed": "0x400bba",
+       "expected_placed": "0x400eba",
        "fmt": "addr",
-       "ours": "0x400bba",
+       "ours": "0x400eba",
        "ours_source": "relocated",
        "vh": null,
        "vs2": "0x102674"
@@ -194171,9 +194171,9 @@
      "fields": {
       "ptr": {
        "diff": false,
-       "expected_placed": "0x4010c8",
+       "expected_placed": "0x4013c8",
        "fmt": "addr",
-       "ours": "0x4010c8",
+       "ours": "0x4013c8",
        "ours_source": "relocated",
        "vh": null,
        "vs2": "0x102b82"
@@ -194350,7 +194350,7 @@
        "diff": true,
        "expected_placed": "0x3fbda2",
        "fmt": "addr",
-       "ours": "0x401ea0",
+       "ours": "0x4034b0",
        "ours_source": "UNATTRIBUTED",
        "vh": null,
        "vs2": "0x0ca1ca"
@@ -195468,7 +195468,7 @@
        "diff": true,
        "expected_placed": "0x3fcbf2",
        "fmt": "addr",
-       "ours": "0x4148d0",
+       "ours": "0x415ee0",
        "ours_source": "manifest:sound_table:don_sfx_records (the array is placed by the sound op; the row is its ptr_table)",
        "vh": null,
        "vs2": "0x0cb01a"
@@ -206280,7 +206280,7 @@
     "orc": "0x0594c0",
     "placed": "0x0bf6a0",
     "refs": 474,
-    "sha1_ours": "b5b0074fe273ad1983996dab91337a0d4fe470e4",
+    "sha1_ours": "76a09abeea64da04e4cd913463868fd30ed990f4",
     "sha1_vs2": "bbfabf4a4ecd29fdc0549ea02e2e1ebc6b2d9418",
     "src": "0x059490",
     "variant_sites": 0
@@ -206465,6 +206465,21 @@
     "src": "0x06717c",
     "variant_sites": 0
    },
+   "x06e1d2": {
+    "diff": {
+     "bytes_differ": 15,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 766,
+    "orc": "0x06e346",
+    "placed": "0x400010",
+    "refs": 6,
+    "sha1_ours": "5a9f7869e836dc5cc3b3bfb44babb53659693a61",
+    "sha1_vs2": "d076182eeb80f43182b92ab461254232684c8756",
+    "src": "0x06e1d2",
+    "variant_sites": 0
+   },
    "x088512": {
     "diff": {
      "bytes_differ": 11982,
@@ -206475,7 +206490,7 @@
     "orc": "0x088512",
     "placed": "0x0d0170",
     "refs": 251,
-    "sha1_ours": "2e1e04117045f4fb084289ef832339eb198ff8db",
+    "sha1_ours": "309494cc334a0868bc1c1bea8e064240bd2e57b2",
     "sha1_vs2": "e1f908111c70cbdb0a24209e959c2bc989d055f4",
     "src": "0x088512",
     "variant_sites": 0
@@ -206512,11 +206527,35 @@
     "kind": "data",
     "len": 4302,
     "orc": "0x101aca",
-    "placed": "0x400010",
+    "placed": "0x400310",
     "refs": 0,
     "sha1_ours": "a34b061531e2452699d34e2ee35afca837f6036e",
     "sha1_vs2": "a34b061531e2452699d34e2ee35afca837f6036e",
     "src": "0x101aca",
+    "variant_sites": 0
+   },
+   "x1d7428": {
+    "diff": {
+     "attributed_by": {},
+     "counts": {
+      "attributed": 0,
+      "gfx_remap": 0,
+      "override": 0,
+      "relocated_bad": 0,
+      "relocated_ok": 403,
+      "total": 1209,
+      "unattributed": 0
+     },
+     "sites": []
+    },
+    "kind": "data",
+    "len": 4872,
+    "orc": "0x1de55a",
+    "placed": "0x4013e0",
+    "refs": 403,
+    "sha1_ours": "0113ecf22f154245e6885569ecba0fb4d68f7e76",
+    "sha1_vs2": "77ff59b24c03736c1b8cb83c1b75e12a9b80721d",
+    "src": "0x1d7428",
     "variant_sites": 0
    },
    "x2b7ef4": {

@@ -110,6 +110,11 @@ Tier 1 (staged tree `727def25`): NOT GREEN, PASS 132 FAIL 8 — the tree no long
 then PASS on the main tree, `test_m3a_reproducible` rebuilding every frozen reference bit-exactly with the committed
 generator and extractor facilities, which are therefore inert; what the freeze re-freezes with the patch applied is in
 patch_notes 14z-219. Tier 2 on the red run's results (#317).
+After the commit (these lines ride the next close): tier 2 on the staged tree `1c0dbd26`, strict, `--jobs 8`, `--confirm` on
+the red run: PASS 138, FAIL 0, SKIP 0, GREEN; committed `d19546c7` (the pre-commit green guard read that row); pins OK; sweep
+CLEAN; nothing new on `origin` at the fetch; pushed `79a376ef..d19546c7`, origin/main equal to HEAD; ledger page published on
+`gh-pages` (`1453a3a9` → `ab09c137`, 357 sessions); the maintainer's own site SKIPPED, `DEPLOY_TARGET` not set
+(`build/agent219/close/ledger.out`). Every step of the close is done.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

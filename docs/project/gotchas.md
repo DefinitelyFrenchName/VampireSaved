@@ -7977,3 +7977,32 @@ unaligned)` — a placed copy would have carried 403 raw vs2 addresses into the 
 DATA root's report line is read before its build — "0 pointer fields" on a table of nodes is a classification failure,
 not a fact; check the twin's pointers against the source's by hand, and when the twin cannot class them use `:dp`
 (self-pointers only), cross-checked against the third sibling's table (403 of 403 offsets for `0x1D7428`).
+
+## `audit_region_overlap`'s NORMALISER RE-MAPS ANY WORD THAT LANDS IN A PLACED RANGE — a new placement moves its counts with no byte of the compared copies changed (paid: 14z-220, the M25 freeze)
+
+`tools/audit_region_overlap.py` un-relocates every 4-byte word whose value lies inside some placed region back to that
+region's source address, so that three independent builds' allocators do not read as conflicts. It cannot tell a pointer
+from an immediate. At M25 `tests/test_region_overlap.sh` section 5 moved on the current trio — x026142 (38,69) -> (32,75),
+x05c800 (444,385) -> (429,400), total 2,089 -> 2,110 — while Donovan's four shared copies were RAW byte-identical to M24
+(`cmp` of `patch/fixed_<name>.bin`) and the un-normalised total (7,604) did not move. The moved bytes are `0x0040xxxx`
+immediates that now land in M25's new placed ranges (`x06e1d2` at `0x400010`, `x1d7428` at `0x4013E0`) instead of
+`x101aca`'s old range at `0x400010` or none, so they "un-relocate" to different sources
+(`build/agent220/m25/ro_diff.py`, local). **The rule:** when the normalised figures move at a freeze, `cmp` the raw
+copies and read the un-normalised total before attributing anything to the content; a placement change alone can move
+them. Re-frozen with that attribution in the gate's comment.
+
+## A FREEZE'S STATIC EXPECTATIONS ARE NOT ONLY THE ONES THE BATTERY NAMES — the relocation moved five more, found only by the static freeze tier (paid: 14z-220, the M25 freeze)
+
+M25 inserts two regions at the head of the WIDE extension, so every region placed after them moves +0x1610. The freeze
+re-froze the emulator battery's reds and the static gates already known to read placed addresses (region overlap,
+pointer flow, rule-5 census), then ran the static freeze tier on snapshot S6: five more static expectations read
+placed addresses and FAILed there — `tests/expected/latch_readers.tsv`, `df_field_readers.tsv`, `reaction_classes.tsv`,
+`escape_triage.txt` and `docs/project/tables/donovan.md` (the last for the two new regions) — and two bookkeeping gates
+followed the freeze's other steps: `test_jtcores_twin` (the new fork patch needs its `PATCH_NAMES` entry in
+`tools/setup_jtcores.sh`, and the mirrored file must be `git format-patch --stdout --no-signature`, the command that
+script's line 101 uses: a plain `format-patch` copy carries a `-- ` / git-version trailer the gate's byte compare
+rejects) and `test_recurrence_alarm` (a rule-checker finding cited in three packets across sessions needs its
+acknowledgement row). **The rule:** at a freeze that moves placements, run the static tier on the staged tree BEFORE the
+rule-checker runs for the re-freezes are prepared, not after, so every moved expectation goes into one attribution;
+and let `tools/setup_jtcores.sh` write the mirrored patch once its name is in `PATCH_NAMES`, never a hand-run
+`format-patch` (`build/agent220/m25/rc/r_s6fix/`, local; rule-checker run 2026-11-04-1613).

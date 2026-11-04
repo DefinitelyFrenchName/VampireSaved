@@ -12,7 +12,7 @@
  },
  "inputs": {
   "bank_map.toml": "414f66951fee3a2ca94932baeb8d3189c1c03aee",
-  "manifest": "8a7d95a90bd5c3af1dbb25d202c16519fffda204",
+  "manifest": "b711deb971b81fd670ac89f70989bff09362982d",
   "overrides": "c9fd380922c8aa18a77ee701da7589f037c25a42",
   "placements.json": "a15a693a9b57f85b73c16b22c2cf027567c1b6c0",
   "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
@@ -25,7 +25,7 @@
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/pyron47"
+   "set": "build/pyron48"
   },
   "vh": null,
   "vs2": {

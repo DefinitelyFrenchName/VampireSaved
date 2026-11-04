@@ -52,14 +52,14 @@
 # rig never lands). A FIX CHANGES THIS FILE BY DESIGN: re-freeze it with the move-parity
 # table, and read the diff as the fix's effect (rows gone, roots gone), never as noise.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [JOBS=6] [FREEZE=1] tests/audit_move_parity_attribution.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged33] [JOBS=6] [FREEZE=1] tests/audit_move_parity_attribution.sh
 #   emulator tier, MAME; ~12 ablation steps over the 19 parts carrying a DIFF — measured 14z-168 on this MacBook, solo: ~5 min wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged32}"
+BUILD="${BUILD:-build/m3b_merged33}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/move_parity_attribution.tsv"
 EVENTS="$REPO/tests/expected/move_parity_events.tsv"
@@ -114,7 +114,7 @@ if [ "${FREEZE:-0}" = 1 ]; then
     {
         echo "# tests/expected/move_parity_attribution.tsv — the cause of every DIFF row of tests/expected/move_parity_events.tsv, by ablation"
         echo "# and a measured signature (tests/audit_move_parity_attribution.sh; tools/move_parity_attribution.py). Evidence class:"
-        echo "# in-emulator. Frozen 14z-168 with FREEZE=1 on $(basename "$BUILD") (GitHub #136). A FIX CHANGES THIS FILE BY DESIGN — re-freeze it"
+        echo "# in-emulator. First frozen 14z-168 (GitHub #136); this freeze with FREEZE=1 on $(basename "$BUILD"). A FIX CHANGES THIS FILE BY DESIGN — re-freeze it"
         echo "# with the move-parity table and read the diff as the fix's effect."
         echo "# Columns: root <part:event|opening> <name> <class> step=<n> <evidence> | row <part> <event> <base|surfaced> <root> <class>"
         echo "#--"

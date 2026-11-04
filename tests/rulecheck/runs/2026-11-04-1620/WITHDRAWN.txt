@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-220): the claim's untested item (2) still said edit_classes.py has no planted control after its dropped-op control was added (edit_classes_control.txt); reworded to what is uncontrolled, a wrong change fitting RELOC or TYPE+1; re-prepared.

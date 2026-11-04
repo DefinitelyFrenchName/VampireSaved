@@ -46,7 +46,7 @@
 # line is not a measurement) and a per-run verdict map kept under
 # build/guard_corpus/ for the record.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [JOBS=N]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged33] [JOBS=N]
 #        [LEGS="none 10 11 13"] [ONLY=<replay-stem>]
 #        [PICK_FRAMES="1400 1450 1500 1600 1700"]
 #        tests/audit_guard_corpus.sh
@@ -85,7 +85,7 @@ if [ "$MODE" = known-crash ]; then
     fi
     BUILD=build/hui41; ONLY=26_don_arcade_mash; LEGS=10; PICK_FRAMES="1704 1760 1900 2100 2400"
 fi
-BUILD="${BUILD:-build/m3b_merged32}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged33}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 if [ -z "${JOBS:-}" ]; then   # min(8, CPUs/3), at least 1 (#321)
     _np="$(getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 3)"
     JOBS=$(( _np / 3 )); [ "$JOBS" -le 8 ] || JOBS=8; [ "$JOBS" -ge 1 ] || JOBS=1

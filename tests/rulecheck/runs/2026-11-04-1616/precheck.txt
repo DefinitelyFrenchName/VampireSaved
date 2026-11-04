@@ -1,0 +1,11 @@
+  FLAG D-FIGURE: 1917  [build/agent220/m25/rc/freeze/registry_rows.txt]
+  FLAG D-FIGURE: 14877  [build/agent220/m25/rc/freeze/registry_rows.txt]
+  FLAG D-FIGURE: 13604  [build/agent220/m25/rc/freeze/registry_rows.txt]
+  FLAG D-FIGURE: 1273  [build/agent220/m25/rc/freeze/registry_rows.txt]
+  FLAG D-ABSOLUTE: 20672b01fec5a7dde047af14bb17ee4da4a6daee donovan-m29 14z-220 THE M25 FREEZE — #356 (Donovan's dash speed lines: vs2's speed-line handler, its two 14-row tabl...  [build/agent220/m25/rc/freeze/registry_rows.txt]
+  FLAG D-ABSOLUTE: WHOLE-SET key (program 63447128).  [build/agent220/m25/rc/freeze/registry_rows.txt]
+  FLAG D-ABSOLUTE: 815488af3bcb66bc4c6d8b36da619c8724c31403 huitzil-m36 14z-220 THE M25 FREEZE: the mark only.  [build/agent220/m25/rc/freeze/registry_rows.txt]
+  FLAG D-ABSOLUTE: WHOLE-SET key (program cc9c4b68, UNCHANGED from huitzil-m35 — neither change is Phobos's: every M25 row only_variant_slot).  [build/agent220/m25/rc/freeze/registry_rows.txt]
+  FLAG D-ABSOLUTE: 930ce568d03f8879d6cc33eb3c8819c6982adf1f pyron-m30 14z-220 THE M25 FREEZE: the mark only.  [build/agent220/m25/rc/freeze/registry_rows.txt]
+  FLAG D-ABSOLUTE: WHOLE-SET key (program 9d135e7b, UNCHANGED from pyron-m29 — neither change is Pyron's).  [build/agent220/m25/rc/freeze/registry_rows.txt]
+packet_check: 10 flag(s): D-ABSOLUTE 6, D-FIGURE 4

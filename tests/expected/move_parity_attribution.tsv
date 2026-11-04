@@ -1,10 +1,10 @@
 # tests/expected/move_parity_attribution.tsv — the cause of every DIFF row of tests/expected/move_parity_events.tsv, by ablation
 # and a measured signature (tests/audit_move_parity_attribution.sh; tools/move_parity_attribution.py). Evidence class:
-# in-emulator. Frozen 14z-168 with FREEZE=1 on m3b_merged32 (GitHub #136). A FIX CHANGES THIS FILE BY DESIGN — re-freeze it
+# in-emulator. First frozen 14z-168 (GitHub #136); this freeze with FREEZE=1 on m3b_merged33. A FIX CHANGES THIS FILE BY DESIGN — re-freeze it
 # with the move-parity table and read the diff as the fix's effect.
 # Columns: root <part:event|opening> <name> <class> step=<n> <evidence> | row <part> <event> <base|surfaced> <root> <class>
 #--
-root	donovan_2:2	Blizzard Sword [HP]	SLOWDOWN	step=1	zero-pass frame native [] ours [3094]
+root	donovan_2:2	Blizzard Sword [HP]	SLOWDOWN	step=1	zero-pass frame native [3098] ours []
 root	donovan_3:14	Slay Shred [MP+MK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
 root	donovan_4:21	Slay Shred [LP+LK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
 root	donovan_6:2	Slay Shred [LP+LK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
@@ -28,6 +28,29 @@ root	huitzil_5:6	Reflect Wall [gc HK at hit+6]	GUARD-REENTRY	step=6	node differs
 root	huitzil_5:7	Reflect Wall [gc PP at hit+6]	GUARD-REENTRY	step=7	node differs at 5751, both legs leaving the block freeze at 5750 (seq 0 -> 2)
 root	huitzil_5:8	Reflect Wall [gc LP at hit+6] (control: no block)	P2-RECORD	step=8	Phobos takes 11 native / 12 ours: P2 Demitri's attack record a2:0x04#2 red power 13 native / 14 ours (vs2 lowered it; ours runs vsavj's Demitri, #161/#191)
 row	donovan_2	2	base	donovan_2:2	SLOWDOWN
+row	donovan_2	3	base	donovan_2:2	SLOWDOWN
+row	donovan_2	4	base	donovan_2:2	SLOWDOWN
+row	donovan_2	5	base	donovan_2:2	SLOWDOWN
+row	donovan_2	6	base	donovan_2:2	SLOWDOWN
+row	donovan_2	7	base	donovan_2:2	SLOWDOWN
+row	donovan_2	8	base	donovan_2:2	SLOWDOWN
+row	donovan_2	9	base	donovan_2:2	SLOWDOWN
+row	donovan_2	10	base	donovan_2:2	SLOWDOWN
+row	donovan_2	11	base	donovan_2:2	SLOWDOWN
+row	donovan_2	12	base	donovan_2:2	SLOWDOWN
+row	donovan_2	13	base	donovan_2:2	SLOWDOWN
+row	donovan_2	14	base	donovan_2:2	SLOWDOWN
+row	donovan_2	15	base	donovan_2:2	SLOWDOWN
+row	donovan_2	16	base	donovan_2:2	SLOWDOWN
+row	donovan_2	17	base	donovan_2:2	SLOWDOWN
+row	donovan_2	18	base	donovan_2:2	SLOWDOWN
+row	donovan_2	19	base	donovan_2:2	SLOWDOWN
+row	donovan_2	20	base	donovan_2:2	SLOWDOWN
+row	donovan_2	21	base	donovan_2:2	SLOWDOWN
+row	donovan_2	22	base	donovan_2:2	SLOWDOWN
+row	donovan_2	23	base	donovan_2:2	SLOWDOWN
+row	donovan_2	24	base	donovan_2:2	SLOWDOWN
+row	donovan_2	25	base	donovan_2:2	SLOWDOWN
 row	donovan_3	14	base	donovan_3:14	DF-STOCK
 row	donovan_4	21	base	donovan_4:21	DF-STOCK
 row	donovan_6	2	base	donovan_6:2	DF-STOCK

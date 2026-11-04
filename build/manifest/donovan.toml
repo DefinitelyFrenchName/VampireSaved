@@ -53,7 +53,7 @@ near_map = "x0905ae=x088512"
 hole_b_regions = "aux0_4,hitbox"
 # 14z-111: his CPU AI script block (a WIDE-only DATA root) lives in the extension — placing it in hole_a
 # cascaded x2b7ef4 (0xB20C) out of hole_a and reshuffled 56 regions of the merged layout (measured).
-region_space = "x101aca=wide_ext"
+region_space = "x101aca=wide_ext,x06e1d2=wide_ext,x1d7428=wide_ext"   # 14z-219: #356's speed-line copy and #345 A1b's table copy (WIDE-only roots)
 # M3a IN PROGRESS — the de-substituted id is NOT declared here yet, on
 # purpose. The moment this manifest maps the WIDE profile to 0x13, the
 # frozen reference `donovan-m5w` (9bac6ee3) stops being reproducible from
@@ -79,7 +79,7 @@ near_map = "x0905ae=x088512"
 hole_b_regions = "aux0_4,hitbox"
 # 14z-111: his CPU AI script block (a WIDE-only DATA root) lives in the extension — placing it in hole_a
 # cascaded x2b7ef4 (0xB20C) out of hole_a and reshuffled 56 regions of the merged layout (measured).
-region_space = "x101aca=wide_ext"
+region_space = "x101aca=wide_ext,x06e1d2=wide_ext,x1d7428=wide_ext"   # 14z-219: #356's speed-line copy and #345 A1b's table copy (WIDE-only roots)
 
 # free-space holes (verified 0xFF fill, tools/extract free-space scan)
 [hole_a]
@@ -436,6 +436,96 @@ walker_len = 0x2c
 walker_old_hex = "4ded38001b7c002000b54a1667127000102e0002d040d040207b001270004e904dee0080532d00b566e04e75"
 caller_old_hex = "4eb90005e52a"
 callers = "0x0053f6,0x005410,0x00577c,0x0057a8,0x00590a,0x005ebc,0x00943c,0x009caa,0x009f36,0x00a188,0x00a804,0x00abcc,0x010dfa,0x012a3e,0x012d16,0x012e4c,0x012e66,0x020316,0x021638,0x021ada,0x021dea"
+
+# ── #356 (14z-219, ruled 2026-11-02 Option 1 + "Raw allocator"): DONOVAN'S DASH SPEED LINES ─────────────────
+# vs2 widened the speed-line effect (class 0x0F) from 12 subs to 14: Donovan's forward dash spawns sub 0x0C and his
+# back dash sub 0x0D (vs2 dash handler 0x05A81A: `moveq #$c/#$d,d3; move.w d3,d0; jmp $6E4A6`). Ours sent that jmp
+# to vsavj's 12-row twin spawner 0x061ED4, whose handler indexes past both its tables into code: junk positions,
+# culled pieces (census build/agent218/tspeed/REPORT.md). The fix is a TENANT-ONLY COPY of vs2's whole effect —
+# handler 0x06E1D2 + its 14-row tables + spawner 0x06E4A6 (the WIDE-only root x06e1d2, tools/build_donovan.sh) — as
+# the authored effect type 124 on the walker extension below. The dash's jmp resolves to the placed spawner copy by
+# the placed-region rule; legacy class 0x0F, its tables and every legacy dash are untouched BY CONSTRUCTION: no
+# vanilla object carries a type >= 114 ([VSE-18]), and the shared row 0x0F is never written. Huitzil's and Pyron's
+# copies of the call (unreached on native, 14z-218 census) keep vsavj's spawner. Every row below is
+# only_variant_slot: the stock twin (Donovan substituted at 0x0F, no root) must stay byte-identical.
+[[obj_hook_extra]]
+site = 0x05E542
+index = 124
+src = 0x06E1D2
+only_variant_slot = true
+note = "#356: vs2's 14-row speed-line handler (class 0x0F) as Donovan's own effect type"
+
+# the spawner's type stamp: class 0x0F -> the authored type 124 (0x7C)
+[[port_patch]]
+stage = 6
+region = "x06e1d2"
+src_addr = 0x06E4B2
+old_hex = "197c000f0002"
+new_hex = "197c007c0002"
+only_variant_slot = true
+note = "#356 speed-line spawner copy: type stamp 0x0F -> authored type 124"
+
+# the handler's OBJ bank word: vs2 draws this art from bank 0x4000; vsavj's identical art (0 differing pixels on all
+# four pieces, build/agent218/tspeed/feas/) is at bank 0 — vsavj's own handler writes #$0 here (0x061C6E)
+[[port_patch]]
+stage = 6
+region = "x06e1d2"
+src_addr = 0x06E1FE
+old_hex = "3d7c40000018"
+new_hex = "3d7c00000018"
+only_variant_slot = true
+note = "#356 speed-line handler copy: OBJ bank vs2 0x4000 -> vsavj 0 (vsavj's own art and records)"
+
+# the anim-table operand: vs2's 0x2B7EF4 lies inside Donovan's PLACED x2b7ef4 copy, whose records carry vs2 tile
+# words (0 of 316 cells match ours, feasibility); pin it to vsavj's own table 0x283690, which vsavj's handler reads
+# (0x061C92) and whose art is pixel-identical
+[[ref_pin]]
+stage = 6
+region = "x06e1d2"
+off = 0x52
+target = 0x2B7EF4
+pin = 0x283690
+only_variant_slot = true
+note = "#356: speed-line anim table -> vsavj's own (0x283690)"
+
+# the RAW allocator (ruled 2026-11-02, "Raw allocator (Recommended)"): vs2's spawner calls 0x15702, which this
+# tenant's alloc_wrap would route through the slot-clearing wrapper; vsavj's and vs2's own spawners call the raw
+# allocator, so the copy calls vsavj's 0x016FBA (the verified mapping of 0x15702) directly
+[[ref_pin]]
+stage = 6
+region = "x06e1d2"
+off = 0x2D8
+target = 0x15702
+pin = 0x016FBA
+only_variant_slot = true
+note = "#356: speed-line spawner allocator -> vsavj raw 0x016FBA (no alloc_wrap)"
+
+# ── #345 option A1b (14z-219, ruled 2026-11-03 "A1b (Recommended)"): THE TRAIL PIECES' NO-DRAW TABLE ──────────────
+# Donovan's class-0x72 sub-0x00 trail pieces (Blizzard Sword's snowflake machine) pick their animation from the shared
+# effect anim table vs2 PRG:0x1D7428, which ours resolved to vsavj's twin PRG:0x1F3FD2 (reconciliation.toml): the same
+# index, nodes and timing, but vsavj's nodes reach DRAWING records (format 0/2; Sasquatch's live content) where vs2's
+# reach only two format-10 no-draw records. So ours drew #346's ice streak and paid #345's +458 cycles per piece per
+# drawing pass. The WIDE-only DATA root x1d7428 (tools/build_donovan.sh) places vs2's whole table; the class's operand
+# (x088512+0xAE) resolves into it by the placed-region rule. His two OTHER operands naming the table — the projectile
+# machine's child base (x05c800+0x5C76) and x0905ae+0x2FC — were reached by no rig (census build/agent219/t345/CENSUS.md),
+# so they stay on vsavj's table exactly as today. vsavj's table and records are never touched ([VSP-1]).
+[[ref_pin]]
+stage = 6
+region = "x05c800"
+off = 0x5C76
+target = 0x1D7428
+pin = 0x1F3FD2
+only_variant_slot = true
+note = "#345 A1b: an unreached operand of the shared effect anim table stays on vsavj's 0x1F3FD2"
+
+[[ref_pin]]
+stage = 6
+region = "x0905ae"
+off = 0x2FC
+target = 0x1D7428
+pin = 0x1F3FD2
+only_variant_slot = true
+note = "#345 A1b: an unreached operand of the shared effect anim table stays on vsavj's 0x1F3FD2"
 
 # non-bank repoints (select screen, win quotes, AI, versus tables) land here
 # as stage-5 RE pins their addresses down; op = poke16|poke32, both slots
@@ -2538,7 +2628,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M24"
+version_text = "M25"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202

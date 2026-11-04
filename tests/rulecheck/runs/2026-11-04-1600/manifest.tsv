@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent220/m25/rc/r_parity/move_parity_events.tsv.diff	152d03aef688f88f4f449c149bdc12617cdcce61
+build/agent220/m25/rc/r_parity/move_parity_attribution.tsv.diff	a995bcc8bab8de863c92a753e106fad1839d055a
+build/agent220/m25/rc/r_parity/parity_vs_219_and_m24.txt	a72ebd930405b7ccd70263049392769078211782
+build/agent220/m25/rc/r_parity/programs.txt	0794df64e4d603361973b45220562c710215d3b5
+build/agent220/m25/rc/r_parity/S3_freeze_audit_move_parity.log	b558611a8b0a702c44374b2a1d80250841859bc7
+build/agent220/m25/rc/r_parity/S3_freeze_audit_move_parity_attribution.log	e82b72af441691d374e37e06b4d5b24d6311ca6a
+build/agent220/m25/rc/r_parity/verify_audit_rng_forms.log	c0c938a74c0b870b9b3c965cd6bee751e88832ab
+build/agent220/m25/rc/r_parity/verify_audit_move_parity_attribution.log	099b07b036497b1c56ffbc1ea1043a789bb5fd9d
+build/agent220/m25/rc/r_parity/verify_rows.tsv	45520a81ce30dcad16121c111ed8dfacad2f0407
+build/agent220/m25/rc/r_parity/REC_lostframes.md	eae63856ccdb5e4e9962d9328b6f3db8f7eaa5f2
+DECISIONS_HISTORY.md.lines-9769-9786 (lines 9769-9786 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted; A1b freezes in M25 with #3")	c15347f627bace1e49be1f450c69538826c6c811

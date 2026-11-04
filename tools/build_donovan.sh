@@ -129,6 +129,24 @@ case "${GEN_FLAGS:-}" in
     *cps2-wide-v1*) DEFAULT_ROOTS="$DEFAULT_ROOTS,0x101aca:0x10ce:t0x101aca:d" ;;
     *) : ;;   # STOCK (4 MB): no hole for it (x2b7ef4 0xB20C would no longer fit) — row stays aliased, no crash class there (Donovan has no private jump handler)
 esac
+# 14z-219 (#356, ruled 2026-11-02 Option 1): vs2's speed-line effect (class 0x0F) — handler 0x06E1D2, its two
+# 14-row pc-relative tables 0x06E2D4/0x06E2E6, and its spawner 0x06E4A6, one span 0x2FE; vhunt2 twin 0x06E346
+# (shift +0x174, 758 of 766 opcode-view bytes equal, the rest pointer fields). WIDE-only: Donovan's two dashes
+# (subs 0x0C/0x0D) reach it as the tenant-only effect type 124 (donovan.toml [[obj_hook_extra]]).
+case "${GEN_FLAGS:-}" in
+    *cps2-wide-v1*) DEFAULT_ROOTS="$DEFAULT_ROOTS,0x6e1d2:0x2fe:t0x6e346" ;;   # the Huitzil/Pyron cases below reset DEFAULT_ROOTS
+    *) : ;;
+esac
+# 14z-219 (#345 option A1b, ruled 2026-11-03 "A1b (Recommended)"): vs2's shared effect anim table PRG:0x1D7428 (index,
+# nodes and its two format-10 no-draw records, every pointer internal), vhunt2 twin 0x1DE55A; a DATA root. Donovan's
+# class-0x72 sub-0x00 trail pieces read it through the placed copy (the placed-region rule); vsavj's twin PRG:0x1F3FD2
+# stays legacy-live and untouched (Sasquatch). WIDE-only (region_space wide_ext); his two unreached operands are pinned
+# on vsavj's table (donovan.toml [[ref_pin]]).
+case "${GEN_FLAGS:-}" in
+    # :dp, not :d — vh2's nodes point at its own records elsewhere, so the sibling oracle cannot class them (14z-219)
+    *cps2-wide-v1*) DEFAULT_ROOTS="$DEFAULT_ROOTS,0x1d7428:0x1308:t0x1de55a:dp" ;;
+    *) : ;;
+esac
 # DEFAULT_ROOTS is DONOVAN'S measured root census — it applies only to his
 # char. Another tenant's census accumulates here as its R1 loop finds
 # roots (EXTRA_ROOTS overrides for census experiments).

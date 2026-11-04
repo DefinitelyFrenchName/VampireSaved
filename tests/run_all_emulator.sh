@@ -234,11 +234,11 @@ done
 # huitzil-m25 / pyron-m19, mark M12, 14z-119). Deliberately not the newest
 # built tracks: an UNREGISTERED image makes run_suite.sh refuse, so a sweep
 # against one would report dispatch failures instead of gate verdicts.
-MERGED="${MERGED:-build/m3b_merged32}"
-DON="${DON:-build/don_m28}"
-HUI="${HUI:-build/hui62}"
-PYR="${PYR:-build/pyron47}"
-STOCK="${STOCK:-build/m5_stock23}"
+MERGED="${MERGED:-build/m3b_merged33}"
+DON="${DON:-build/don_m29}"
+HUI="${HUI:-build/hui63}"
+PYR="${PYR:-build/pyron48}"
+STOCK="${STOCK:-build/m5_stock24}"
 
 expand() {  # expand <string> — the %PLACEHOLDER% vocabulary
     printf '%s' "$1" \
@@ -918,11 +918,15 @@ for line in open(reg_path):
 # runner and that is exactly the orphan class both exist to end. A gate that runs the emulator registry's own gates
 # (tests/ci_emulator.tsv: audit_pool_drop, 14z-212) is emulator-tier too: without it that gate read as a DEAD ROW here,
 # so every strict run was NOT GREEN, and as an emulator-free gate in neither registry there (14z-213).
+# A gate that runs tests/test_crash_sweep.sh --tier emulator (audit_crash_sweep_emu, #310, 14z-218) is emulator-tier
+# too: it reaches the emulator through that gate's emulator rows, so the pattern missed it and the emulator runner read
+# its row as a DEAD ROW — every strict emulator run NOT GREEN, first seen at the M25 freeze's parity run (14z-220).
 EMU = re.compile(r'run_(replay_)?(mame|fbneo)\.sh|run_replay_guarded\.sh'
                  r'|MAME_BIN|FBNEO_BIN|autoboot_script|emu/fbneo/fbneo'
                  r'|run_battery|run_sim_jtcps2\.sh'
                  r'|run_inp_probe\.sh|run_inp_guarded\.sh'
-                 r'|desktop_session_play\.py|cleanhost_libs\.py|tests/ci_emulator\.tsv')
+                 r'|desktop_session_play\.py|cleanhost_libs\.py|tests/ci_emulator\.tsv'
+                 r'|test_crash_sweep\.sh"? --tier emulator')
 SRC = re.compile(r'^\s*\.\s+"?\$(?:REPO|\{REPO\})"?/(tests/lib/[a-z0-9_]+\.sh)', re.M)
 def uncomment(path):
     try:

@@ -28,7 +28,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-MERGED="${MERGED:-build/m3b_merged32}"
+MERGED="${MERGED:-build/m3b_merged33}"
 W="$(mktemp -d "${TMPDIR:-/tmp}/mapread.XXXXXX")" || { echo "FAIL: test_map_table_readers — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 

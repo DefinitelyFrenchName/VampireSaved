@@ -98,7 +98,7 @@
 # at a fixed call site is a structural property of the call chain. Still,
 # the per-site replay count is printed so the base is visible.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=8] [BUILD=build/m3b_merged32] [--freeze | --freeze-clock] tests/audit_walker_ghost.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=8] [BUILD=build/m3b_merged33] [--freeze | --freeze-clock] tests/audit_walker_ghost.sh
 # ~6 min (two corpus-wide debug legs, JOBS-parallel; 83 s on this MacBook at 14z-185 while the frame_done clock
 # cut the long replays short; 320 s at 14z-197 on emulated time, the whole replays played).
 #
@@ -130,7 +130,7 @@ JOBS="${JOBS:-8}"
 # the `jsr (A0)` of each walker = walker + 0x1E (walker 0x54458 / 0x5E52A)
 SPSITES="54476,5e548"
 FROZEN="build/manifest/walker_ghost.toml"
-BUILD="${BUILD:-build/m3b_merged32}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+BUILD="${BUILD:-build/m3b_merged33}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
 . "$REPO/tests/lib/instr_align.sh"

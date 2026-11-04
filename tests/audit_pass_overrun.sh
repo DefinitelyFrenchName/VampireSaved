@@ -39,7 +39,7 @@
 #   for donovan_2 (events 0-2), donovan_10 (0-1) and donovan_11 (the P2 block event and
 #   Blizzard Sword [LP] blocked), the committed rigs with the parity gate's pins.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [FREEZE=1] tests/audit_pass_overrun.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged33] [FREEZE=1] tests/audit_pass_overrun.sh
 #   emulator tier, MAME; 12 runs (the task taps write ~100 MB each, deleted with the work dir) —
 #   measured 14z-168 on this MacBook, solo: ~60 s wall
 set -eu
@@ -47,7 +47,7 @@ set -eu
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged32}"
+BUILD="${BUILD:-build/m3b_merged33}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/pass_overrun.tsv"
 CONTROL="${CONTROL:-}"
@@ -157,9 +157,9 @@ sed 's/^/  /' "$W/got.tsv"
 if [ "${FREEZE:-0}" = 1 ]; then
     { echo "# tests/expected/pass_overrun.tsv — the Blizzard Sword CPU overruns (zero-pass frames, RAM:\$FF8081) and the scheduler's idle"
       echo "# spin dispatches per event window, ours ($(basename "$BUILD")) vs native vsav2 (tests/audit_pass_overrun.sh; field_trace + read_tap"
-      echo "# on the task table). Evidence class: in-emulator. First frozen 14z-168 with FREEZE=1 (GitHub #136, class SLOWDOWN); since M24"
-      echo "# (14z-216, #294: vs2's per-frame palette routine) ours overruns where native does on donovan_2 (3094, native 3098) and"
-      echo "# donovan_10 (neither) — the 3094 frame accepted 2026-11-01 (DECISIONS_HISTORY.md \"#294's lag frame\"); donovan_11 native only."
+      echo "# on the task table). Evidence class: in-emulator. First frozen 14z-168 with FREEZE=1 (GitHub #136, class SLOWDOWN); since M25"
+      echo "# (14z-220, #345 A1b) ours overruns on none of the three parts while native does on donovan_2 (3098) and donovan_11 (4580),"
+      echo "# accepted 2026-11-03 (DECISIONS_HISTORY.md \"#345: the built A1b's timing is accepted\"); M24's 3094 frame (#294) is gone."
       echo "# Columns: overrun <part> <leg> <frames|none> | idle <part> <event> <leg> mean= zero="
       echo "#--"; cat "$W/got.tsv"; } > "$EXPECT"
     echo "  FROZE  $(basename "$EXPECT") — VERIFY by re-running without FREEZE"; exit 0

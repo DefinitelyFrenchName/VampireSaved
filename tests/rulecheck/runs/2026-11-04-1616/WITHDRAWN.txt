@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-220): the packet check's D-FIGURE flags on the deliverable registry_rows.txt (14877, 13604, 1273, 1917): their sources were not artifacts; attribution_merged.txt, attribution_don.txt and edit_classes_{merged,don}.txt (re-run, edit_classes.py.txt) added; re-prepared.

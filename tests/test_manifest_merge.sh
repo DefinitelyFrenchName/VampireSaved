@@ -139,7 +139,9 @@ FROZEN = [
     # hit-pair store rows to huitzil and pyron (+6 each) and moves Donovan's six
     # from stage 99 to 6 (his count unchanged); merged +6, shared +6 as this gate
     # measured them — the merge key, not a theory, decides what dedupes
-    ("port_patch",       (23, 69, 28), 103, 16),
+    # RE-FROZEN 14z-220 (M25, was (23,69,28),103,16): +2 DONOVAN = #356's two rows (the spawner's type stamp 0x0F -> 0x7C, the
+    # handler's bank word), declared by donovan.toml alone -> merged +2, shared unchanged (855 ops, tests/test_tenant_loop.sh).
+    ("port_patch",       (25, 69, 28), 105, 16),
     ("tenant",           (1, 1, 1),  3,  0),   # never shared, by definition
     ("select_records",   (6, 6, 6),  18, 0),   # six pieces PER TENANT
     ("win_pal_variant",  (1, 1, 1),  3,  0),

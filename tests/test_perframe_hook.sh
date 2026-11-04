@@ -31,8 +31,8 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR not set"; exit 0; }
 python3 -c "import capstone" 2>/dev/null || { echo "SKIP: python capstone not installed"; exit 0; }
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-BUILD="${1:-build/m3b_merged32}"
-SOLO="${2:-build/don_m28}"
+BUILD="${1:-build/m3b_merged33}"
+SOLO="${2:-build/don_m29}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 case "$SOLO" in /*) ;; *) SOLO="$REPO/$SOLO" ;; esac
 for b in "$BUILD" "$SOLO"; do

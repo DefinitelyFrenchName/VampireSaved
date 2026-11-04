@@ -1,6 +1,38 @@
 # patch_notes — per-change detail: every byte, and why
 
-## 14z-219 — #345 OPTION A1b: DONOVAN'S TRAIL PIECES TAKE vs2's NO-DRAW TABLE (BUILT AND STAGED for the M25 freeze with #356)
+## 14z-220 — THE M25 FREEZE: #356 AND #345 A1b LANDED (donovan-m29 / huitzil-m36 / pyron-m30 / merged-m25)
+
+**WHAT LANDED.** `build/manifest/staged/356_345a1b.patch` (the two 14z-219 entries below) applied and the staged file
+retired in the freeze commit, the 14z-188 precedent; `build/m5_wide/extract` re-extracted on purpose for the two new WIDE
+roots (byte-identical to the 14z-219 scratch extract `build/agent219/t345a/ex`); `version_text` M24 -> M25 in the three
+tenant manifests.
+
+**THE BUILDS (`build/agent220/m25/build_all.sh`).** `build/don_m29` program `63447128` (360 ops), `build/hui63`
+`cc9c4b68` UNCHANGED, `build/pyron48` `9d135e7b` UNCHANGED, `build/m3b_merged33` `a24aa560` (855 ops, = the 14z-219
+scratch `build/agent219/t345a/mg`), stock twin `build/m5_stock24` `a3910ded` UNCHANGED, stage-4 `2fa7c2f1` UNCHANGED.
+ERIS rebuilt all six from the same tree: every program, set key and zip member CRC equal.
+
+**THE DELTA, EXPLAINED OP BY OP.** donovan +2 ops and merged +2 (the code region at `0x400010`, the data region at
+`0x4013E0`), 0 removed. Three designed EDITs: the two calls of vs2 `0x06E4A6` in Donovan's code region (+0x13E6 dash
+`jmp`, +0x1B46 sub-4 `jsr`) -> the copy's spawner `0x4002E4`; the class-0x72 operand (+0xAF of `0x0D0170`) `0x1F3FD2` ->
+`0x4013E0`. Every other changed byte run in merged's 16 EDITs is a pointer relocated by +0x1610 (1,917 runs) or a tenant
+effect type renumbered +1 for the new type 124 (69 runs); the relocated walker `0x4C23B0` -> `0x4C39C0` gains row 124
+-> `0x400010` (rows 124-135 -> 125-136); 1,273 relocation targets differ only by a relocated long straddling the tool's
+window. The byte diff (`tests/expected/freeze_bytediff/merged-m25.txt`): every fixed-site range below `PRG:0x3F0000` is
+one of the three designed sites, a long relocated +0x1610 or +0x300 (Donovan's AI-script block moved behind the copy),
+or the other view's echo — 0 unexplained (`build/agent220/m25/bytediff_fixed_review.txt`).
+
+**THE MiSTer TAIL.** Eight `vsavjw.zip` members moved (`vm3j.03d/04d/07b/10b`, `vsw.41/42`, `vsw.33m/37m` the mark): fork
+commit `930818f5` (`doc/mame.xml` only), `emu/jtcores-patches/0041`, the pin in `tools/setup_jtcores.sh`; the WIDE MRA
+regenerated (its BUILD block and the six program CRCs; the stock MRA identical).
+
+**RE-FROZEN STATIC COUNTS.** `test_manifest_merge` port_patch (25,69,28)/105; `test_region_overlap` section 1 unique 17
+and section 5 (19 unique, 2,110 conflicting bytes — Donovan's shared copies RAW byte-identical to M24, the moved bytes
+the normaliser's: `docs/project/gotchas.md`, the 14z-220 entry); `rule5_baked` a declared growth of seven
+`only_variant_slot` rows (223 -> 230, ledger line); the three charmaps and their page hashes; `test_m3a_reproducible`'s
+donovan and merged pins.
+
+## 14z-219 — #345 OPTION A1b: DONOVAN'S TRAIL PIECES TAKE vs2's NO-DRAW TABLE (BUILT AND STAGED for the M25 freeze with #356) — LANDED at the M25 freeze (the 14z-220 entry above)
 
 **WHAT IT IS.** Ruled 2026-11-03 (`DECISIONS_HISTORY.md` "Ruled 2026-11-03 (14z-219) — #345"): **"A1b (Recommended)"**, after
 the class-0x72 legacy census (`build/agent219/t345/CENSUS.md`, local; rule-checker run `2026-11-03-1590` OK). The table and
@@ -24,7 +56,7 @@ relocated into it, every other byte equal to vs2's — and the later `wide_ext` 
 
 **MEASURED:** see the 14z-219 STATE group (the census on the build, the lost-frame re-measure, the capture sheets).
 
-## 14z-219 — #356: DONOVAN'S DASH SPEED LINES, A TENANT-ONLY COPY OF vs2's EFFECT (BUILT AND STAGED for the M25 freeze)
+## 14z-219 — #356: DONOVAN'S DASH SPEED LINES, A TENANT-ONLY COPY OF vs2's EFFECT (BUILT AND STAGED for the M25 freeze) — LANDED at the M25 freeze (the 14z-220 entry above)
 
 **STAGED (14z-219 close, this entry and the A1b one above):** the rows that change build output — `tools/build_donovan.sh`'s two
 WIDE roots, `build/manifest/donovan.toml`'s rows, `reconciliation_donovan.toml`'s row, `tests/test_tenant_loop.sh`'s counts —

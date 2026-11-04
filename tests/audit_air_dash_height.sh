@@ -22,12 +22,12 @@
 #
 # SHEET: legs vs2,ours — moments: one per air-dash event, at the frame the leg enters the air dash (seq 0x14), or at the second R when it does not dash (the low event under vs2's row), on that leg's own field trace — not comparable: each game's stage and palette, and P2's art (each game's own copy; [VSP-168])
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged32] [EXPECT=same|gap] [KEEP=<dir>] tests/audit_air_dash_height.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged33] [EXPECT=same|gap] [KEEP=<dir>] tests/audit_air_dash_height.sh
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 : "${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged32}"
+BUILD="${BUILD:-build/m3b_merged33}"
 EXPECT="${EXPECT:-same}"   # 14z-192: gap until M23, same since
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 [ -x "$MAME_BIN" ] || { echo "FAIL: no MAME binary at $MAME_BIN (tools/setup_mame.sh)"; exit 1; }

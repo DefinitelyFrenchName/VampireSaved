@@ -5,7 +5,7 @@
 # WHAT: Phobos's air movement is alive with its measured mode signatures: hold-8 rises then
 #   HOVERS at a pinned height, and a dash input in the air engages the air dash (seq 0x14,
 #   airborne) with a flat advance — not merely no crash.
-# HOW: replay 75 (float) and replay 79 (air dash) on MAME against build/hui62 (another
+# HOW: replay 75 (float) and replay 79 (air dash) on MAME against build/hui63 (another
 #   build can be given; a stage-4 build until 14z-197), Y and X and the seq byte read from
 #   dumps at the frames after the rise completes.
 # EXPECTS: Y pinned >= 100px over f3350-f3370; seq 0x14 AIRBORNE (Y >= 100px) with X moving
@@ -50,9 +50,9 @@
 #   is an air dash: seq 0x14 over f3321-3340 at Y=121.1, X moving -116.3 px over f3322-3337 at dy 0
 #   (build/agent197/t228/s3/air/).
 #
-# Usage: ROMDIR=... [JOBS=N] tests/test_hui_air.sh [builddir]   (default build/hui62)
+# Usage: ROMDIR=... [JOBS=N] tests/test_hui_air.sh [builddir]   (default build/hui63)
 #
-# THE BUILD IS build/hui62 BY DEFAULT since 14z-197 (maintainer-ruled 2026-10-11, the four Huitzil stage gates "Move to
+# THE BUILD IS build/hui63 BY DEFAULT since 14z-197 (maintainer-ruled 2026-10-11, the four Huitzil stage gates "Move to
 # hui61, re-time 2"; DECISIONS_HISTORY.md). Until then it self-built STAGE 4. Once replay_guard.lua counts emulated
 # frames (#228 step 4) a rig plays on its own timing, and on that timing the fresh stage-4 build RESETS just after the
 # match starts on the 2P-dummy rigs (80, 81: the state word and both ids zero by f2500; measured with replay.lua, no
@@ -80,7 +80,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-set -- "${1:-build/hui62}"   # re-pointed 14z-197 (was: a fresh stage-4 build) — see THE BUILD above
+set -- "${1:-build/hui63}"   # re-pointed 14z-197 (was: a fresh stage-4 build) — see THE BUILD above
 if [ $# -ge 1 ]; then
     BUILD="$1"
     echo "== using existing build $BUILD"

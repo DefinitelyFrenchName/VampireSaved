@@ -1,0 +1,6 @@
+  FLAG QUOTE: Accept, freeze A1b (Recommended)
+  FLAG QUOTE: Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted
+  FLAG ATTRIB: The moved rows equal, line for line, the ones measured on the 14z-219 scratch build build/agent219/t345a/mg (overrun_219_vs_m25.txt), whose program a24aa560 ...
+  FLAG D-FIGURE: 44  [build/agent220/m25/rc/r_overrun2/pass_overrun.tsv.diff]
+  FLAG D-ABSOLUTE: # Columns: overrun <part> <leg> <frames|none> | idle <part> <event> <leg> mean= zero= #-- overrun donovan_2 native 3098 -overrun donovan_2 ours 3094 +overrun...  [build/agent220/m25/rc/r_overrun2/pass_overrun.tsv.diff]
+packet_check: 5 flag(s): ATTRIB 1, D-ABSOLUTE 1, D-FIGURE 1, QUOTE 2

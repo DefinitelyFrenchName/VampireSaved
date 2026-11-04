@@ -1,0 +1,15 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: M25: rng_forms.tsv re-frozen for #345 A1b's accepted timing
+Claim (the working agent's sentence): Re-freeze tests/expected/rng_forms.tsv on merged-m25, build/m3b_merged33 (its registry row, key and program: build_identity.txt): only rows of the "mp" family (audit_move_parity under forms B and C against form A) move (rng_forms.tsv.diff) — under form B the DIFF->DIFF row (donovan_2:2) and the IDENT->DIFF row (23: donovan_2:3-25) leave and DIFF->IDENT grows 1 -> 25 (donovan_11:12 and donovan_2:2-25); under form C DIFF->IDENT grows 2 -> 25 with the same rows and IDENT->IDENT shrinks 50 -> 27 (donovan_2:3-25 leave it); every c174 and c184 row and both "same" counts unchanged. That is the mirror of the 24 form-A rows the ruling moved: under the gates' 0000 pin (form A) donovan_2's events 2-25 now DIFF against native, under forms B and C the same events read IDENT. The gate's failure lines against the M24 file are identical on 14z-219's scratch build build/agent219/t345a/mg and on merged-m25 (rng_219_vs_m25.txt), whose program a24aa560 is the same (programs.txt); the maintainer accepted that build's timing, "Accept, freeze A1b (Recommended)", the ruling naming "rng_forms' rows" among the re-frozen expectations (DECISIONS_HISTORY.md "Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted"). Frozen by FREEZE=1 on ERIS at snapshot S3 after the move-parity table (S3_freeze_audit_rng_forms.log); verified by the S3 battery's plain run (verify_audit_rng_forms.log: "all 16 rows equal the frozen expectation", its three controls fired; verify_row.tsv PASS). NOT tested: the rows under forms B and C were not put to the maintainer as rows (REC_lostframes.md reports the held pictures per form, its capture sheets holds_d2_B.png and holds_d11_*.png, not these parity rows); the build's identity rests on the registry row and the measured key in build_identity.txt; FBNeo and MiSTer were not measured.
+Artifacts (read every one, in full):
+  - build/agent220/m25/rc/r_rng/rng_forms.tsv.diff
+  - build/agent220/m25/rc/r_rng/rng_219_vs_m25.txt
+  - build/agent220/m25/rc/r_rng/build_identity.txt
+  - build/agent220/m25/rc/r_rng/programs.txt
+  - build/agent220/m25/rc/r_rng/S3_freeze_audit_rng_forms.log
+  - build/agent220/m25/rc/r_rng/verify_audit_rng_forms.log
+  - build/agent220/m25/rc/r_rng/verify_row.tsv
+  - build/agent220/m25/rc/r_rng/REC_lostframes.md
+  - DECISIONS_HISTORY.md.lines-9769-9786 (lines 9769-9786 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted; A1b freezes in M25 with #3")

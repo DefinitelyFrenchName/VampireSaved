@@ -11,6 +11,8 @@ extra region x065e5a: twin 0x065E8E (shift +0x34), len 0x106A
 extra region x066ec4: twin 0x066EF8 (shift +0x34), len 0x2B8
 extra region x06717c: twin 0x0671B0 (shift +0x34), len 0x154
 extra region x101aca: DATA (segmented oracle), twin 0x101ACA, len 0x10CE, 0 pointer fields, 1 segments, 0 dead zones (0x0 bytes unaligned)
+extra region x06e1d2: twin 0x06E346 (shift +0x174), len 0x2FE
+extra region x1d7428: DATA, SELF-POINTERS ONLY (`:dp`), len 0x1308, 403 pointer fields (every 2-aligned long whose value lies inside the region)
 region hitbox: vsav2 0x0C8BB8+0x25C2 (data, shift bank)
 region hitbox_proj: vsav2 0x0D0CA8+0x1000 (data, shift bank)
 region anim: vsav2 0x27F548+0xFA00 (data, shift anim)
@@ -27,15 +29,17 @@ region x065e5a: vsav2 0x065E5A+0x106A (code, shift x065e5a)
 region x066ec4: vsav2 0x066EC4+0x2B8 (code, shift x066ec4)
 region x06717c: vsav2 0x06717C+0x154 (code, shift x06717c)
 region x101aca: vsav2 0x101ACA+0x10CE (data, shift x101aca)
+region x06e1d2: vsav2 0x06E1D2+0x2FE (code, shift x06e1d2)
+region x1d7428: vsav2 0x1D7428+0x1308 (data, shift x1d7428)
   anim: grown to +0x20F00 to close 2710 forward refs
   DISCOVERED shift aux0 (-0x2002c): 2535 referencing fields, 5 cluster regions
   hitbox: 0 pointer fields, 24 variant-site bytes (0.25%)
   hitbox_proj: 0 pointer fields, 0 variant-site bytes (0.00%)
   anim: 3979 pointer fields, 0 variant-site bytes (0.00%)
   code: 474 pointer fields, 0 variant-site bytes (0.00%)
-  code: non-internal refs {'engine': 195, 'bank_ref': 4}
+  code: non-internal refs {'engine': 193, 'bank_ref': 4}
   x05c800: 696 pointer fields, 0 variant-site bytes (0.00%)
-  x05c800: non-internal refs {'bank_ref': 2, 'engine': 578}
+  x05c800: non-internal refs {'bank_ref': 2, 'engine': 577}
   x026142: 40 pointer fields, 0 variant-site bytes (0.00%)
   x026142: non-internal refs {'engine': 10, 'bank_ref': 30}
   x028122: 44 pointer fields, 0 variant-site bytes (0.00%)
@@ -55,6 +59,9 @@ region x101aca: vsav2 0x101ACA+0x10CE (data, shift x101aca)
   x06717c: 13 pointer fields, 0 variant-site bytes (0.00%)
   x06717c: non-internal refs {'engine': 10}
   x101aca: 0 pointer fields, 0 variant-site bytes (0.00%)
+  x06e1d2: 6 pointer fields, 0 variant-site bytes (0.00%)
+  x06e1d2: non-internal refs {'engine': 5}
+  x1d7428: 403 pointer fields, 0 variant-site bytes (0.00%)
   aux0_0: 0 pointer fields, 0 variant-site bytes (0.00%)
   aux0_1: 0 pointer fields, 0 variant-site bytes (0.00%)
   aux0_2: 0 pointer fields, 0 variant-site bytes (0.00%)

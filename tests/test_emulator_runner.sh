@@ -359,6 +359,17 @@ dead_lists "$out3b" g_harness && fail "a gate that runs the registry's gates was
 out3c="$(run --log "$T/l3c" || true)"
 dead_lists "$out3c" g_harness && ok "the same stub without the registry line is a DEAD ROW (the case discriminates)" \
     || fail "the stub without the registry line was not reported DEAD: the case above proves nothing"
+# A gate that runs the crash sweep's emulator tier (audit_crash_sweep_emu, #310, 14z-218) is emulator-tier too: it read as
+# a DEAD ROW at the M25 freeze's parity run (14z-220). Both sides again: the --tier emulator call, then the same stub
+# calling the sweep's static tier.
+{ echo "#!/bin/sh"; echo '/bin/sh "$REPO/tests/test_crash_sweep.sh" --tier emulator > /dev/null'; echo "exit 0"; } > "$FR/tests/g_harness.sh"
+out3d="$(run --log "$T/l3d" || true)"
+dead_lists "$out3d" g_harness && fail "a gate that runs the crash sweep's emulator tier was reported as a DEAD ROW" \
+    || ok "a gate that runs the crash sweep's emulator tier is emulator-tier, not a DEAD ROW"
+{ echo "#!/bin/sh"; echo '/bin/sh "$REPO/tests/test_crash_sweep.sh" --tier static > /dev/null'; echo "exit 0"; } > "$FR/tests/g_harness.sh"
+out3e="$(run --log "$T/l3e" || true)"
+dead_lists "$out3e" g_harness && ok "the same stub on the sweep's static tier is a DEAD ROW (the case discriminates)" \
+    || fail "the static-tier stub was not reported DEAD: the crash-sweep case above proves nothing"
 rm -f "$FR/tests/g_harness.sh"
 
 echo "4. --strict makes SKIP and an unregistered gate fatal"

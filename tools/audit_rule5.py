@@ -156,7 +156,7 @@ KNOWN_PAIRS = {
         "note", "only_base_slot", "only_variant_slot", "orc",
         "slot_ptr_table", "slot_rows", "src", "stage"
     },
-    "don_m28": {
+    "don_m29": {
         "escapes", "resolved", "unresolved"
     },
     "file": {
@@ -174,7 +174,7 @@ KNOWN_PAIRS = {
     "hole_b": {
         "end", "start"
     },
-    "hui62": {
+    "hui63": {
         "escapes", "resolved", "unresolved"
     },
     "init_shim": {
@@ -207,6 +207,11 @@ KNOWN_PAIRS = {
         "vanilla_entries", "vanilla_table", "walker", "walker_len",
         "walker_old_hex"
     },
+    # 14z-220 (M25, #356): [[obj_hook_extra]] — an authored walker row (index = the new effect type number, src = the
+    # placed region it dispatches to, site = the walker); structure, so FACT; its only_variant_slot is a GAMEPLAY key.
+    "obj_hook_extra": {
+        "index", "note", "only_variant_slot", "site", "src"
+    },
     "origins": {
         "vhunt2", "vsav2", "vsavj"
     },
@@ -222,13 +227,18 @@ KNOWN_PAIRS = {
         "near_map", "region_space", "src_char", "src_set"
     },
     "port_patch": {
-        "new_hex", "new_hex_variant", "note", "old_hex", "region",
+        "new_hex", "new_hex_variant", "note", "old_hex", "only_variant_slot", "region",
         "src_addr", "stage"
+    },
+    # 14z-220 (M25, #356 and #345 A1b): [[ref_pin]] pins one pointer field (region + off) of a placed region to a fixed
+    # target (pin = the mode); addresses, so FACT; its only_variant_slot is a GAMEPLAY key.
+    "ref_pin": {
+        "note", "off", "only_variant_slot", "pin", "region", "stage", "target"
     },
     "profile": {
         "bank4_word", "bank5_word", "collision_rule", "group", "name"
     },
-    "pyron47": {
+    "pyron48": {
         "escapes", "resolved", "unresolved"
     },
     "reaction_hook": {
