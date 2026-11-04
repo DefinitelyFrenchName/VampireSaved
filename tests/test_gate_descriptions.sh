@@ -34,11 +34,15 @@ fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 census() { python3 tools/gate_descriptions.py --root "$1" 2>/dev/null | cut -f1,2 | sort; }
 cls() { awk -F'\t' -v c="$1" '$1==c{print $2}' "$2" | sort; }
 
-# perturb NAME ROOT — a copy of tests/ under ROOT with one defect planted
+# perturb NAME ROOT — a copy of tests/ under ROOT with one defect planted. Prints the gate, or NONE (no declaring gate in
+# the copy) or UNCHANGED (the perturbation left the file as it was). The target is picked from the COPY it perturbs, and
+# an unchanged file is refused: a pick from the live tree once took a transient file the copy did not hold, so `sed`
+# perturbed nothing and both modes exited 0 — LIES (#362, 14z-221).
 perturb() {
     mkdir -p "$2/tests"; cp tests/*.sh "$2/tests/"
-    g="$(census . | awk -F'\t' '$1=="declares"{print $2; exit}')"
-    [ -n "$g" ] || { echo "NONE"; return 1; }
+    g="$(census "$2" | awk -F'\t' '$1=="declares"{print $2; exit}')"
+    [ -n "$g" ] && [ -f "$2/tests/$g.sh" ] || { echo "NONE"; return 1; }
+    cp "$2/tests/$g.sh" "$2/before.sh"
     case "$1" in
         dropped-field) sed -i.bak '/^# WHAT:/d' "$2/tests/$g.sh" ;;
         field-outside-block)
@@ -59,13 +63,18 @@ PY
             ;;
     esac
     rm -f "$2/tests/"*.bak
+    if cmp -s "$2/before.sh" "$2/tests/$g.sh"; then echo "UNCHANGED"; return 1; fi
+    rm -f "$2/before.sh"
     echo "$g"
 }
 
 root="."
 if [ -n "$VS_CTL" ]; then
     g="$(perturb "$VS_CTL" "$W/mode")"; root="$W/mode"
-    [ "$g" != NONE ] || { echo "FAIL: no declaring gate in the tree to perturb — the control cannot run"; exit 1; }
+    case "$g" in
+        NONE) echo "REFUSED: CONTROL=$VS_CTL — no declaring gate in the copy to perturb"; exit 3 ;;
+        UNCHANGED) echo "REFUSED: CONTROL=$VS_CTL — the perturbation left the target unchanged (#362)"; exit 3 ;;
+    esac
     echo "MODE: control $VS_CTL — the census runs on a copy where $g.sh is perturbed"
 fi
 
@@ -107,10 +116,17 @@ if [ -z "$VS_CTL" ]; then
     echo "== 2. controls: each perturbation of a copy must be caught"
     for c in dropped-field field-outside-block; do
         g="$(perturb "$c" "$W/$c")"
-        [ "$g" != NONE ] || { vs_ctl_dead "$c" "no declaring gate in the tree to perturb"; fail=1; continue; }
+        case "$g" in NONE|UNCHANGED) vs_ctl_dead "$c" "the perturbation could not be applied ($g)"; fail=1; continue ;; esac
         if census "$W/$c" | grep -qx "declares	$g"; then vs_ctl_dead "$c" "$g still classed declares after the perturbation"; fail=1
         else vs_ctl_fired "$c" "$g classed undeclared on the perturbed copy"; fi
     done
+fi
+
+if [ -z "$VS_CTL" ]; then
+    echo "== 3. a perturbation that changes nothing is refused, never run (#362)"
+    g="$(perturb no-such-defect "$W/noop")"
+    if [ "$g" = UNCHANGED ]; then ok "a perturbation that leaves the target as it was reads UNCHANGED"
+    else bad "a no-op perturbation read '$g', not UNCHANGED: a mode could run on an unperturbed copy and pass"; fi
 fi
 
 [ "$fail" -eq 0 ] && echo "PASS" || echo "FAIL"

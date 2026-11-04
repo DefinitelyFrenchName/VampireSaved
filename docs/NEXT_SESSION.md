@@ -58,8 +58,6 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **#361 — ITS CLOSURE CHECK** (the classifier dead row, fixed in the M25 freeze commit `91bde83b`; gate
-   `tests/test_emulator_runner.sh` section 3): a recommendation rule-checker run, then close it done.
 2. **#362** (`test_crash_sweep` writes its perturbed copies into the live `tests/`; `test_gate_descriptions`' modes do not refuse
    a vanished target): both gates are OFF `tests/controls_concurrent.txt` until it is fixed and they are re-traced on PILOT.
 3. **THE M25 RELEASE, WHEN THE MAINTAINER ASKS FOR IT** (M25 frozen 14z-220 at `91bde83b`, tags `freeze/donovan-m29`,
@@ -72,7 +70,7 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 5. **#310 — GROUP 7, in batches** (the crash-injection sweep: `tests/test_crash_sweep.sh`).
 6. **#359** (cleanup traps on `EXIT INT TERM` with no `exit`; 210 scripts).
 7. **Ask the maintainer for the order of the rest.** Open tickets (GitHub severity labels): bugs: #345 (frozen, awaits the
-   release), #361, #362; evolution: #348, #352, #354; cosmetic: #344, #346, #356 (both frozen, await the release), #357, #358,
+   release), #362; evolution: #348, #352, #354; cosmetic: #344, #346, #356 (both frozen, await the release), #357, #358,
    #360 (#356's Dark Force phase); test-integrity: #310, #359. Parked: #123, #124, #125, #128.
 
 ## PARKED (not open work)

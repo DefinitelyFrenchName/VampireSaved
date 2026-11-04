@@ -1505,6 +1505,28 @@ records (vsavj: 212 format 2, 23 format 0, 1 format 10). vsavj's is live legacy 
 0x33-0x44 and 0x5D; rows 2-5, the trail pieces', were read by no legacy rig of the census. vsavj has no class 0x72 at all
 (its effect walker table ends at type 0x71). [M: `build/agent219/t345/CENSUS.md` (local)]
 
+### Donovan's guard orbs: a type-0x13 watcher in the `$FFD400` pool that vsavj dispatches to a stub (measured 14z-221, #357)
+
+At Donovan's guard, native vs2 draws eight small red orbs around the fighters for about 14 frames and ours draws none
+(#357, the maintainer's read on 14z-219's capture sheets). **The orbs are spawned by a WATCHER object**, not by the guard
+code: a type-0x13 object in the second object pool, `RAM:$FFD400` (32 slots × `$80`, ticked by the walker at vsavj
+`PRG:0x080A80` / vs2 `PRG:0x08F1AA` / vhunt2 `PRG:0x08EDB6`, dispatching on `+$02` through a 38-row table, vsavj
+`PRG:0x080AAC` / vs2 `PRG:0x08F1D6` — the beam pool of «The beam / effect family»). Donovan's fighter set-up creates it once
+per round (vs2 `PRG:0x05AE3C`, `move.l #$01001300,(a4)`, linked both ways: `$30(obj)` the fighter, `$2A(fighter)` the
+object). Its handler, vs2 `PRG:0x090EDA` (vhunt2 `PRG:0x090AE6`), copies the fighter's position, palette and flip every
+frame and reads byte `+$0B` of the fighter's current anim-frame record (`a3 = $1C(fighter)`, vs2 `PRG:0x090F24`); when that
+byte is positive and differs from the last one seen it spawns eight effect-pool objects of type 0x72 sub 0x16 (the loop at
+vs2 `PRG:0x090FEA`, the stamp at `PRG:0x090FF4`) — the orbs, whose draw records are vs2 `PRG:0x29C0C0`-`0x29C114`
+(14z-219's census). **vsavj points rows 0x10-0x14 of that table at one bare `rts` (`PRG:0x080B44`)**; vs2 and vhunt2 fill
+rows 0x10, 0x11 and 0x13 (0x12 and 0x14 stay stubs). Ours ports the set-up (vs2 `0x05AE3C` → `PRG:0x0C104C`, inside
+Donovan's `code` region) but not the handler, so the watcher is created and dispatched into the stub. Row 0x10 on ours
+already points at the ported beam handler (`PRG:0x42F920`, Huitzil's `[[code_ptr]]` of 14z-71, safe because vanilla never
+reads row 16: `tests/audit_effect_class_rows.sh`); row 0x13 is still the stub. On donovan_15 under the parity rig's pins
+both legs show the same watcher (P1-owned, 4,883 slot-frames from frame 2363, stamped once) and the same trigger (181
+frames with the record byte in range, first at frame 2796); only the handler differs. Not measured: whether vanilla ever
+reads row 0x13 (the deadness a repoint would rest on), what our build's class-0x72 handler (the port's; vsavj has none) does with sub 0x16, FBNeo, MiSTer.
+[M: `build/agent221/t357/` (local: `lua/d400_tap.lua`, `run_d4.sh`, `measurer_357.txt`); no gate]
+
 ### Every `$FF9400` type's parameters, decoded and measured (14z-121)
 
 `tools/projectile_params.py` decodes the init block of a type handler

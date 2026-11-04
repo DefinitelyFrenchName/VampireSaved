@@ -1349,6 +1349,13 @@ CHANGED SOMETHING before the gate is re-run. In python, `assert t2 != t,
 before and after. [VSP-22] says a blind instrument and a real zero look
 identical — this is that, with the instrument being the control itself.
 
+**Paid again (14z-221, #362), as a target the copy does not hold:** `tests/test_gate_descriptions.sh`' `perturb` picked
+its target from the census of the LIVE `tests/` but perturbed a copy made with `cp tests/*.sh`, which skips dot-files.
+With a transient `tests/.cs_*.sh` present (`test_crash_sweep` running beside it), the pick was that file: `sed` failed on
+a file the copy did not hold, both modes exited 0 (LIES), and the plain run's own in-gate controls read FIRED on the
+same absent file. Fixed: the target is picked from the copy, and a perturbation that leaves it unchanged is REFUSED
+(`UNCHANGED`; section 3 proves the refusal fires).
+
 
 ## A gate that `cd`s and then uses a RELATIVE `$ROMDIR` finds no ROMs, and the
 ## liveness check reports it as a defect in the ARTIFACT (paid: 14z-132)
@@ -7415,6 +7422,12 @@ the gate fails if the tracked file changed during its run. **A control perturbs 
 "perturb, run, restore" on a tracked file is a race the moment gates run in parallel.** Not covered: the census is
 a session instrument, not a gate, so a new in-place perturbation would be caught only by another trace.
 
+**Paid again, with UNTRACKED files (14z-221, #362):** `tests/test_crash_sweep.sh` wrote its perturbed gate copies INTO
+the live tree as `tests/.cs_<gate>_<pid>_<leg>.sh`, so a gate walking `tests/` beside it read them (the M25 re-trace:
+`test_gate_descriptions`' modes read LIES). Fixed: `tools/crash_sweep.py copy` pins the copy's `REPO=` line to
+`CS_REPO`, and the sweep writes each copy as `<gate>.sh` in its own scratch directory, refusing one inside `tests/`. **A
+gate writes nothing, tracked or not, into a directory other gates walk.**
+
 ## A RELATIVE NAME THAT CLIMBS OUT OF THE REPOSITORY RESOLVES DIFFERENTLY BY PATH DEPTH — surplus `..` stop at `/`, so a "must not resolve" control is dead on a deep enough host (paid: 14z-206, #309)
 
 `test_proof_sheets`' control `relative-unresolved` proves that `tools/proof_sheets.py` resolves a relative SHEET_OUT
@@ -7829,7 +7842,7 @@ before the ROM audit, nothing written) a `--log` directory that already holds a 
 `identity_end.tsv`, a `run_record_*.json`, or a `results.tsv` with a row — unless `--resume` continues it; an absent or
 empty directory, or one holding only a dry run's header, is fresh (`tests/test_emulator_runner.sh` section 24).
 
-## A GATE THAT REACHES AN EMULATOR THROUGH SOMETHING THE TIER CLASSIFIER DOES NOT NAME IS A DEAD ROW — every strict emulator run read NOT GREEN with every row PASS (paid: 14z-196 and 14z-213, #340)
+## A GATE THAT REACHES AN EMULATOR THROUGH SOMETHING THE TIER CLASSIFIER DOES NOT NAME IS A DEAD ROW — every strict emulator run read NOT GREEN with every row PASS (paid: 14z-196, 14z-213 (#340) and 14z-220 (#361))
 
 Both runners decide that a gate is emulator-tier by a regular expression over its code (comments stripped, sourced
 `tests/lib/*.sh` followed two deep) that names the emulator wrappers (`run_mame.sh`, `MAME_BIN`, `autoboot_script` and
@@ -7838,7 +7851,11 @@ only through something the pattern does not name is classed emulator-free: `test
 registry row a DEAD ROW (`--strict` makes that a failure), and `tests/run_all_static.sh` lists it as an "emulator-free gate
 in NEITHER registry", which it does not fail. Paid twice: 14z-196, `audit_release_linux_cleanhost` through
 `tools/cleanhost_libs.py`; 14z-213, `audit_pool_drop` (14z-212, #334), which runs the registry's own gates as
-`tests/$gate.sh` from `tests/ci_emulator.tsv`, so every strict emulator run from 14z-212 on read NOT GREEN. **The rule:** a
+`tests/$gate.sh` from `tests/ci_emulator.tsv`, so every strict emulator run from 14z-212 on read NOT GREEN. Paid a third
+time: 14z-218 registered `audit_crash_sweep_emu` (#310), which reaches the emulator only as `/bin/sh
+"$REPO/tests/test_crash_sweep.sh" --tier emulator`, without adding that name to either pattern, and the M25
+freeze's parity run (14z-220) read it a DEAD ROW (#361; both patterns match `test_crash_sweep\.sh"? --tier emulator` since
+`91bde83b`). **The rule:** a
 new gate that drives an emulator through a helper, a tool or other gates adds that name to BOTH runners' `EMU` pattern in
 the commit that registers it, and the runner's own registry line (`N emulator-tier gates; N registered`, `ok: every
 emulator-tier gate has exactly one registry row`) is read on a `--dry-run` of the new row's scope before the gate is

@@ -622,7 +622,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A POOLED GATE THAT GLOBS ITS OUTPUTS CANNOT SEE A LOST RUN — name every leg the pool starts, and fail on one that wrote nothing (paid: 14z-212, #334)
 - A PUBLISH TEST THAT PUSHES TO A HOOKLESS SCRATCH REMOTE NEVER MEETS THE REPOSITORY'S OWN GUARD — the ledger page's first push was refused at the close (paid: 14z-212/14z-213, #267)
 - A FRESH RUN POINTED AT AN OLD `--log` DIRECTORY INHERITS THAT RUN'S ROWS AND ITS COMMIT OF RECORD — #310's ERIS rerun still showed the LIES it was run to clear (paid: 14z-213, #310)
-- A GATE THAT REACHES AN EMULATOR THROUGH SOMETHING THE TIER CLASSIFIER DOES NOT NAME IS A DEAD ROW — every strict emulator run read NOT GREEN with every row PASS (paid: 14z-196 and 14z-213, #340)
+- A GATE THAT REACHES AN EMULATOR THROUGH SOMETHING THE TIER CLASSIFIER DOES NOT NAME IS A DEAD ROW — every strict emulator run read NOT GREEN with every row PASS (paid: 14z-196, 14z-213 (#340) and 14z-220 (#361))
 - A COLLECTOR THAT GROUPS RECORDS BY A KEY DROPS A RECORD WITH NO KEY, AND SAYS NOTHING — 132 rule-checker runs missing from both ledger pages (paid: 14z-213/14z-214, #339)
 - A CONTROL THAT PERTURBS "THE FIRST ROW" DEPENDS ON THAT ROW'S STATE — test_tickets' parked-disagrees went DEAD the day the newest ticket closed (paid: 14z-214, #341)
 - A CRASH PLANTED ON EVERY CALL PROVES NOTHING ABOUT WHERE A GATE HIDES ONE — and a census counting `# MUST-FIRE:` lines anywhere counts a heredoc stub's header (paid: 14z-215, #310)

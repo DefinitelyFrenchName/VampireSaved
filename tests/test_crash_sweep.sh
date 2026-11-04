@@ -10,8 +10,10 @@
 # HOW: (1) `python3 tools/crash_sweep.py check` on the table: every caller's every site covered by a row, or its gate on
 #   an `# EXEMPT:` line; every row well-formed (a declared mode, a live site key). (2) For each row of the selected tier
 #   (static by default; `--tier emulator`: the rows whose target gate needs an emulator, and on a Linux host with
-#   podman the `linux` rows (audit_release_linux_cleanhost) — tests/audit_crash_sweep_emu.sh runs it), two copies of the target gate in tests/ (each call wrapped
-#   by its site tag; the second with the helper neutered), each run under tests/lib/crash_sweep.sh's PATH shim that turns
+#   podman the `linux` rows (audit_release_linux_cleanhost) — tests/audit_crash_sweep_emu.sh runs it), two copies of the target gate, each `<gate>.sh` in its own
+#   directory under the sweep's scratch directory and never in tests/, its REPO pinned to this repository (#362: a gate
+#   walking tests/ beside the sweep read a transient copy there) (each call wrapped by its site tag; the second with the
+#   helper neutered), each run under tests/lib/crash_sweep.sh's PATH shim that turns
 #   the row's nth matching python3/sh call into a crash; the run classified with tests/lib/classify.sh exactly as both
 #   runners classify (vs_classify_control for a mode, vs_classify for PLAIN). Copies are re-made for every run.
 # EXPECTS: (1) 0 problems; (2) per row: the fx leg's class is the row's (DIED|UNJUDGED for a mode, FAIL for PLAIN), the
@@ -37,8 +39,8 @@ case "${1:-}" in --tier) TIER="${2:-}"; shift 2 ;; "") ;; *) echo "usage: $0 [--
 case "$TIER" in static|emulator) ;; *) echo "REFUSED: tier $TIER (static|emulator)"; exit 3 ;; esac
 T="$REPO/tests/expected/crash_sweep.tsv"
 W="$(mktemp -d)" || { echo "FAIL: test_crash_sweep — mktemp -d failed"; exit 2; }
-COPIES=""
-trap 'rm -rf "$W"; for _c in $COPIES; do rm -f "$_c"; done' EXIT
+case "$(cd "$W" && pwd -P)/" in "$REPO"/tests/*) echo "REFUSED: the scratch directory $W is inside tests/ — the copies must live outside it (#362)"; exit 3 ;; esac
+trap 'rm -rf "$W"' EXIT
 trap 'exit 143' INT TERM   # a TERM must END the run (the EXIT trap then cleans up): a trap on TERM alone returns to the script
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 CS_PY="$(command -v python3)"; CS_REPO="$REPO"; export CS_PY CS_REPO
@@ -88,12 +90,12 @@ while IFS="$(printf '\t')" read -r G TR M K RE NTH SITE FX KB NOTE; do
     nrun=$((nrun + 1)); tag="row $i ($G $M $K nth $NTH${SITE:+ site $SITE})"
     legs="fx"; [ "$KB" != - ] && legs="fx kb"
     for leg in $legs; do
-        c="tests/.cs_${G}_$$_$leg.sh"; COPIES="$COPIES $REPO/$c"
+        mkdir -p "$W/c$i.$leg"; c="$W/c$i.$leg/$G.sh"   # outside tests/ (#362), named as the gate
         neut=""; [ "$leg" = kb ] && neut="--neuter"
         [ "$leg" = fx ] && [ "$VS_CTL" = helper-neutered ] && neut="--neuter"
         python3 tools/crash_sweep.py copy "tests/$G.sh" "$c" $neut > "$W/copy.out" 2>&1 || { bad "$tag: cannot copy the gate ($(head -1 "$W/copy.out"))"; continue; }
         cs_run "$c" "$M" "$K" "$RE" "$NTH" "$W/shim" "$W/r$i.$leg"
-        rm -f "$REPO/$c"
+        rm -rf "$W/c$i.$leg"
         got="$CS_CLASS h$CS_HITS [$CS_SITES] ${CS_SECS}s"
         if [ "$leg" = fx ]; then
             want_ok=0
@@ -123,11 +125,11 @@ if [ "$VS_CTL" != shim-inert ] && [ "$nrun" -gt 0 ] && shim_inert_copy "$W/lib_i
     first="$(awk -F'\t' -v t="$TIER" '$2==t' "$W/rows.tsv" | head -1)"
     G="$(printf '%s' "$first" | cut -f1)"; M="$(printf '%s' "$first" | cut -f3)"; K="$(printf '%s' "$first" | cut -f4)"
     RE="$(printf '%s' "$first" | cut -f5)"; NTH="$(printf '%s' "$first" | cut -f6)"
-    c="tests/.cs_${G}_$$_inert.sh"; COPIES="$COPIES $REPO/$c"
+    mkdir -p "$W/c_inert"; c="$W/c_inert/$G.sh"   # outside tests/ (#362)
     python3 tools/crash_sweep.py copy "tests/$G.sh" "$c" > /dev/null 2>&1
     ( . "$W/lib_inert_ctl.sh"; cs_mkshim "$W/shim_inert"; cs_run "$c" "$M" "$K" "$RE" "$NTH" "$W/shim_inert" "$W/inert"
       echo "$CS_CLASS $CS_HITS" > "$W/inert.res" )
-    rm -f "$REPO/$c"
+    rm -rf "$W/c_inert"
     case "$(cat "$W/inert.res" 2>/dev/null)" in
         "HONOURED 0"|"PASS 0") vs_ctl_fired shim-inert "$G $M with a never-planting shim reads $(cut -d' ' -f1 "$W/inert.res"), no planted call" ;;
         *) vs_ctl_dead shim-inert "$G $M with a never-planting shim read $(cat "$W/inert.res" 2>/dev/null)" ;;

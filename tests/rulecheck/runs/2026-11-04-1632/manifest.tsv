@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent221/t361/close/issue361.md	b7b9a788def947b42d93ce36a5db27a408b314cc
+build/agent221/t361/close/fix_committed.diff	4055e57df32ae728a2658e4f2a7dfab854637e47
+build/agent221/t361/close/evidence361.txt	2718f16b329f954d7fdee4092d96ba4d0ff73588
+build/agent221/t361/close/measurer_return.txt	850d028cab386399fa07d4cb0e6986030d983ed5
+build/agent221/t361/close/gotcha.diff	46901b089fda7da4973e4c7f59ed9fe259971cda
+build/agent221/t361/close/closing_361.md	05b7b1938e642197c4c9646ba6733fbc0b1b1b1d
+build/agent221/t361/close/ticket_row_361.tsv	3384cc6174c722e1ad235dad3976bda7e0e9405e

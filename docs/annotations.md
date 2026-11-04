@@ -23,12 +23,12 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3843 |
-| named by a document or manifest only | 2355 |
+| distinct program-space addresses named | 3854 |
+| named by a document or manifest only | 2366 |
 | named by both a document/manifest and code | 989 |
 | named by CODE ONLY (the gap list below) | 499 |
 | carried by atlas | 821 |
-| carried by engine_internals | 877 |
+| carried by engine_internals | 891 |
 | carried by other docs | 1090 |
 | carried by manifests | 1906 |
 | carried by code | 1488 |
@@ -2096,6 +2096,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x05AD12` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05AD3E` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05AE20` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/game/atlas/character_tables.md — Ported-three handler code (bank[0] rows; the "code" manifest entry); build/manifest/bank_map.toml — (top); tools/extract_char.py; tools/scan_code_refs.py |
+| `PRG:0x05AE3C` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
 | `PRG:0x05AE50` | docs/game/atlas/character_tables.md — Ported-three handler code (bank[0] rows; the "code" manifest entry) |
 | `PRG:0x05AE54` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05AE8C` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vs2]; docs/game/preserved_data.md — 1. The VS-style Dark Force handler family in vs2 and vh2 — for all 18 characters (measured 14z-69c, 14z-126) [vs2] |
@@ -2386,12 +2387,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x07FFF0` | docs/project/mister_fit.md — 1. Program ROM (68k) |
 | `PRG:0x080000` | docs/platform/gotchas.md — CPS-2 gfx simms are not tile-contiguous — naive slicing silently "works" on siblings only; tests/audit_mister_map_fit.sh; tests/test_ladder_tenant_vs_palette.sh; tests/test_phasec_image.sh; tests/test_wheel_bank5.sh; tools/audit_pointer_flow.py; +4 more |
 | `PRG:0x080A1E` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x080A80` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) |
 | `PRG:0x080A90` | docs/game/engine_internals.md — The chain, end to end; build/manifest/huitzil.toml — grab_hold_keyframes; tools/build_donovan.sh |
 | `PRG:0x080A9C` | build/manifest/huitzil.toml — beam_effect_class16; tests/audit_clone_beam_lines.sh; tools/build_donovan.sh |
-| `PRG:0x080AAC` | docs/game/engine_internals.md — The chain, end to end; docs/project/porting_sprite_lists.md — 1. Does the host have the CLASS row?; build/manifest/huitzil.toml — grab_hold_keyframes; tests/audit_effect_class_rows.sh |
+| `PRG:0x080AAC` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357); docs/game/engine_internals.md — The chain, end to end; docs/project/porting_sprite_lists.md — 1. Does the host have the CLASS row?; build/manifest/huitzil.toml — grab_hold_keyframes; tests/audit_effect_class_rows.sh |
 | `PRG:0x080AEC` | docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); docs/project/patch_index.md — The beam takeover trio (Huitzil — three mechanisms, 14z-71); docs/project/patch_notes.md — 14z-71 — the beam: byte detail; build/manifest/huitzil.toml — beam_effect_class16; build/manifest/shared_writes.toml — huitzil; tests/audit_effect_class_rows.sh |
 | `PRG:0x080B28` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/huitzil.toml — beam_effect_class16; build/manifest/huitzil.toml — beam_effect_class31; build/manifest/shared_writes.toml — huitzil; tests/audit_clone_beam_lines.sh |
-| `PRG:0x080B44` | build/manifest/huitzil.toml — grab_hold_keyframes; build/manifest/shared_writes.toml — huitzil; tests/audit_clone_beam_lines.sh; tools/build_donovan.sh |
+| `PRG:0x080B44` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357); build/manifest/huitzil.toml — grab_hold_keyframes; build/manifest/shared_writes.toml — huitzil; tests/audit_clone_beam_lines.sh; tools/build_donovan.sh |
 | `PRG:0x080B46` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x08237E` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index) |
 | `PRG:0x0823E2` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21); docs/game/engine_internals.md — Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f); docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index); build/manifest/huitzil.toml — obj_hook |
@@ -2497,16 +2499,22 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x08C724` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) |
 | `PRG:0x08E336` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x08E342` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
+| `PRG:0x08EDB6` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vh2] |
 | `PRG:0x08EDE2` | build/manifest/huitzil.toml — grab_hold_keyframes |
-| `PRG:0x08F1D6` | build/manifest/huitzil.toml — grab_hold_keyframes [vs2] |
+| `PRG:0x08F1AA` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
+| `PRG:0x08F1D6` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2]; build/manifest/huitzil.toml — grab_hold_keyframes [vs2] |
 | `PRG:0x0907F6` | build/manifest/pcrel_escapes.toml — don_m29 |
 | `PRG:0x0908A0` | build/manifest/pcrel_escapes.toml — don_m29 |
 | `PRG:0x09098A` | build/manifest/pcrel_escapes.toml — don_m29 |
+| `PRG:0x090AE6` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vh2] |
 | `PRG:0x090B08` | docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index) [vs2] |
 | `PRG:0x090B0C` | docs/game/engine_internals.md — The child-companion shadow item (14z-68g/q — measured, still open) [vs2] |
 | `PRG:0x090BD2` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x090BE4` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
-| `PRG:0x090FF4` | build/manifest/type_stamps.toml — stamp; tools/audit_type_stamps.py |
+| `PRG:0x090EDA` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
+| `PRG:0x090F24` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
+| `PRG:0x090FEA` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
+| `PRG:0x090FF4` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2]; build/manifest/type_stamps.toml — stamp; tools/audit_type_stamps.py |
 | `PRG:0x0918F0` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/overlay_port.py |
 | `PRG:0x09190A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x09192A` | build/manifest/reconciliation.toml — map |
@@ -2729,6 +2737,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0C010E` | build/manifest/donovan.toml — capture_kf_lilith; build/manifest/huitzil.toml — capture_kf_lilith; build/manifest/pyron.toml — capture_kf_lilith |
 | `PRG:0x0C0A84` | docs/project/patch_notes.md — 14z-219 — #356: DONOVAN'S DASH SPEED LINES, A TENANT-ONLY COPY OF vs2's EFFECT (BUILT AND STAGED for the M25 freeze) — LANDED at the M25 freeze (the 14z-220 entry above) |
 | `PRG:0x0C0D74` | docs/project/patch_notes.md — donovan-m2 stage 4 — dispatch_14 repoint (2026-07-27, session 8) |
+| `PRG:0x0C104C` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
 | `PRG:0x0C109C` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vs2]; docs/game/preserved_data.md — 1. The VS-style Dark Force handler family in vs2 and vh2 — for all 18 characters (measured 14z-69c, 14z-126) [vs2] |
 | `PRG:0x0C11E4` | docs/project/patch_notes.md — 14z-219 — #356: DONOVAN'S DASH SPEED LINES, A TENANT-ONLY COPY OF vs2's EFFECT (BUILT AND STAGED for the M25 freeze) — LANDED at the M25 freeze (the 14z-220 entry above) |
 | `PRG:0x0C1780` | docs/game/engine_internals.md — The two engines run DIFFERENT Dark Force systems (traced 14z-69c) |
@@ -3136,6 +3145,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x28DC58` | build/manifest/donovan.toml — obj_bank_word_slot; build/manifest/donovan.toml — select_companion_tbl_b [vs2] |
 | `PRG:0x28DEF8` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; tests/test_don_sword.sh |
 | `PRG:0x28ED08` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x29C0C0` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
+| `PRG:0x29C114` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
 | `PRG:0x2A0426` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); tools/gen_donovan_patch.py; tools/overlay_port.py |
 | `PRG:0x2A04FA` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tools/audit_marionette_cost.py; tools/overlay_port.py |
 | `PRG:0x2A05E2` | docs/game/engine_internals.md — The select screen's laws (the atlas is canonical); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — splash_p1; build/manifest/huitzil.toml — splash_p1; build/manifest/pyron.toml — splash_p1; tools/check_tenant_select.py; +1 more |

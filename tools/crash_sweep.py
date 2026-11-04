@@ -14,6 +14,10 @@ is what shows the row reaches THAT call. This tool is the static half:
                                     wrapper (inserted after the gate's one `. "$REPO/tests/lib/controls.sh"` line) runs
                                     the call unchanged and, when it returns non-zero (it fired), appends the key to
                                     $VS_SWEEP_SITES. --neuter also redefines the helper as `return 0` (the KNOWN-BAD leg).
+                                    The gate's one `REPO="$(cd "$(dirname "$0")/.." && pwd[ -P])"` line becomes
+                                    `REPO="${CS_REPO:?…}"`, so the copy runs on the repository from OUTSIDE it: the sweep
+                                    writes its copies into its own scratch directory, never into tests/, where a gate
+                                    walking tests/ beside the sweep read a transient copy (#362, 14z-221).
   callers                           every tests/*.sh with at least one call site, with its count.
   check  <table.tsv>                the table is complete and well-formed: every caller is either covered (each of its
                                     site keys is the `site` of at least one row) or named on an `# EXEMPT: <gate> — why`
@@ -34,6 +38,8 @@ import sys
 
 CALL = re.compile(r'(^\s*|[;|&{(]\s*|\b(?:then|else|elif|if|do|while|until)\s+|!\s+)vs_ctl_show_err(?=\s)')
 SRC_LINE = re.compile(r'(?m)^\. "\$REPO/tests/lib/controls\.sh".*$')
+REPO_LINE = re.compile(r'(?m)^REPO="\$\(cd "\$\(dirname "\$0"\)/\.\." && pwd(?: -P)?\)"')   # #362: the copy is pinned
+REPO_PIN = 'REPO="${CS_REPO:?test_crash_sweep: CS_REPO unset}"'
 COLS = ["gate", "tier", "mode", "kind", "ere", "nth", "site", "fx", "kb", "note"]
 TIERS = {"static", "emulator", "linux"}   # where the row runs: tests/test_crash_sweep.sh (static), its emulator
 #   scope (--tier emulator: the target gate needs MAME/FBNeo), or a Linux host with podman (audit_release_linux_cleanhost)
@@ -81,8 +87,13 @@ def copy(src, dst, neuter=False):
             '   # test_crash_sweep: the site tag (#310)')
     if neuter:
         wrap += '\nvs_ctl_show_err() { return 0; }   # test_crash_sweep: the KNOWN-BAD leg, the helper neutered (#310)'
+    repo_lines = list(REPO_LINE.finditer(s2))
+    if len(repo_lines) != 1:
+        print("REFUSED: %s has %d REPO=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\" lines (need 1)" % (src, len(repo_lines)))
+        sys.exit(2)
     e = src_lines[0].end()
-    open(dst, "w").write(s2[:e] + wrap + s2[e:])
+    s3 = s2[:e] + wrap + s2[e:]
+    open(dst, "w").write(REPO_LINE.sub(lambda m: REPO_PIN, s3, count=1))
 
 
 def callers(root):

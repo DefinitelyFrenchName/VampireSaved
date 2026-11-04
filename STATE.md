@@ -38,6 +38,23 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-221 — **#361 closed done on rule-checker run -1633 (after -1632 VIOLATED, resolved by a mutant dry-run); its gotcha records the third payment.**
+
+### opened with
+
+**"read handoff.md, state.md and docs/next_session.md"**; the opener's sweep CLEAN; asked whether to start with #361's closure
+check, the maintainer: **"yes."**
+
+### (1) #361 — CLOSED DONE
+
+The fix is in the M25 freeze commit `91bde83b`. Measured by measurer workers in clean worktrees (`build/agent221/t361/`,
+local): the emulator runner's dry-run registry check reads 254 of 255 with `audit_crash_sweep_emu` a DEAD ROW at
+`d19546c7`, 255 of 255 at `8bc62bf4`, and 254 of 255 again at `8bc62bf4` with only the new alternative removed;
+`tests/test_emulator_runner.sh` PASSES on `8bc62bf4` and fails exactly its new crash-sweep case on that mutant. Rule-checker
+run 2026-11-04-1632 VIOLATED (Q1, Q4: nothing tied the real row to the alternative alone; resolved by the mutant dry-run),
+-1633 OK. Closing comment posted and the issue closed; the row `done`; the gotcha «A GATE THAT REACHES AN EMULATOR THROUGH
+SOMETHING THE TIER CLASSIFIER DOES NOT NAME» now names #361 as its third payment (`docs/project/gotchas.md`).
+
 ## Session 14z-220 — **M25 FROZEN at `91bde83b` (#356, Donovan's dash speed lines, and #345 option A1b; tags donovan-m29, huitzil-m36, pyron-m30, merged-m25) after freeze rule-checker run -1631 OK and the static freeze tier on that tree (PASS 237, its one red confirmed GREEN); the S6 tier's five relocation-moved expectations re-frozen (run -1614); pass_overrun's re-freeze re-checked to OK (run -1629); #361 and #362 filed; the jtcores fork's M25 catalogue commit pushed.**
 
 ### opened with
@@ -114,6 +131,12 @@ the regenerated indexes; the jtcores fork commit `930818f5` pushed to `Definitel
 driver); dashboard (14z-163..14z-220, 3,529 figures, 0 unclassed; five assets uploaded, `datasets` re-pointed: actions v9,
 costly v29, figures v29, rc_runs v29, tiers v30). On GitHub before the close: #361 and #362 filed; done-awaiting-release
 comments on #345, #346, #356. The tier's results: `build/agent220/close/tier_results.tsv`, the next close's `--prev`.
+After the commit (these lines ride the next close): the tier on the staged tree, strict, `--jobs 8`, `--confirm` on the S8
+confirm run: GREEN, PASS 109, FAIL 0 (74 carried); committed `8bc62bf4` (the green guard read that row); nothing new on
+`origin` at the fetch; pins OK; sweep CLEAN; pushed `d19546c7..8bc62bf4`, origin/main equal to HEAD, and the four freeze tags
+(`freeze/donovan-m29`, `huitzil-m36`, `pyron-m30`, `merged-m25` -> `91bde83b`); ledger page published on `gh-pages`
+(`ab09c137` -> `d2a53258`, 358 sessions); the maintainer's own site SKIPPED, `DEPLOY_TARGET` not set
+(`build/agent220/close/ledger.out`). Every step of the close is done.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

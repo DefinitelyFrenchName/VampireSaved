@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: **Not tested:** the static runner's copy of the pattern is changed identically in the same commit, but its effect was not measured on its own here (that runn...  [build/agent221/t361/close/closing_361.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1
