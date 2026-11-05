@@ -666,6 +666,18 @@ the attacker's `+4` word `0x0202` -> class 5, `+0x117` := 1, on to `0x22582`) th
 two are a difference between the games, as #191's records are (vsavj is the standard); which moves reach them is not
 measured.
 
+**Rows 0x4E and 0x4F of vsavj's reaction table are DEFAULT rows; vs2 and vh2 give both a handler (measured 14z-221,
+#358 and #363; static plus a write tap, `build/agent221/t358/`, local; gated by `tests/audit_beam_slide.sh`, 14z-221b).** Of the 80 rows vsavj's table `0x2385C` shares
+with vs2's `0x22388` and vh2's `0x223B6`, only these two differ in kind: vsavj points both at its default row `0x238FC`
+(the same code as vs2's default `0x22430`), vs2 sends 0x4E to `0x226E0` and 0x4F to `0x2296C` (vh2 `0x2270E`/`0x2299A`,
+the same offsets). Phobos's Plasma Beam (ES) hits with class 0x4F on both games (the victim's `+0x54` tapped 0x4F at every
+hit, `+0x59` = 2 on both): on vs2 `0x2296C` writes sub 08 and the victim is held in place; on vsavj the default row runs
+the pushback slide (seq 02, the `+0x164` step counter, x written by `0x27E22`/`0x281FC`), so Demitri ends 49 px further
+from Phobos than native. No reachable legacy record of either game carries class 0x4E or 0x4F and no vsavj instruction
+writes either as an immediate to `+0x54` (`tools/audit_reaction_classes.py`; a register write is that tool's stated blind
+spot) — so only the tenants reach the two rows. Which tenant records carry them, and what row 0x4E's handler does, are not
+measured.
+
 **A dead tail between the class-0x20 and class-0x21 handlers (14z-216, GitHub #294; static, `tests/test_dead_span.sh`).**
 Class 0x20's handler (vsavj `0x024002`, row 0x20 of `0x2385C`) sets `+0x140` and `+0x14E`, calls `0x3E3A`, then
 reads its anim index from the byte table `0x28D00` by `+0x54` and leaves by `bra.w 0x27EC0` at `0x024020`. The six bytes

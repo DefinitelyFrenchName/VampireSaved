@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 362
+# issues: 363
 number	state	reason	closed	labels	title
+363	OPEN	-	-	bug,needs-maintainer-ruling	Phobos's Plasma Beam (ES) knocks the victim back 49 px further than native vs2: vsavj's reaction-table rows 0x4E/0x4F are default rows (the pushback slide) where vs2/vh2 hold the victim
 362	CLOSED	COMPLETED	2026-11-04	bug	test_crash_sweep writes its perturbed gate copies into the live tests/ directory, where concurrently running gates can read them; test_gate_descriptions' modes do not refuse a vanished target
 361	CLOSED	COMPLETED	2026-11-04	bug	The tier classifier misses audit_crash_sweep_emu's emulator call (test_crash_sweep.sh --tier emulator), so the emulator runner reads it a DEAD ROW
 360	OPEN	-	-	bug,cosmetic	In Dark Force, two of Donovan's dash speed lines alternate one frame out of phase with native vs2

@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**511 scripts** — 154 ci_portable, 97 ci_static, 260 emulator-tier (run by name).
+**512 scripts** — 154 ci_portable, 97 ci_static, 261 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 88 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 108 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 109 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -434,6 +434,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_air_dash_height.sh` | audit | emulator | MAME, a build dir, ~2 min | PHOBOS'S AIR DASH UNDER vs2's MINIMUM HEIGHT: native refuses it, and since M23 ours does too (GitHub #222, measured in play 14z-191, closed 14z-192). Emulator tier (MAME), ~2 min. | 14z-191 |
 | `tests/audit_air_gc_legacy.sh` | audit | emulator | MAME, FBNeo, a build dir, ~7 s | THE LEGACY CONTROL FOR #182: no original character's AIR block opens the guard window or commits a guard cancel, on pristine vsavj, native vs2 or ours (14z-185, GitHub #182). | 14z-185 |
 | `tests/audit_anakaris_rows.sh` | audit | emulator | MAME, ~3 min | FIVE MIZUUMI PLAYER-STRUCT CANDIDATES ON ANAKARIS, MEASURED ON PRISTINE VSAVJ: +0x152 IS HIS HOVER TIMER, +0x156 AND +0x1A0 THE VICTIM'S CURSE TIMER AND FLAG, +0x1AA THE LOSER'S FLAG THAT PICKS HIS WIN POSE, +0x374 THE X OF HIS MUMMY DROP H… | 14z-215 |
+| `tests/audit_beam_slide.sh` | audit | emulator | MAME, FBNeo, a build dir | #363, FROZEN AS THE BUG STANDS: PHOBOS'S ES PLASMA BEAM SLIDES THE VICTIM ON OURS WHERE NATIVE vs2 HOLDS HIM (14z-221; the maintainer, 2026-11-05: "this finding is indeed mechanical NOT cosmetic, thus of greater severity", then "Yes. | 14z-221 |
 | `tests/audit_bishamon_charge_316.sh` | audit | emulator | MAME, ~2 min | BISHAMON'S [CHARGE]6+K ON PRISTINE VSAVJ: +0x316 COUNTS THE LOGIC PASSES BACK (OR DOWN-BACK) IS HELD, AND ITS VALUE WHEN 6+K COMPLETES PICKS THE IAI GIRI LOW'S LEVEL (0 BELOW 70, 1 BELOW 110, ELSE 2) (measured 14z-215, GitHub #118 batch B7;… | 14z-215 |
 | `tests/audit_chains174.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TENANTS' ONCE NEVER-ENTERED a2 ATTACK CHAINS, ENTERED ON NATIVE AND COMPARED WITH OURS (GitHub #174, 14z-184). | 14z-184 |
 | `tests/audit_chains184.sh` | audit | emulator | MAME, FBNeo, a build dir, ~3 min | THE TENANTS' ONCE NEVER-ENTERED a2 CHAINS WITH NO ATTACK RECORD, ENTERED ON NATIVE AND COMPARED WITH OURS (GitHub #184, 14z-186). | 14z-186 |

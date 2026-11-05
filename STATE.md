@@ -38,135 +38,113 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-221 — **#361 and #362 closed done (rule-checker runs -1633 and -1640); #362's fix committed `d3e8810d` after a GREEN strict tier, its three gates re-traced SAFE on PILOT; #357 attributed and put to the maintainer (run -1637); #358's intro difference captured and a draw-order difference sent to the maintainer; #310 group 7 batch 1: 25 control modes read UNJUDGED on a dead leg, proven live on PILOT.**
+## Session 14z-221b — **#358's beam difference re-read as position, not draw order (the 14z-221 reading RETRACTED): Phobos's ES Plasma Beam slides the victim on ours because vsavj's reaction-table rows 0x4E/0x4F are default rows; the maintainer ruled it mechanical, filed as #363 (bug) with #358 kept as its look; the measurements made rerunnable: `tests/audit_beam_slide.sh` (frozen on rule-checker run -1649), the `FIELDS_EXTRA` census knob on `audit_move_parity` and `tools/move_parity_p2x.py`, both write-traced on PILOT.** A continuation of 14z-221 after its close (`0ddac362`), on the same transcript (`218de16e`), Opus 5.5 at effort High.
 
 ### opened with
 
-**"read handoff.md, state.md and docs/next_session.md"**; the opener's sweep CLEAN; asked whether to start with #361's closure
-check, the maintainer: **"yes."**
+The maintainer's read of #358's beam pages (`build/agent221/t358/sheets/358_zoom_corner.png`, `358_beam_3row_p1.png`,
+`_p2.png`, local), sent at 14z-221: **"RNG pin at 0000 provides the same results as native on page 2/3 but not on the other pages. No idea if
+it's a rendering issue or different planes of render issue. cosmetic in all cases, but a potential gap"**.
 
-### (1) #361 — CLOSED DONE
+### (1) #358 — POSITION, NOT DRAW ORDER; THE SLIDE
 
-The fix is in the M25 freeze commit `91bde83b`. Measured by measurer workers in clean worktrees (`build/agent221/t361/`,
-local): the emulator runner's dry-run registry check reads 254 of 255 with `audit_crash_sweep_emu` a DEAD ROW at
-`d19546c7`, 255 of 255 at `8bc62bf4`, and 254 of 255 again at `8bc62bf4` with only the new alternative removed;
-`tests/test_emulator_runner.sh` PASSES on `8bc62bf4` and fails exactly its new crash-sweep case on that mutant. Rule-checker
-run 2026-11-04-1632 VIOLATED (Q1, Q4: nothing tied the real row to the alternative alone; resolved by the mutant dry-run),
--1633 OK. Closing comment posted and the issue closed; the row `done`; the gotcha «A GATE THAT REACHES AN EMULATOR THROUGH
-SOMETHING THE TIER CLASSIFIER DOES NOT NAME» now names #361 as its third payment (`docs/project/gotchas.md`).
+**The beam sheets read; it is position, not draw order (after 14z-221's close commit).** The
+maintainer: **"RNG pin at 0000 provides the same results as native on page 2/3 but not on the other pages. No idea if
+it's a rendering issue or different planes of render issue. cosmetic in all cases, but a potential gap"**. Measured
+(`build/agent221/t358/od/`, `tests/lua/obj_records_dump.lua` at f2600/2720/2810 on the three sheet legs; the `rv/` taps):
+- **Not draw order.** On all three legs Cecil's entries (palette 0x0D, 5-6 entries) come BEFORE Phobos's body (palette
+  0x0A) in the live OBJ list, every entry with x-word priority 7 — the same order and priority on native and ours.
+- **Cecil is moved on ours.** His slot x is 0x1F8 on native from 2560 to 2860; on ours it walks right from f2743 to 0x210
+  (drive-in, by 2752) or from 0x1C5 to 0x20F (frozen, by 2772). That puts him under Phobos's legs, which the list draws
+  over him on both games. Native and ours agree on the order; on native he simply stands clear of the legs. f2720's empty
+  corner on ours is the camera: Cecil's OBJ x is 0x18 left of native's there, i.e. off screen.
+- **The cause upstream: Demitri slides on ours.** P2 x on ours slides 0x2D8 → 0x329 on the ground at f2642-2654 (P2 y
+  constant), where native's P2 does not move until the launch at 2665; the launch arcs then step identically, so P2 ends
+  0x377 against native's 0x346. With P1 at 0x228 on both, (0x228+0x377)/2 − 0xC0 = 0x20F and (0x228+0x346)/2 − 0xC0 =
+  0x1F7: Cecil's resting x on each leg is the left edge of a 384-px screen centred between the two (an arithmetic match;
+  the camera word and the writer of Cecil's x are not read).
+- ~~**Not measured:** why the beam's early hits slide vsavj's Demitri~~ — measured below. `audit_move_parity` compares
+  the tenant's own state and P2's HP, not P2's x, which is why huitzil_4:0 reads IDENT.
 
-### (2) #362 — FIXED, COMMITTED `d3e8810d`, CLOSED DONE
+**The maintainer, on the slide: "it needs further testing but this finding is indeed mechanical NOT cosmetic, thus of
+greater severity".** Measured after it (`build/agent221/t358/push*/`, local, tap `lua/p2push_tap.lua`;
+`p2x/`):
+- **The cause: rows 0x4E and 0x4F of vsavj's reaction table are DEFAULT rows.** The beam's three hits (2640, 2645, 2654)
+  give Demitri the same damage, the same pushback index `+0x59` = 2 and the same class `+0x54` = 0x4F on both games.
+  The reaction table indexed by `+0x54` (vs2 `0x022388`, vsavj `0x02385C`, vhunt2 `0x0223B6`; engine_internals "Who uses
+  class 0x51") sends 0x4F on vs2 and vh2 to a handler (vs2 `0x02296C`: sub 08, a hold in place — tapped writing it at
+  2641) and on vsavj to its default row (`0x0238FC`, the code of vs2's default row `0x022430`), which runs the pushback
+  slide (seq 02, the `+0x164` counter, x written by vsavj `0x027E22`/`0x0281FC`). Of the rows the three tables share,
+  only 0x4E and 0x4F differ in kind: vs2 and vh2 give both a handler at the same offsets, vsavj the default.
+- **Legacy content does not reach those rows** (`tools/audit_reaction_classes.py` on the pristine images,
+  `build/agent221/t358/rclass.txt`): no reachable legacy record of either game carries class 0x4E or 0x4F (both in the
+  "unused<50" lists), and no vsavj instruction writes either as an immediate to `+0x54`. Not covered by that tool: a
+  `+0x54` written from a register (its header: the live census, `tests/audit_reaction_class_live.sh`, not run here).
+- **The census of P2's position** (`p2x/`: `audit_move_parity` copied with P2 x/y added to FIELDS, `ALL=1`; it read
+  PASS, all 526 events as frozen; `p2x_events.py` per event window): 24 of 526 events move Demitri differently. With
+  the tenant's own x identical (p1max 0): huitzil_4:0 and :1 (the two ES Plasma Beams, +49 px each, from the slide) and
+  pyron_1:26 (Rushing Punch, 8 px, back to 0 by the window's end). The other 21 are on events whose tenant x or state
+  already differs (DIFF / NOT-IN-DF rows, or donovan_1's carried 8 px — the b:0x10 push-box confound named in
+  `tools/move_parity.py`) and are not attributed.
+- **Not measured:** which other tenant records carry 0x4E/0x4F (the tool walks legacy ids only); what row 0x4E's
+  handler does; vs2's rows 0x50-0x53 beyond vsavj's 80 are the 14z-110 `reaction_hook` window, not these. Any fix
+  (a vs2 handler for rows 0x4E/0x4F, Huitzil's row-16 precedent) is the maintainer's call ([VSP-10]).
+- **The ticket: #363 (bug), filed after it.** The maintainer: **"Yes. Make the new bug related to #358. If Cecil looks
+  are solved via the new bug then #358 could be closed".** #363 holds the slide; #358 stays open as its presentation
+  side (comment posted on #358), to be re-captured once #363 is fixed.
+- The maintainer's page-2 read is not what the pixels show: on f2720-2839 the frozen and drive-in rows differ by 0-59
+  pixels a frame (both hide Cecil), so the RNG pin changes page 1's f2600-2660 (the entrance) and not page 2.
 
-`tools/crash_sweep.py copy` pins a copy's `REPO=` line to `CS_REPO`, and `tests/test_crash_sweep.sh` writes its perturbed
-copies under its scratch directory, never in `tests/`; `tests/test_gate_descriptions.sh`' `perturb` picks its target from
-the copy and refuses an unchanged file (section 3 proves it). Reproduced with a planted `tests/.cs_aaa_plant.sh`: the old
-modes exit 0 (LIES), the new ones FAIL. Re-traced on PILOT at scratch commit `bb407777`: 26 control runs of the three gates
-at once, 3 SAFE; their rows back on `tests/controls_concurrent.txt` (the trace grep's positive control run once PILOT was
-reachable again: the pre-fix copy step's `tests/.cs_*` write is named, the post-fix one's is not). Static tier on the staged tree: first run red on `test_tickets` only (#362's row
-linked removed list lines), confirm GREEN, PASS 110. Rule-checker runs -1638 and -1639 VIOLATED (the tool's blob at the
-traced commit not shown; the confirm's carry not stated), each resolved by work; -1640 OK; closed on GitHub.
+### (2) #363 — FILED, #358 KEPT AS ITS LOOK
 
-### (3) #357 — ATTRIBUTED, PUT TO THE MAINTAINER
+The maintainer, to the proposal to file the slide as a new bug: **"Yes. Make the new bug related to #358. If Cecil looks
+are solved via the new bug then #358 could be closed"**. Filed as #363 (`bug`, `needs-maintainer-ruling`: the fix is the
+maintainer's call, [VSP-10]; no severity label, theirs to pick), its row in `docs/project/tickets.tsv`; a comment on #358
+says it stays open as #363's presentation side, to be re-captured and closed if Cecil matches native once #363 is fixed.
 
-Donovan's round set-up (vs2 `0x05AE3C`, ours `0x0C104C`) creates a type-0x13 watcher in the `$FFD400` pool; vsavj's table row
-0x13 for that pool is a bare `rts`, so on ours it never spawns the eight orbs. Measured on donovan_15 (taps
-`build/agent221/t357/lua/`, local): the same watcher and trigger on both legs; at runtime, on the opcodes space, row 0x13
-reads native `0x090EDA` / ours `0x080B44`, native stamps the orbs from `0x090FF4`, ours none. Fact homed in
-`docs/game/engine_internals.md`. The recommendation (Huitzil's row-16 precedent, deadness first) through runs -1634/-1635
-(withdrawn unspawned on wording), -1636 VIOLATED (no runtime proof; a cosmetic ruling misapplied — its words cover
-out-of-combat items only), resolved by the runtime tap, -1637 OK; posted on #357, the maintainer's call.
+### (3) THE MEASUREMENTS MADE RERUNNABLE ([VSP-18])
 
-### (4) #358 — THE INTRO DIFFERENCE CAPTURED
+The maintainer, to the proposal to capture them before the session ends: **"I'd do it now if you have the time, since
+it's the only way to keep [VSP-18]. -> do it. Also, PILOT should be ready for any other tasks"**.
+- **`tests/audit_beam_slide.sh`** with tap `tests/lua/beam_slide_tap.lua` (emulator tier, MAME, 2 runs, ~4 s on the Mac):
+  step 0 reads the three reaction tables' rows 0x00/0x4E/0x4F from the opcode images (the table is read through the
+  opcode view: a data-view read gives junk targets); step 1 runs huitzil_4 f2560-3080 on native vs2 and ours; the checks
+  require, in both beam windows, class 0x4F from f2640 / f2880 on both legs, native's P2 x constant with sub 08, ours'
+  +81 px slide with seq 02 and a +49 px end offset, and the same P2 HP on the last frame before the part's own HP pin
+  (its 2950 pin sits in the KK window: a compare after it is forced to agree, found by run -1647). FROZEN AS THE BUG STANDS: it goes red when #363 is fixed, and the
+  fix re-freezes it. Controls `held` (ours' P2 x replaced by native's) and `class-cleared` (native's +0x54 zeroed),
+  in-gate and as modes; each mode on a dead emulator reads UNJUDGED (`vs_ctl_nj`). On the Mac and on PILOT (scratch
+  commit `090acd0d`, `refs/scratch/t363`): plain PASS, both modes HONOURED, both dead UNJUDGED, an undeclared mode
+  REFUSED (`build/agent221/t358/rc/`, local).
+- **The census:** `tests/audit_move_parity.sh` gains the probe knob `FIELDS_EXTRA` (more traced fields; refused under
+  `FREEZE=1`), and `tools/move_parity_p2x.py` (the investigation's script, its docstring, usage and REPO line changed)
+  reads P2's position per event from the kept traces. `ALL=1` with `FIELDS_EXTRA=ff8810:w:p2x,ff8814:w:p2y` PASSES, and
+  the tool reproduces the investigation's 526-event table byte for byte (`build/agent221/t358/knob/`, local). Not frozen.
+- **The capture of the slide** (`build/agent221/t358/sheets/slide/363_slide_p1.png`-`_p3.png`, local;
+  `tools/naming_pair_sheet.sh`, native above ours): every frame f2638-2655 and the launch to f2799, sent to the maintainer
+  before the freeze; the beam pages read at 14z-221 had no frame inside the slide, and the ruling came on the figure. Seen on
+  it, not analysed: at f2649-2652 native draws a pale effect at the hit that ours does not.
 
-The figure's types are renumbered on ours (0x75/0x77 → 0x83/0x87). The legs part at the round intro: native Phobos drives in
-on his car with the child (P1 x 0x168 → 0x228), ours stands at 0x228 from the first frame; the child ends at x 0x1C5 (sub
-0x06) against native's 0x1F8 (sub 0x00). Sheet `build/agent221/t358/sheets/358_intro.png` sent to the maintainer, who read
-it: **"Phobos has multiple intros. Off the top of my head 3 (the car, the one where the child is carried by Phobos, the one
-where the child is standing between Phobos and their opponent as if trying to defend Phobos) so the captures do represent
-two of these intros and both are different"**, and of the beams: **"As for the ES beams, I haven't check them in detail
-yet"**.
+- **Rule-checker:** the gate's freeze, `expectation`: run 2026-11-05-1645 withdrawn unspawned (the packet named no capture
+  the maintainer read); -1646 VIOLATED on Q1 (PILOT showed six of the seven runs claimed; the `.fig` traces read as binary;
+  the knob run's command, the census diff's files and the scratch commit's parent not shown), resolved by work (the
+  dead-plain case run on PILOT, `.txt` copies, the runner script, the diff re-cut, the parent recorded); -1647 VIOLATED on
+  Q1 (the packet's sheets not the three pages sent), Q2 (no capture inside the slide; the ruling came on the figure) and
+  Q3 (the HP compare after the rig's HP pin), resolved by work (the gate's HP compare moved before the pin, re-run on the
+  Mac and PILOT; the slide captured and sent; the sent pages put in the packet); -1648 VIOLATED on Q1 (PILOT's blob list unlabelled; its plain
+  run not shown to be the fixed gate's), resolved by work (the blobs by path on both hosts, PILOT's plain log); -1649 OK.
+- **PILOT:** both gates' controls write-traced at `6993aef7` (9 runs, 242 s, PILOT running nothing else): SAFE; `audit_beam_slide`
+  re-traced after its fix at `090acd0d` and after its FOLLOWS line (`tools/name_moves.py`, asked by
+  `test_gate_follows` in the clean-checkout bookkeeping run) at `4f53e4f0`, the staged close tree (2 runs, 8 s each): SAFE;
+  `tests/controls_concurrent_emu.txt` rows for `audit_move_parity` (its blob changed) and `audit_beam_slide`.
+- **Gotcha:** a reader took a `.fig` text file for binary (`docs/project/gotchas.md`).
 
-**The census figure is the entrance draw; the capture shows a second difference it could not see.** The entrance is the
-14z-168 fact (`tests/audit_entrance_draw.sh`): each game draws it from its own RNG state at char load. Where they part, on
-huitzil_4 (read tap on `RAM:$FF80D4-D7` by CURPC, f2200-2370): both legs hold 4c02 to 2306; at 2307 native only reads
-`$FF80D7` (vs2 `PRG:0x0079E2`, a side pick in match init) while ours calls the RNG routine once (vsavj `0x014E8A`, the same
-routine as vs2 `0x01357E`); from the anchor both are pinned. With one RNG poke `2250:ff80d4:0000` ours draws the drive-in
-too (P1 x 0x168 at 2363, the figure at 0x1F8 by 2599, equal to native) and its figure reads visible on 240 of 240 frames over
-the [PP] event, against 177 of 240 without the poke: the 177/240 of #356's census is the entrance. But the capture of the
-same event on three rows (native, ours as frozen, ours on the drive-in; `build/agent221/t358/sheets/358_beam_3row_p1.png`,
-`_p2.png`, `358_zoom_corner.png`) shows that from the beam (f2660-2690) to f2839 native draws Cecil IN FRONT of Phobos's legs
-and ours, on both rows, BEHIND them; before it (f2600) all three show him in front. The figure's slot (type, sub, state, x,
-+0x18, the cull flag) is constant over 2560-2860 on both legs, so the change is on Phobos's side of the draw order — not
-measured. Sent to the maintainer before any mechanism work; their read is pending.
+### CLOSE (14z-221b, 2026-11-05)
 
-### (5) #310 GROUP 7, BATCH 1 — 25 MODES MADE UNJUDGED ON A DEAD LEG
-
-The maintainer: **"I'd welcome #310 group 7 before the close, or any other open ticket that is compatible with the ongoing
-work"**. Batch 1 is the gates of the 14z-215 re-census's group 7 with one PRESENT mode
-(`build/agent215/t310/census57/group7.tsv`, local): 31 candidates, run at `d3e8810d` with `MAME_BIN=/usr/bin/false`
-(`build/agent221/t310g7/base/classes.tsv`, local): 25 HONOURED, 1 LIES, 4 DIED (a traceback: a crash is not a verdict), 1
-REFUSED (a header-only mode). In the batch: the 24 HONOURED gates whose leg runs on MAME, plus `audit_dispatch_census`
-(its drift-clock read LIES because its plain run PASSED on zero legs: it now requires every launched leg's output).
-`test_dualtrack` (its leg runs on FBNeo; a dead MAME cannot kill it) and the DIED and REFUSED rows are left for later batches.
-
-`tests/lib/controls.sh` gains `vs_ctl_nj <why>`: under a control mode (VS_CTL, or CONTROL for the gates that read it
-themselves) it prints `NOT JUDGED: under control mode <mode>, <why>`, which `tests/lib/classify.sh` reads UNJUDGED; it is
-silent in a plain run. Each gate calls it beside each liveness check, tagged `# #310 g7 NJ`; the seven gates that parsed
-CONTROL themselves now source the library. Where a mode's close fired on any FAIL, it now fires only on the gate's own
-finding (`audit_id_writers`, `audit_kill_poke_shape`, `audit_ladder_selector`, `audit_legacy_pairings`,
-`audit_move_parity_attribution`, `audit_pass_overrun`). New gate `tests/test_dead_leg_unjudged.sh` with
-`tests/expected/dead_leg_unjudged.tsv` (25 rows): every mode reads UNJUDGED with a dead emulator, every plain run is red and
-silent, and each gate copied with its tagged lines NEUTERED reads HONOURED again (its `nj-stripped` control). Its
-`plain-loud` control plants a helper that prints in a plain run, in section 1 and in every row's gate, and reports FIRED
-only when that line shows (23 of 25 plain runs print it; `audit_dispatch_census` and `audit_id_writers` call the helper
-only where a dead emulator does not reach in a plain run). Its first form fired on a CRASH of its own planted copy
-(`CONTROL: unbound variable` under `set -u`), caught by rule-checker run 2026-11-05-1641; a copy with the old plant now
-reads LIES. A fourth gotcha records it. The table frozen on rule-checker run 2026-11-05-1644 OK, after -1641 VIOLATED
-(Q1: six candidates never baselined, unnamed; Q4: the crash), -1642 VIOLATED (Q1: two wordings the artifacts did not
-back), each resolved by work, and -1643 withdrawn unspawned (a reason its one-line log does not show).
-At the close the tier REFUSED at its `--confirm` plan, before any gate: 12,203 changed untracked paths, 12,163 of them
-under `build/legacy_pairings/dead/`. `audit_legacy_pairings` keeps every dead leg's sandbox there (#233), and this sitting's
-dead-emulator runs had left 78 such directories. The gate now runs its rows with `PAIRINGS_OUT` in its own scratch; the 78
-directories (all this sitting's, 2026-11-04T22:38Z on) were removed. After the change the gate and both controls PASS and
-FIRE again, and nothing new lands under `build/` (`build/agent221/t310g7/rc/post_close_fix/`, local). The frozen table is
-unchanged. Its rule-checker run, -1644, read the gate before this line.
-
-Measured on PILOT at scratch commit `aefcb1a7` (`refs/scratch/t310g7`; `build/agent221/t310g7/pilot_out/`, local): with a
-live emulator 25 of 25 plain runs PASS and 28 of 28 modes read HONOURED, so the added lines do not fire on a real leg;
-`test_dead_leg_unjudged` PASSES on Linux; `audit_move_parity_attribution` re-traced alone, 2 controls, SAFE, its row on
-`tests/controls_concurrent_emu.txt` rewritten. The batch's gates and the library differ from `aefcb1a7` only by five
-FOLLOWS lines naming `tests/lib/controls.sh` (`build/agent221/t310g7/scratch_vs_tree.diff`, local), the new gate by its
-`plain-loud` fix (run on the Mac; it runs no emulator). Gotchas: a planted copy that crashes fires its control for the wrong reason; a stripped copy that deletes its
-tagged lines deletes their commands; a verdict that counts only the legs that wrote output passes on zero legs; an
-apostrophe inside `${VAR:?message}`; and the must-fire contract's dead-leg paragraph. Seen, not this batch's:
-`audit_guard_corpus@known-crash` reads HONOURED on PILOT on a vec3 crash while its FIRED text names vec4 (predates the batch).
-
-### CLOSE (14z-221, 2026-11-05)
-
-Driver `build/agent221/close/` (`--prev build/agent221/tier362b_results.tsv`, the GREEN confirm run on #362's commit, the
-most recent run of record; `--row` (5)). Committed before this close: `d3e8810d` (#362's fix and #361's closure). Riding this
-close: #310 group 7 batch 1 (the 25 gates, `tests/lib/controls.sh`, `tests/test_dead_leg_unjudged.sh` and its table, the
-emulator concurrent-list row), the records (STATE's 14z-221 group, 14z-220 rolled, the opener, four gotchas, the must-fire
-contract paragraph, the regenerated indexes) and rule-checker runs -1634 to -1644. On GitHub before the close: #361 and #362
-closed; the attribution on #357; the progress comment on #310. Steps: sections (this group); next-session (the 14z-220 opener moved VERBATIM to
-the top of `docs/NEXT_SESSION_HISTORY.md`, 104 lines, 0 missing; `docs/NEXT_SESSION.md` rewritten: #310 batch 2, #357 and
-#358 awaiting the maintainer); rollover (the 14z-220 group, 83 lines, to `STATE_HISTORY.md` below its HISTORY INDEX with its
-ledger line; 0 lines missing); indexes (by the driver); dashboard (14z-163..14z-221, 3,583 figures, 0 unclassed; five assets
-uploaded, `datasets` re-pointed: actions v10, costly v30, figures v30, rc_runs v30, tiers v31). The bookkeeping gates on the
-working tree before staging: 13 PASS (`build/agent221/close/book/`, local). The first tier REFUSED at its plan (12,203 changed
-untracked paths: the dead-leg gate's debris, (5)), no gate judged, so `--prev` stands; fixed, re-staged, re-run. The second tier: PASS 159, FAIL 3,
-MISSING 1, all four the new gate's: it was not executable (MISSING, and `test_static_runner`'s registry check), its ROMDIR
-demand sat after its EXIT trap (`test_demand_after_trap`), and its plain-loud refusal exited 3 with no REFUSED line on that
-path (`test_dead_exit_census`). Fixed (mode 755, an explicit ROMDIR test, a REFUSED line); the three gates PASS on the
-working tree and the new gate and its controls PASS and FIRE (`build/agent221/close/red/`,
-`build/agent221/t310g7/rc/post_close_fix/`, local); re-staged and re-run on the red run's results. The third tier: PASS 162,
-FAIL 1, the new gate, `controls RED: plain-loud(not fired)`. The runner reads every declared control's FIRED line from
-the plain run (the 14z-198 gotcha, paid again), and `plain-loud` fired only under its mode. It now also runs in-gate in
-every run: it builds the loud copies and FIRES only when section 1's plain case and some row's plain run print (23 of 25),
-and a copy with the crashing plant reads CONTROL DEAD in both forms. The gate, both controls and eight header and
-contract gates PASS on the working tree (`build/agent221/close/red3/`, `build/agent221/t310g7/rc/post_close_fix/`,
-local); re-staged and re-run on the third run's results. The tier's results:
-`build/agent221/close/tier_results.tsv`, the next close's `--prev`.
+Driver `build/agent221/close221b/` (`--prev build/agent221/close/tier_results.tsv`, 14z-221's GREEN close tier; `--row`
+(3)). Riding this close: (1)-(3) above, the 14z-221 group rolled to `STATE_HISTORY.md` with its ledger line, the 14z-221
+opener moved to `docs/NEXT_SESSION_HISTORY.md`, the new opener, rule-checker runs -1645 to -1649, the regenerated indexes.
+On GitHub before the close: #363 filed; the comment on #358. Steps: sections (this group); next-session (the 14z-221 opener moved VERBATIM to the top of `docs/NEXT_SESSION_HISTORY.md`, 112 lines; `docs/NEXT_SESSION.md` rewritten); rollover (the 14z-221 group to `STATE_HISTORY.md` with its ledger line); indexes (by the driver); dashboard (14z-163..14z-221b, 3,604 figures, 0 unclassed; five assets uploaded, `datasets` re-pointed: actions v11, costly v31, figures v31, rc_runs v31, tiers v32). The tier's results: `build/agent221/close221b/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

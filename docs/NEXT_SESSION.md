@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-221 CLOSE, 2026-11-05)
+# NEXT SESSION — orientation (rewritten at the 14z-221b CLOSE, 2026-11-05)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -19,8 +19,8 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
-idle`). Idle at the 14z-221 close; its checkout `~/vampire-saved` moved to `main` at the close (it had held scratch commit
-`aefcb1a7`, #310 group 7): check it is on `main` before other work. **ERIS** (WSL2, 24 threads, 47 GB) runs the release shape;
+idle`). Idle at the 14z-221b close; its checkout `~/vampire-saved` moved to `main` at the close (it had held scratch commit
+`6993aef7`, #363's write trace): check it is on `main` before other work. **ERIS** (WSL2, 24 threads, 47 GB) runs the release shape;
 UNREACHABLE all of 14z-221 (ssh timed out), its checkout last at
 snapshot S7 `37150456` (detached): move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
 commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS)
@@ -28,7 +28,7 @@ or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shel
 a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-221's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-221b's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
@@ -65,11 +65,18 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 4. **#357 — the maintainer's call (put 14z-221 after rule-checker run 2026-11-04-1637 OK, the attribution on the issue):**
    port the type-0x13 guard-orb watcher (row 0x13 of the `$FFD400` walker, Huitzil's row-16 precedent) or leave it open;
    `docs/game/engine_internals.md` «Donovan's guard orbs». **#358 — the maintainer's read of the beam sheets**
-   (`build/agent221/t358/sheets/358_beam_3row_p1.png`, `_p2.png`, `358_zoom_corner.png`, local; STATE 14z-221 (4)): the
-   intro difference is the entrance draw (the maintainer: *"the captures do represent two of these intros"*); from the
-   beam to f2839 native draws Cecil in front of Phobos's legs, ours behind, even on the same entrance. Its mechanism is not
-   measured. A fix for either needs the maintainer's word ([VSP-10]).
-5. **#310 — GROUP 7, BATCH 2** (batch 1, 25 modes, landed 14z-221: `tests/test_dead_leg_unjudged.sh` and its table, STATE
+   (`build/agent221/t358/sheets/358_beam_3row_p1.png`, `_p2.png`, `358_zoom_corner.png`, local; STATE_HISTORY 14z-221 (4), STATE 14z-221b (1)): the
+   intro difference is the entrance draw (the maintainer: *"the captures do represent two of these intros"*); the
+   beam's difference is not draw order (14z-221b): the OBJ order is the same on both games; on ours Demitri slides
+   0x51 px at f2642-2654 where native's does not, the camera follows, and Cecil is moved to the screen's left edge, under
+   Phobos's legs (STATE 14z-221b (1)). The maintainer: *"this finding is indeed mechanical NOT cosmetic, thus of greater
+   severity"*. Its cause, measured: rows 0x4E/0x4F of vsavj's reaction table `0x2385C` are default rows where vs2/vh2 have
+   handlers; the beam hits with class 0x4F (engine_internals, "Rows 0x4E and 0x4F"); `tests/audit_beam_slide.sh` holds
+   the bug as it stands and goes RED when #363 is fixed (the fix re-freezes it to native's hold). Open: which tenant records carry
+   0x4E/0x4F and the live register-write census. The slide is #363 (bug); #358 stays open as its look, to be re-captured
+   and closed if Cecil matches native once #363 is fixed (the maintainer: *"If Cecil looks are solved via the new bug
+   then #358 could be closed"*). A fix needs the maintainer's word ([VSP-10]).
+5. **#310 — GROUP 7, BATCH 2** (batch 1, 25 modes, landed 14z-221: `tests/test_dead_leg_unjudged.sh` and its table, STATE_HISTORY
    14z-221 (5)). Next: `test_dualtrack` (its leg is FBNeo, so the proof needs a dead FBNeo, not `MAME_BIN=/usr/bin/false`),
    the six held out before the baseline (four MiSTer gates, which need verilator, though `test_mister_obj_oracle` and
    `test_mister_tenant_oracle` have a MAME leg too; `test_release_roundtrip`; `audit_stock_emulator_stall`, whose stock
@@ -79,7 +86,7 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
    joins the table and is proven by the same gate.
 6. **#359** (cleanup traps on `EXIT INT TERM` with no `exit`; 210 scripts).
 7. **Ask the maintainer for the order of the rest.** Open tickets (GitHub severity labels): bugs: #345 (frozen, awaits the
-   release); evolution: #348, #352, #354; cosmetic: #344, #346, #356 (both frozen, await the release), #357, #358,
+   release), #363 (item 4); evolution: #348, #352, #354; cosmetic: #344, #346, #356 (both frozen, await the release), #357, #358,
    #360 (#356's Dark Force phase); test-integrity: #310, #359. Parked: #123, #124, #125, #128.
 
 ## PARKED (not open work)
@@ -104,9 +111,15 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 - **PILOT is reached with a bundle on a commit it already has** (`git bundle create … <scratch ref> ^<a commit PILOT has>`), and a
   long run is launched with `setsid nohup timeout` from a script, watched by an until-loop on a DONE marker.
 
-## WHAT CLOSED THIS SITTING (14z-221)
+## WHAT CLOSED THIS SITTING (14z-221, and 14z-221b after its close)
+
+- **14z-221b:** #358's beam difference re-read as the victim's slide (the draw-order reading retracted); #363 filed (bug)
+  and #358 kept as its look; `tests/audit_beam_slide.sh` frozen on rule-checker run `2026-11-05-1649` (after `-1646`,
+  `-1647` and `-1648` VIOLATED, each resolved by work; `-1645` withdrawn unspawned); the slide captured for the maintainer
+  (`build/agent221/t358/sheets/slide/`, local; their read pending); the census made rerunnable (`FIELDS_EXTRA` on
+  `tests/audit_move_parity.sh`, `tools/move_parity_p2x.py`); both gates write-traced SAFE on PILOT.
 
 - **Closed done:** #361 (rule-checker run `2026-11-04-1633`), #362 (run `-1640`; committed `d3e8810d`).
-- **Put to the maintainer:** #357 (port the guard-orb watcher or leave it; run `-1637`), #358 (the beam draw-order sheets).
+- **Put to the maintainer:** #357 (port the guard-orb watcher or leave it; run `-1637`), #358 (the beam sheets; their draw-order reading retracted after the close).
 - **#310 group 7 batch 1:** 25 modes UNJUDGED on a dead leg, `tests/test_dead_leg_unjudged.sh`, the table frozen on run
   `2026-11-05-1644`; progress comment posted on #310.

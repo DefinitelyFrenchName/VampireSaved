@@ -1,0 +1,10 @@
+  FLAG ATTRIB: The maintainer asked for this work (quotes.txt, item 3) and ruled the finding mechanical (item 1) and the ticket's form (item 2); freezing the bug state rath...
+  FLAG D-FIGURE: 143  [build/agent221/t358/rc/audit_beam_slide.sh]
+  FLAG D-FIGURE: 1100  [build/agent221/t358/rc/audit_beam_slide.sh]
+  FLAG D-FIGURE: 1160  [build/agent221/t358/rc/audit_beam_slide.sh]
+  FLAG D-FIGURE: 1220  [build/agent221/t358/rc/audit_beam_slide.sh]
+  FLAG D-FIGURE: 1280  [build/agent221/t358/rc/audit_beam_slide.sh]
+  FLAG D-FIGURE: 900  [build/agent221/t358/rc/audit_beam_slide.sh]
+  FLAG D-ABSOLUTE: Each beam is judged in its event window  [build/agent221/t358/rc/audit_beam_slide.sh]
+  FLAG D-ABSOLUTE: # legs complete (END) with P1's x equal on both legs through each window; in each window the hits give +0x54 = 0x4F on  [build/agent221/t358/rc/audit_beam_slide.sh]
+packet_check: 9 flag(s): ATTRIB 1, D-ABSOLUTE 2, D-FIGURE 6

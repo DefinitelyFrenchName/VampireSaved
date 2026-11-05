@@ -8059,3 +8059,11 @@ prints and cannot crash; section 2 runs each row's gate with the loud copy; and 
 only when section 1 saw the exact line and some plain run printed it, else `CONTROL DEAD` (LIES). A copy that crashes again
 reads LIES (`build/agent221/t310g7/rc/ctl_plain-loud_crashcopy.log`, local). **A control's FAIL proves nothing until the
 log shows the plant's own effect. Have the gate check that effect, not just its exit.**
+
+## A RULE-CHECKER READER TOOK A `.fig` TEXT FILE FOR BINARY — name a text artifact `.txt` (paid: 14z-221b, #363's rule-checker run 2026-11-05-1646)
+
+The investigation's tap traces were plain ASCII (`file` reads "ASCII text") with a `.fig` extension. Staged as artifacts,
+the reader answered "inv_native.fig and inv_ours.fig are binary and unreadable", so the claim's figures drawn from them read
+as unshown and Q1 was VIOLATED on them (with four real gaps beside). The re-check gave `.fig.txt` copies and the reader read
+them. **An artifact's extension decides whether a reader can open it: give every text artifact a text extension (`.txt`,
+`.log`, `.tsv`) before `prepare`.**

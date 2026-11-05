@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**511 of 511 gates described.**
+**511 of 512 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 88 | 88 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 108 | 108 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 108 | 109 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2818,7 +2818,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 108 of 108 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 108 of 109 described.
 
 ### `audit_air_dash_height.sh` — audit, emulator
 
@@ -3683,6 +3683,8 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** tools/vanilla_join_rig.py's far and near legs (30 on MAME in parallel), the entered chain from the node pointer within the event window mapped onto tools/anim_nodes.py's graph; the rigs must regenerate byte-identically; the per-move damage table's values are written out of tree and only their SHA-256 frozen; the control swaps one character's far and near rows.
 
 **EXPECTS:** every event fires, the 180 rows equal to the frozen slot map, the out-of-tree hash equal; the swapped rows fail.
+
+**Not yet described:** `audit_beam_slide.sh`.
 
 ## review-triage
 

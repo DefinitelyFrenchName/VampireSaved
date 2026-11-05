@@ -126,9 +126,12 @@
 # real picks on both sides; the 27 verdicts were re-frozen on them at 14z-160
 # and the ten Phobos DIVERGES rows of 14z-159 were verdicts on the VH2 branch.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged33] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] [GOT_OUT=<path>] [KEEP=<dir>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_move_parity.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged33] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] [GOT_OUT=<path>] [KEEP=<dir>] [FIELDS_EXTRA=<a:w:name,...>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_move_parity.sh
 #   RNG_WORD / RNG_UNTIL (#183, 14z-186): a PROBE knob — the word poked into $FF80D4 on every frame from 2363 (default
 #   0000) and the frame the pin stops (default the part's end, i.e. never free); FREEZE=1 refuses either
+#   FIELDS_EXTRA (14z-221, #363): a PROBE knob — more `addr:size:name` words appended to the traced FIELDS; the verdicts
+#   read their own fields by name, so an extra one changes no verdict (measured 14z-221: ff8810:w:p2x,ff8814:w:p2y, ALL=1,
+#   526 events as frozen); FREEZE=1 refuses it. With KEEP=, tools/move_parity_p2x.py reads P2's position per event.
 #   GOT_OUT (14z-183): also copy this run's computed per-event table to <path> (verdicts unaffected) — how a probe build's
 #   whole table is read when it moves rows (the failure diff shows only each part's first changed rows).
 #   emulator tier, MAME. MEASURED 14z-159 on this MacBook, solo, at the default
@@ -148,6 +151,7 @@ EXPECT="$REPO/tests/expected/move_parity_events.tsv"
 JOBS="${JOBS:-6}"
 CONTROL="${CONTROL:-}"
 [ -n "${FREEZE:-}" ] && { [ -n "${RNG_WORD:-}" ] || [ -n "${RNG_UNTIL:-}" ]; } && { echo "REFUSED: FREEZE=1 with the RNG_WORD/RNG_UNTIL probe knob (#183) — the expectation is frozen at the 0000 pin only"; exit 3; }
+[ -n "${FREEZE:-}" ] && [ -n "${FIELDS_EXTRA:-}" ] && { echo "REFUSED: FREEZE=1 with the FIELDS_EXTRA probe knob (#363) — the expectation is frozen on the gate's own fields"; exit 3; }
 
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
@@ -216,6 +220,7 @@ rpl_for() {
 }
 
 FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp,ff8852:w:p2white,ff8452:w:p1white,ff881c:l:p2node,ff8b82:b:p2id"
+FIELDS="$FIELDS${FIELDS_EXTRA:+,$FIELDS_EXTRA}"
 
 run_leg() {  # run_leg <tenant> <part> <leg>
     _t="$1"; _p="$2"; _leg="$3"
