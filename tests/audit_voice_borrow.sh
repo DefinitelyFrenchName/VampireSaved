@@ -163,7 +163,7 @@ vs_pool_run run_ring_tap
 vs_pool_wait
 
 echo "== section 1: serialized borrow write + dispatcher read (one run)"
-grep -q "^END " "$WORK/rt.txt" || fail "read_tap run did not complete"
+grep -q "^END " "$WORK/rt.txt" || { vs_ctl_nj "read_tap run did not complete (no END line in rt.txt)"; fail "read_tap run did not complete"; }   # #310 g7 NJ
 python3 - "$WORK" "$EXPECT" <<'EOF' || exit 1
 import re,sys
 work,expect=sys.argv[1],sys.argv[2]
@@ -211,6 +211,7 @@ EOF
 # The window WIDTHS are unchanged; only the origin moved.
 echo "== section 2: output level — ring window membership"
 # (its ring-tap run ran in the pool above section 1)
+grep -qx END "$WORK/ring.txt" 2>/dev/null || vs_ctl_nj "the ring_tap run did not complete (no END line in ring.txt)"   # #310 g7 NJ
 python3 - "$WORK" "$EXPECT" "$MODE" <<'EOF' || exit 1
 import re,sys,struct
 work,expect=sys.argv[1],sys.argv[2]
@@ -238,6 +239,10 @@ def check(path, fam, expect):
 fam=set(int(x,16) for x in open(work+'/node13_family').read().split())
 # THE EXECUTABLE MODE: inject a foreign id into the REAL ring, so the plant-end
 # membership check fails and the gate FAILs (caught cleanly, never a traceback).
+if mode=="foreign-ring-id":   # #310 g7 NJ: the injected id would hide a dead real ring, so its liveness is read first
+    try: check(work+'/ring.txt',fam,expect)   # #310 g7 NJ
+    except (AssertionError, OSError) as e:   # #310 g7 NJ
+        if not isinstance(e, AssertionError) or "rig dead" in str(e): print(f"NOT JUDGED: under control mode {mode}, the real ring is dead before the injection: {e}")   # #310 g7 NJ
 if mode=="foreign-ring-id": open(work+'/ring.txt','a').write("f4000 id 1234 pc 0031ee\n")
 try:
     ids=check(work+'/ring.txt',fam,expect)

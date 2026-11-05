@@ -250,3 +250,8 @@ test_mame_ident
 # (tests/expected/crash_sweep.tsv: per call site, the gate as it stands reads DIED/UNJUDGED/FAIL and, with the helper
 # neutered, HONOURED/PASS); three controls. ~7 min (78 static rows, 421 s measured 14z-218 on the Mac). Freeze cadence.
 test_crash_sweep
+# test_dead_leg_unjudged.sh — #310 group 7 (14z-221): tests/lib/controls.sh vs_ctl_nj — every row of
+# tests/expected/dead_leg_unjudged.tsv (a gate's control mode) reads UNJUDGED with a dead emulator (MAME_BIN=/usr/bin/false),
+# its plain run red and silent, and without its `# #310 g7 NJ` lines HONOURED again; two controls. Needs ROMDIR, runs no
+# emulator; ~1 min.
+test_dead_leg_unjudged

@@ -20,7 +20,7 @@
 #   damage and every own-value leg reproduces its unpoked trace; the no-ablation run fails.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/move_parity_attribution.tsv
 #   tests/expected/move_parity_events.tsv tools/move_parity_attribution.py tests/lua/rom_poke.lua tools/dmg_sweep.py
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/controls.sh
 #
 # SHEET: no-picture — its rigs run inside tools/move_parity_attribution.py (an ablation over the parts carrying a DIFF), not as legs of this script
 #
@@ -69,6 +69,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 case "$CONTROL" in ""|no-ablation|p2-record-unswapped) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -79,7 +80,8 @@ echo "== 1. the attribution (steps 0, E, 1..N)"
 NA=""; [ "$CONTROL" = no-ablation ] && NA="--no-ablate"
 US=""; [ "$CONTROL" = p2-record-unswapped ] && US="--p2check-unswapped"
 python3 "$TOOL" run --build "$BUILD" --romdir "$ROMDIR" --work "$W/run" --jobs "$JOBS" --mame-bin "$MAME_BIN" $NA $US --p2check-out "$W/p2check.txt" > "$W/got.tsv" 2> "$W/err" \
-    || { bad "the tool: $(tail -1 "$W/err")"; }
+    || { grep -q '^VOID: ' "$W/err" && vs_ctl_nj "the tool's run is $(grep -m1 '^VOID: ' "$W/err")"   # #310 g7 NJ
+         bad "the tool: $(tail -1 "$W/err")"; }
 [ "$fail" = 0 ] || { echo "FAIL: audit_move_parity_attribution"; exit 1; }
 ok "$(grep -c '^root' "$W/got.tsv" | tr -d ' ') roots, $(grep -c '^row' "$W/got.tsv" | tr -d ' ') rows"
 awk -F'\t' '$1=="row"{print "  " $6}' "$W/got.tsv" | sort | uniq -c | sed 's/^/ /'
@@ -106,7 +108,7 @@ if [ -s "$W/p2check.txt" ]; then
     if [ "$n_in" -gt 0 ] && [ "$n_id" = "$n_in" ]; then
         ok "the poke path is inert on both images: $n_id of $n_in own-value legs reproduce their unpoked trace, each swapped trace differs"
     else bad "own-value legs: $n_id of $n_in identical with a differing swapped trace"; fi
-elif awk -F'\t' '$1=="root" && $4=="P2-RECORD"' "$W/got.tsv" | grep -q .; then bad "P2-RECORD roots with no check file"; fi
+elif awk -F'\t' '$1=="root" && $4=="P2-RECORD"' "$W/got.tsv" | grep -q .; then vs_ctl_nj "P2-RECORD roots with no check file: the swap legs produced nothing"; bad "P2-RECORD roots with no check file"; fi   # #310 g7 NJ
 
 echo "== 2. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ]; then
@@ -129,12 +131,12 @@ else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt" | hea
 
 echo "== 3. must-fire control"
 if [ "$CONTROL" = no-ablation ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: no-ablation — without removing roots, rows stay unattributed"; echo "FAIL: audit_move_parity_attribution (control mode)"; exit 1
-    else echo "CONTROL DEAD: no-ablation — the table was attributed without any ablation"; echo "FAIL: audit_move_parity_attribution"; exit 1; fi
+    if awk -F'\t' '$1=="row" && $5=="UNATTRIBUTED"' "$W/got.tsv" | grep -q .; then echo "CONTROL FIRED: no-ablation — without removing roots, rows stay unattributed"; echo "FAIL: audit_move_parity_attribution (control mode)"; exit 1   # #310 g7 NJ
+    else echo "CONTROL DEAD: no-ablation — the table was attributed without any ablation"; echo "FAIL: audit_move_parity_attribution"; exit 1; fi   # #310 g7 NJ (fires on an UNATTRIBUTED row only)
 fi
 if [ "$CONTROL" = p2-record-unswapped ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: p2-record-unswapped — with the unpoked traces in place of the swapped ones the P2-RECORD check fails"; echo "FAIL: audit_move_parity_attribution (control mode)"; exit 1
-    else echo "CONTROL DEAD: p2-record-unswapped — the check passed on unswapped traces"; echo "FAIL: audit_move_parity_attribution"; exit 1; fi
+    if grep -q '^check	.*	MISMATCH	' "$W/p2check.txt" 2>/dev/null; then echo "CONTROL FIRED: p2-record-unswapped — with the unpoked traces in place of the swapped ones the P2-RECORD check fails"; echo "FAIL: audit_move_parity_attribution (control mode)"; exit 1   # #310 g7 NJ
+    else echo "CONTROL DEAD: p2-record-unswapped — the check passed on unswapped traces"; echo "FAIL: audit_move_parity_attribution"; exit 1; fi   # #310 g7 NJ (fires on a MISMATCH check line only)
 fi
 if grep -q '^control	p2-record-unswapped	fired' "$W/p2check.txt" 2>/dev/null; then
     echo "CONTROL FIRED: p2-record-unswapped — $(awk -F'\t' '$1=="control"{print $4}' "$W/p2check.txt"), so the swap's equality is something the check can refuse"

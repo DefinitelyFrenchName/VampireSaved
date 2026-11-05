@@ -86,7 +86,7 @@ export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}"
 
 # the decrypted view is ROM-derived (rule 7) and comes from the SHARED CACHE
 . "$REPO/tests/lib/decrypt_cache.sh"
-decrypt_view vsavj "$W/vj_op.bin" "$W/vj_dat.bin" || { echo "FAIL: vsavj decrypt view"; exit 1; }
+decrypt_view vsavj "$W/vj_op.bin" "$W/vj_dat.bin" || { vs_ctl_nj "the vsavj decrypt view was not produced"; echo "FAIL: vsavj decrypt view"; exit 1; }   # #310 g7 NJ
 
 # JOBS (#334 item 2, 14z-211): the three legs are independent — each writes only its own sandbox, tap and output — so
 # they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). leg_check then judges each leg's END
@@ -100,7 +100,8 @@ leg() { # <name> <replay> <frames>
 }
 leg_check() { # <name> <replay> <frames>
     grep -q "^END $3 " "$W/$1.tap" 2>/dev/null \
-        || { echo "FAIL: leg $1 ($2) did not reach frame $3 (see its MAME output)"; tail -3 "$W/$1.out"; exit 1; }
+        || { vs_ctl_nj "leg $1 ($2) did not reach frame $3"   # #310 g7 NJ
+             echo "FAIL: leg $1 ($2) did not reach frame $3 (see its MAME output)"; tail -3 "$W/$1.out"; exit 1; }
 }
 vs_pool_start "$JOBS"
 vs_pool_run leg r11 11_pick_donovan 3600

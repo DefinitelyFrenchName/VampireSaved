@@ -135,7 +135,7 @@ mkdir -p "$W/ref"
 
 names="$(ls tests/expected/vsavj/masked-v2/logs/*.log | xargs -n1 basename | sed 's/\.log$//')"
 echo "corpus: $(echo "$names" | wc -w | tr -d ' ') legacy replays (every replay with a vanilla basis log)"
-pool=0
+pool=0; nexp=0
 for n in $names; do
     rpl="tests/replays/$n.rpl"
     [ -f "$rpl" ] || continue
@@ -155,6 +155,7 @@ for n in $names; do
       tools/run_mame.sh vsavj \
       -autoboot_script "$PWD/tests/lua/dispatch_census.lua" >"$W/ref/$n.log" 2>&1 ) &
     pool=$((pool + 2)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi
+    nexp=$((nexp + 1))   # #310 g7: the legs launched, so a leg that wrote nothing is counted (a dead emulator read PASS on 0 legs)
 done
 wait
 
@@ -186,7 +187,7 @@ else
     vs_ctl_fired drift-clock "every census leg is running the old frame_done clock (mode)"
 fi
 
-W="$W" FROZEN="$FROZEN" CTL_FAIL="$ctl" BASIS="$BASIS" python3 - "${1:---check}" <<'PY'
+W="$W" FROZEN="$FROZEN" CTL_FAIL="$ctl" BASIS="$BASIS" NEXP="$nexp" VS_CTL="${VS_CTL:-}" python3 - "${1:---check}" <<'PY'
 import glob, os, re, sys
 W, FROZEN, BASIS = os.environ["W"], os.environ["FROZEN"], os.environ["BASIS"]
 mode = sys.argv[1]
@@ -247,6 +248,14 @@ hard = 1 if os.environ.get("CTL_FAIL") == "1" else 0
 if incomplete:
     print("  FAIL: incomplete census runs: " + ", ".join(incomplete)); hard = 1
 nruns = len(glob.glob(f"{W}/*.txt"))
+# #310 g7 (14z-221): every launched leg must have written its census file and its reference leg's; with a dead emulator
+# none does, and the counts below all read over zero legs (the drift-clock mode, which skips the in-gate control, PASSed).
+nexp = int(os.environ.get("NEXP", "0"))
+nref = len(glob.glob(f"{W}/ref/*.txt"))
+if nruns < nexp or nref < nexp:
+    print(f"  FAIL: {nexp - nruns} of {nexp} census legs and {nexp - nref} of {nexp} reference legs wrote no census file (a leg that did not run)"); hard = 1
+    if os.environ.get("VS_CTL"):
+        print(f"NOT JUDGED: under control mode {os.environ['VS_CTL']}, {nexp - nruns} of {nexp} census legs wrote no census file")   # #310 g7 NJ
 if short:
     print(f"  FAIL: {len(short)} run(s) covered fewer emulated frames than they counted "
           f"(the [MFI-5] desync): " + ", ".join(short)); hard = 1

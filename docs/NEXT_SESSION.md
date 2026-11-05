@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-220 CLOSE, 2026-11-04)
+# NEXT SESSION — orientation (rewritten at the 14z-221 CLOSE, 2026-11-05)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -19,15 +19,16 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
-idle`). Idle at the 14z-220 close; its checkout `~/vampire-saved` sits at snapshot S6 `4617659f` (detached): move it to `main`
-before other work. **ERIS** (WSL2, 24 threads, 47 GB) runs the release shape; idle at the 14z-220 close, its checkout at
+idle`). Idle at the 14z-221 close; its checkout `~/vampire-saved` moved to `main` at the close (it had held scratch commit
+`aefcb1a7`, #310 group 7): check it is on `main` before other work. **ERIS** (WSL2, 24 threads, 47 GB) runs the release shape;
+UNREACHABLE all of 14z-221 (ssh timed out), its checkout last at
 snapshot S7 `37150456` (detached): move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
 commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS)
 or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shell splits it at a pipe and mangles quotes), and
 a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-220's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-221's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
@@ -58,19 +59,27 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-2. **#362** (`test_crash_sweep` writes its perturbed copies into the live `tests/`; `test_gate_descriptions`' modes do not refuse
-   a vanished target): both gates are OFF `tests/controls_concurrent.txt` until it is fixed and they are re-traced on PILOT.
 3. **THE M25 RELEASE, WHEN THE MAINTAINER ASKS FOR IT** (M25 frozen 14z-220 at `91bde83b`, tags `freeze/donovan-m29`,
    `freeze/huitzil-m36`, `freeze/pyron-m30`, `freeze/merged-m25`; `release/merged-m25` packaged). #345, #346 and #356 carry
    done-awaiting-release comments and close with that release.
-4. **#357 and #358 — attribute** (the captures read: *"Yes, the guard orbs"*, *"Yes, that figure"*; `DECISIONS_HISTORY.md`
-   "Ruled 2026-11-03 (14z-219) — #357 and #358"). #357: native spawns the orbs (class 0x72 sub 0x16) from vs2 `PRG:0x090FF4`,
-   a span no tenant region ports (`build/agent219/t345/CENSUS.md`, local). #358: the figure's x and pose
-   (`build/agent219/t357/`, local). A fix needs the maintainer's green light.
-5. **#310 — GROUP 7, in batches** (the crash-injection sweep: `tests/test_crash_sweep.sh`).
+4. **#357 — the maintainer's call (put 14z-221 after rule-checker run 2026-11-04-1637 OK, the attribution on the issue):**
+   port the type-0x13 guard-orb watcher (row 0x13 of the `$FFD400` walker, Huitzil's row-16 precedent) or leave it open;
+   `docs/game/engine_internals.md` «Donovan's guard orbs». **#358 — the maintainer's read of the beam sheets**
+   (`build/agent221/t358/sheets/358_beam_3row_p1.png`, `_p2.png`, `358_zoom_corner.png`, local; STATE 14z-221 (4)): the
+   intro difference is the entrance draw (the maintainer: *"the captures do represent two of these intros"*); from the
+   beam to f2839 native draws Cecil in front of Phobos's legs, ours behind, even on the same entrance. Its mechanism is not
+   measured. A fix for either needs the maintainer's word ([VSP-10]).
+5. **#310 — GROUP 7, BATCH 2** (batch 1, 25 modes, landed 14z-221: `tests/test_dead_leg_unjudged.sh` and its table, STATE
+   14z-221 (5)). Next: `test_dualtrack` (its leg is FBNeo, so the proof needs a dead FBNeo, not `MAME_BIN=/usr/bin/false`),
+   the six held out before the baseline (four MiSTer gates, which need verilator, though `test_mister_obj_oracle` and
+   `test_mister_tenant_oracle` have a MAME leg too; `test_release_roundtrip`; `audit_stock_emulator_stall`, whose stock
+   binary is `MAME_REF_BIN`), the four baseline rows that DIED on a traceback (`audit_pyron_ring`, `audit_tech_roll`, `test_down_flash_mechanism`,
+   `test_random_select_tenants`), `audit_column_flash`'s header-only mode (REFUSED), then the group's gates with more than one
+   PRESENT mode (`build/agent215/t310/census57/group7.tsv`, `build/agent221/t310g7/base/classes.tsv`, local). Each new row
+   joins the table and is proven by the same gate.
 6. **#359** (cleanup traps on `EXIT INT TERM` with no `exit`; 210 scripts).
 7. **Ask the maintainer for the order of the rest.** Open tickets (GitHub severity labels): bugs: #345 (frozen, awaits the
-   release), #362; evolution: #348, #352, #354; cosmetic: #344, #346, #356 (both frozen, await the release), #357, #358,
+   release); evolution: #348, #352, #354; cosmetic: #344, #346, #356 (both frozen, await the release), #357, #358,
    #360 (#356's Dark Force phase); test-integrity: #310, #359. Parked: #123, #124, #125, #128.
 
 ## PARKED (not open work)
@@ -80,25 +89,24 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **Run the static freeze tier on the staged tree BEFORE preparing a freeze's re-freeze checks** (`docs/project/gotchas.md`,
-  "A FREEZE'S STATIC EXPECTATIONS ARE NOT ONLY THE ONES THE BATTERY NAMES"): the M25 relocation moved five static expectations
-  the battery never named, found only by the S6 tier.
-- **Let `tools/setup_jtcores.sh` write the mirrored fork patch** once its name is in `PATCH_NAMES`: a plain `format-patch`
-  copy carries a signature trailer `test_jtcores_twin` rejects.
-- **A gate whose FOLLOWS names `docs/project/gotchas.md`** (`test_don_sound`) goes stale on any new gotcha: add a freeze's
-  gotchas before the emulator rows are run, or re-run that gate's row.
-- **`--confirm` is refused at freeze cadence** (`tests/run_all_static.sh`): a freeze tier runs in full; a red in it is
-  confirmed by a session-cadence `--strict --confirm` on the freeze run's results.
-- **The staleness audit judges against the snapshot's HEAD**: run it through `tests/run_on_snapshot.sh` on the commit you
-  will make, with every remote run directory (ERIS's and PILOT's `build/emu_*`) copied into the Mac's `build/` first.
-- **A byte classifier that silently skips a line form is no classifier**: count what it classed against the source's own
-  total, and plant a dropped line (`build/agent220/m25/edit_classes2.py`, local).
-- **Quote a ruling's own scope**: the 14z-209 written-resolution ruling covers #229's freezes, and 14z-163's option C covers
-  Q3 and Q4; neither closes a Q1 finding in writing — re-check it afresh.
+- **A dead emulator is a cheap proof of a control's liveness handling**: `MAME_BIN=/usr/bin/false` with `CONTROL=<mode>`,
+  classified by `tests/lib/classify.sh`, must read UNJUDGED; `tests/test_dead_leg_unjudged.sh` holds the batch's rows. It
+  kills only legs launched through `MAME_BIN`: FBNeo (`test_dualtrack`), a second stock MAME at `MAME_REF_BIN` and the
+  Verilator legs need their own dead instrument.
+- **A control's FAIL proves nothing until its log shows the plant's own effect** (`docs/project/gotchas.md`, "A PLANTED
+  COPY THAT CRASHES FIRES ITS CONTROL FOR THE WRONG REASON"): a plant that crashes reads HONOURED when the crash is quoted
+  inside the gate's own FAIL line; have the gate check the effect and print FIRED or DEAD itself.
+- **A stripped-copy control NEUTERS its tagged lines, never deletes them**: a tag marks a line, and the line may carry the
+  gate's own command.
+- **A verdict over a glob must know how many entries it expects** (`audit_dispatch_census` passed on zero legs).
+- **An apostrophe inside `${VAR:?message}` opens a quote** (`docs/platform/gotchas.md`): bisect a `sh -n` error with
+  `head -N | sh -n`.
+- **PILOT is reached with a bundle on a commit it already has** (`git bundle create … <scratch ref> ^<a commit PILOT has>`), and a
+  long run is launched with `setsid nohup timeout` from a script, watched by an until-loop on a DONE marker.
 
-## WHAT CLOSED THIS SITTING (14z-220)
+## WHAT CLOSED THIS SITTING (14z-221)
 
-- **Frozen:** M25 at `91bde83b` (#356 and #345 A1b), freeze rule-checker run `2026-11-04-1631` OK; the static freeze tier on
-  that tree PASS 237 with its one red confirmed GREEN; tags re-cut; the jtcores fork commit `930818f5` pushed.
-- **Commented done-awaiting-release:** #345, #346, #356.
-- **Filed:** #361, #362.
+- **Closed done:** #361 (rule-checker run `2026-11-04-1633`), #362 (run `-1640`; committed `d3e8810d`).
+- **Put to the maintainer:** #357 (port the guard-orb watcher or leave it; run `-1637`), #358 (the beam draw-order sheets).
+- **#310 group 7 batch 1:** 25 modes UNJUDGED on a dead leg, `tests/test_dead_leg_unjudged.sh`, the table frozen on run
+  `2026-11-05-1644`; progress comment posted on #310.

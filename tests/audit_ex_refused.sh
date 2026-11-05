@@ -12,7 +12,7 @@
 # EXPECTS: no leg of ours enters the mode, vs2's stock-3 legs enter, our stocked paths equal
 #   vs2's refused paths (Pyron's the ES move); the stock-kept control fails. Which move a
 #   path IS is for the captures, not frozen here.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ex_refused.tsv
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ex_refused.tsv tests/lib/controls.sh
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/replays/df/97_df_mech.rpl
 #   tools/run_mame.sh tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh tests/lib/sheet.sh
 #
@@ -58,6 +58,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] && [ -f "$BUILD/verify_data.bin" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 case "$CONTROL" in ""|stock-kept) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -73,9 +74,9 @@ ex_lines() {  # the same inputs as tests/audit_df_modes.sh, relative to the acti
     esac
 }
 . "$REPO/tests/lib/decrypt_cache.sh"
-decrypt_view vsav2 "$W/v2_op.bin" "$W/v2_da.bin" || { echo "FAIL: no vsav2 view"; exit 1; }
-python3 "$REPO/tools/select_wheel.py" "$W/v2_da.bin" --set vsav2 --json "$W/wheel_vsav2.json" > /dev/null 2>&1 || { echo "FAIL: vsav2 wheel"; exit 1; }
-python3 "$REPO/tools/select_wheel.py" "$BUILD/verify_data.bin" --set vsavj --json "$W/wheel_ours.json" > /dev/null 2>&1 || { echo "FAIL: our wheel"; exit 1; }
+decrypt_view vsav2 "$W/v2_op.bin" "$W/v2_da.bin" || { vs_ctl_nj "no vsav2 view"; echo "FAIL: no vsav2 view"; exit 1; }   # #310 g7 NJ
+python3 "$REPO/tools/select_wheel.py" "$W/v2_da.bin" --set vsav2 --json "$W/wheel_vsav2.json" > /dev/null 2>&1 || { vs_ctl_nj "vsav2 wheel failed"; echo "FAIL: vsav2 wheel"; exit 1; }   # #310 g7 NJ
+python3 "$REPO/tools/select_wheel.py" "$BUILD/verify_data.bin" --set vsavj --json "$W/wheel_ours.json" > /dev/null 2>&1 || { vs_ctl_nj "our wheel failed"; echo "FAIL: our wheel"; exit 1; }   # #310 g7 NJ
 # ONE leg builder: the stock value is the perturbation's only lever ([VSP-181])
 leg() {  # leg <game> <id> <stock> <role>
     case $1 in vsav2) _set=vsav2; _rp="$ROMDIR" ;; ours) _set=vsavjw; _rp="$BUILD/rompath;$ROMDIR" ;; esac
@@ -118,8 +119,8 @@ PY
 for g in vsav2 ours; do for id in 13 10 11; do for role in refused stocked; do
     [ "$role" = stocked ] && [ -n "$CONTROL" ] && continue
     st="$REFUSED_STOCK"; [ "$role" = stocked ] && st=3
-    [ -f "$W/${g}_${id}_$role.ft" ] || { bad "${g}_${id}_$role: no trace (exit $(cat "$W/${g}_${id}_$role/rc" 2>/dev/null || echo none))"; continue; }
-    reduce "$g" "$id" "$st" "$role" "$W/${g}_${id}_$role.ft" >> "$W/got.tsv" 2> "$W/err" || bad "$(cat "$W/err")"
+    [ -f "$W/${g}_${id}_$role.ft" ] || { vs_ctl_nj "${g}_${id}_$role: no trace"; bad "${g}_${id}_$role: no trace (exit $(cat "$W/${g}_${id}_$role/rc" 2>/dev/null || echo none))"; continue; }   # #310 g7 NJ
+    reduce "$g" "$id" "$st" "$role" "$W/${g}_${id}_$role.ft" >> "$W/got.tsv" 2> "$W/err" || { grep -q '^VOID: ' "$W/err" && vs_ctl_nj "$(cat "$W/err")"; bad "$(cat "$W/err")"; }   # #310 g7 NJ
 done; done; done
 [ "$fail" = 0 ] || { echo "FAIL: audit_ex_refused"; exit 1; }
 sort -u "$W/got.tsv" -o "$W/got.tsv"

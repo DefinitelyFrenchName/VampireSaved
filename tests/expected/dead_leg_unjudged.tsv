@@ -1,0 +1,32 @@
+# tests/expected/dead_leg_unjudged.tsv — #310 group 7 (14z-221): per row, a gate's control mode and the class
+# tests/lib/classify.sh vs_classify_control must give its run with a dead emulator (MAME_BIN=/usr/bin/false), read by
+# tests/test_dead_leg_unjudged.sh. Batch 1: the gates with one PRESENT mode in the 14z-215 re-census
+# (build/agent215/t310/census57/group7.tsv, local) whose dead-emulator run read HONOURED at HEAD d3e8810d
+# (build/agent221/t310g7/base/classes.tsv, local), and audit_dispatch_census's drift-clock (read LIES: a PASS on 0 legs).
+# Each row's gate carries `# #310 g7 NJ` on the lines that make it UNJUDGED; the gate's nj-stripped control removes them.
+# gate	mode	class	stripped class (the gate with its NJ lines neutered)
+audit_air_dash_height	native-dash-planted	UNJUDGED	HONOURED
+audit_crouch_flag	down-removed	UNJUDGED	HONOURED
+audit_df_meter	swing-planted	UNJUDGED	HONOURED
+audit_df_modes	power-armed	UNJUDGED	HONOURED
+audit_dispatch_census	drift-clock	UNJUDGED	HONOURED
+audit_entrance_draw	variant-lost	UNJUDGED	HONOURED
+audit_ex_refused	stock-kept	UNJUDGED	HONOURED
+audit_ff8130_writers	lane-blind	UNJUDGED	HONOURED
+audit_guard_corpus	known-crash	UNJUDGED	HONOURED
+audit_id_writers	word-write-variant	UNJUDGED	HONOURED
+audit_kill_poke_shape	two-byte-flowed	UNJUDGED	HONOURED
+audit_ladder_selector	mask-not-load-bearing	UNJUDGED	HONOURED
+audit_lag_budget	lag-planted	UNJUDGED	HONOURED
+audit_legacy_pairings	shared-sandbox	UNJUDGED	HONOURED
+audit_move_parity_attribution	p2-record-unswapped	UNJUDGED	HONOURED
+audit_pass_overrun	overrun-planted	UNJUDGED	HONOURED
+audit_qs_voice_wav	truncated-window	UNJUDGED	HONOURED
+audit_voice_borrow	foreign-ring-id	UNJUDGED	HONOURED
+test_crash_guard	drift-clock	UNJUDGED	HONOURED
+test_hui_air	ground-dash	UNJUDGED	HONOURED
+test_meter_gain	perturbed-net	UNJUDGED	HONOURED
+test_pod_black_foot_palette	neighbour-poke-disjoint	UNJUDGED	HONOURED
+test_pyron_medallion_2p	accent-lost	UNJUDGED	HONOURED
+test_shadow_tenant	four-presses-morph	UNJUDGED	HONOURED
+test_vanilla_aerial_join	swapped-directions	UNJUDGED	HONOURED

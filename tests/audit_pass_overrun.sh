@@ -14,7 +14,7 @@
 # FOLLOWS: build/manifest/ docs/platform/gotchas.md emu/mame-patches/
 #   tests/expected/pass_overrun.tsv tests/lua/field_trace.lua tests/lua/read_tap.lua
 #   tests/replays/naming/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
-#   tools/setup_mame.sh tests/lib/sheet.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh tests/lib/controls.sh
 #
 # SHEET: legs vs2,ours — moments: per part, every zero-pass frame either leg reads after the round start, and each event window's mid-frame captioned with both legs' idle figures — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); after a leg's lost pass the legs are one engine pass out of step by design of the measurement
 #
@@ -55,6 +55,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 case "$CONTROL" in ""|overrun-planted) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -101,10 +102,10 @@ done
 # the task tap segfaults MAME at teardown on some legs (docs/platform/gotchas.md, the hot-field tap) — its log is
 # evidence only if it carries its END line; the field traces must exit 0
 for pf in $PARTS; do part="${pf%:*}"; for leg in native ours; do
-    _rc="$(cat "$W/$part.$leg.f/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "$part $leg trace exited $_rc"
+    _rc="$(cat "$W/$part.$leg.f/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "$part $leg trace exited $_rc"; bad "$part $leg trace exited $_rc"; }   # #310 g7 NJ
     if tail -1 "$W/$part.$leg.tap" 2>/dev/null | grep -q '^END '; then
         ok "$part $leg: the pass trace completed and the task tap reached $(tail -1 "$W/$part.$leg.tap" | cut -c1-24) (a teardown segfault after END is MAME's, docs/platform/gotchas.md)"
-    else bad "$part $leg task tap has no END line (exit $(cat "$W/$part.$leg.t/rc" 2>/dev/null))"; fi
+    else vs_ctl_nj "$part $leg task tap has no END line"; bad "$part $leg task tap has no END line (exit $(cat "$W/$part.$leg.t/rc" 2>/dev/null))"; fi   # #310 g7 NJ
 done; done
 [ "$fail" = 0 ] || { echo "FAIL: audit_pass_overrun"; exit 1; }
 plant() {  # plant <trace in> <trace out>: one pass-counter step removed at 4000 (a planted zero-pass frame)
@@ -170,8 +171,8 @@ if diff "$W/want.tsv" "$W/got.tsv" > "$W/diff.txt"; then ok "every row as frozen
 else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt"; fi
 
 if [ "$CONTROL" = overrun-planted ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: overrun-planted — a planted zero-pass frame turns our overrun rows"; echo "FAIL: audit_pass_overrun (control mode)"; exit 1
-    else echo "CONTROL DEAD: overrun-planted — the plant changed nothing"; echo "FAIL: audit_pass_overrun"; exit 1; fi
+    if grep -qE '^> overrun[[:space:]]+[^[:space:]]+[[:space:]]+ours[[:space:]]' "$W/diff.txt" 2>/dev/null; then echo "CONTROL FIRED: overrun-planted — a planted zero-pass frame turns our overrun rows"; echo "FAIL: audit_pass_overrun (control mode)"; exit 1   # #310 g7 NJ
+    else echo "CONTROL DEAD: overrun-planted — the plant changed nothing"; echo "FAIL: audit_pass_overrun"; exit 1; fi   # #310 g7 NJ (fires on an ours overrun row off its frozen value only)
 fi
 plant "$W/donovan_11.ours.ft" "$W/ctl.ft"; cp "$W/donovan_11.ours.ft" "$W/keep.ft"; cp "$W/ctl.ft" "$W/donovan_11.ours.ft"
 reduce "$W" "donovan_11:4590" > "$W/ctl.rows" 2>/dev/null || true; cp "$W/keep.ft" "$W/donovan_11.ours.ft"

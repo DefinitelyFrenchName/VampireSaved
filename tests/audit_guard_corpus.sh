@@ -131,7 +131,7 @@ for rpl in tests/replays/*.rpl; do
     done
 done
 wait
-[ "$n" -gt 0 ] || { echo "FAIL: nothing ran (bad ONLY filter?)"; exit 1; }
+[ "$n" -gt 0 ] || { vs_ctl_nj "nothing ran (bad ONLY filter?)"; echo "FAIL: nothing ran (bad ONLY filter?)"; exit 1; }   # #310 g7 NJ
 
 fail=0
 ok=0
@@ -141,6 +141,7 @@ for d in "$W"/*/; do
     stem="${tag%__*}"; leg="${tag##*__}"
     log="$d/g.log"
     if [ ! -f "$log" ] || ! grep -qE "^(END |CRASH |END-CRASH |PCWEEDS |SOFTRESET )" "$log"; then
+        vs_ctl_nj "leg $tag has no verdict line (DEAD; not a measurement)"   # #310 g7 NJ
         echo "  DEAD: $tag — no verdict line; not a measurement"
         printf "%s\t%s\tDEAD\n" "$stem" "$leg" >> "$MAP"
         fail=1; continue

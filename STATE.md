@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-221 — **#361 closed done on rule-checker run -1633 (after -1632 VIOLATED, resolved by a mutant dry-run); its gotcha records the third payment.**
+## Session 14z-221 — **#361 and #362 closed done (rule-checker runs -1633 and -1640); #362's fix committed `d3e8810d` after a GREEN strict tier, its three gates re-traced SAFE on PILOT; #357 attributed and put to the maintainer (run -1637); #358's intro difference captured and a draw-order difference sent to the maintainer; #310 group 7 batch 1: 25 control modes read UNJUDGED on a dead leg, proven live on PILOT.**
 
 ### opened with
 
@@ -55,88 +55,118 @@ run 2026-11-04-1632 VIOLATED (Q1, Q4: nothing tied the real row to the alternati
 -1633 OK. Closing comment posted and the issue closed; the row `done`; the gotcha «A GATE THAT REACHES AN EMULATOR THROUGH
 SOMETHING THE TIER CLASSIFIER DOES NOT NAME» now names #361 as its third payment (`docs/project/gotchas.md`).
 
-## Session 14z-220 — **M25 FROZEN at `91bde83b` (#356, Donovan's dash speed lines, and #345 option A1b; tags donovan-m29, huitzil-m36, pyron-m30, merged-m25) after freeze rule-checker run -1631 OK and the static freeze tier on that tree (PASS 237, its one red confirmed GREEN); the S6 tier's five relocation-moved expectations re-frozen (run -1614); pass_overrun's re-freeze re-checked to OK (run -1629); #361 and #362 filed; the jtcores fork's M25 catalogue commit pushed.**
+### (2) #362 — FIXED, COMMITTED `d3e8810d`, CLOSED DONE
 
-### opened with
+`tools/crash_sweep.py copy` pins a copy's `REPO=` line to `CS_REPO`, and `tests/test_crash_sweep.sh` writes its perturbed
+copies under its scratch directory, never in `tests/`; `tests/test_gate_descriptions.sh`' `perturb` picks its target from
+the copy and refuses an unchanged file (section 3 proves it). Reproduced with a planted `tests/.cs_aaa_plant.sh`: the old
+modes exit 0 (LIES), the new ones FAIL. Re-traced on PILOT at scratch commit `bb407777`: 26 control runs of the three gates
+at once, 3 SAFE; their rows back on `tests/controls_concurrent.txt` (the trace grep's positive control run once PILOT was
+reachable again: the pre-fix copy step's `tests/.cs_*` write is named, the post-fix one's is not). Static tier on the staged tree: first run red on `test_tickets` only (#362's row
+linked removed list lines), confirm GREEN, PASS 110. Rule-checker runs -1638 and -1639 VIOLATED (the tool's blob at the
+traced commit not shown; the confirm's carry not stated), each resolved by work; -1640 OK; closed on GitHub.
 
-**"read handoff.md, state.md and docs/next_session.md"**; told the next opener's first item was the M25 freeze and asked whether
-PILOT and ERIS were up, the maintainer: **"all are up"**.
+### (3) #357 — ATTRIBUTED, PUT TO THE MAINTAINER
 
-### (1) THE M25 FREEZE — COMMITTED `91bde83b`, TAGGED
+Donovan's round set-up (vs2 `0x05AE3C`, ours `0x0C104C`) creates a type-0x13 watcher in the `$FFD400` pool; vsavj's table row
+0x13 for that pool is a bare `rts`, so on ours it never spawns the eight orbs. Measured on donovan_15 (taps
+`build/agent221/t357/lua/`, local): the same watcher and trigger on both legs; at runtime, on the opcodes space, row 0x13
+reads native `0x090EDA` / ours `0x080B44`, native stamps the orbs from `0x090FF4`, ours none. Fact homed in
+`docs/game/engine_internals.md`. The recommendation (Huitzil's row-16 precedent, deadness first) through runs -1634/-1635
+(withdrawn unspawned on wording), -1636 VIOLATED (no runtime proof; a cosmetic ruling misapplied — its words cover
+out-of-combat items only), resolved by the runtime tap, -1637 OK; posted on #357, the maintainer's call.
 
-The staged patch `build/manifest/staged/356_345a1b.patch` applied and removed; the mark M25; the six builds made on the Mac and,
-independently from snapshot S0 `a252b89e`, on ERIS: program and whole-set key field-for-field equal on both (the zip containers
-differ, member manifests equal; cause not measured). Registry rows donovan-m29 `20672b01` (program `63447128`), huitzil-m36
-`815488af` and pyron-m30 `930ce568` (the mark only, programs unchanged), merged-m25 `add7bc1a` (program `a24aa560`); stock twin
-and stage-4 unchanged. The four expectation sets frozen on the Mac and on ERIS at S1: 454 files equal. Every region placed after
-M25's two new head regions (`x06e1d2` at `0x400010`, `x1d7428` at `0x4013E0`) moved `+0x1610`: the re-point sweep (m3b_merged33,
-don_m29, hui63, pyron48, m5_stock24) and the relocation re-freezes, each through its own rule-checker run (-1607..-1612, OK at
--1612); A1b's accepted timing re-frozen (rng_forms -1601, the lag-budget exemption removed -1604, donovan_2's parity rows -1606,
-pass_overrun -1629 — see (3)). The freeze battery on ERIS at S3 (PASS 183, SKIP 4 host-only); the 17 gates the freeze-cadence
-staleness audit then named re-run at S7 (ERIS 14, the Mac's MiSTer lane 3, all PASS); the Linux desktop and clean-host rows on
-PILOT at S6 (PASS; the provisional PILOT tag deleted after); the Mac's parity and the release rows. Both concurrent-controls lists
-re-traced: static at S2 on PILOT (631 runs; test_gate_descriptions, test_crash_sweep, test_emulator_runner and the HOLLOW ones
-kept off); emulator 45 rows at S3, S4 and S6 split between PILOT and ERIS. The MiSTer tail: fork commit `930818f5` (doc/mame.xml,
-the CRC catalogue), patch 0041 mirrored, the pin moved; pushed to the fork at the close. release/merged-m25 packaged and identical
-to a fresh package of build/m3b_merged33 (a control build differing). The classifier dead row fixed (`audit_crash_sweep_emu`,
-#361). Static freeze tier on snapshot S8 `c48bcc87` = the commit's tree: PASS 237, FAIL 1 — `test_emulator_staleness`,
-`test_don_sound`'s row stale on `docs/project/gotchas.md`, which the freeze's own gotcha moved after S7; `test_don_sound` re-run
-at S8 through the runner (PASS), then `--strict --confirm` on the freeze run: GREEN, PASS 170. Freeze rule-checker run -1631 OK.
-Tags `freeze/donovan-m29`, `freeze/huitzil-m36`, `freeze/pyron-m30`, `freeze/merged-m25` re-cut on `91bde83b` (the S1 scratch
-tags replaced, never pushed). Evidence local under `build/agent220/m25/` (packet `rc/freeze/`).
+### (4) #358 — THE INTRO DIFFERENCE CAPTURED
 
-### (2) THE S6 STATIC TIER'S FINDS — RE-FROZEN AND FIXED (run -1614)
+The figure's types are renumbered on ours (0x75/0x77 → 0x83/0x87). The legs part at the round intro: native Phobos drives in
+on his car with the child (P1 x 0x168 → 0x228), ours stands at 0x228 from the first frame; the child ends at x 0x1C5 (sub
+0x06) against native's 0x1F8 (sub 0x00). Sheet `build/agent221/t358/sheets/358_intro.png` sent to the maintainer, who read
+it: **"Phobos has multiple intros. Off the top of my head 3 (the car, the one where the child is carried by Phobos, the one
+where the child is standing between Phobos and their opponent as if trying to defend Phobos) so the captures do represent
+two of these intros and both are different"**, and of the beams: **"As for the ES beams, I haven't check them in detail
+yet"**.
 
-The first freeze tier, on S6, read PASS 228, FAIL 10. Five static expectations read placed addresses and had not been re-frozen
-(`latch_readers`, `df_field_readers`, `reaction_classes`, `escape_triage`, `donovan.md`): every changed line attributed, +0x1610
-or a header, the build row, or the two new regions (`build/agent220/m25/rc/r_s6fix/attribution.txt`, its matcher with a
-planted control). `test_jtcores_twin`: patch 0041 needed its `PATCH_NAMES` entry, and its mirror had been written with plain
-`format-patch` (a signature trailer); regenerated `--no-signature`, as `tools/setup_jtcores.sh` does. `test_recurrence_alarm`:
-Q1 3094 + 3098, cited in three packets of #345's timing, acknowledged under #345. Rule-checker run -1613 VIOLATED (the three
-other reds' causes asserted without logs; the ruling the acknowledgement cites, unquoted), resolved, -1614 OK. The order lesson
-is a gotcha (`docs/project/gotchas.md`, "A FREEZE'S STATIC EXPECTATIONS ARE NOT ONLY THE ONES THE BATTERY NAMES").
+**The census figure is the entrance draw; the capture shows a second difference it could not see.** The entrance is the
+14z-168 fact (`tests/audit_entrance_draw.sh`): each game draws it from its own RNG state at char load. Where they part, on
+huitzil_4 (read tap on `RAM:$FF80D4-D7` by CURPC, f2200-2370): both legs hold 4c02 to 2306; at 2307 native only reads
+`$FF80D7` (vs2 `PRG:0x0079E2`, a side pick in match init) while ours calls the RNG routine once (vsavj `0x014E8A`, the same
+routine as vs2 `0x01357E`); from the anchor both are pinned. With one RNG poke `2250:ff80d4:0000` ours draws the drive-in
+too (P1 x 0x168 at 2363, the figure at 0x1F8 by 2599, equal to native) and its figure reads visible on 240 of 240 frames over
+the [PP] event, against 177 of 240 without the poke: the 177/240 of #356's census is the entrance. But the capture of the
+same event on three rows (native, ours as frozen, ours on the drive-in; `build/agent221/t358/sheets/358_beam_3row_p1.png`,
+`_p2.png`, `358_zoom_corner.png`) shows that from the beam (f2660-2690) to f2839 native draws Cecil IN FRONT of Phobos's legs
+and ours, on both rows, BEHIND them; before it (f2600) all three show him in front. The figure's slot (type, sub, state, x,
++0x18, the cull flag) is constant over 2560-2860 on both legs, so the change is on Phobos's side of the draw order — not
+measured. Sent to the maintainer before any mechanism work; their read is pending.
 
-### (3) THE FREEZE'S RULE-CHECKER — RUNS -1615 TO -1631, AND WHAT THEY CAUGHT
+### (5) #310 GROUP 7, BATCH 1 — 25 MODES MADE UNJUDGED ON A DEAD LEG
 
-The freeze check took runs -1615 to -1631 (-1615, -1616, -1617, -1620, -1626 and -1630 withdrawn unspawned on packet-check
-flags or a wording slip; -1618, -1619, -1621 to -1625 and -1627 VIOLATED, each resolved; -1631 OK; -1628, withdrawn, and
--1629 are pass_overrun's re-check, below). Real defects it found, each
-fixed in the tree or named untested in the claim: `build/agent220/m25/edit_classes.py` silently skipped the length-changing EDIT
-ops (the relocated walker), rewritten as `edit_classes2.py` with an EDIT-count check and a dropped-op control; a fact measured
-before the S6-tier fixes cited after them; the stock twin, stage-4 and the control build's program asserted, not measured;
-"the .rbf is unchanged" asserted (the fork's change is doc/mame.xml only, measured); two counters of `test_mister_prg_window`'s
-red not attributed (named). And a misattribution carried from run -1602's own resolve: it cited "the 14z-209 ruling" for closing a
-Q1 finding in writing, but that ruling is scoped to #229's freezes, and 14z-163's option C covers Q3 and Q4; pass_overrun's
-re-freeze was therefore re-checked afresh, run -1629 OK. Two slips of mine, both corrected in the records: twice a checker's
-verdict ran its Q4 over several lines; once (run -1625) I joined the lines myself before recording, then had the checker restate
-its own six lines and replaced `verdict_real.txt` with them (the resolve says so); and run -1631's claim says the final tier would
-run with `--confirm` on S6's results — the runner refuses `--confirm` at freeze cadence, so it ran in full, stricter than stated.
+The maintainer: **"I'd welcome #310 group 7 before the close, or any other open ticket that is compatible with the ongoing
+work"**. Batch 1 is the gates of the 14z-215 re-census's group 7 with one PRESENT mode
+(`build/agent215/t310/census57/group7.tsv`, local): 31 candidates, run at `d3e8810d` with `MAME_BIN=/usr/bin/false`
+(`build/agent221/t310g7/base/classes.tsv`, local): 25 HONOURED, 1 LIES, 4 DIED (a traceback: a crash is not a verdict), 1
+REFUSED (a header-only mode). In the batch: the 24 HONOURED gates whose leg runs on MAME, plus `audit_dispatch_census`
+(its drift-clock read LIES because its plain run PASSED on zero legs: it now requires every launched leg's output).
+`test_dualtrack` (its leg runs on FBNeo; a dead MAME cannot kill it) and the DIED and REFUSED rows are left for later batches.
 
-### (4) TICKETS AND COMMENTS
+`tests/lib/controls.sh` gains `vs_ctl_nj <why>`: under a control mode (VS_CTL, or CONTROL for the gates that read it
+themselves) it prints `NOT JUDGED: under control mode <mode>, <why>`, which `tests/lib/classify.sh` reads UNJUDGED; it is
+silent in a plain run. Each gate calls it beside each liveness check, tagged `# #310 g7 NJ`; the seven gates that parsed
+CONTROL themselves now source the library. Where a mode's close fired on any FAIL, it now fires only on the gate's own
+finding (`audit_id_writers`, `audit_kill_poke_shape`, `audit_ladder_selector`, `audit_legacy_pairings`,
+`audit_move_parity_attribution`, `audit_pass_overrun`). New gate `tests/test_dead_leg_unjudged.sh` with
+`tests/expected/dead_leg_unjudged.tsv` (25 rows): every mode reads UNJUDGED with a dead emulator, every plain run is red and
+silent, and each gate copied with its tagged lines NEUTERED reads HONOURED again (its `nj-stripped` control). Its
+`plain-loud` control plants a helper that prints in a plain run, in section 1 and in every row's gate, and reports FIRED
+only when that line shows (23 of 25 plain runs print it; `audit_dispatch_census` and `audit_id_writers` call the helper
+only where a dead emulator does not reach in a plain run). Its first form fired on a CRASH of its own planted copy
+(`CONTROL: unbound variable` under `set -u`), caught by rule-checker run 2026-11-05-1641; a copy with the old plant now
+reads LIES. A fourth gotcha records it. The table frozen on rule-checker run 2026-11-05-1644 OK, after -1641 VIOLATED
+(Q1: six candidates never baselined, unnamed; Q4: the crash), -1642 VIOLATED (Q1: two wordings the artifacts did not
+back), each resolved by work, and -1643 withdrawn unspawned (a reason its one-line log does not show).
+At the close the tier REFUSED at its `--confirm` plan, before any gate: 12,203 changed untracked paths, 12,163 of them
+under `build/legacy_pairings/dead/`. `audit_legacy_pairings` keeps every dead leg's sandbox there (#233), and this sitting's
+dead-emulator runs had left 78 such directories. The gate now runs its rows with `PAIRINGS_OUT` in its own scratch; the 78
+directories (all this sitting's, 2026-11-04T22:38Z on) were removed. After the change the gate and both controls PASS and
+FIRE again, and nothing new lands under `build/` (`build/agent221/t310g7/rc/post_close_fix/`, local). The frozen table is
+unchanged. Its rule-checker run, -1644, read the gate before this line.
 
-Filed #361 (the classifier missed `audit_crash_sweep_emu`'s emulator call; fixed in `91bde83b`, open until its closure check)
-and #362 (`test_crash_sweep` writes its perturbed copies into the live `tests/`; `test_gate_descriptions`' modes do not refuse a
-vanished target). Comments posted on #345, #346 and #356: done, awaiting release (`91bde83b`, its gates, closes with the release
-that ships M25).
+Measured on PILOT at scratch commit `aefcb1a7` (`refs/scratch/t310g7`; `build/agent221/t310g7/pilot_out/`, local): with a
+live emulator 25 of 25 plain runs PASS and 28 of 28 modes read HONOURED, so the added lines do not fire on a real leg;
+`test_dead_leg_unjudged` PASSES on Linux; `audit_move_parity_attribution` re-traced alone, 2 controls, SAFE, its row on
+`tests/controls_concurrent_emu.txt` rewritten. The batch's gates and the library differ from `aefcb1a7` only by five
+FOLLOWS lines naming `tests/lib/controls.sh` (`build/agent221/t310g7/scratch_vs_tree.diff`, local), the new gate by its
+`plain-loud` fix (run on the Mac; it runs no emulator). Gotchas: a planted copy that crashes fires its control for the wrong reason; a stripped copy that deletes its
+tagged lines deletes their commands; a verdict that counts only the legs that wrote output passes on zero legs; an
+apostrophe inside `${VAR:?message}`; and the must-fire contract's dead-leg paragraph. Seen, not this batch's:
+`audit_guard_corpus@known-crash` reads HONOURED on PILOT on a vec3 crash while its FIRED text names vec4 (predates the batch).
 
-### CLOSE (14z-220, 2026-11-04)
+### CLOSE (14z-221, 2026-11-05)
 
-Driver `build/agent220/close/` (`--prev build/agent220/m25/static_confirm_results_s8.tsv`, the freeze's confirm run on S8 —
-the most recent run of record, on the freeze commit's own tree; `--row -`). Committed before this close: the freeze `91bde83b`
-(tags re-cut on it). Riding this close: STATE's 14z-220 group (14z-219 rolled), the opener, the ticket rows for #361 and #362,
-the regenerated indexes; the jtcores fork commit `930818f5` pushed to `DefinitelyFrenchName/jtcores` before the pins check
-(`8d527341..930818f5`). Steps: sections (this group); next-session (the 14z-219 opener moved VERBATIM to the top of
-`docs/NEXT_SESSION_HISTORY.md`, 0 lines missing; `docs/NEXT_SESSION.md` rewritten: #361's closure check first); rollover (the
-14z-219 group, 77 lines, to `STATE_HISTORY.md` below its HISTORY INDEX with its ledger line; 0 lines missing); indexes (by the
-driver); dashboard (14z-163..14z-220, 3,529 figures, 0 unclassed; five assets uploaded, `datasets` re-pointed: actions v9,
-costly v29, figures v29, rc_runs v29, tiers v30). On GitHub before the close: #361 and #362 filed; done-awaiting-release
-comments on #345, #346, #356. The tier's results: `build/agent220/close/tier_results.tsv`, the next close's `--prev`.
-After the commit (these lines ride the next close): the tier on the staged tree, strict, `--jobs 8`, `--confirm` on the S8
-confirm run: GREEN, PASS 109, FAIL 0 (74 carried); committed `8bc62bf4` (the green guard read that row); nothing new on
-`origin` at the fetch; pins OK; sweep CLEAN; pushed `d19546c7..8bc62bf4`, origin/main equal to HEAD, and the four freeze tags
-(`freeze/donovan-m29`, `huitzil-m36`, `pyron-m30`, `merged-m25` -> `91bde83b`); ledger page published on `gh-pages`
-(`ab09c137` -> `d2a53258`, 358 sessions); the maintainer's own site SKIPPED, `DEPLOY_TARGET` not set
-(`build/agent220/close/ledger.out`). Every step of the close is done.
+Driver `build/agent221/close/` (`--prev build/agent221/tier362b_results.tsv`, the GREEN confirm run on #362's commit, the
+most recent run of record; `--row` (5)). Committed before this close: `d3e8810d` (#362's fix and #361's closure). Riding this
+close: #310 group 7 batch 1 (the 25 gates, `tests/lib/controls.sh`, `tests/test_dead_leg_unjudged.sh` and its table, the
+emulator concurrent-list row), the records (STATE's 14z-221 group, 14z-220 rolled, the opener, four gotchas, the must-fire
+contract paragraph, the regenerated indexes) and rule-checker runs -1634 to -1644. On GitHub before the close: #361 and #362
+closed; the attribution on #357; the progress comment on #310. Steps: sections (this group); next-session (the 14z-220 opener moved VERBATIM to
+the top of `docs/NEXT_SESSION_HISTORY.md`, 104 lines, 0 missing; `docs/NEXT_SESSION.md` rewritten: #310 batch 2, #357 and
+#358 awaiting the maintainer); rollover (the 14z-220 group, 83 lines, to `STATE_HISTORY.md` below its HISTORY INDEX with its
+ledger line; 0 lines missing); indexes (by the driver); dashboard (14z-163..14z-221, 3,583 figures, 0 unclassed; five assets
+uploaded, `datasets` re-pointed: actions v10, costly v30, figures v30, rc_runs v30, tiers v31). The bookkeeping gates on the
+working tree before staging: 13 PASS (`build/agent221/close/book/`, local). The first tier REFUSED at its plan (12,203 changed
+untracked paths: the dead-leg gate's debris, (5)), no gate judged, so `--prev` stands; fixed, re-staged, re-run. The second tier: PASS 159, FAIL 3,
+MISSING 1, all four the new gate's: it was not executable (MISSING, and `test_static_runner`'s registry check), its ROMDIR
+demand sat after its EXIT trap (`test_demand_after_trap`), and its plain-loud refusal exited 3 with no REFUSED line on that
+path (`test_dead_exit_census`). Fixed (mode 755, an explicit ROMDIR test, a REFUSED line); the three gates PASS on the
+working tree and the new gate and its controls PASS and FIRE (`build/agent221/close/red/`,
+`build/agent221/t310g7/rc/post_close_fix/`, local); re-staged and re-run on the red run's results. The third tier: PASS 162,
+FAIL 1, the new gate, `controls RED: plain-loud(not fired)`. The runner reads every declared control's FIRED line from
+the plain run (the 14z-198 gotcha, paid again), and `plain-loud` fired only under its mode. It now also runs in-gate in
+every run: it builds the loud copies and FIRES only when section 1's plain case and some row's plain run print (23 of 25),
+and a copy with the crashing plant reads CONTROL DEAD in both forms. The gate, both controls and eight header and
+contract gates PASS on the working tree (`build/agent221/close/red3/`, `build/agent221/t310g7/rc/post_close_fix/`,
+local); re-staged and re-run on the third run's results. The tier's results:
+`build/agent221/close/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

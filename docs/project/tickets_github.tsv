@@ -4,7 +4,7 @@
 # repo: DefinitelyFrenchName/VampireSaved
 # issues: 362
 number	state	reason	closed	labels	title
-362	OPEN	-	-	bug	test_crash_sweep writes its perturbed gate copies into the live tests/ directory, where concurrently running gates can read them; test_gate_descriptions' modes do not refuse a vanished target
+362	CLOSED	COMPLETED	2026-11-04	bug	test_crash_sweep writes its perturbed gate copies into the live tests/ directory, where concurrently running gates can read them; test_gate_descriptions' modes do not refuse a vanished target
 361	CLOSED	COMPLETED	2026-11-04	bug	The tier classifier misses audit_crash_sweep_emu's emulator call (test_crash_sweep.sh --tier emulator), so the emulator runner reads it a DEAD ROW
 360	OPEN	-	-	bug,cosmetic	In Dark Force, two of Donovan's dash speed lines alternate one frame out of phase with native vs2
 359	OPEN	-	-	bug,test-integrity	Cleanup traps on EXIT INT TERM with no exit let a TERM'd gate keep running (210 scripts)

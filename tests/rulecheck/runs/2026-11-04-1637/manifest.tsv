@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent221/t357/rc/recommendation_357.md	2c437e905576014248624ab9ece07417aac22dd1
+build/agent221/t357/rc/measurer_357.txt	1162d1f5a4ebed6d1e12221c3565de63c1c55c15
+build/agent221/t357/rc/measurer_357_rows.txt	69285cc3402938422e37e14acdfb084d725ed89b
+build/agent221/t357/rc/donovan_15.native.rows	aebb61282831c71291d86604c41869b4f3fc773e
+build/agent221/t357/rc/donovan_15.ours.rows	d65ca650435a724858f8eb0de42f577d3e70dc87
+build/agent221/t357/rc/d400_rows_tap.lua	44c7ef99075dbbb0fb8050d61eaaec7aaf38e282
+build/agent221/t357/rc/engine_internals.diff	2bc1fcccc6614ca8e523dd6f4bebea327c63aa24
+build/agent221/t357/rc/huitzil_row16_precedent.txt	0b179deb1d57b4e4fcc204ccac2b522315afd75e
+build/agent221/t357/rc/ruling_357_358.txt	c88190752f0e814b61b74b10534d750722e9da09
+build/agent221/t357/rc/claude_vsp10.txt	a3a4f06f7e0d76696bcb75f928a5be805ed57743

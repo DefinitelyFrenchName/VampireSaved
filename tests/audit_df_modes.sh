@@ -14,7 +14,7 @@
 # EXPECTS: every Power row arm=none with pow held, every Change row armed from its handler,
 #   the EX rows entering the Change machinery on both games; the planted Power log changes
 #   its row and fails.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_modes.tsv
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_modes.tsv tests/lib/controls.sh
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/lua/read_tap.lua
 #   tests/replays/df/97_df_mech.rpl tools/run_mame.sh tools/select_paths.py
 #   tools/select_wheel.py tools/setup_mame.sh tests/lib/sheet.sh
@@ -88,6 +88,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 [ -f "$BUILD/verify_data.bin" ] || { echo "SKIP: no verify_data.bin at $BUILD"; exit 0; }
 case "$CONTROL" in ""|power-armed) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -170,12 +171,12 @@ PY
 
 echo "== 1. the three decoded wheels"
 . "$REPO/tests/lib/decrypt_cache.sh"
-decrypt_view vsav2 "$W/v2_op.bin" "$W/v2_da.bin" || bad "vsav2 views not delivered"
-decrypt_view vsavj "$W/vj_op.bin" "$W/vj_da.bin" || bad "vsavj views not delivered"
+decrypt_view vsav2 "$W/v2_op.bin" "$W/v2_da.bin" || { vs_ctl_nj "vsav2 views not delivered"; bad "vsav2 views not delivered"; }   # #310 g7 NJ
+decrypt_view vsavj "$W/vj_op.bin" "$W/vj_da.bin" || { vs_ctl_nj "vsavj views not delivered"; bad "vsavj views not delivered"; }   # #310 g7 NJ
 [ "$fail" = 0 ] || { echo "FAIL: audit_df_modes"; exit 1; }
-python3 "$REPO/tools/select_wheel.py" "$W/v2_da.bin" --set vsav2 --json "$W/wheel_vsav2.json" > "$W/w1.log" 2>&1 || bad "vsav2 wheel: $(tail -1 "$W/w1.log")"
-python3 "$REPO/tools/select_wheel.py" "$W/vj_da.bin" --set vsavj --json "$W/wheel_vsavj.json" > "$W/w2.log" 2>&1 || bad "vsavj wheel: $(tail -1 "$W/w2.log")"
-python3 "$REPO/tools/select_wheel.py" "$BUILD/verify_data.bin" --set vsavj --json "$W/wheel_ours.json" > "$W/w3.log" 2>&1 || bad "our wheel: $(tail -1 "$W/w3.log")"
+python3 "$REPO/tools/select_wheel.py" "$W/v2_da.bin" --set vsav2 --json "$W/wheel_vsav2.json" > "$W/w1.log" 2>&1 || { vs_ctl_nj "vsav2 wheel failed"; bad "vsav2 wheel: $(tail -1 "$W/w1.log")"; }   # #310 g7 NJ
+python3 "$REPO/tools/select_wheel.py" "$W/vj_da.bin" --set vsavj --json "$W/wheel_vsavj.json" > "$W/w2.log" 2>&1 || { vs_ctl_nj "vsavj wheel failed"; bad "vsavj wheel: $(tail -1 "$W/w2.log")"; }   # #310 g7 NJ
+python3 "$REPO/tools/select_wheel.py" "$BUILD/verify_data.bin" --set vsavj --json "$W/wheel_ours.json" > "$W/w3.log" 2>&1 || { vs_ctl_nj "our wheel failed"; bad "our wheel: $(tail -1 "$W/w3.log")"; }   # #310 g7 NJ
 [ "$fail" = 0 ] || { echo "FAIL: audit_df_modes"; exit 1; }
 ok "wheels decoded"
 
@@ -199,10 +200,10 @@ for s in $LEGS; do
 $s
 EOF2
     nm="${m}_${g}_$id"
-    for k in f t; do _rc="$(cat "$W/$nm.$k/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "$nm.$k exited $_rc (an emulator that crashed is not evidence)"; done
+    for k in f t; do _rc="$(cat "$W/$nm.$k/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "$nm.$k exited $_rc (an emulator that crashed is not evidence)"; bad "$nm.$k exited $_rc (an emulator that crashed is not evidence)"; }; done   # #310 g7 NJ
     tp="$W/$nm.tap"
     if [ "$CONTROL" = power-armed ] && [ "$m" = power ]; then plant_arm "$tp" "$W/$nm.pl" && tp="$W/$nm.pl"; fi
-    reduce "$m" "$g" "$id" "$W/$nm.ft" "$tp" >> "$W/got.tsv" 2> "$W/$nm.err" || bad "$nm: $(cat "$W/$nm.err")"
+    reduce "$m" "$g" "$id" "$W/$nm.ft" "$tp" >> "$W/got.tsv" 2> "$W/$nm.err" || { grep -q '^VOID: ' "$W/$nm.err" && vs_ctl_nj "$nm: $(cat "$W/$nm.err")"; bad "$nm: $(cat "$W/$nm.err")"; }   # #310 g7 NJ
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_df_modes (a leg did not run or was VOID)"; exit 1; }
 ok "$(wc -l < "$W/got.tsv" | tr -d ' ') legs reduced"

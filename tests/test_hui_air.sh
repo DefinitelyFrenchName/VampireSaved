@@ -93,7 +93,7 @@ else
     BUILD="$WORK/hui4"
 fi
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
-[ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no vsavjw.zip (WIDE build required)"; exit 1; }
+[ -f "$BUILD/rompath/vsavjw.zip" ] || { vs_ctl_nj "no vsavjw.zip (WIDE build required)"; echo "FAIL: no vsavjw.zip (WIDE build required)"; exit 1; }   # #310 g7 NJ
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 
 PK="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10"
@@ -135,6 +135,7 @@ vs_pool_wait
 echo "== float (replay 75)"
 d="$WORK/float"
 air_ok "$d" || {   # (the run itself ran in the pool, air_exec)
+    vs_ctl_nj "the float replay guard tripped (the replay-75 run did not complete)"   # #310 g7 NJ
     echo "FAIL: float replay guard tripped:"
     grep -m2 -E "CRASH|REGS" "$d/g.log" || tail -5 "$d/g.out"
     exit 1
@@ -161,6 +162,7 @@ echo "  ok: float hovers (mover bypassed, Y pinned)"
 # (since #334 item 2 the run itself is air_exec's, in the pool above; dash_run judges it)
 dash_run() {
     air_ok "$2" || {
+        vs_ctl_nj "the air-dash replay guard tripped in $2 (the run did not complete)"   # #310 g7 NJ
         echo "FAIL: air-dash replay guard tripped:"
         grep -m2 -E "CRASH|REGS" "$2/g.log" || tail -5 "$2/g.out"
         return 2

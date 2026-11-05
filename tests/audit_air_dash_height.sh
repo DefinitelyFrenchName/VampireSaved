@@ -30,12 +30,12 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 BUILD="${BUILD:-build/m3b_merged33}"
 EXPECT="${EXPECT:-same}"   # 14z-192: gap until M23, same since
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-[ -x "$MAME_BIN" ] || { echo "FAIL: no MAME binary at $MAME_BIN (tools/setup_mame.sh)"; exit 1; }
-[ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
+[ -x "$MAME_BIN" ] || { vs_ctl_nj "no MAME binary at $MAME_BIN"; echo "FAIL: no MAME binary at $MAME_BIN (tools/setup_mame.sh)"; exit 1; }   # #310 g7 NJ
+[ -f "$BUILD/rompath/vsavjw.zip" ] || { vs_ctl_nj "no $BUILD/rompath/vsavjw.zip"; echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }   # #310 g7 NJ
 W="${KEEP:-$(mktemp -d)}" || { echo "FAIL: audit_air_dash_height — mktemp -d failed (W)"; exit 2; }; mkdir -p "$W"
 [ -n "${KEEP:-}" ] || trap 'rm -rf "$W"' EXIT INT TERM
 echo "== audit_air_dash_height (#222): build $BUILD ($(python3 tools/build_fingerprint.py "$BUILD/rompath" --set vsavjw --sha-only 2>/dev/null | cut -c1-8))"
-python3 tools/air_dash_rigs.py gen "$W" > /dev/null || { echo "FAIL: rig generation"; exit 1; }
+python3 tools/air_dash_rigs.py gen "$W" > /dev/null || { vs_ctl_nj "rig generation failed"; echo "FAIL: rig generation"; exit 1; }   # #310 g7 NJ
 J="$W/h222.json"
 fr="$(python3 -c "import json;print(json.load(open('$J'))['frames'])")"
 pk="$(python3 -c "import json;print(';'.join(json.load(open('$J'))['pokes']))");2000-$((fr - 1)):ff8116:06;2363-$((fr - 1)):ff80d4:0000"
@@ -51,12 +51,18 @@ for side in native ours; do
 done
 wait
 fail=0
-for side in native ours; do grep -q FIELDSUMMARY "$W/tr_$side.txt" 2>/dev/null || { echo "FAIL: $side: no complete trace ($W/$side/mame.log)"; fail=1; }; done
+for side in native ours; do grep -q FIELDSUMMARY "$W/tr_$side.txt" 2>/dev/null || { vs_ctl_nj "$side: no complete trace"; echo "FAIL: $side: no complete trace ($W/$side/mame.log)"; fail=1; }; done   # #310 g7 NJ
 [ "$fail" = 0 ] || exit 1
 PL=""; vs_ctl_is native-dash-planted && PL="--plant-native-dash"
 echo "== 1. --expect $EXPECT: the low event under vs2's row, and identical above it"
 python3 tools/air_dash_rigs.py compare "$J" "$W/tr_native.txt" "$W/tr_ours.txt" --expect "$EXPECT" $PL; rc=$?
 [ "$rc" = 0 ] || fail=1
+# a VOID (SystemExit: the rig did not produce the event / not an airborne Phobos / the rig moved) is a dead leg, not the
+# planted MISMATCH: under a mode only, re-read the compare's stderr for it (a plain run runs nothing extra)   # #310 g7 NJ
+if [ "$rc" != 0 ] && [ -n "${VS_CTL:-}" ]; then   # #310 g7 NJ
+    python3 tools/air_dash_rigs.py compare "$J" "$W/tr_native.txt" "$W/tr_ours.txt" --expect "$EXPECT" $PL > "$W/cmp_nj.txt" 2>&1   # #310 g7 NJ
+    grep -q '^VOID: ' "$W/cmp_nj.txt" && vs_ctl_nj "the compare was $(grep -m1 '^VOID: ' "$W/cmp_nj.txt" | cut -c1-110)"   # #310 g7 NJ
+fi   # #310 g7 NJ
 if vs_ctl_is native-dash-planted; then
     [ "$fail" = 1 ] && { echo "FAIL: audit_air_dash_height (control mode: the planted native dash broke the compare)"; exit 1; }
     vs_ctl_left_green "native-dash-planted" "FAIL: audit_air_dash_height — the planted native dash still passed"

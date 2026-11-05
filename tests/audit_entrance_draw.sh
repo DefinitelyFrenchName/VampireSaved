@@ -11,7 +11,7 @@
 #   moves x through three values), else VOID; the control rewrites our draws to variant 6.
 # EXPECTS: the per-seed rows frozen and the two legs' variant SETS equal; the rewritten
 #   copy's set differs and fails.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/entrance_draw.tsv
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/entrance_draw.tsv tests/lib/controls.sh
 #   tests/lua/field_trace.lua tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
 #
 # SHEET: legs vs2,ours — moments: per RNG seed, each leg's drawn entrance (the first frame a held variant shows, mid-drive for the drive-in) — not comparable: the variant drawn for one seed, which differs between the games by design (their RNG consumption differs; the gate compares the SETS), each game's stage and palette, and P2's art
@@ -53,6 +53,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 case "$CONTROL" in ""|variant-lost) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -65,7 +66,7 @@ nm.FIRST_EVENT = 2800
 with contextlib.redirect_stdout(io.StringIO()):
     nm.gen("huitzil", "5", f"{sys.argv[1]}/rig.rpl", f"{sys.argv[1]}/rig.json")
 PY
-) || { echo "FAIL: rig generation"; exit 1; }
+) || { vs_ctl_nj "rig generation failed"; echo "FAIL: rig generation"; exit 1; }   # #310 g7 NJ
 # our leg's cursor path on the merged wheel (tests/audit_move_parity.sh rpl_for)
 awk '/^1104-1106 p2=R$/ && !done { print "1100-1102 p1=D"; print "1160-1162 p1=D"; print "1220-1222 p1=D"; done = 1 }
      /^(1100|1160|1220|1280)-[0-9]+ p1=/ { next } { print }' "$W/rig.rpl" > "$W/ours.rpl"
@@ -82,9 +83,9 @@ for s in $SEEDS; do for leg in native ours; do
       _st=$?; grep -q -E '^(FIELDSUMMARY|END )' "$d.ft" 2>/dev/null && _st=0; echo $_st > "$d/rc"; rm -rf "$d/sb" ) </dev/null &
 done; done
 wait
-for s in $SEEDS; do for leg in native ours; do _rc="$(cat "$W/$leg.$s/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "$leg $s exited $_rc"; done; done
+for s in $SEEDS; do for leg in native ours; do _rc="$(cat "$W/$leg.$s/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "$leg $s exited $_rc"; bad "$leg $s exited $_rc"; }; done; done   # #310 g7 NJ
 [ "$fail" = 0 ] || { echo "FAIL: audit_entrance_draw"; exit 1; }
-python3 - "$W" "$SEEDS" > "$W/got.tsv" 2> "$W/err" <<'PY' || bad "$(cat "$W/err")"
+python3 - "$W" "$SEEDS" > "$W/got.tsv" 2> "$W/err" <<'PY' || { grep -qE '^VOID: .*(trace incomplete|not Phobos|the intro never initialised)' "$W/err" && vs_ctl_nj "$(cat "$W/err")"; bad "$(cat "$W/err")"; }   # #310 g7 NJ
 import sys
 W, seeds = sys.argv[1], sys.argv[2].split()
 sets = {}

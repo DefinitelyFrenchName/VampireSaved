@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent221/t362/close/issue362.md	e10cfd14a69ab9a3b2f29ad7f3d76b58b4fb0d7e
+build/agent221/t362/close/fix.diff	f8ffb0d636bb6e62ed3df35fbce9c43e9758fb44
+build/agent221/t362/close/measurer_repro.txt	310c5f6f2f9369aab4fa3790c8cf3c7f4c643c4d
+build/agent221/t362/close/measurer_pilot.txt	d2a22cd1e24813c6c8aa8a626e238211951171ca
+build/agent221/t362/close/pilot_t362.sh	6252f946253b65a4b5a2afb5246c54c6e52926d0
+build/agent221/t362/close/blobs_committed.txt	1136e7a49c146622e7e6e03f3e2dfb82fd53fa81
+build/agent221/t362/close/blobs_fix_files.txt	a544da3d0f4811af7ad97ff2e485932a2b733ec1
+build/agent221/t362/close/controls_concurrent.diff	6c4eb6262040c2a820158a389d0fa1f11c90c534
+build/agent221/t362/close/gotchas.diff	2e42b6ffe08ec0005135ef340ab6cc91d240f56b
+build/agent221/t362/close/tier.txt	0452b50a813370a3ef2f3a1e2af04f532297626e
+build/agent221/t362/close/tier_first.txt	942fd3a5eea5ade491fade79bf41fba95f29c01a
+build/agent221/t362/close/tier_rows.txt	211fc097072a3423e5e160dc4ec4125c24c68741
+build/agent221/t362/close/confirm_carry.txt	b770669da4e72a2996b59a1c988cd3fd4d12930b
+build/agent221/t362/close/closing_362.md	19d1e76811cb5a399d18e3e5a46618671df3086f
+build/agent221/t362/close/ticket_row_362.tsv	02f10f91a238bae20eda3a4624b486afa0cf4c9f

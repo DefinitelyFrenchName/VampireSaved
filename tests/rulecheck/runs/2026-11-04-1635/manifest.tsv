@@ -1,0 +1,7 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent221/t357/rc/recommendation_357.md	b43dd0c9cc3eb104c26efa2e6145d5be44626a50
+build/agent221/t357/rc/measurer_357.txt	1162d1f5a4ebed6d1e12221c3565de63c1c55c15
+build/agent221/t357/rc/engine_internals.diff	2bc1fcccc6614ca8e523dd6f4bebea327c63aa24
+build/agent221/t357/rc/huitzil_row16_precedent.txt	0b179deb1d57b4e4fcc204ccac2b522315afd75e
+build/agent221/t357/rc/ruling_357_358.txt	c88190752f0e814b61b74b10534d750722e9da09
+build/agent221/t357/rc/state_cosmetic_ruling.txt	2c39705360b4a70f0d479fd03c937f89d685351b

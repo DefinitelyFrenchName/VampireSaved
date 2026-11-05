@@ -160,6 +160,7 @@ declares	test_crash_sweep
 declares	test_crosscheck_229
 declares	test_ctl_show_err
 declares	test_dead_exit_census
+declares	test_dead_leg_unjudged
 declares	test_dead_span
 declares	test_defense_rows_census
 declares	test_demand_after_trap

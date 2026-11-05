@@ -104,16 +104,20 @@ wait
 echo "== 0: rig liveness — both legs must complete and the probe must fire"
 for leg in ctl sat; do
     grep -q "^END " "$W/$leg/out.log" 2>/dev/null \
-        || { bad "$leg leg did not END (crash or dead rig)"
+        || { vs_ctl_nj "$leg leg did not END (crash or dead rig)"   # #310 g7 NJ
+             bad "$leg leg did not END (crash or dead rig)"
              grep -m1 "^CRASH\|^REGS" "$W/$leg/out.log" 2>/dev/null || tail -2 "$W/$leg/emu"; }
     n=$(ls "$W/$leg"/dump_*_ff8100.bin 2>/dev/null | wc -l | tr -d ' ')
-    [ "$n" -gt 100 ] || bad "$leg leg produced only $n samples — probe dead"
+    [ "$n" -gt 100 ] || { vs_ctl_nj "$leg leg produced only $n samples — probe dead"; bad "$leg leg produced only $n samples — probe dead"; }   # #310 g7 NJ
 done
 
 python3 - "$W" "$MODE" <<'PY' || fail=1
 import glob, sys, struct
 W = sys.argv[1]
 MODE = sys.argv[2] if len(sys.argv) > 2 else ""
+def nj(why):  # #310 g7 NJ: under a mode, a rig that did not make its event is handed to the shell's vs_ctl_nj
+    if MODE:  # #310 g7 NJ
+        open(f"{W}/nj.txt", "a").write(why + "\n")  # #310 g7 NJ
 def timeline(leg):
     out, prev = [], None
     for f in sorted(glob.glob(f"{W}/{leg}/dump_*_ff8100.bin"),
@@ -137,6 +141,7 @@ EXPECT_SEL = 1   # measured 14z-95: ONE index/mask advance in 40,620 frames
 if len(sel) < EXPECT_SEL:
     print(f"FAIL: only {len(sel)} ladder advance(s) — fewer than the measured "
           f"{EXPECT_SEL}; the rig stopped reaching the ladder")
+    nj(f"only {len(sel)} ladder advance(s): the rig stopped reaching the ladder")  # #310 g7 NJ
     rc = 1
 elif len(sel) > EXPECT_SEL:
     print(f"  note: {len(sel)} ladder advances, MORE than the measured "
@@ -159,6 +164,7 @@ sat_sel = [r for r in sat if r[2] == 0xffffffff and r[3] != 0]
 if not sat_sel:
     print("FAIL: the saturated leg never selected with a full mask — the poke "
           "missed its window, so this section proves nothing")
+    nj("the saturated leg never selected with a full mask: the poke missed its window")  # #310 g7 NJ
     rc = 1
 else:
     worst = max(r[3] for r in sat_sel)
@@ -180,10 +186,14 @@ ctl_stages = {r[1] for r in ctl}
 sat_stages = {r[1] for r in sat}
 # THE EXECUTABLE MODE: force the saturated set equal to the control, so section 3
 # reads the mask as inert and the gate FAILs.
-if MODE == "mask-not-load-bearing": sat_stages = set(ctl_stages)
+# #310 g7 NJ: forced only when the legs MEASURED the mask load-bearing; a mask measured inert is the gate's own finding.
+forced = MODE == "mask-not-load-bearing" and ctl_stages != sat_stages  # #310 g7 NJ
+if forced: sat_stages = set(ctl_stages)  # #310 g7 NJ
 if ctl_stages == sat_stages:
-    if MODE == "mask-not-load-bearing":
+    if forced:  # #310 g7 NJ
         print("mask-not-load-bearing mode: the mask reads inert (forced equal), so section 3 FAILs")
+    elif MODE == "mask-not-load-bearing":  # #310 g7 NJ
+        print("mask-not-load-bearing mode: the legs measured the mask inert before any forcing, so section 3 FAILs on its own finding")  # #310 g7 NJ
     else:
         print("CONTROL DEAD: mask-not-load-bearing — saturating the mask changed no stage, so the mask is not load-bearing")
     print(f"FAIL: saturating the in-use mask changed no stage ({sorted(map(hex,ctl_stages))}) "
@@ -195,6 +205,7 @@ else:
     print("CONTROL FIRED: mask-not-load-bearing — the in-use mask IS load-bearing (it changes the stage); the mode forces it inert and the gate FAILs")
 sys.exit(rc)
 PY
+if [ -s "$W/nj.txt" ]; then while IFS= read -r _nj; do vs_ctl_nj "$_nj"; done < "$W/nj.txt"; fi   # #310 g7 NJ
 
 [ "$fail" = 0 ] && echo "
 PASS: ladder selector — coverage quantified, bound holds, mask load-bearing" \

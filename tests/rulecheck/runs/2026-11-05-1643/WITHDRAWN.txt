@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-221): the claim said audit_dispatch_census's plain run was 'kept red only by its in-gate control', which plain_dead.txt does not show (its log is one line, exit 2); reworded and re-prepared.

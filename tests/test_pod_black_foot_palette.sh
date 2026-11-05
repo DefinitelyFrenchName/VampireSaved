@@ -83,6 +83,7 @@ vs_pool_run probe base
 vs_pool_run probe fix "$(mk 90c17c)"
 vs_pool_run probe ctl "$(mk 90c17a)"
 vs_pool_wait
+for leg in base fix ctl; do [ -f "$W/$leg/snap/vsavjw/0000.png" ] || vs_ctl_nj "no snapshot in $W/$leg (run did not reach f14370)"; done   # #310 g7 NJ
 
 python3 - "$W" "$MODE" <<'PY'
 import sys, os

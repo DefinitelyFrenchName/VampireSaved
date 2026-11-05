@@ -97,7 +97,7 @@ for leg in "SA 0x0a hit" "SA 0x0a hit_crouch" "BI 0x08 hit_crouch" "FE 0x07 hit"
         tools/run_mame.sh vsavj -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/${ch}_$st/l.log" 2>&1 || true ) </dev/null &
 done
 wait
-for d in "$W"/*_*/; do [ -s "$d/t.txt" ] || { echo "  FAIL: no trace in $d"; fail=1; }; done
+for d in "$W"/*_*/; do [ -s "$d/t.txt" ] || { vs_ctl_nj "no trace in $d (the leg produced nothing)"; echo "  FAIL: no trace in $d"; fail=1; }; done   # #310 g7 NJ
 [ "$fail" -eq 0 ] || { echo "FAIL test_meter_gain"; exit 1; }
 python3 tools/vanilla_frames.py "$DATA" --json "$W/v.json" >/dev/null
 python3 tools/meter_gain.py "$W" "$W/v.json" "$DATA" --sheet "$SHEET" > "$W/table.tsv"
@@ -146,8 +146,10 @@ echo "== A-D. the verdict"
 # perturbation of the measured data reaches the gate's own FAIL.
 MAIN="$W/table.tsv"
 if [ "$MODE" = perturbed-net ]; then perturb_net "$W/table.tsv" "$W/table.mode.tsv"; MAIN="$W/table.mode.tsv"; fi
-if verdict "$MAIN"; then echo "  ok the per-hit law, the swing costs and the six cells hold"
-else echo "  FAIL"; fail=1; fi
+if verdict "$MAIN" > "$W/verdict.out"; then cat "$W/verdict.out"; echo "  ok the per-hit law, the swing costs and the six cells hold"   # #310 g7 NJ
+else cat "$W/verdict.out"   # #310 g7 NJ
+    grep -qE 'VOID leg \(no hit landed\)|the rig did not connect' "$W/verdict.out" && vs_ctl_nj "a leg landed no hit (VOID leg / the rig did not connect)"   # #310 g7 NJ
+    echo "  FAIL"; fail=1; fi
 
 echo "== E. the measured table, hash-locked out of tree"
 mkdir -p "$OUTDIR"

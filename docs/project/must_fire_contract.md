@@ -113,6 +113,15 @@ a crash HONOURED in the 21 gates #310's group-5 census found, and in the three r
 shadow runners' stderr is now handed to the helper under a mode; `tests/test_ctl_show_err.sh` holds the helper on planted
 copies.
 
+**A DEAD EMULATOR LEG IS NOT THE CONTROL FIRING** (#310 group 7, 14z-221): beside each liveness check (an emulator that
+exited non-zero, a trace with no END line, no samples, a reducer's VOID about a leg that never ran) a gate calls
+`vs_ctl_nj <why>` (`tests/lib/controls.sh`), which under a mode prints `NOT JUDGED: under control mode <mode>, <why>`
+(UNJUDGED) and in a plain run prints nothing; the mode is `VS_CTL`, else `CONTROL`, so a gate that parses `CONTROL` itself
+only sources the library. It is not called for a mode whose honoured outcome IS a dead or VOID leg. A mode close prints
+`CONTROL FIRED` on its own finding, never on any fail flag. Batched by #310's re-census; each batch's rows are held by
+`tests/test_dead_leg_unjudged.sh` (`tests/expected/dead_leg_unjudged.tsv`): with `MAME_BIN=/usr/bin/false` every row reads
+UNJUDGED, its plain run is red and silent, and its gate with the `# #310 g7 NJ` lines neutered reads the pre-fix class.
+
 ## The pattern that makes the mode cheap to write
 
 Write each perturbation as ONE function the control section and the mode both

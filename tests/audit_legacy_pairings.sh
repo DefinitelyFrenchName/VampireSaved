@@ -255,6 +255,7 @@ if [ -f "$W/plant/PLANT_dead.field.DEAD" ] && _pk="$(cat "$W/plant/PLANT_dead.fi
     rm -rf "$_pk"; rmdir "$DEAD_DIR" 2>/dev/null || true
 else
     echo "  FAIL plant: a dead leg's log was not kept (marker: $(cat "$W/plant/PLANT_dead.field.DEAD" 2>/dev/null || echo none))"
+    vs_ctl_nj "the planted dead leg left no mame.log naming its cause — the emulator did not run the leg"   # #310 g7 NJ
     fail=1
 fi
 
@@ -306,6 +307,7 @@ for b in $BUILDS; do
     if [ -s "$W/$tag/CONTROL_forced_$id.field" ] && loads_id "$W/$tag/CONTROL_forced_$id.field" "$id"; then
         echo "  ok control $id: the forced-pick leg loads id 0x$id (its own run)"
     else
+        [ -s "$W/$tag/CONTROL_forced_$id.field" ] || vs_ctl_nj "the forced-pick leg for id 0x$id produced no field data"   # #310 g7 NJ
         echo "  FAIL control $id: the forced-pick leg does not load id 0x$id — a shared or wrong control run"; fail=1
     fi
 done
@@ -328,6 +330,7 @@ for b in $BUILDS; do
         echo "  ok control: the same replay with the tenant id poked -> TENANT"
     else
         echo "  FAIL control: poking the tenant id did not flip the verdict (rc=$rc)"
+        if [ "$rc" = 3 ]; then vs_ctl_nj "the forced-pick verdict is DEAD (rc=3): a leg produced no samples"; fi   # #310 g7 NJ
         sed 's/^/      /' "$W/pos"; fail=1
     fi
     case " $_classified " in *" $tag "*) echo "  (the sweep of $tag is classified above, once)"; continue ;; esac
@@ -341,6 +344,7 @@ for b in $BUILDS; do
         sed -n '1p' "$W/live" | sed 's/^/      /'
     else
         echo "  FAIL liveness: rc=$rc — the rig is not producing matches"
+        if [ "$rc" = 3 ]; then vs_ctl_nj "liveness: 16_xemu_2p's verdict is DEAD (rc=3): a leg produced no samples"; fi   # #310 g7 NJ
         sed 's/^/      /' "$W/live"; fail=1
     fi
 
@@ -351,6 +355,7 @@ for b in $BUILDS; do
     _reused=$(ls "$W/$tag"/*.field.REUSED "$W/van"/*.field.REUSED 2>/dev/null | wc -l | tr -d ' ')
     if [ "${_reused:-0}" != 0 ]; then
         echo "FAIL: $_reused leg(s) found their sandbox already there — a carried run (#293), refused:"
+        _reused_hit=1   # #310 g7 NJ (the shared-sandbox mode fires on THIS finding only)
         for _rm in "$W/$tag"/*.field.REUSED "$W/van"/*.field.REUSED; do [ -f "$_rm" ] && echo "        $(basename "$_rm" .field.REUSED)"; done
         fail=1
     fi
@@ -358,6 +363,7 @@ for b in $BUILDS; do
     if [ "${_dead:-0}" != 0 ]; then
         echo "FAIL: $_dead leg(s) produced no field data — those replays were"
         echo "      NOT measured, and a glob-derived corpus cannot see that:"
+        vs_ctl_nj "$_dead leg(s) produced no field data — those replays were NOT measured"   # #310 g7 NJ
         for _dm in "$W/$tag"/*.field.DEAD "$W/van"/*.field.DEAD; do
             [ -f "$_dm" ] && show_dead "$_dm"
         done
@@ -380,6 +386,7 @@ for b in $BUILDS; do
         exempt="$REPO/tests/expected/$exp/$name.legacy-exempt"
         printf '%s\t%s\t%s\n' "$name" "$v" "$kind" >> "$rep"
         if [ "$v" = DEAD ]; then
+            vs_ctl_nj "$name: instrument dead (the checker read a leg with no samples)"   # #310 g7 NJ
             echo "  FAIL $name: instrument dead"; sed 's/^/      /' "$W/v"; fail=1
         elif [ "$v" = LEGACY ] && [ "$kind" != masked ] && [ "$kind" != pending ]; then
             # A LEGACY verdict means only "the same fighters loaded". A rig that
@@ -501,8 +508,8 @@ PYS
 fi
 
 if vs_ctl_is shared-sandbox; then
-    if [ "$fail" = 1 ]; then vs_ctl_fired shared-sandbox "with the sweep not de-duplicated, a replay's second leg found the first one's sandbox and was refused"
-    else vs_ctl_dead shared-sandbox "the duplicated sweep passed — a carried sandbox goes unseen"; fail=1; fi
+    if [ "${_reused_hit:-0}" = 1 ]; then vs_ctl_fired shared-sandbox "with the sweep not de-duplicated, a replay's second leg found the first one's sandbox and was refused"   # #310 g7 NJ
+    else vs_ctl_dead shared-sandbox "the duplicated sweep left no REUSED refusal — a carried sandbox goes unseen"; fail=1; fi   # #310 g7 NJ
 fi
 if [ "$fail" = 0 ]; then echo "LEGACY-PAIRING COVERAGE: PASS"; else echo "LEGACY-PAIRING COVERAGE: FAIL"; fi
 exit "$fail"

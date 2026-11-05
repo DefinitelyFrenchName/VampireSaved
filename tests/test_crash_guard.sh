@@ -62,7 +62,7 @@ GUARD_DEBUG=0 CODE_RANGES="0-400000" GUARD_MATCH="3000-3100" \
     "$REPO/tools/run_replay_guarded.sh" vsavj \
     "$REPO/tests/replays/02_demitri_vs_cpu.rpl" "$WORK/negc.log" "$WORK/negcbox" \
     > "$WORK/negc.out" 2>&1 \
-    || { echo "FAIL: cheap guard tripped on clean vanilla replay"; cat "$WORK/negc.out"; exit 1; }
+    || { vs_ctl_nj "the cheap guard run (1a) exited $? on the clean vanilla replay: a dead, unfinished or tripped leg, not the drift"; echo "FAIL: cheap guard tripped on clean vanilla replay"; cat "$WORK/negc.out"; exit 1; }   # #310 g7 NJ
 got=$(shasum "$WORK/negc.log" | cut -d' ' -f1)
 exp=$(cat "$REPO/tests/expected/vsavj/02_demitri_vs_cpu.sha1")
 if [ "$got" = "$exp" ]; then
@@ -76,12 +76,12 @@ fi
 env $_clk "$REPO/tools/run_replay_guarded.sh" vsavj \
     "$REPO/tests/replays/02_demitri_vs_cpu.rpl" "$WORK/neg1.log" "$WORK/neg1box" \
     > "$WORK/neg1.out" 2>&1 \
-    || { echo "FAIL: -debug guard tripped on clean vanilla replay"; cat "$WORK/neg1.out"; exit 1; }
+    || { vs_ctl_nj "the -debug guard run 1 (1b) exited $? on the clean vanilla replay: a dead, unfinished or tripped leg, not the drift"; echo "FAIL: -debug guard tripped on clean vanilla replay"; cat "$WORK/neg1.out"; exit 1; }   # #310 g7 NJ
 # shellcheck disable=SC2086
 env $_clk "$REPO/tools/run_replay_guarded.sh" vsavj \
     "$REPO/tests/replays/02_demitri_vs_cpu.rpl" "$WORK/neg2.log" "$WORK/neg2box" \
     > "$WORK/neg2.out" 2>&1 \
-    || { echo "FAIL: -debug guard tripped on clean vanilla replay (run 2)"; cat "$WORK/neg2.out"; exit 1; }
+    || { vs_ctl_nj "the -debug guard run 2 (1b) exited $? on the clean vanilla replay: a dead, unfinished or tripped leg, not the drift"; echo "FAIL: -debug guard tripped on clean vanilla replay (run 2)"; cat "$WORK/neg2.out"; exit 1; }   # #310 g7 NJ
 if cmp -s "$WORK/neg1.log" "$WORK/neg2.log"; then
     echo "  ok: -debug guard clean + deterministic run-to-run"
 else

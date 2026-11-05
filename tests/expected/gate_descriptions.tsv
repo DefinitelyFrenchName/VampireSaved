@@ -225,6 +225,7 @@ declares	test_crosscheck_229
 declares	test_crypt_boundary
 declares	test_ctl_show_err
 declares	test_dead_exit_census
+declares	test_dead_leg_unjudged
 declares	test_dead_span
 declares	test_decode_stage_banners
 declares	test_decrypt_cache

@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**510 of 510 gates described.**
+**511 of 511 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 63 | 63 | the suite runners and their own ground truth |
+| [runner](#runner) | 64 | 64 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 63 of 63 described.
+the suite runners and their own ground truth. 64 of 64 described.
 
 ### `audit_crash_sweep_emu.sh` — audit, emulator
 
@@ -231,6 +231,14 @@ the suite runners and their own ground truth. 63 of 63 described.
 **HOW:** tools/dead_exit_census.py reads every `tests/*.sh` for the copied block's shapes (P1: an echo-exit straight after a fired branch; P2: an echo-exit naming the mode and a dead word; P3: the inverted block, a braced echo-exit on a green rc) and names each unmarked one; the reviewed exceptions below (ALLOW) are lines the scan matches that no mode reaches. Beside it, four stub gates run under CONTROL=flip and classified as both runners do show what the scan is for: the word-only block reads HONOURED (and is named), its vs_ctl_left_green form reads LIES (and is not), the inverted block reads HONOURED (and is named). SINCE #310 GROUP 6 (14z-215; the maintainer, 2026-10-31: "... and two new dead-exit patterns") the scan also names two mode exits that read HONOURED when the mode tested nothing (printed DEADEXIT): P4, an UNCONDITIONAL mode exit at the script's top level (`if vs_ctl_is X; then echo "FAIL…"; exit 1; fi`, its `&& { … }` and multi-line forms), which exits 1 whether or not the mode's own finding fired; P5, `|| exit 3` (or a braced echo-exit 3) on a line with no `REFUSED` — classify.sh's rule 3 reads exit 3 as UNJUDGED only beside a `REFUSED: ` line. Their stubs under CONTROL=flip: the unconditional exit reads HONOURED (and is named), its form conditional on the finding with vs_ctl_left_green reads LIES (and is not); the bare `|| exit 3` reads HONOURED (and is named), its REFUSED form reads UNJUDGED (and is not).
 
 **EXPECTS:** zero unallowed word-only or mode exits; every ALLOW line still present; every stub its class and its naming.
+
+### `test_dead_leg_unjudged.sh` — test, ci_static
+
+**WHAT:** tests/lib/controls.sh `vs_ctl_nj <why>`, which a gate calls beside each liveness check (an emulator that exited non-zero, a trace with no END line, no samples, a reducer's VOID about a leg that never ran): under a CONTROL= mode it prints `NOT JUDGED: under control mode <mode>, <why>` and tests/lib/classify.sh reads the run UNJUDGED; in a plain run it prints nothing. Before it, those gates' modes ended a dead leg in their ordinary FAIL and read HONOURED: a control certified on no measurement.
+
+**HOW:** (1) the helper on its own, in a subshell, with and without a mode. (2) For each row of tests/expected/dead_leg_unjudged.tsv (gate, mode, class, stripped class), the gate's mode is run with MAME_BIN=/usr/bin/false, so every leg dies at once, and its log is classified with vs_classify_control exactly as both runners do; the gate's PLAIN run under the same dead emulator must exit non-zero and print no `NOT JUDGED:` line (a dead emulator never passes a plain run, and the helper is silent there). (3) The in-gate control: each row's gate copied with its `# #310 g7 NJ` lines NEUTERED (vs_ctl_nj made `:`, a printed `NOT JUDGED:` renamed; never deleted, since a tagged line may carry the gate's own command; its REPO line pinned to this repository, the crash sweep's form) must read its frozen pre-fix class under the same dead emulator: HONOURED, or LIES where the batch also made a mode close fire only on its own finding; never UNJUDGED, so the rows read UNJUDGED because of those lines.
+
+**EXPECTS:** (1) silent and 0 with no mode, the one line with a mode; (2) every row reads its frozen class (UNJUDGED) and every plain run is red and silent; (3) every neutered copy reads its frozen stripped class (HONOURED or LIES). A row whose mode is not declared by its gate any more, or whose gate carries no `# #310 g7 NJ` line, FAILs.
 
 ### `test_demand_after_trap.sh` — test, ci_portable
 

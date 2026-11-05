@@ -81,7 +81,7 @@ mkdir -p "$OUT"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 SET=vsavj; RP="$ROMDIR"
 if [ -n "${BUILD:-}" ]; then
-    [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: BUILD=$BUILD has no rompath/vsavjw.zip"; exit 1; }
+    [ -f "$BUILD/rompath/vsavjw.zip" ] || { vs_ctl_nj "BUILD=$BUILD has no rompath/vsavjw.zip, so no leg ran"; echo "FAIL: BUILD=$BUILD has no rompath/vsavjw.zip"; exit 1; }   # #310 g7 NJ
     BUILD="$(cd "$BUILD" && pwd)"; SET=vsavjw; RP="$BUILD/rompath;$ROMDIR"
     # WHICH BUILD RAN (14z-192, rule-checker run 2026-10-05-677, [VSP-108]): print the registry row
     # the opened romset resolves to, its full fingerprint and the zip's sha1 — an image the
@@ -92,6 +92,7 @@ if [ -n "${BUILD:-}" ]; then
     echo "build: registry row '${REGNAME:-?}', program fingerprint ${FULLFP:-?}, vsavjw.zip sha1 $ZSHA"
     # build_fingerprint.py prints the registry NAME for a registered image and the bare hex otherwise
     if [ -z "$REGNAME" ] || printf '%s' "$REGNAME" | grep -E >/dev/null '^[0-9a-f]{40}$'; then
+        vs_ctl_nj "BUILD=$BUILD resolves to no registry row, so no leg ran"   # #310 g7 NJ
         echo "FAIL: BUILD=$BUILD resolves to no registry row — not a registered build"; exit 1
     fi
 fi
@@ -102,6 +103,7 @@ REPLAYS="01_attract_long 02_demitri_vs_cpu 03_two_player_vs 04_select_fuzz
          09_mirror_pick 10_midattract_start 16_xemu_2p"
 
 python3 tools/audit_roms.py "$ROMDIR" >/dev/null || {
+    vs_ctl_nj "the ROM audit FAILED, so no leg ran"   # #310 g7 NJ
     echo "ROM audit FAILED — stop (CLAUDE.md §3)"; exit 1; }
 
 # JOBS (#334 item 2, 14z-211): the 22 runs are independent — each writes only its own trace, log and sandbox — so they
@@ -195,7 +197,15 @@ if not fail:
     print("  (caveat in the header: 0x18/Oboro is unexercised by this corpus)")
 sys.exit(fail)
 PY
-rc=0; python3 "$OUT/analyze.py" "$OUT" "$OUT/legs.list" || rc=$?
+rc=0
+if [ -z "${VS_CTL:-}" ]; then
+    python3 "$OUT/analyze.py" "$OUT" "$OUT/legs.list" || rc=$?
+else   # #310 g7 NJ: under the mode the reducer's output is kept, so its MISSING/INCOMPLETE legs and its finding can be read
+    python3 "$OUT/analyze.py" "$OUT" "$OUT/legs.list" > "$OUT/analyze.out" 2>&1 || rc=$?   # #310 g7 NJ
+    cat "$OUT/analyze.out"   # #310 g7 NJ
+    if grep -q '^MISSING (no trace written): ' "$OUT/analyze.out"; then vs_ctl_nj "a leg wrote no trace (MISSING)"; fi   # #310 g7 NJ
+    if grep -q '^INCOMPLETE (no END line): ' "$OUT/analyze.out"; then vs_ctl_nj "a tap log lacks an END summary line (INCOMPLETE)"; fi   # #310 g7 NJ
+fi
 # THE IN-GATE CONTROL: plant (a), on a copy of the real logs, must FAIL naming id 13; plant
 # (b), on another copy, must leave the verdict PASS (the +0x383 byte is not the id).
 if [ -z "${VS_CTL:-}" ]; then
@@ -209,7 +219,9 @@ if [ -z "${VS_CTL:-}" ]; then
     else
         vs_ctl_dead word-write-variant "the lanes are not separated (plant a rc=$crc_a, plant b rc=$crc_b)" || rc=1
     fi
-else
-    vs_ctl_fired word-write-variant "the planted log joined the real ones (mode)"
+elif [ "$rc" != 0 ] && grep -qE 'VARIANT-HALF id: (.* )?13( |$)' "$OUT/analyze.out"; then   # #310 g7 NJ: FIRED on the plant's own finding only
+    vs_ctl_fired word-write-variant "the planted log joined the real ones and the gate FAILs naming id 13 (mode)"
+else   # #310 g7 NJ
+    vs_ctl_dead word-write-variant "the planted word write of 0x1300 did not FAIL naming id 13 (rc=$rc)" || rc=1   # #310 g7 NJ
 fi
 exit $rc

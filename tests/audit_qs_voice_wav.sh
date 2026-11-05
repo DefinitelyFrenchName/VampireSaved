@@ -92,8 +92,11 @@ NATIVE="$(sed -n '2p' "$W/ids.txt")"
   -sound auto -wavwrite "$W/native/voices.wav" > out 2>&1 ) &
 wait
 for leg in ours native; do
-    [ -s "$W/$leg/voices.wav" ] || { tail -5 "$W/$leg/out"; fail "$leg capture dead"; }
+    [ -s "$W/$leg/voices.wav" ] || { tail -5 "$W/$leg/out"; vs_ctl_nj "$leg capture dead (no wav)"; fail "$leg capture dead"; }   # #310 g7 NJ
 done
+# a leg cut short writes a SHORT wav, which the A/B refuses exactly as it refuses the mode's truncation: qs_sweep.lua    # #310 g7 NJ
+# writes END only when its whole id list was swept, and the mode truncates the wav, never s.txt                        # #310 g7 NJ
+for leg in ours native; do grep -qx END "$W/$leg/s.txt" 2>/dev/null || vs_ctl_nj "the $leg sweep did not complete (its s.txt has no END line): its capture is short"; done   # #310 g7 NJ
 
 # THE EXECUTABLE MODE: truncate the real ours capture (zero its back three
 # quarters), so the spectral A/B against native fails and the gate FAILs.

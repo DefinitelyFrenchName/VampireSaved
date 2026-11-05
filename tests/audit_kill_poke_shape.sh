@@ -132,21 +132,32 @@ A="$(classify "$W/hponly")"; echo "== 2-byte poke (hp only):  $A"
 B="$(classify "$W/both")";   echo "== 4-byte poke (hp+white): $B"
 # THE EXECUTABLE MODE: classify the 2-byte leg as FLOWED, which the real judge
 # never allows, so the gate FAILs.
-if [ "$MODE" = two-byte-flowed ]; then A="FLOWED 600 (mode: forced)"; fi
+# #310 g7 NJ: the mode forces only a 2-byte leg that ran to its END and measured the stall; a dead leg is NOT JUDGED.
+if [ "$MODE" = two-byte-flowed ]; then
+    if ! grep -q '^END ' "$W/hponly/out.log" 2>/dev/null; then   # #310 g7 NJ
+        vs_ctl_nj "the 2-byte leg's run did not END (MAME died or stalled; see its mame.log)"; fail=1   # #310 g7 NJ
+    else   # #310 g7 NJ
+        case "$A" in STALL*|UNRESOLVED*) A="FLOWED 600 (mode: forced; measured $A)" ;; esac   # #310 g7 NJ
+    fi   # #310 g7 NJ
+fi
 
 case "$A" in
 STALL*|UNRESOLVED*) echo "  ok: the 2-byte shape manufactures the unjudgeable state (frozen)"
    vs_ctl_fired two-byte-flowed "the 2-byte shape STALLS ($A) because the judge reads white's sign; the mode forces FLOWED and the gate FAILs" ;;
-NO-KO) echo "FAIL: 2-byte leg produced no KO — the rig did not make the event"; fail=1 ;;
-*) [ -z "$MODE" ] && echo "CONTROL DEAD: two-byte-flowed — the 2-byte leg FLOWED ($A), so the judge no longer reads white's sign alone"   # in its mode the FLOWED is forced: the gate's FAIL below is the control honoured (#310 rule 1)
+NO-KO) vs_ctl_nj "2-byte leg produced no KO — the rig did not make the event"   # #310 g7 NJ
+   echo "FAIL: 2-byte leg produced no KO — the rig did not make the event"; fail=1 ;;
+*) if [ "$A" = NO-DATA ]; then vs_ctl_nj "the 2-byte leg wrote no dumps (NO-DATA)"; fi   # #310 g7 NJ
+   [ -z "$MODE" ] && echo "CONTROL DEAD: two-byte-flowed — the 2-byte leg FLOWED ($A), so the judge no longer reads white's sign alone"   # in its mode the FLOWED is forced: the gate's FAIL below is the control honoured (#310 rule 1)
    echo "FAIL: the 2-byte leg FLOWED ($A) — the judge no longer reads white's"
    echo "      sign alone; engine_internals \"THE ROUND JUDGE\" needs re-derivation"
    fail=1 ;;
 esac
 case "$B" in
 FLOWED*) echo "  ok: the 4-byte idiom flows through the healthy kill commit (frozen)" ;;
-NO-KO) echo "FAIL: 4-byte leg produced no KO — the rig did not make the event"; fail=1 ;;
-*) echo "FAIL: the 4-byte leg did not flow ($B) — the kill commit broke"; fail=1 ;;
+NO-KO) vs_ctl_nj "4-byte leg produced no KO — the rig did not make the event"   # #310 g7 NJ
+   echo "FAIL: 4-byte leg produced no KO — the rig did not make the event"; fail=1 ;;
+*) if [ "$B" = NO-DATA ]; then vs_ctl_nj "the 4-byte leg wrote no dumps (NO-DATA)"; fi   # #310 g7 NJ
+   echo "FAIL: the 4-byte leg did not flow ($B) — the kill commit broke"; fail=1 ;;
 esac
 
 [ "$fail" = 0 ] && echo "AUDIT PASS (both poke shapes behave as frozen)" \

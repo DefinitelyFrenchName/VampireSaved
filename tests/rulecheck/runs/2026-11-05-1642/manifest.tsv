@@ -1,0 +1,26 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent221/t310g7/rc/dead_leg_unjudged.tsv	a707abcb26185246c8056428c5f48bf7e19224a6
+build/agent221/t310g7/rc/test_dead_leg_unjudged.sh	310f18d106fb3891097963088b37c20c99985b7e
+build/agent221/t310g7/rc/classify.sh	f443305a13d66e39d9aedc5f33e581b5497631ba
+build/agent221/t310g7/rc/batch_1.diff	6005a63508f001f2eee18f1f025381348820f91a
+build/agent221/t310g7/rc/batch_2.diff	a4270780072d71a315bb53e3878f4a6c1a9c47e8
+build/agent221/t310g7/rc/batch_3.diff	314cb838b2cff60cac9f90de6233a1e1b6cf4f5a
+build/agent221/t310g7/rc/batch1_candidates.tsv	f0c609afc2c85c45228cc9caf93d13224e0632c2
+build/agent221/t310g7/rc/census_rows.tsv	da67e2ec8c33687c9c414da4e69d7e1cf060dc51
+build/agent221/t310g7/rc/excluded.txt	ddeba38e1335d0a6b7c604b37da549a2d96ceaae
+build/agent221/t310g7/rc/base_classes_d3e8810d.tsv	fc5e45ec18d7fc2b673673e6a2b13514317d7dcf
+build/agent221/t310g7/rc/baseline.sh	86f3cc2a6ce58c39676873d5767e22f8b97af3ff
+build/agent221/t310g7/rc/gate_mac.log	1327459910fce8a03c1f573fe4672078e8ed4837
+build/agent221/t310g7/rc/ctl_nj-stripped.log	6f822c0cbc40556cd8f3c1ce994c0481a00fb93c
+build/agent221/t310g7/rc/ctl_plain-loud.log	5f8d72f4c79092dc543a031cc68d097833e3a9ab
+build/agent221/t310g7/rc/ctl_plain-loud_crashcopy.log	f95075ebfae7cb87721aab2a651af03e5ac96636
+build/agent221/t310g7/rc/crashcopy.sh	aecb9137af27cf35d32452a369ab43a53a12ba90
+build/agent221/t310g7/rc/pilot_t310g7.sh	c78f7f2e998f91d4208905283c16078e0b6811cb
+build/agent221/t310g7/rc/pilot_summary.txt	7b59e788a629e795cf59e6d5113e7644898400d1
+build/agent221/t310g7/rc/pilot_runs.tsv	8549e618e1f9a5bd546dedd7158f171685e46fed
+build/agent221/t310g7/rc/pilot_dead_leg.out	ea3a16363f7a2ae0ce18bdeea60ac0ba83fbf5ae
+build/agent221/t310g7/rc/pilot_overlap.txt	52e6b6244b688cb2693b2d355aa9b72dfa95a46b
+build/agent221/t310g7/rc/controls_concurrent_emu.diff	4a71d21e6a2de08854574476c10ddc498cf60683
+build/agent221/t310g7/rc/scratch_vs_tree.diff	63e7072e414e56865ddfaa5fa248110b8f01dbf7
+build/agent221/t310g7/rc/new_files_blobs.txt	3406db46430c8a6a9d0ddf4d1410ebe045faa0bb
+build/agent221/t310g7/rc/gate_since_pilot.diff	9589dd9e402617f8c58b6cc07621d57be304c622

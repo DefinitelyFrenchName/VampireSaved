@@ -3629,3 +3629,10 @@ Python process at start (the crash sweep's `pyx` plant) cannot simply `raise`. `
 runs (measured: a child started with `subprocess.run([sys.executable, "-c", "pass", "child-arg"])` saw
 `['-c', 'child-arg']`). **The rule:** to fail a process from `sitecustomize`, print the traceback yourself and call
 `os._exit(1)`; a process started with `-I`, `-E` or `-S` never runs the hook.
+
+## AN APOSTROPHE INSIDE `${VAR:?message}` OPENS A QUOTE — the whole script fails to parse, at a line far below (paid: 14z-221, #310)
+
+`: "${ROMDIR:?test_dead_leg_unjudged: ROMDIR unset (the rows' gates check their ROMs first)}"` made `sh -n` (bash as
+`/bin/sh` on macOS) report `syntax error near unexpected token` at line 98, then at line 102 after an unrelated edit: the
+`'` in the expansion's word starts a single-quoted string that runs on through the file. Bisecting with `head -N | bash -n`
+named the line. Keep quotes out of a `:?` message, or quote the message as its own word.

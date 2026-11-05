@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-605 entries (49 game / 153 platform / 403 project), counted from the buckets at generation.
+609 entries (49 game / 154 platform / 406 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
@@ -74,7 +74,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A MOTION THAT LEAVES A NEUTRAL FRAME BETWEEN BACK AND DOWN-BACK IS TWO TAPS TOWARD BACK, AND A CHARACTER WITH A BACKDASH DASHES — the press then lands in the hop (paid: 14z-205, #229, forks F3 and P1)
 - THE GAME HAS ONE ROUND: A DOWN THAT ENDS THE MATCH IS NEVER FOLLOWED BY A ROUND 2, AND A KO POKED WITH HP ALONE ENDS THE MATCH WITH THE SPARE BAR UNUSED (paid: 14z-215, GitHub #343)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 153 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 154 entries
 
 - LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB; `/bin/sh` IS DASH; THE PINNED MAME'S VERBOSITY IS A BUILD FACT — three macOS facts the first Linux emulator tier paid for (paid: 2026-10-01, ERIS WSL2 Ubuntu, GitHub #201)
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
@@ -229,8 +229,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A `trap '<cleanup>' EXIT INT TERM` WITH NO `exit` LETS A TERM'D SCRIPT RUN ON — the trap runs, then the script resumes after the interrupted command, its work directory already deleted (paid: 14z-218, the Mac and PILOT)
 - GNU `timeout` PUTS ITS COMMAND IN A PROCESS GROUP OF ITS OWN — `kill -- -<pgid>` of the caller's group does not reach it (paid: 14z-218, PILOT)
 - AN EXCEPTION RAISED IN `sitecustomize.py` DOES NOT CRASH PYTHON — `site.py` catches it, prints "Error in sitecustomize", and the program runs (paid: 14z-218, the Mac; `tests/lib/crash_sweep.sh`)
+- AN APOSTROPHE INSIDE `${VAR:?message}` OPENS A QUOTE — the whole script fails to parse, at a line far below (paid: 14z-221, #310)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 403 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 406 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -635,3 +636,6 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A `:d` DATA ROOT WHOSE TWIN POINTS ELSEWHERE CLASSES NO POINTER — and copies every node's source address verbatim (paid: 14z-219, the Mac; #345 A1b)
 - `audit_region_overlap`'s NORMALISER RE-MAPS ANY WORD THAT LANDS IN A PLACED RANGE — a new placement moves its counts with no byte of the compared copies changed (paid: 14z-220, the M25 freeze)
 - A FREEZE'S STATIC EXPECTATIONS ARE NOT ONLY THE ONES THE BATTERY NAMES — the relocation moved five more, found only by the static freeze tier (paid: 14z-220, the M25 freeze)
+- A STRIPPED-COPY CONTROL THAT DELETES ITS TAGGED LINES DELETES THE COMMANDS ON THEM — neuter the tagged call, never drop the line (paid: 14z-221, #310 group 7)
+- A VERDICT THAT COUNTS ONLY THE LEGS THAT WROTE OUTPUT PASSES ON ZERO LEGS (paid: 14z-221, #310 group 7)
+- A PLANTED COPY THAT CRASHES FIRES ITS CONTROL FOR THE WRONG REASON — the control must see its own plant's effect (paid: 14z-221, #310 group 7)

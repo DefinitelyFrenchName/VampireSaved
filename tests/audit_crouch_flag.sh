@@ -10,7 +10,7 @@
 #   deletes the Down from the replay and the flag must then never rise.
 # EXPECTS: the frozen transitions on both legs, P2's flag held 0, the stripped run flat. NOT
 #   covered: +0x121 in the air, while blocking, or on P2.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/crouch_flag.tsv
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/crouch_flag.tsv tests/lib/controls.sh
 #   tests/lua/field_trace.lua tests/replays/naming/donovan_1 tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh tests/lib/sheet.sh
 #
@@ -47,6 +47,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 case "$CONTROL" in ""|down-removed) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -94,8 +95,8 @@ PY
 }
 : > "$W/got.tsv"
 for leg in native ours; do
-    [ -f "$W/$leg.ft" ] || { bad "$leg: no trace (exit $(cat "$W/$leg/rc" 2>/dev/null || echo none))"; continue; }
-    reduce "$leg" "$W/$leg.ft" >> "$W/got.tsv" 2> "$W/$leg.err" || bad "$(cat "$W/$leg.err")"
+    [ -f "$W/$leg.ft" ] || { vs_ctl_nj "$leg: no trace"; bad "$leg: no trace (exit $(cat "$W/$leg/rc" 2>/dev/null || echo none))"; continue; }   # #310 g7 NJ
+    reduce "$leg" "$W/$leg.ft" >> "$W/got.tsv" 2> "$W/$leg.err" || { grep -q '^VOID: ' "$W/$leg.err" && vs_ctl_nj "$(cat "$W/$leg.err")"; bad "$(cat "$W/$leg.err")"; }   # #310 g7 NJ
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_crouch_flag"; exit 1; }
 sed 's/^/  /' "$W/got.tsv"

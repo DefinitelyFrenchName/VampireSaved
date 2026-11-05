@@ -89,7 +89,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 RPL="$REPO/tests/replays/113_shadow_vs_tenant.rpl"
-[ -f "$RPL" ] || { echo "FAIL: missing $RPL"; exit 1; }
+[ -f "$RPL" ] || { vs_ctl_nj "missing $RPL (no leg can run)"; echo "FAIL: missing $RPL"; exit 1; }   # #310 g7 NJ
 # The control differs by ONE line: the fifth START press is commented out.
 sed 's/^1360-1362 sys=S1/# CONTROL: FOUR presses — must NOT arm/' "$RPL" > "$W/four.rpl"
 cmp -s "$RPL" "$W/four.rpl" && { echo "FAIL: the control edit matched nothing — the replay's 5th press line moved"; exit 1; }
@@ -113,10 +113,10 @@ vs_pool_run run_one four "$W/four.rpl"
 vs_pool_wait
 run() { # run <tag> <replay> — judges the pooled run <tag> (the replay was given to run_one)
     [ "$(cat "$W/$1/rc" 2>/dev/null)" = 0 ] || {
-            echo "FAIL: $1 — MAME run failed"; tail -5 "$W/$1/mame.log"; fail=1; return 1; }
+            vs_ctl_nj "$1 — MAME run failed"; echo "FAIL: $1 — MAME run failed"; tail -5 "$W/$1/mame.log"; fail=1; return 1; }   # #310 g7 NJ
     # RH-25 / CPE-9: assert the run COMPLETED before reading any value from
     # it — an aborted run leaves dumps that look like a measurement.
-    grep -q '^END ' "$W/$1/c.log" || { echo "FAIL: $1 — no END line"; fail=1; return 1; }
+    grep -q '^END ' "$W/$1/c.log" || { vs_ctl_nj "$1 — no END line (the run did not complete)"; echo "FAIL: $1 — no END line"; fail=1; return 1; }   # #310 g7 NJ
 }
 fld() { # fld <tag> <frame> <side 0|1> <id|base|f3bc|f43>
     python3 - "$W/$1/dump_$2_ff8400.bin" "$3" "$4" <<'PY'

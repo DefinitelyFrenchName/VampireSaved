@@ -41,6 +41,8 @@
 #                                      crash in it is re-printed so the run
 #                                      reads DIED / UNJUDGED (returns 1), none
 #                                      returns 0 silently
+#   vs_ctl_nj <why>                    under a mode, a dead leg's NOT JUDGED
+#                                      line (UNJUDGED); silent in a plain run
 #   vs_ctl_read <script> <log>         declared vs fired for one run; sets
 #                                      VS_CTL_DECLARED/FIRED/DEAD/UNDECLARED
 #                                      (counts), VS_CTL_MISSING (names),
@@ -86,6 +88,16 @@ vs_ctl_left_green() {
     echo "CONTROL DEAD: $1 — the control mode left the gate green: its perturbation changed no verdict"   # #310 DEAD-close
     echo "$2"; exit 1
 }
+# vs_ctl_nj <why> — A DEAD LEG IS NOT A FINDING (#310 group 7, 14z-221; maintainer-ruled 2026-10-31 "5 and 6 now, 7 in
+# batches"). Under a CONTROL= mode, a leg that never finished (an emulator that exited non-zero, a trace with no END line,
+# no samples, a reducer's VOID) ends the run in the gate's ordinary FAIL, and tests/lib/classify.sh read that as the
+# control firing: HONOURED on no measurement. Call this beside each such liveness check, with the check's own words: under
+# a mode it prints `NOT JUDGED: under control mode <mode>, <why>` at column 0 (classify.sh reads the run UNJUDGED); in a
+# plain run it prints nothing, so a plain run's output and exit are unchanged. Returns 0: the caller keeps its own fail
+# flag. NOT for a mode whose honoured outcome IS a dead or VOID leg. The same shape as instr_align.sh's _ia_nj: the mode
+# is VS_CTL (vs_ctl_mode), else CONTROL, so a gate that parses CONTROL itself only needs to source this file.
+# Ground truth: tests/test_dead_leg_unjudged.sh (control plain-loud checks the silence; nj-stripped the rows).
+vs_ctl_nj() { [ -n "${VS_CTL:-${CONTROL:-}}" ] || return 0; echo "NOT JUDGED: under control mode ${VS_CTL:-$CONTROL}, $1"; }
 # vs_ctl_show_err <output file> [<expected exception>|-] [<copy script path>] — A PERTURBED COPY'S CRASH IS NOT ITS FINDING
 # (#310 group 5, 14z-215; maintainer-ruled 2026-10-31). A control mode runs a copy of a tool or script with one
 # perturbation; when the copy CRASHED, the gate used to print only `tail -N` of its output, an indented or joined excerpt,

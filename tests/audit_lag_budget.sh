@@ -64,7 +64,8 @@ bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 FP_B="$(python3 "$REPO/tools/build_fingerprint.py" "$BUILD/rompath" --set vsavjw --sha-only | cut -c1-8)"
 FP_R="$(python3 "$REPO/tools/build_fingerprint.py" "$REF/rompath" --set vsavjw --sha-only | cut -c1-8)"
 echo "== build under test: $BUILD $FP_B; reference: $REF $FP_R"
-[ "$FP_B" != "$FP_R" ] || { echo "FAIL: the build under test and the reference are the same build ($FP_B) — the comparison would be vacuous"; exit 1; }
+[ "$FP_B" != "$FP_R" ] || { vs_ctl_nj "the build under test and the reference are the same build ($FP_B), so no leg ran"   # #310 g7 NJ
+    echo "FAIL: the build under test and the reference are the same build ($FP_B) — the comparison would be vacuous"; exit 1; }
 if [ -z "${PARTS:-}" ]; then
     PARTS="$(ls "$REPO/tests/replays/naming/" | sed -n 's/\.rpl$//p' | sort)"
 fi
@@ -99,7 +100,7 @@ done; done
 wait
 for p in $PARTS; do for l in build ref; do
     _rc="$(cat "$W/$p.$l/rc" 2>/dev/null || echo none)"
-    [ "$_rc" = 0 ] && [ -s "$W/$p.$l/f.ft" ] || bad "$p $l: the run did not complete (exit $_rc) — VOID"
+    [ "$_rc" = 0 ] && [ -s "$W/$p.$l/f.ft" ] || { vs_ctl_nj "$p $l: the run did not complete (exit $_rc) — VOID"; bad "$p $l: the run did not complete (exit $_rc) — VOID"; }   # #310 g7 NJ
 done; done
 [ "$fail" = 0 ] || { echo "FAIL: audit_lag_budget"; exit 1; }
 plant() {  # plant <trace in> <trace out>: THE PERTURBATION — the midpoint frame's whole pass-counter advance removed

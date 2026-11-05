@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-221): a D-ABSOLUTE flag — 'the watcher is created and never runs' states what was not watched (only the table entry was read); reworded and re-prepared.

@@ -130,7 +130,7 @@ for pair in $ALL; do
     tab="${pair%%:*}"; cid="${pair##*:}"
     [ -n "$WANT" ] && { case " $WANT " in *" $tab "*) ;; *) continue;; esac; }
     for d in $DIRS; do
-        [ -s "$W/${tab}_$d/t.txt" ] || { nope "leg $tab $d: no samples (see $W/${tab}_$d/l.log)"; continue; }
+        [ -s "$W/${tab}_$d/t.txt" ] || { vs_ctl_nj "leg $tab $d: no samples (the leg produced nothing)"; nope "leg $tab $d: no samples (see $W/${tab}_$d/l.log)"; continue; }   # #310 g7 NJ
         python3 tools/vanilla_join_rig.py analyse "$W/${tab}_$d/t.txt" "$W/${tab}_$d.json" "$IMG" "$cid" \
             --tab "$tab" --tsv --airborne >> "$W/got.txt" || nope "analyse $tab $d"
     done
@@ -145,7 +145,8 @@ done
 # jump_down rows may be UNFIRED where D+button in the air is not an attack at all
 # (a character whose neutral jump takes no normal — AN — or whose down-input is
 # eaten): reported in section 4, never a rig failure.
-if grep -v -E '^AN	jump	|^[A-Z]+	jump_down	|^[A-Z]+	jump_fwd_down	' "$W/got.txt" | grep -q UNFIRED; then nope "some events never fired:"; grep -v -E '^AN	jump	|^[A-Z]+	jump_down	|^[A-Z]+	jump_fwd_down	' "$W/got.txt" | grep UNFIRED | sed 's/^/        /'
+if grep -v -E '^AN	jump	|^[A-Z]+	jump_down	|^[A-Z]+	jump_fwd_down	' "$W/got.txt" | grep -q UNFIRED; then vs_ctl_nj "some events never fired (a leg that did not produce the event is VOID)"; nope "some events never fired:";   # #310 g7 NJ
+    grep -v -E '^AN	jump	|^[A-Z]+	jump_down	|^[A-Z]+	jump_fwd_down	' "$W/got.txt" | grep UNFIRED | sed 's/^/        /'
 else ok "every event entered a chain (no UNFIRED outside the declared Anakaris neutral-jump exception; jump_down and jump_fwd_down reported in 4)"; fi
 
 echo "== 3. against the frozen table"

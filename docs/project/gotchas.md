@@ -7016,7 +7016,10 @@ FAILed as it should. Through `tests/run_all_emulator.sh` on ERIS it read `contro
 the runner reads every declared control's `CONTROL FIRED` line from the NORMAL run (`tests/lib/controls.sh`
 `vs_ctl_read`), and the executable mode is a second, separate check. The control now also fires inline, through
 `hit_in()`, the one copy of the count-aware test. **The rule:** a gate that gains a control is run through the
-runner with `--controls` before it is committed, never only by hand.
+runner with `--controls` before it is committed, never only by hand. **Paid again 14z-221:**
+`test_dead_leg_unjudged`'s `plain-loud`, rebuilt after rule-checker run 2026-11-05-1641, fired only under its mode. It was
+run by hand and read by `vs_classify_control`, and the close tier read `controls RED: plain-loud(not fired)`. It now
+also checks in-gate, in every run, that its plant prints where sections 1 and 2 would catch it.
 
 ## A CLASSIFICATION BY TWO READERS OF ONE RUBRIC IS ONE CLASSIFICATION — the rubric that defined "mattered" came from the working agent that wanted the answer (paid: 14z-199, the session-time report; carried into GitHub #273)
 
@@ -8023,3 +8026,36 @@ acknowledgement row). **The rule:** at a freeze that moves placements, run the s
 rule-checker runs for the re-freezes are prepared, not after, so every moved expectation goes into one attribution;
 and let `tools/setup_jtcores.sh` write the mirrored patch once its name is in `PATCH_NAMES`, never a hand-run
 `format-patch` (`build/agent220/m25/rc/r_s6fix/`, local; rule-checker run 2026-11-04-1613).
+
+## A STRIPPED-COPY CONTROL THAT DELETES ITS TAGGED LINES DELETES THE COMMANDS ON THEM — neuter the tagged call, never drop the line (paid: 14z-221, #310 group 7)
+
+`tests/test_dead_leg_unjudged.sh` proves that each batch gate reads UNJUDGED with a dead emulator because of its
+`# #310 g7 NJ` lines, by running a copy of the gate without them, which must misread as the pre-fix gate did. Its first form
+DELETED every tagged line, and 20 of 25 copies read DIED or LIES instead of HONOURED. The fixes had put the
+`vs_ctl_nj` call ON an existing line: `python3 tools/air_dash_rigs.py gen ... || { vs_ctl_nj "..."; echo FAIL; exit 1; }`
+lost the rig generation itself, so the compare crashed on a missing JSON; a tagged `else` or `fi` left `audit_crouch_flag`'s
+copy a syntax error. The copy then tested a different gate. The control now NEUTERS a tagged line (`vs_ctl_nj` becomes `:`,
+a printed `NOT JUDGED:` is renamed), and all 25 copies read HONOURED, the pre-fix misreading reproduced exactly. **A
+control that removes a fix must remove the fix's EFFECT and nothing else; a tag marks a line, not a statement.**
+
+## A VERDICT THAT COUNTS ONLY THE LEGS THAT WROTE OUTPUT PASSES ON ZERO LEGS (paid: 14z-221, #310 group 7)
+
+`audit_dispatch_census` globbed its legs' census files and judged what it found: incomplete runs, clock drift, anchors,
+growth against the frozen set. With a dead emulator (`MAME_BIN=/usr/bin/false`) no leg wrote a file, every check read "ok"
+over zero legs (`ok: all 0 completed runs ...`), and its `drift-clock` mode, which skips the in-gate control, exited 0 with
+`DISPATCH CENSUS: PASS`. The plain run stayed red only because its in-gate control needs its own legs. The gate now counts the
+legs it LAUNCHED and fails when fewer wrote their census and reference files. **A gate that reads a directory must know how
+many entries it expects; a glob's count is what happened, not what was asked.**
+
+## A PLANTED COPY THAT CRASHES FIRES ITS CONTROL FOR THE WRONG REASON — the control must see its own plant's effect (paid: 14z-221, #310 group 7)
+
+`test_dead_leg_unjudged`'s `plain-loud` control planted a copy of `tests/lib/controls.sh` whose `vs_ctl_nj` prints in a
+plain run, by deleting the line's mode guard. The rest of the line read `${VS_CTL:-$CONTROL}`, which only the guard had kept
+from being reached without a mode, so under `set -u` the copy died with `CONTROL: unbound variable`. The gate's section 1
+reported that as "printed or failed", the run exited 1, and `tests/lib/classify.sh` read it HONOURED: the crash was inside
+the gate's own FAIL text, from a file outside `tests/lib/`, so no crash rule matched. Rule-checker run 2026-11-05-1641 caught
+it from the log. The control also covered only section 1, never section 2's plain-run silence check. Now the planted line
+prints and cannot crash; section 2 runs each row's gate with the loud copy; and the gate prints `CONTROL FIRED: plain-loud`
+only when section 1 saw the exact line and some plain run printed it, else `CONTROL DEAD` (LIES). A copy that crashes again
+reads LIES (`build/agent221/t310g7/rc/ctl_plain-loud_crashcopy.log`, local). **A control's FAIL proves nothing until the
+log shows the plant's own effect. Have the gate check that effect, not just its exit.**

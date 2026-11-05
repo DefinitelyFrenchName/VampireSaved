@@ -137,8 +137,8 @@ vs_pool_run run_exec p1 "$W/p1.rpl"
 vs_pool_wait
 run() { # run <tag> <replay> — judges the pooled run_exec's artifacts
     [ "$(cat "$W/$1/rc" 2>/dev/null)" = 0 ] || {
-            echo "FAIL: $1 — MAME run failed"; tail -5 "$W/$1/mame.log"; fail=1; return 1; }
-    grep -q '^END ' "$W/$1/c.log" || { echo "FAIL: $1 — no END line"; fail=1; return 1; }
+            vs_ctl_nj "$1 — MAME run failed"; echo "FAIL: $1 — MAME run failed"; tail -5 "$W/$1/mame.log"; fail=1; return 1; }   # #310 g7 NJ
+    grep -q '^END ' "$W/$1/c.log" || { vs_ctl_nj "$1 — no END line (the run did not complete)"; echo "FAIL: $1 — no END line"; fail=1; return 1; }   # #310 g7 NJ
 }
 
 echo "== 1. P2 hovers the tenant: Pyron's medallion row 0x1A must HOLD =="
