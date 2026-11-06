@@ -82,7 +82,7 @@
 #
 # Usage: ROMDIR=... [BEAM_WALK_EXPECT=absent|walks] [JOBS=N] \
 #            tests/test_beam_anim_walk.sh [wide-builddir] [--freeze-clock]
-#        (defaults to build/hui63; needs a build carrying H's real art)
+#        (defaults to build/hui64; needs a build carrying H's real art)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -120,7 +120,7 @@ for a in "$@"; do [ "$a" = "--freeze-clock" ] && FREEZE_CLOCK=1; done
 CLOCKS="tests/expected/instr_gameclock/test_beam_anim_walk.tsv"
 [ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
 _clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
-BUILD="${1:-build/hui63}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/hui64}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 EXPECT="${BEAM_WALK_EXPECT:-walks}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {

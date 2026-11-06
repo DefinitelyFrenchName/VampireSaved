@@ -29,7 +29,7 @@
 #
 # SHEET: none — the capture sheets for the maintainer are a separate step (14z-219, build/agent219/t345/after/snap/sheets/); this gate judges records only
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged33] [JOBS=3] tests/audit_don_trail_nodraw.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged34] [JOBS=3] tests/audit_don_trail_nodraw.sh
 #   emulator tier, MAME; 6 runs
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
@@ -37,7 +37,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged33}"
+BUILD="${BUILD:-build/m3b_merged34}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] && [ -f "$BUILD/verify_op.bin" ] && [ -f "$BUILD/verify_data.bin" ] || {

@@ -1,5 +1,77 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-222 — THE M26 FREEZE: #357 AND #363 LANDED (donovan-m30 / huitzil-m37 / pyron-m31 / merged-m26)
+
+**WHAT LANDED.** `build/manifest/staged/357_363.patch` (the two 14z-221c entries below) applied and the staged file
+retired in the freeze commit, the 14z-188 precedent; `build/m5_wide/extract` re-extracted on purpose for #357's two WIDE
+roots (every earlier region file byte-identical, two new: `region_x090eda.bin`, `region_x0d1bbe.bin`); `version_text`
+M25 -> M26 in the three tenant manifests.
+
+**THE BUILDS (`build/agent222/m26/build_all.sh`).** `build/don_m30` program `0f5b6866` (363 ops), `build/hui64`
+`41a55597` (384 ops), `build/pyron49` `9d135e7b` UNCHANGED, `build/m3b_merged34` `2c594c29` (861 ops, = the 14z-221c
+scratch `build/agent221c/m34x`), stock twin `build/m5_stock25` `a3910ded` UNCHANGED, stage-4 `2fa7c2f1` UNCHANGED. ERIS
+rebuilt all six from the same tree (scratch `e22dea4f`): every program, set key and zip member CRC equal.
+
+**THE DELTA, EXPLAINED OP BY OP** (`build/agent222/m26/fixed_site_delta.txt`, `apd_straddle_*.txt`). donovan +3 ops (the
+code region at `0x400310`, the data region at `0x400480`, the row word at `PRG:0x080AF8`), one designed EDIT (the orbs'
+motion operand, +0xF75 of `0x0D0170`: `0x0CB716` -> `0x400480`); huitzil +3 (`PRG:0x0238FA`, `PRG:0x029CBA`, the handler
+at `0x0FE320`), nothing relocated; merged +6 (the same six, the handler at `0x4740E0`), 0 removed — the `(kind, length)`
+multiset of the merged ops differs by exactly those six. Every `wide_ext` placement after the new regions moved +0x270,
+Pyron's merged regions +0x2A0 (behind the handler); fixed-site ops: 269 same, 161 pointers relocated by those shifts, 3
+added; of 15,296 relocation targets 15,094 content-identical in the tool's window and 202 equal modulo a relocated long
+straddling its end. The aligner's nine other merged EDITs pair unchanged 2-byte ops out of position beside the inserted
+row word (no 2-byte fixed-site op changed but that one).
+
+**THE MiSTer TAIL.** Eight `vsavjw.zip` members moved (`vm3j.03d/04d/07b/10b`, `vsw.41/42`, `vsw.33m/37m` the mark,
+`build/agent222/m26/member_delta.txt`): fork commit `e11729fe` (`doc/mame.xml` only), `emu/jtcores-patches/0042`, the
+pin in `tools/setup_jtcores.sh`; the WIDE MRA regenerated (its BUILD block and the eight CRCs; the stock MRA identical).
+The byte diff (`tests/expected/freeze_bytediff/merged-m26.txt`): every fixed-site range below `PRG:0x3F0000` is one of
+the designed sites (row 19, the motion operand, row 0x4F, the span's `jmp`, Huitzil's solo handler), a long relocated
++0x270 or +0x2A0, or the other view's echo — 0 unexplained (`build/agent222/m26/bytediff_fixed_review.txt`); Pyron's
+images byte-identical.
+
+**RE-FROZEN, EACH LINE ATTRIBUTED** (`build/agent222/m26/refreeze_attribution.md`). Static: `test_tenant_loop` (above),
+`test_manifest_merge` (site_thunk and code_word +1 Huitzil), `test_region_overlap` (unique +2), `rule5_baked` (+1
+declared growth, ledger line), the three charmaps' page hashes, `test_m3a_reproducible`'s program and member pins, the
+pointer-flow baselines `donovan-m30` / `merged-m26`, `roster_pairings/bases.tsv`, `tables/donovan.md`, and the
+relocation-moved `escape_triage`, `latch_readers`, `df_field_readers`, `reaction_classes`; the type-stamp inventory's
+`0x090FF4` row (ported by #357, `docs/project/gotchas.md`). Emulator (on ERIS): fifteen gates — relocations and build
+rows, Donovan's region count, the tenant-content counts that moved because Donovan's watcher now runs and Phobos's 0x4F
+hits now freeze (the first divergence of `audit_ranking_tenant`'s Donovan leg is the frame the watcher first exists);
+every legacy control row unchanged.
+
+## 14z-221c — #363: PHOBOS'S PLASMA BEAM FREEZES ITS VICTIM (BUILT AND STAGED for the next freeze with #357) — LANDED at the M26 freeze (the 14z-222 entry above)
+
+**WHAT IT IS.** Ruled 2026-11-05 (`DECISIONS_HISTORY.md` "Ruled 2026-11-05 (14z-221c)"): **"Fix it too (Recommended)"**.
+vs2's victim reaction row 0x4F (`PRG:0x02296C`) is vsavj's row-0x14 freeze (`0x023D82`) plus a class-0x4F case:
+`+0x11E` cleared and the freeze timer `+0x5C` = 0x1F; vsavj sends rows 0x4E and 0x4F to its default slide `0x0238FC`.
+Mechanism: `docs/game/engine_internals.md`, "Rows 0x4E and 0x4F of vsavj's reaction table".
+
+**THE CHANGE (`build/manifest/huitzil.toml`).** `[[code_word]]` `freeze_reaction_row4f`: `PRG:0x0238FA` `00a0` -> `645e`
+(the 16-bit row now names `PRG:0x029CBA`); `[[site_thunk]]` `freeze_reaction_4f`: the dead span `PRG:0x029CBA-0x029CBF`
+(`old_hex` `1d7c000403b5`) -> a `jmp` to the authored 0x26-byte handler (vs2's case on vsavj's twins: `jsr 0x027EC0`,
+`jmp 0x060ED8`). The first candidate span `0x0236CE` passed the dead-span tool and was a byte table's tail (rules D and R
+since, `tools/audit_dead_span.py`). Row 0x4E is not ported. Legacy reach: none (`tests/audit_effect_class_rows.sh` §1c,
+`tests/audit_dead_span_exec.sh`). Gate `tests/audit_beam_slide.sh` (re-frozen to native's freeze).
+
+## 14z-221c — #357: DONOVAN'S GUARD ORBS, vs2's WATCHER AND ITS MOTION TABLE (BUILT AND STAGED for the next freeze with #363) — LANDED at the M26 freeze (the 14z-222 entry above)
+
+**WHAT IT IS.** Ruled 2026-11-05 (`DECISIONS_HISTORY.md` "Ruled 2026-11-05 (after the 14z-221b close)"): *"we should port
+the orbs unless we find out we technically cannot"*. At his guard vs2 draws eight orbs (effect type 0x72 sub 0x16) spawned
+by a type-0x13 watcher in the `$FFD400` pool; vsavj's row 0x13 of that pool's table (`PRG:0x080AF8`) is the bare-`rts`
+stub. Mechanism: `docs/game/engine_internals.md` «Donovan's guard orbs».
+
+**THE CHANGE.**
+- `tools/build_donovan.sh`: two WIDE-only roots, `0x90eda:0x168:t0x90ae6` (the watcher, vhunt2 twin 353 of 360 bytes
+  equal) and `0xd1bbe:0x100:t0xd1450:d` (the 64-entry motion table).
+- `build/manifest/donovan.toml`: `region_space` adds both to `wide_ext`; `[[code_ptr]]` `guard_orb_class19` (row 19 ->
+  the watcher; `code_ptr` gained a `profile` key, inert for every earlier row); `[[ref_pin]]` (`pin_region`, new) pins
+  the orbs' motion operand `x088512+0xF74` to the table copy — it had resolved into his `hitbox_proj` copy (capped at
+  0x1000), which ends 0x16 bytes into vs2's table, so one orb per guard event took y += 0xFB on the first scratch build.
+- Kept as built: the tenant's slot-clearing allocator wrapper (on a spawn frame a recycled slot reads x/y 0 where native
+  keeps its previous occupant's; nothing is drawn that frame). Gate `tests/audit_guard_orbs.sh` (every drawn piece equal
+  native's on all 4,941 frames of donovan_15).
+
 ## 14z-220 — THE M25 FREEZE: #356 AND #345 A1b LANDED (donovan-m29 / huitzil-m36 / pyron-m30 / merged-m25)
 
 **WHAT LANDED.** `build/manifest/staged/356_345a1b.patch` (the two 14z-219 entries below) applied and the staged file

@@ -39,6 +39,8 @@ Source set `vsav2`, oracle set `vhunt2` (`tools/extract_char.py`; every region i
 | `x101aca` | `+0` (`0x00000000`) |
 | `x06e1d2` | `+372` (`0x00000174`) |
 | `x1d7428` | `+28978` (`0x00007132`) |
+| `x090eda` | `-1012` (`0xfffffc0c`) |
+| `x0d1bbe` | `-1902` (`0xfffff892`) |
 | `aux0` | `-131116` (`0xfffdffd4`) |
 
 ## Region manifest
@@ -63,6 +65,8 @@ Source set `vsav2`, oracle set `vhunt2` (`tools/extract_char.py`; every region i
 | `x101aca` | data | `PRG:0x101aca` | `PRG:0x101aca` | `0x10ce` | `0x0` | 0 | 0 | 0 | `a34b061531e2452699d34e2ee35afca837f6036e` |
 | `x06e1d2` | code | `PRG:0x06e1d2` | `PRG:0x06e346` | `0x2fe` | `0x2fe` | 6 | 0 | 0 | `d076182eeb80f43182b92ab461254232684c8756` |
 | `x1d7428` | data | `PRG:0x1d7428` | `PRG:0x1de55a` | `0x1308` | `0x0` | 403 | 0 | 0 | `77ff59b24c03736c1b8cb83c1b75e12a9b80721d` |
+| `x090eda` | code | `PRG:0x090eda` | `PRG:0x090ae6` | `0x168` | `0x168` | 5 | 0 | 0 | `216b82e6497de3d31a053d5415cd049b84c73b73` |
+| `x0d1bbe` | data | `PRG:0x0d1bbe` | `PRG:0x0d1450` | `0x100` | `0x0` | 0 | 0 | 0 | `6f52196019012ba8a21a39e85267952a9bb3b757` |
 | `aux0_0` | data | `PRG:0x334b80` | `PRG:0x314b54` | `0xf10` | `0x0` | 0 | 0 | 0 | `90dc675a71ffd36d1b3d9e0f8b991da9acc0beb7` |
 | `aux0_1` | data | `PRG:0x337460` | `PRG:0x317434` | `0x190` | `0x0` | 0 | 0 | 0 | `d63ade90c05932bf09652c63d9f7d51f4d97a8f5` |
 | `aux0_2` | data | `PRG:0x33ccf0` | `PRG:0x31ccc4` | `0x1a0` | `0x0` | 0 | 0 | 0 | `8f61859c3f7aa61c5be2e80155652c7365c4dc5d` |

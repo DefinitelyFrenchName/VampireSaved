@@ -9,8 +9,8 @@
 #   FREEZE (PRG:0x02296C: sub 08, +0x140 = 0x14, +0x11E = 0, the freeze timer +0x5C = 0x1F, the ice block). vsavj's table
 #   PRG:0x02385C sends rows 0x4E and 0x4F to its default row PRG:0x0238FC (the pushback slide: before #363's fix Demitri
 #   slid 81 px and ended 49 px further from Phobos). #363's fix (build/manifest/huitzil.toml freeze_reaction_row4f and
-#   freeze_reaction_4f; STAGED for the next freeze as build/manifest/staged/357_363.patch, so this gate is RED against
-#   the frozen merged build until that freeze) points row 0x4F at a jump on the dead span PRG:0x029CBA
+#   freeze_reaction_4f; frozen in M26, 14z-222: merged-m26, build/m3b_merged34, carries the scratch build's program
+#   2c594c29 unchanged) points row 0x4F at a jump on the dead span PRG:0x029CBA
 #   (tests/test_dead_span.sh) to an authored copy of vs2's handler on vsavj's twins. Mechanism:
 #   docs/game/engine_internals.md, "Rows 0x4E and 0x4F of vsavj's reaction table". Legacy reach: none — vanilla never
 #   reads row 0x4F (tests/audit_effect_class_rows.sh section 1c) or executes the span (tests/audit_dead_span_exec.sh).
@@ -20,7 +20,8 @@
 #   gate's protocol (real cursor picks, speed level pinned 6 from f2000, RNG 0000 from f2363, the part's own X pins at
 #   2560/2800/3040) on naming part huitzil_4 (P2 Demitri), Plasma Beam (ES) [PP] and [KK]. Each beam is judged in its
 #   event window [2600, 2800) and [2840, 3040), cut before the next X pin.
-# EXPECTS (frozen 14z-221c on the scratch build build/agent221c/m34x, build/agent221c/t363/fix2/): step 0 — vsavj rows
+# EXPECTS (frozen 14z-221c on the scratch build build/agent221c/m34x, build/agent221c/t363/fix2/; BUILD re-pointed to
+#   build/m3b_merged34 at the M26 freeze, 14z-222, the same program): step 0 — vsavj rows
 #   0x00/0x4E/0x4F -> 0x0238FC x3, vsav2 -> 0x022430/0x0226E0/0x02296C, ours -> 0x0238FC/0x0238FC/0x029CBA, ours'
 #   PRG:0x029CBA a `jmp` to the authored body (its 0x26 bytes, the manifest's thunk_hex). Step 2 — both legs complete
 #   (END); in each window the hits give +0x54 = 0x4F on both legs from the same frozen first frame (f2640, f2880);
@@ -39,14 +40,14 @@
 #
 # SHEET: none — the beam's capture sheets for the maintainer are #358's (build/agent221/t358/sheets/, local); this gate judges P2's state words only
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged33] [KEEP=<dir>: the two traces are copied there] tests/audit_beam_slide.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged34] [KEEP=<dir>: the two traces are copied there] tests/audit_beam_slide.sh
 #   emulator tier, MAME; 2 runs
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"; export ROMDIR
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged33}"
+BUILD="${BUILD:-build/m3b_merged34}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] && [ -f "$BUILD/verify_op.bin" ] || { echo "SKIP: no WIDE build with verify_op.bin at $BUILD"; exit 0; }

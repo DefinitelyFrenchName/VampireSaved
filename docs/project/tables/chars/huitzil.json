@@ -12,20 +12,20 @@
  },
  "inputs": {
   "bank_map.toml": "414f66951fee3a2ca94932baeb8d3189c1c03aee",
-  "manifest": "f00e8519cb76400e755db4fa1ea0374507411834",
+  "manifest": "be09afadfa0aa31c9c83115bd904b5cb1889ce78",
   "overrides": "be0e9b96c8414532cc7a1d60f7a4a235a7d6362d",
   "placements.json": "913270ce40f1e46e11e9b6daa7ff4346771009c3",
   "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
   "reconciliation_huitzil.toml": "23a15e51725a81723de8019f1e61bca7b8c62f22",
   "regions.json": "97f76c952701ef0e82b257ef5fe848a86304481f",
-  "verify_data.bin": "dffb7780cc9d6fbfef478dfdc58096b237cab213"
+  "verify_data.bin": "1da76ea83fc780d63e76a4f99872f8a85734abf5"
  },
  "overrides": [],
  "schema": 1,
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/hui63"
+   "set": "build/hui64"
   },
   "vh": null,
   "vs2": {

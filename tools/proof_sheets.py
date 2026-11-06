@@ -1386,7 +1386,7 @@ WEB_LOCAL_PATH = re.compile(r"(?:/Users/|/home/|/private/|/var/folders/|/tmp/|[A
 # that pattern knows fails too, by construction rather than by sampled forms. The detector matches any
 # absolute path of two or more parts outside a URL, a ~/ path, a drive path, a session scratch dir, a path after a colon
 # too (rompath:/Users/...), while a URL's own slashes never match (each follows a slash or a word character). A
-# repo-relative name (build/m3b_merged33, tests/...) names the repository's own directory and is allowed.
+# repo-relative name (build/m3b_merged34, tests/...) names the repository's own directory and is allowed.
 WEB_PATH_LEAK = re.compile(r"(?<![\w./~-])/[\w.@-]+(?:/[\w.@-]+)+|(?<!\w)~/|(?<!\w)[A-Za-z]:[\\/]|(?<![\w/.-])build/agent")
 WEB_FILES = (".html", ".webp", ".wav", ".css")
 

@@ -41,8 +41,9 @@ Controls (the list_type_census.py lesson: a census that cannot see what it
 is looking for reads exactly like a clean result):
   --expect  (default ON for the 0x5E542 family): the six known immediate
             sites MUST appear in the rewrite class, else FAIL.
-  negative: vs2 0x0697B8 / 0x090FF4 (family stamps in unported spans) must
-            map to NO tenant, else the region model drifted.
+  negative: vs2 0x0697B8 / 0x00B63C (family stamps in unported spans) must
+            map to NO tenant, else the region model drifted (0x090FF4 was one
+            until #357 ported its span, 14z-222).
 
 Usage:
   python3 tools/audit_type_stamps.py <src_opcodes.bin> \
@@ -73,8 +74,9 @@ EXPECT_5E542 = {
     0x057492: 115,  # hui x057456+0x3C, imm $0100730B (nonzero ss)
     0x05946A: 118,  # hui x057456+0x2014 / pyron code+0x1FAA
 }
-# family stamps that live in spans NO tenant ports — the negative control
-EXPECT_UNPORTED = (0x0697B8, 0x090FF4, 0x00B63C)
+# family stamps that live in spans NO tenant ports — the negative control. 0x090FF4 left it at 14z-222 (M26): #357
+# ports vs2's guard-orb watcher (Donovan's x090eda), whose spawn loop holds that stamp (build/manifest/type_stamps.toml)
+EXPECT_UNPORTED = (0x0697B8, 0x00B63C)
 
 DEFAULT_FAMILIES = ("0x5E542:114-120", "0x54470:59-75")
 

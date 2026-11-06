@@ -29,6 +29,8 @@
   "x101aca": 0,
   "x06e1d2": 372,
   "x1d7428": 28978,
+  "x090eda": -1012,
+  "x0d1bbe": -1902,
   "aux0": -131116
  },
  "regions": {
@@ -60948,6 +60950,69 @@
    "variant_sites": [],
    "selfptr_only": true,
    "sha1": "77ff59b24c03736c1b8cb83c1b75e12a9b80721d"
+  },
+  "x090eda": {
+   "src": 593626,
+   "orc": 592614,
+   "len": 360,
+   "grow": 360,
+   "kind": "code",
+   "shift": "x090eda",
+   "refs": [
+    {
+     "off": 128,
+     "width": 32,
+     "target": 79652,
+     "orc_target": 79658,
+     "shift": "engine",
+     "class": "engine"
+    },
+    {
+     "off": 196,
+     "width": 32,
+     "target": 2660968,
+     "shift": "anim",
+     "class": "internal"
+    },
+    {
+     "off": 202,
+     "width": 32,
+     "target": 79736,
+     "orc_target": 79742,
+     "shift": "engine",
+     "class": "engine"
+    },
+    {
+     "off": 276,
+     "width": 32,
+     "target": 87810,
+     "orc_target": 87816,
+     "shift": "engine",
+     "class": "engine"
+    },
+    {
+     "off": 356,
+     "width": 32,
+     "target": 88090,
+     "orc_target": 88096,
+     "shift": "engine",
+     "class": "engine"
+    }
+   ],
+   "variant_sites": [],
+   "charid_sites": [],
+   "sha1": "216b82e6497de3d31a053d5415cd049b84c73b73"
+  },
+  "x0d1bbe": {
+   "src": 859070,
+   "orc": 857168,
+   "len": 256,
+   "kind": "data",
+   "shift": "x0d1bbe",
+   "pre_classified": true,
+   "refs": [],
+   "variant_sites": [],
+   "sha1": "6f52196019012ba8a21a39e85267952a9bb3b757"
   },
   "aux0_0": {
    "src": 3361664,

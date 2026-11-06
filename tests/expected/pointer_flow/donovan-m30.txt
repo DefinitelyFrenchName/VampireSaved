@@ -1,0 +1,8 @@
+# pointer-flow baseline for donovan-m30 (build/don_m30), frozen 14z-222 — the M26 freeze (#357 and #363).
+# vs donovan-m29: `data:long` 1264 -> 1263 (-1), every row ATTRIBUTED by its bytes, one-to-one, each OLD row tried first at
+# its own placed region's measured shift (build/agent222/m26/pflow/weak_class3.py, weak3_don_m30.txt): 1,263 the same long
+# at the same site (760) or moved +0x270 with its region (503), still flagged; -1 the long at 0xf3022 (0x0041bb40),
+# unchanged, now inside the data op placed at 0x41bb40 (the +0x270 shift moved an op over it), so no longer in a hole.
+# The counts reconcile (OLD 1264, NEW 1263). Nothing STRONG.
+WEAK-COUNT	code:move_imm	1
+WEAK-COUNT	data:long	1263

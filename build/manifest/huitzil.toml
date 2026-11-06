@@ -892,7 +892,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M25"
+version_text = "M26"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202
@@ -3105,3 +3105,41 @@ old_hex = "3b49b48e"
 new_hex = "3b49b43c"
 note = "#157: grab ptr store a1 (site 3)"
 
+
+# ── #363 (14z-221c; the maintainer chose "Fix it too (Recommended)" for #363 on 2026-11-05): THE FREEZE REACTION ────
+# Phobos's Plasma Beam (ES) hits with reaction class 0x4F. vs2's victim reaction table (vs2 0x022388) sends row 0x4F to
+# 0x02296C, the FREEZE: sub 08, +0x140 = 0x14, +0x11E cleared, +0x5C = 0x1F (the freeze timer, counted down each frame:
+# 0x1F, 0x1D, 0x1C ... on native, build/agent221c/t363/base/native.st), the anim byte 0x1B, then the ice-block spawn —
+# the maintainer, on 14z-221b's capture: "vs2 always freezes (not paralyses: the whole ice block effect) Demitri on each
+# hit". vsavj's table (PRG:0x02385C, 80 16-bit rows read by `move.w $2385c(pc,d0.w),d1 / jmp $2385c(pc,d1.w)` at
+# PRG:0x023854) sends rows 0x4E and 0x4F to its default row 0x0238FC, the pushback slide: ours slid Demitri +81 px.
+# vsavj carries the same freeze for class 0x14 (PRG:0x023D82: sub 08, +0x140 = 0x14, +0x11E = 1, its anim byte from
+# the class map, `bsr 0x27EC0`, `jmp 0x060ED8` — the twins of vs2's 0x027114 and 0x06D31C), but not the class-0x4F
+# special case (+0x11E = 0, +0x5C = 0x1F), and vsavj's class map (data PRG:0x028D00) holds 0x00 at 0x4F where vs2's
+# (0x027FD8) holds 0x1B; without +0x5C the freeze would end at once. So the handler is authored: vs2's 0x02296C with
+# vsavj's twins, the map byte as an immediate (`move.b #$1b,d0` leaves d0's upper bits as vs2's `move.b` does).
+# THE ROW IS 16 BITS, so the handler must be reached from within +-32K of the table: the jump sits on the six dead
+# bytes PRG:0x029CBA-0x029CBF (`move.b #4,$3B5(a6)`, an unreferenced entry fragment ending `bra.b 0x029C74`):
+# tools/audit_dead_span.py DEAD (refs A 0 C 0 T 0, fenced) and tests/audit_dead_span_exec.sh 0 executions there and at
+# its `bra.b` 0x029CC0 over the 64-replay legacy corpus (14z-221c). The first candidate, 0x0236CE, was REJECTED: the
+# tool called it dead, but it is entries 10-15 of a 16-byte table read by `move.b $236c4(pc,d0.w),d0` after
+# `andi.w #$f,d0` at PRG:0x023694 (docs/project/gotchas.md). Row 0x4F's deadness in vanilla: tests/audit_effect_class_rows.sh
+# section 1c. Row 0x4E (vs2 0x0226E0, a different handler) is not ported: no move measured to carry it.
+[[code_word]]
+stage = 6
+name = "freeze_reaction_row4f"
+addr = 0x0238FA
+old_hex = "00a0"
+new_hex = "645e"
+# 0x0238FC - 0x02385C = 0x00A0 (the default row); 0x029CBA - 0x02385C = 0x645E (the jump below)
+
+[[site_thunk]]
+stage = 6
+name = "freeze_reaction_4f"
+site = 0x029CBA
+old_hex = "1d7c000403b5"
+patch = "jmp"
+rts_ok = true
+# move.b #8,$7(a6) / move.b #$14,$140(a6) / clr.b $11e(a6) / move.b #$1f,$5c(a6) / move.b #$1b,d0 /
+# jsr $27ec0.l / jmp $60ed8.l   (vs2 0x02296C-0x0229A5; the jmp's target rts's to the dispatch's caller, as every row does)
+thunk_hex = "1d7c000800071d7c00140140422e011e1d7c001f005c103c001b4eb900027ec04ef900060ed8"

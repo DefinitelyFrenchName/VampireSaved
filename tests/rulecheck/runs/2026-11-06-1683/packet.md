@@ -1,0 +1,83 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: M26 freeze: every expectation the freeze moved, re-frozen and attributed line by line (static on the Mac, fifteen emulator gates on ERIS at S3pre, verified in the S3 battery) — re-check after run 2026-11-06-1682
+Claim (the working agent's sentence): Re-freeze, for the M26 freeze (#357 and #363, ruled: rulings.txt), every expectation the freeze moved, as the per-file diffs in diffs/ show them against HEAD 35e4d0df (the M25 tree): each changed line is accounted for in refreeze_attribution.md. By attr_refreeze.py.txt, run over every file of diffs/ (33, attr_all.txt), a changed line is RELOC when every differing token is a hex value moved by +0x270 or +0x2A0 — the placement shifts measured from the builds' own placements.json (region_shifts.txt) — or BUILD when it is the M25 -> M26 build or set name or key; its plant flips one relocated digit and turns that pair OTHER in each of the 12 files holding a RELOC pair (attr_all_plant.txt, attr_plant_check.txt). Every OTHER line — 283, the matcher printing all of them — is read by an explicit file-scoped rule in other_lines.py.txt, which FAILs on any line no rule reads, on any count unequal to the matcher's, and on a matcher file list unequal to diffs/'s (other_lines.txt: 0 unread; an invented line fails it, other_lines_plant.txt; a dropped file fails it, other_lines_drop.txt), and refreeze_attribution.md gives each rule's reading: build names before a full stop; Donovan's region count 23 -> 25; the clock file's freeze-provenance comment; the counts that moved on tenant content, each shown with its legacy control unchanged — defense_row_reads changes only 41 rows of its `suite` leg while its vsavj, victim and attacker legs are identical (refreeze_counts.txt); reaction_class_live's vsavj and native legs are identical, and ours keeps 81 rows, relocates 20, loses class 0x4F at the fixed default-path readers PRG:0x023926 and 0x024420-0x024458, and gains three readers, one in #357's watcher copy and two in Donovan's x088512 copy beside the class-0x72 sub-0x16 code, located by address (refreeze_counts.txt, reader_sites.txt); facing_hook_ab's verdict keys are unchanged and only the counts of its Donovan-vs-CPU arcade leg moved; pass_overrun keeps its 34 keys, 14 Donovan means moving by 0.0 to -0.2, the zero-pass counts unchanged but one fewer (5 -> 4) in one row, none increased (pass_overrun_check.txt); audit_ranking_tenant's Donovan clock moved while its legacy leg held, and that leg's first divergence is the frame at which #357's watcher first runs (first_divergence.txt). Static re-freezes — test_tenant_loop, test_manifest_merge, test_region_overlap (its log now prints the measured 19 and 21 unique spans: two of its ok lines had been literals, fixed, diffs/tests_test_region_overlap.sh.diff), rule5_baked (one declared growth; its fact count +19 = the staged patch's new rows' FACT keys, rule5_keys_diff.txt), the pointer-flow baselines (WEAK rows matched one-to-one, weak3_*.txt, the two STRONG findings +0x2A0), the charmap page hashes (each M25 page with its build name substituted equals the M26 page, charmap_html_check.txt), test_m3a_reproducible's pins (m3a_manifests.txt), the hitbox-base rows (only 0x10 and 0x11 differ, bases_rows_check.txt), the CPU-AI gate's seven sites (cpu_ai_sites.txt) and its header's stale M24 return site corrected, the type-stamp row 0x090FF4 — each PASS on the tree (static_*.log); the fifteen emulator re-freezes were made on ERIS at scratch S3pre and each reads PASS in the battery at S3 (S3_battery_results.tsv). What this rests on that is NOT tested: (1) the matcher's RELOC class accepts any hex token moved by exactly +0x270 or +0x2A0, so an unintended change of that size would be counted as a relocation; (2) the count changes on tenant content (defense_row_reads' suite leg, reaction_class_live's ours rows, facing_hook_ab's arc110 counts, pass_overrun's means) are attributed to #357 and #363 as mechanisms, not replay by replay, and the two x088512 readers' running only for the orbs is a reading, not traced: only audit_ranking_tenant's leg was traced to its first divergence; (3) pass_overrun's re-freeze records ours as measured and draws no conclusion about lag a player could feel — the no-new-lag rule is held by audit_lag_budget, which PASSed in the S2 and S3 batteries, not by this re-freeze; (4) no capture was made for these re-freezes (the looks of #357 and #363 rest on the maintainer's reads of the 14z-221c captures, rulings.txt); (5) the static re-freezes were run on the Mac only, and the fifteen emulator re-freezes were both made and verified on ERIS alone (the S3 battery skips test_mame_parity, whose row of record is the Mac's, S3_battery_verdict.txt), so no second host measured any of those fifteen files.
+Artifacts (read every one, in full):
+  - build/agent222/m26/rc/refreeze/S3_battery_results.tsv
+  - build/agent222/m26/rc/refreeze/S3_battery_verdict.txt
+  - build/agent222/m26/rc/refreeze/attr_all.txt
+  - build/agent222/m26/rc/refreeze/attr_all_plant.txt
+  - build/agent222/m26/rc/refreeze/attr_plant_check.txt
+  - build/agent222/m26/rc/refreeze/attr_refreeze.py.txt
+  - build/agent222/m26/rc/refreeze/bases_rows_check.txt
+  - build/agent222/m26/rc/refreeze/charmap_html_check.txt
+  - build/agent222/m26/rc/refreeze/cpu_ai_sites.txt
+  - build/agent222/m26/rc/refreeze/diffs/build_manifest_type_stamps.toml.diff
+  - build/agent222/m26/rc/refreeze/diffs/docs_project_tables_donovan.md.diff
+  - build/agent222/m26/rc/refreeze/diffs/docs_project_tables_rule5_ledger.md.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_audit_tenant_cpu_ai.sh.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_charmap_pages.sha256.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_column_flash.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_defense_row_reads.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_df_field_readers.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_df_field_readers_live.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_df_modes.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_dmg_legacy_sweep.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_escape_triage.txt.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_facing_hook_ab.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_hitbox_parity.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_instr_gameclock_audit_ranking_tenant.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_ladder_tenant_vs_palette.txt.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_latch_readers.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_latch_reads.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_pass_overrun.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_phobos_dmg_residual.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_reaction_class_live.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_reaction_classes.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_roster_pairings_bases.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_rule5_baked.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_tenant_cpu_ai.txt.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_expected_throw_registration.tsv.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_test_m3a_reproducible.sh.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_test_manifest_merge.sh.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_test_pointer_flow.sh.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_test_region_overlap.sh.diff
+  - build/agent222/m26/rc/refreeze/diffs/tests_test_tenant_loop.sh.diff
+  - build/agent222/m26/rc/refreeze/diffs/tools_audit_rule5.py.diff
+  - build/agent222/m26/rc/refreeze/diffs/tools_audit_type_stamps.py.diff
+  - build/agent222/m26/rc/refreeze/donovan-m30.txt.new
+  - build/agent222/m26/rc/refreeze/first_divergence.txt
+  - build/agent222/m26/rc/refreeze/m3a_manifests.txt
+  - build/agent222/m26/rc/refreeze/merged-m26.txt.new
+  - build/agent222/m26/rc/refreeze/other_lines.py.txt
+  - build/agent222/m26/rc/refreeze/pass_overrun_check.txt
+  - build/agent222/m26/rc/refreeze/reader_sites.txt
+  - build/agent222/m26/rc/refreeze/refreeze_attribution.md
+  - build/agent222/m26/rc/refreeze/refreeze_counts.txt
+  - build/agent222/m26/rc/refreeze/region_shifts.txt
+  - build/agent222/m26/rc/refreeze/rule5_keys_diff.txt
+  - build/agent222/m26/rc/refreeze/rule5_keys_head.txt
+  - build/agent222/m26/rc/refreeze/rule5_keys_now.txt
+  - build/agent222/m26/rc/refreeze/rulings.txt
+  - build/agent222/m26/rc/refreeze/static_test_charmap_current.log
+  - build/agent222/m26/rc/refreeze/static_test_df_field_readers.log
+  - build/agent222/m26/rc/refreeze/static_test_escape_triage.log
+  - build/agent222/m26/rc/refreeze/static_test_latch_readers.log
+  - build/agent222/m26/rc/refreeze/static_test_m3a_reproducible.log
+  - build/agent222/m26/rc/refreeze/static_test_manifest_merge.log
+  - build/agent222/m26/rc/refreeze/static_test_pointer_flow.log
+  - build/agent222/m26/rc/refreeze/static_test_reaction_classes.log
+  - build/agent222/m26/rc/refreeze/static_test_region_overlap.log
+  - build/agent222/m26/rc/refreeze/static_test_rule5_census.log
+  - build/agent222/m26/rc/refreeze/static_test_tables_current.log
+  - build/agent222/m26/rc/refreeze/static_test_tenant_loop.log
+  - build/agent222/m26/rc/refreeze/static_test_type_stamp_census.log
+  - build/agent222/m26/rc/refreeze/weak3_don_m30.txt
+  - build/agent222/m26/rc/refreeze/weak3_m3b_merged34.txt
+  - build/agent222/m26/rc/refreeze/weak_class3.py.txt
+  - build/agent222/m26/rc/refreeze/other_lines.txt.lines-1-150 (lines 1-150 of build/agent222/m26/rc/refreeze/other_lines.txt)
+  - build/agent222/m26/rc/refreeze/other_lines.txt.lines-151-285 (lines 151-285 of build/agent222/m26/rc/refreeze/other_lines.txt)
+  - build/agent222/m26/rc/refreeze/other_lines_drop.txt.lines-280-285 (lines 280-285 of build/agent222/m26/rc/refreeze/other_lines_drop.txt)
+  - build/agent222/m26/rc/refreeze/other_lines_plant.txt.lines-130-140 (lines 130-140 of build/agent222/m26/rc/refreeze/other_lines_plant.txt)
+  - build/agent222/m26/rc/refreeze/other_lines_plant.txt.lines-283-285 (lines 283-285 of build/agent222/m26/rc/refreeze/other_lines_plant.txt)

@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**363 tickets** — status: open 11 · parked 4 · done 315 · declined 15 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 241 · cosmetic 23 · evolution 99 · **backfill debt: 0 rows**.
+**364 tickets** — status: open 12 · parked 4 · done 315 · declined 15 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 242 · cosmetic 23 · evolution 99 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#364](https://github.com/DefinitelyFrenchName/VampireSaved/issues/364) | bug | open | under dash (PILOT's /bin/sh) an EXIT-only cleanup trap does not run when a gate is TERM'd, so its work directory is left behind (~277 scripts) | `tests/test_signal_traps.sh` | none | `docs/platform/gotchas.md § And under dash an EXIT-only trap does not run on TERM at all` | none | 14z-221c |
 | [#363](https://github.com/DefinitelyFrenchName/VampireSaved/issues/363) | bug | open | Phobos's Plasma Beam (ES) slides the victim 81 px where native vs2 freezes him in the ice block: vsavj's reaction-table rows 0x4E/0x4F are default rows (the pushback slide), vs2's row 0x4F the freeze (attributed from #358) | `tests/audit_beam_slide.sh` | `DECISIONS_HISTORY.md § #363: "Fix it too (Recommended)"` | `docs/game/engine_internals.md § Rows 0x4E and 0x4F of vsavj's reaction table are DEFAULT rows` · `docs/game/engine_internals.md § The freeze, ported` | `docs/project/gotchas.md § A DEAD-SPAN PROOF WITHOUT A RULE FOR PC-INDEXED DATA READS` | 14z-221,14z-221b,14z-221c |
 | [#360](https://github.com/DefinitelyFrenchName/VampireSaved/issues/360) | cosmetic | open | in Dark Force two of Donovan's four dash speed lines alternate one frame out of phase with native vs2 (found by #356's fix; 28 of 49 records on donovan_6, each equal to native's at the adjacent frame) | `tests/audit_don_speed_lines.sh` | none | `docs/game/engine_internals.md § The speed-line effect (class 0x0F)` | none | 14z-219 |
 | [#358](https://github.com/DefinitelyFrenchName/VampireSaved/issues/358) | cosmetic | open | Phobos's Plasma Beam (ES) [PP]: the small figure at his lower left sits about 50 px further left on ours, in another pose, and leaves the screen early (the maintainer, 2026-11-03: "Yes, that figure"; lead from #356's census) | `tests/audit_move_parity.sh` | `DECISIONS_HISTORY.md § #358 closes with #363` | none | none | 14z-218,14z-219,14z-221,14z-221b,14z-221c |

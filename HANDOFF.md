@@ -99,7 +99,7 @@ build drives inputs through the 0001 harness instead), so record on MAME.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged33 fbneo # THE 3-TENANT BUILD (all 18
+tools/run_wide.sh build/m3b_merged34 fbneo # THE 3-TENANT BUILD (all 18
                                            # (14z-97: the build argument is
                                            # now REQUIRED. It used to default
                                            # to build/m5w — the known-bad
@@ -109,7 +109,7 @@ tools/run_wide.sh build/m3b_merged33 fbneo # THE 3-TENANT BUILD (all 18
                                            # newest first; m5w and merged1 are
                                            # refused by name.)
                                            # selectable, art included) =
-                                           # merged-m25, FROZEN 14z-220 (the
+                                           # merged-m26, FROZEN 14z-222 (the
                                            # current freeze: "Current WIDE
                                            # builds" below says what it
                                            # carries and names its
@@ -120,7 +120,7 @@ tools/run_wide.sh build/m3b_merged33 fbneo # THE 3-TENANT BUILD (all 18
                                            # naked-eye tell, and the first
                                            # thing on screen;
                                            # (1) the select screen shows
-                                           # "M25" bottom-right — THE NAKED-
+                                           # "M26" bottom-right — THE NAKED-
                                            # EYE A/B TELL (CLAUDE.md §5,
                                            # finally implemented; since the
                                            # 14z-132 ruling the text is the
@@ -133,32 +133,32 @@ tools/run_wide.sh build/m3b_merged33 fbneo # THE 3-TENANT BUILD (all 18
                                            # "Bishamon" — aliased rows).
                                            # Works for P1 and P2. Without
                                            # Start it is plain Bishamon.
-tools/run_wide.sh build/don_m29 fbneo      # or the solo builds (hui63,
-                                           # pyron48); ... mame
+tools/run_wide.sh build/don_m30 fbneo      # or the solo builds (hui64,
+                                           # pyron49); ... mame
                                            # (registry rows name the CURRENT
-                                           # fingerprints — donovan-m29/
-                                           # huitzil-m36/pyron-m30 since the
-                                           # 14z-220 M25 freeze)
+                                           # fingerprints — donovan-m30/
+                                           # huitzil-m37/pyron-m31 since the
+                                           # 14z-222 M26 freeze)
 ```
 
 *(Moved 2026-10-14, #282 item B: Running a CPS-2 WIDE build — the Oboro path → `docs/project/operations.md`.)*
 
-**Current WIDE builds — THE 14z-220 M25 FREEZE: #356 (DONOVAN'S DASH SPEED LINES) AND #345 OPTION A1b
-(DONOVAN'S TRAIL PIECES READ vs2's NO-DRAW TABLE) (mark M25, the merged build number per the 14z-132 option-A ruling):
-donovan-m29 / huitzil-m36 / pyron-m30 / merged-m25.**
-`build/don_m29`, `build/hui63`, `build/pyron48`, `build/m3b_merged33`, stock
-twin `build/m5_stock24` — the stock twin UNCHANGED (`a3910ded`, donovan-m25-stock
-carries: every M25 row is `only_variant_slot`); the stage-4 image UNCHANGED too
-(`2fa7c2f1`, `donovan-m23-stage4` carries).
-**WHAT TO LOOK AT FIRST ON THIS ONE:** the wheel reads **M25**. Donovan's two dashes draw vs2's speed lines
-(#356: a tenant-only copy of vs2's speed-line handler, its 14-row tables and its spawner, placed at `0x400010` and
-reached as his own effect type 124; `tests/audit_don_speed_lines.sh` against native vs2), and the ice streak after
-his Blizzard Sword is gone (#345 A1b: his class-0x72 trail pieces read a WIDE-only copy of vs2's blanked effect anim
-table, placed at `0x4013E0`; vsavj's `PRG:0x1F3FD2` untouched; `tests/audit_don_trail_nodraw.sh`). A1b's accepted
-timing: ours loses no logic frame in Blizzard Sword where native does (ruled 2026-11-03). Inside Dark Force two speed-line
-pieces run one frame out of phase with native (#360, accepted, cosmetic). Program fingerprints: donovan `5ebd4fea` ->
-`63447128`, huitzil UNCHANGED `cc9c4b68`, pyron UNCHANGED `9d135e7b` (the mark only), merged `0e6f423b` -> `a24aa560`;
-rows whole-set keyed. The previous freeze's paragraph is in `HANDOFF_HISTORY.md`.
+**Current WIDE builds — THE 14z-222 M26 FREEZE: #357 (DONOVAN'S GUARD ORBS) AND #363 (PHOBOS'S PLASMA BEAM
+FREEZES ITS VICTIM) (mark M26, the merged build number per the 14z-132 option-A ruling):
+donovan-m30 / huitzil-m37 / pyron-m31 / merged-m26.**
+`build/don_m30`, `build/hui64`, `build/pyron49`, `build/m3b_merged34`, stock
+twin `build/m5_stock25` — the stock twin UNCHANGED (`a3910ded`, donovan-m25-stock
+carries: #357's roots are WIDE-only, its class row profile-gated and its pin `only_variant_slot`); the stage-4 image
+UNCHANGED too (`2fa7c2f1`, `donovan-m23-stage4` carries).
+**WHAT TO LOOK AT FIRST ON THIS ONE:** the wheel reads **M26**. Donovan's guard draws vs2's eight red orbs around the
+fighters (#357: a WIDE-only copy of vs2's type-0x13 watcher at `0x400310`, reached through the `$FFD400` pool's row 19
+`PRG:0x080AF8`, and its motion table at `0x400480`; `tests/audit_guard_orbs.sh` against native vs2), and Phobos's ES
+Plasma Beam freezes Demitri in the ice block on each hit instead of sliding him away (#363: vsavj's reaction row 0x4F
+`PRG:0x0238FA` -> a jump on the dead span `PRG:0x029CBA` to an authored copy of vs2's freeze case;
+`tests/audit_beam_slide.sh` against native vs2). Every later `wide_ext` placement moved +0x270 (Pyron's merged regions
++0x2A0). Program fingerprints: donovan `63447128` -> `0f5b6866`, huitzil `cc9c4b68` -> `41a55597`, pyron UNCHANGED
+`9d135e7b` (the mark only), merged `a24aa560` -> `2c594c29` (= the 14z-221c scratch build `m34x`); rows whole-set
+keyed. The previous freeze's paragraph is in `HANDOFF_HISTORY.md`.
 
 *(Moved 2026-10-14, #282 item B: Running a CPS-2 WIDE build — the previous freezes and the registry cut → `HANDOFF_HISTORY.md`.)*
 
@@ -413,7 +413,7 @@ well as the old build names. The gotcha is
 
 | build (mark) | fingerprint(s) | dir · tag | what changed | detail |
 |---|---|---|---|---|
-| THE 14z-220 M25 FREEZE — #356 (DONOVAN'S DASH SPEED LINES) AND #345 OPTION A1b (DONOVAN'S TRAIL PIECES' NO-DRAW TABLE) | donovan-m29 whole-set `20672b01` (`build/don_m29`), huitzil-m36 `815488af` (`build/hui63`), pyron-m30 `930ce568` (`build/pyron48`), merged-m25 `add7bc1a` (`build/m3b_merged33`). **Program fingerprints:** donovan `5ebd4fea` -> `63447128`, huitzil UNCHANGED `cc9c4b68`, pyron UNCHANGED `9d135e7b`, merged `0e6f423b` -> `a24aa560`; rows whole-set keyed. Stock twin **UNCHANGED** `a3910ded` (`donovan-m25-stock` carries, `build/m5_stock24`: every M25 row `only_variant_slot`); stage-4 target **UNCHANGED** at `2fa7c2f1` (`donovan-m23-stage4` carries). All six builds reproduced on ERIS (program, set key and every zip member's CRC) | tags `freeze/donovan-m29`, `freeze/huitzil-m36`, `freeze/pyron-m30`, `freeze/merged-m25` | **#356 and #345 A1b, ruled 2026-11-02/03 (14z-218/219)** — #356: vs2's speed-line handler, tables and spawner `PRG:0x06E1D2` (+0x2FE) placed at `0x400010` as Donovan's effect type 124 (`[[obj_hook_extra]]`, two `[[port_patch]]`, two `[[ref_pin]]`); A1b: vs2's effect anim table `PRG:0x1D7428` (+0x1308) placed at `0x4013E0` (`:dp`, two `[[ref_pin]]`): donovan +2 ops (358 -> 360), merged 853 -> 855, the other changed ops relocated pointers (+0x1610, +0x300) and the tenant types renumbered +1 (`build/agent220/m25/`) | patch_notes 14z-219; STATE 14z-220 |
+| THE 14z-222 M26 FREEZE — #357 (DONOVAN'S GUARD ORBS) AND #363 (PHOBOS'S PLASMA BEAM FREEZES ITS VICTIM) | donovan-m30 whole-set `18ab998b` (`build/don_m30`), huitzil-m37 `1abc0e27` (`build/hui64`), pyron-m31 `fd0d06a8` (`build/pyron49`), merged-m26 `de548a9e` (`build/m3b_merged34`). **Program fingerprints:** donovan `63447128` -> `0f5b6866`, huitzil `cc9c4b68` -> `41a55597`, pyron UNCHANGED `9d135e7b`, merged `a24aa560` -> `2c594c29`; rows whole-set keyed. Stock twin **UNCHANGED** `a3910ded` (`donovan-m25-stock` carries, `build/m5_stock25`); stage-4 target **UNCHANGED** at `2fa7c2f1` (`donovan-m23-stage4` carries). All six builds reproduced on ERIS (program, set key and every zip member's CRC) | tags `freeze/donovan-m30`, `freeze/huitzil-m37`, `freeze/pyron-m31`, `freeze/merged-m26` | **#357 and #363, ruled 2026-11-05 (14z-221c)** — #357: vs2's watcher `PRG:0x090EDA` (+0x168) and motion table `PRG:0x0D1BBE` (+0x100) as WIDE-only roots placed at `0x400310`/`0x400480`, `[[code_ptr]]` row 19, `[[ref_pin]]` on the orbs' motion operand; #363: `[[code_word]]` row 0x4F + `[[site_thunk]]` on the dead span `0x029CBA`: donovan +3 ops (360 -> 363), huitzil +3 (381 -> 384), merged +6 (855 -> 861), every other changed op a pointer relocated +0x270 (+0x2A0 for Pyron's merged regions) (`build/agent222/m26/`) | patch_notes 14z-222; STATE 14z-222 |
 *(Moved 2026-10-14, #282 item B: Build registry — the rows before the current freeze → `HANDOFF_HISTORY.md`.)*
 
 ## The port pipeline — its tools, and the guarded-replay debug environment (M2a, 2026-07-25)

@@ -201,7 +201,7 @@ def selftest():
         good = bool(rx.match(c)) == want
         ok = ok and good
         print(f"  {'ok' if good else 'FAIL'}: scratch_regex({c}) = {bool(rx.match(c))}")
-    for n, want in (("agent9", "scratch"), ("m5_stock24", "input"), ("advancing_guard_14z123", "kept"),
+    for n, want in (("agent9", "scratch"), ("m5_stock25", "input"), ("advancing_guard_14z123", "kept"),
                     ("x", "fixture"), ("nope", None), ("m5", None)):
         good = classify(rows, n) == want
         ok = ok and good

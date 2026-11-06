@@ -147,6 +147,19 @@ case "${GEN_FLAGS:-}" in
     *cps2-wide-v1*) DEFAULT_ROOTS="$DEFAULT_ROOTS,0x1d7428:0x1308:t0x1de55a:dp" ;;
     *) : ;;
 esac
+# 14z-221c (#357, ruled 2026-11-05 "we should port the orbs unless we find out we technically cannot"): vs2's
+# type-0x13 guard-orb WATCHER handler PRG:0x090EDA-0x091041 (its 4-row state table 0x090EEA, its two 24-byte byte
+# tables 0x090FA8/0x090FC0, the eight-orb spawn loop 0x090FEA), vhunt2 twin 0x090AE6 (353 of 360 opcode-view bytes
+# equal, the rest the five absolute operands). Donovan's set-up (vs2 0x05AE3C, ported) creates the watcher in the
+# $FFD400 pool; vsavj's row 0x13 of that pool's table is a stub (donovan.toml [[code_ptr]] guard_orb_class19).
+# WIDE-only (region_space wide_ext).
+case "${GEN_FLAGS:-}" in
+    # and vs2's 64-entry orb motion table PRG:0x0D1BBE (data, vhunt2 twin 0x0D1450): his hitbox_proj copy (capped at
+    # 0x1000) ends 0x16 bytes into it, so the orbs' class-0x72 sub-0x16 motion read our own code bytes for entries
+    # 0x3A-0x3F (14z-221c, measured on the scratch build); donovan.toml [[ref_pin]] guard_orb_motion_table
+    *cps2-wide-v1*) DEFAULT_ROOTS="$DEFAULT_ROOTS,0x90eda:0x168:t0x90ae6,0xd1bbe:0x100:t0xd1450:d" ;;
+    *) : ;;
+esac
 # DEFAULT_ROOTS is DONOVAN'S measured root census — it applies only to his
 # char. Another tenant's census accumulates here as its R1 loop finds
 # roots (EXTRA_ROOTS overrides for census experiments).

@@ -58,28 +58,37 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **#357 AND #363 ARE STAGED FOR THE NEXT FREEZE** (`build/manifest/staged/357_363.patch`; STATE 14z-221c (1), (2)).
-   The maintainer confirmed both on captures (#357: *"looks identical"*; #363: *"Demitri is frozen indeed"*). The freeze
-   applies the patch and must: re-extract Donovan (`build/m5_wide/extract`); re-freeze `test_tenant_loop` (op counts
-   donovan 360 -> 363, huitzil 381 -> 384, two tenants 642 -> 648, three tenants 855 -> 861, measured on the scratch builds);
-   carry #363's row of `tests/expected/dead_span_reach.tsv` (it is in the patch). Until then `tests/audit_guard_orbs.sh` and
-   `tests/audit_beam_slide.sh` are RED against the frozen builds (both are frozen on the scratch build `build/agent221c/m34x`,
-   local). #358 closes with #363 (the maintainer, 2026-11-05: *"#358 can be closed when we close #363"*). Ask the
-   maintainer when to freeze; the M25 release (item 2) is separate.
-2. **THE M25 RELEASE, WHEN THE MAINTAINER ASKS FOR IT** (M25 frozen 14z-220 at `91bde83b`, tags `freeze/donovan-m29`,
-   `freeze/huitzil-m36`, `freeze/pyron-m30`, `freeze/merged-m25`; `release/merged-m25` packaged). #345, #346 and #356 carry
-   done-awaiting-release comments and close with that release.
+1. **FREEZE M26, THEN RELEASE IT** (the maintainer, after the 14z-221c close: *"let's freeze and then release, so the release
+   includes #363"*; record the ruling in `DECISIONS_HISTORY.md` at this session's close). M26 = M25 plus #357 (the guard orbs)
+   and #363 (the freeze reaction), both confirmed by the maintainer on captures (#357: *"looks identical"*; #363: *"Demitri is
+   frozen indeed"*); M25's release was never published, so the M26 release replaces it and still carries #345, #346 and #356.
+   **The freeze** (the M25 freeze, STATE_HISTORY 14z-220 (1)-(3), is the worked example): apply
+   `build/manifest/staged/357_363.patch` and remove it; the mark M26; build the six builds on the Mac and independently on
+   ERIS; re-extract Donovan (`build/m5_wide/extract`); re-freeze `test_tenant_loop` (op counts donovan 360 -> 363, huitzil
+   381 -> 384, two tenants 642 -> 648, three tenants 855 -> 861, measured on the scratch builds); the registry rows, the four
+   expectation sets (`tools/freeze_expectation_set.py`), `tools/freeze_bytediff.py`; the re-point sweep and every expectation
+   that names a placed address (regions placed after the new ones move); `tests/audit_guard_orbs.sh` and
+   `tests/audit_beam_slide.sh` re-pointed from the scratch build `build/agent221c/m34x` to the frozen merged build, and #363's
+   row of `tests/expected/dead_span_reach.tsv` (in the patch) judged there; the freeze battery on ERIS (~5 h); both
+   concurrent-controls lists re-traced on PILOT; the MiSTer tail (the jtcores fork's catalogue, patch mirror, pin); the freeze
+   rule-checker; the strict freeze-cadence static tier with `ROMDIR`; then the tags and the commit.
+   **The release** (14z-217's M24 release is the worked example): the full emulator scope with `--controls`, the macOS and
+   Windows binaries, `tools/package_release_platforms.py`, `tools/upload_release_assets.sh --prune`; then close #345, #346,
+   #356, #357, #363 and #358 (it closes with #363, the maintainer: *"#358 can be closed when we close #363"*).
+2. **THE M25 RELEASE** is folded into item 1 (M26 replaces it).
 3. **#310 — GROUP 7, BATCH 3** (batches 1 and 2 landed, 43 rows: `tests/test_dead_leg_unjudged.sh`, STATE 14z-221c (5)).
    Left: the six held out (four MiSTer gates needing verilator, `test_release_roundtrip`, `audit_stock_emulator_stall`
    on `MAME_REF_BIN`), podman's, the 14 two-mode gates on the concurrent list, and every gate with three or more modes
    (`build/agent215/t310/census57/group7.tsv`, local). A row's dead instrument goes in the table's fifth column; the gate
    then runs its mode with only that instrument dead.
-4. **A FINDING TO PUT TO THE MAINTAINER (not yet a ticket): under dash an EXIT-only trap does not run on TERM**
-   (`docs/platform/gotchas.md`, measured on the Mac's dash; PILOT's `/bin/sh` is dash). About 277 scripts carry an
-   EXIT-only trap and would leave their work directories behind when TERM'd on PILOT. Ask whether to file it.
+4. **#364 — under dash an EXIT-only cleanup trap does not run on TERM** (filed after the 14z-221c close, the maintainer:
+   *"File the ticket then"*; `docs/platform/gotchas.md`). About 277 scripts leave their work directory behind when TERM'd
+   on PILOT. The fix is #359's pattern beside each EXIT-only trap; then `tests/test_signal_traps.sh` refuses the form.
+   **Its row and the refreshed `docs/project/tickets_github.tsv` are UNCOMMITTED in the working tree**: they ride this
+   session's close.
 5. **Ask the maintainer for the order of the rest.** Open tickets (GitHub severity labels): bugs: #345 (frozen, awaits the
    release), #363 (staged, item 1); evolution: #348, #352; cosmetic: #344, #346, #356 (frozen, await the release), #357
-   (staged, item 1), #358 (closes with #363), #360; test-integrity: #310. Parked: #123, #124, #125, #128.
+   (staged, item 1), #358 (closes with #363), #360; test-integrity: #310, #364. Parked: #123, #124, #125, #128.
 
 ## PARKED (not open work)
 

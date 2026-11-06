@@ -88,7 +88,7 @@
 #   - `round2-before-end` (#343): the retracted round-2 predicate run
 #     beside the new one must land after the match end on every leg.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged33] [JOBS=4]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [JOBS=4]
 #        tests/audit_tenant_timeout.sh          (~7 legs x ~2 min, JOBS at a time)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -106,7 +106,7 @@ export MAME_BIN
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 JOBS="${JOBS:-4}"
-BUILD="${BUILD:-build/m3b_merged33}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged34}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="$(mktemp -d)" || { echo "FAIL: audit_tenant_timeout — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 RPL="$REPO/tests/replays/judge/01_timeout_lead.rpl"

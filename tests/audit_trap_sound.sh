@@ -59,7 +59,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/hui63}"  # re-pointed 14z-210 (#328) <- build/hui30, a pre-M23 build no clean clone has
+BUILD="${1:-build/hui64}"  # re-pointed 14z-210 (#328) <- build/hui30, a pre-M23 build no clean clone has
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }

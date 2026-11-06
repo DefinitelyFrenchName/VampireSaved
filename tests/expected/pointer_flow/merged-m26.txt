@@ -1,0 +1,14 @@
+# pointer-flow baseline for merged-m26 (build/m3b_merged34), frozen 14z-222 — the M26 freeze (#357 and #363).
+# vs merged-m25: the two STRONG `code:movea_imm` findings are the SAME two, RELOCATED BY EXACTLY 0x2A0 — site 0x4d6b10 ->
+# 0x4d6db0 and targets 0x4ca090 -> 0x4ca330 and 0x4d0030 -> 0x4d02d0 (WIDE-HOLE, offset preserved) — the placement cascade
+# of #357's two regions (+0x270) and #363's merged handler (+0x30) ahead of Pyron's regions. Same class, same count.
+# `data:long` 1158 -> 1187 (+29), every row ATTRIBUTED by its bytes, one-to-one, each OLD row tried first at its own placed
+# region's measured shift (build/agent222/m26/pflow/weak_class3.py, weak3_m3b_merged34.txt): 1,158 the same long at the
+# same site (285) or moved +0x270 (691) or +0x2A0 (182) with its region, still flagged; +28 longs OLD held unflagged at
+# the same or the shifted site (values 0x4cff9a-0x4d002c): merged-m25's data op 0x4cff90-0x4d0030 covered them and has
+# moved +0x2A0, so they lie in a hole again (the reverse of merged-m25's -22); +1 at 0x4ba14c (0x0050fea4), a window two
+# bytes into the long at 0x4ba14a, a pointer relocated +0x2A0 (0x4bfdb0 -> 0x4c0050) in Pyron's x2b7ef4 copy. The counts
+# reconcile (OLD 1158, NEW 1187). No STRONG finding appears or disappears.
+STRONG	code:movea_imm	0x4d6db0+0x16	0x4ca330	WIDE-HOLE
+STRONG	code:movea_imm	0x4d6db0+0x24	0x4d02d0	WIDE-HOLE
+WEAK-COUNT	data:long	1187

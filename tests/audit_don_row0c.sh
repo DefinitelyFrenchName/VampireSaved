@@ -29,14 +29,14 @@
 #
 # SHEET: none — the capture sheet for the maintainer is a separate step; this gate judges palette words only
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged33] [JOBS=6] tests/audit_don_row0c.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged34] [JOBS=6] tests/audit_don_row0c.sh
 #   emulator tier, MAME; 48 runs (16 rigs x 3 legs)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged33}"
+BUILD="${BUILD:-build/m3b_merged34}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] && [ -f "$BUILD/verify_op.bin" ] || { echo "SKIP: no WIDE build with verify_op.bin at $BUILD"; exit 0; }

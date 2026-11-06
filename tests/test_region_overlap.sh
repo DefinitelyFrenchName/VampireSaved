@@ -58,7 +58,7 @@ cd "$REPO"
 # it reported PASS about three builds nobody ships. Section 5 adds the CURRENT
 # trio. Both are true at once; neither replaces the other.
 HIST_BUILDS="build/m5_wide build/hui30 build/pyron21"
-CUR_BUILDS="build/don_m29 build/hui63 build/pyron48"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+CUR_BUILDS="build/don_m30 build/hui64 build/pyron49"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 BUILDS="${*:-$HIST_BUILDS}"
 
 # Presence is two-tier. An UNBUILT tree (no build dir has placements.json at
@@ -101,7 +101,7 @@ d = run([])
 print("== 1: the three span classes are frozen ==")
 eq("shared spans", len(d["shared"]), 17)
 eq("name collisions", len(d["name_clash"]), 8)
-eq("unique to one tenant", len(d["unique"]), 17)   # RE-FROZEN 14z-220 (M25, was 15): +2 = x06e1d2 (#356, the speed-line copy) + x1d7428 (#345 A1b, the table copy), both Donovan-only WIDE roots  # 14z-111: +2 in this section's view = x100e3c (pyron) + x101aca (donovan), the CPU AI script blocks (x100000 shows in the second run's list)
+eq("unique to one tenant", len(d["unique"]), 19)   # RE-FROZEN 14z-222 (M26, was 17): +2 = x090eda + x0d1bbe (#357, the guard-orb watcher and its motion table), both Donovan-only WIDE roots  # RE-FROZEN 14z-220 (M25, was 15): +2 = x06e1d2 (#356, the speed-line copy) + x1d7428 (#345 A1b, the table copy), both Donovan-only WIDE roots  # 14z-111: +2 in this section's view = x100e3c (pyron) + x101aca (donovan), the CPU AI script blocks (x100000 shows in the second run's list)
 # The name collisions are TWO kinds wanting opposite treatment.
 clash = {e["name"]: e["spans"] for e in d["name_clash"]}
 generic = sorted(n for n, sp in clash.items()
@@ -112,7 +112,9 @@ eq("generic per-tenant names (need NAMESPACING)", generic,
    ["anim", "aux0_0", "aux0_1", "aux0_2", "code", "hitbox", "hitbox_proj"])
 eq("same start, different EXTENT", extent, ["x088512"])
 if not bad:
-    print("  ok: 17 shared / 8 collisions (7 generic + x088512's extent) / 17 unique")
+    # 14z-222: the figures are the MEASURED ones (a literal here said "17 unique" after the M25 and M26 re-freezes moved it, [VSP-114])
+    print("  ok: %d shared / %d collisions (7 generic + x088512's extent) / %d unique"
+          % (len(d["shared"]), len(d["name_clash"]), len(d["unique"])))
 
 print("== 2: shared spans CONFLICT — they cannot be placed once by dedup ==")
 FROZEN = {"x026142": (68, 54), "x028122": (45, 50),
@@ -192,7 +194,7 @@ if [ $# -eq 0 ]; then
 # — the shared regions' tenant copies differ in placement-dependent bytes,
 # so the 1-differs counts and the totals move (2089 / 7604). The control's
 # superseded trio still measures 2000 and is still rejected.
-echo "== 5: the CURRENT trio — don_m29 / hui63 / pyron48 (label re-pointed 14z-117) =="  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+echo "== 5: the CURRENT trio — don_m30 / hui64 / pyron49 (label re-pointed 14z-117) =="  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
     for b in $CUR_BUILDS; do
         [ -f "$b/patch/placements.json" ] || {
             echo "FAIL: current build $b has no patch/placements.json"; exit 1; }
@@ -214,7 +216,7 @@ def eq(what, got, want):
 d = run([])
 eq("shared spans", len(d["shared"]), 17)
 eq("name collisions", len(d["name_clash"]), 8)
-eq("unique to one tenant", len(d["unique"]), 19)
+eq("unique to one tenant", len(d["unique"]), 21)   # RE-FROZEN 14z-222 (M26, was 19): +2 = #357's x090eda and x0d1bbe; every other figure of this section unchanged
 # The span figures MOVED from the 14z-77 trio, and that movement is the point:
 # 2000 -> 2033 at 14z-103 (2012 at 14z-90), spans shifting. A gate frozen only
 # on the old trio could not see this.
@@ -249,7 +251,8 @@ if bad:
     for b in bad: print("    " + b)
 else:
     print("  ok: 2110 conflicting bytes over the same 4 spans (7604 raw);")
-    print("      17 shared / 8 collisions / 19 unique / 13 undecidable —")
+    print("      %d shared / %d collisions / %d unique / %d undecidable —"   # 14z-222: measured, not a literal
+          % (len(d["shared"]), len(d["name_clash"]), len(d["unique"]), len(und)))
     print("      the SHAPE is unchanged from 14z-77, the figures moved")
 sys.exit(1 if bad else 0)
 PY

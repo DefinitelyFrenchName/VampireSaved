@@ -680,8 +680,8 @@ writes either as an immediate to `+0x54` (`tools/audit_reaction_classes.py`; a r
 spot) — so only the tenants reach the two rows. Which tenant records carry them, and what row 0x4E's handler does, are not
 measured.
 
-**The freeze, ported (14z-221c, #363; the maintainer chose "Fix it too (Recommended)"; STAGED for the next freeze as
-`build/manifest/staged/357_363.patch`).** vs2's `0x2296C`: sub 08, `+0x140` = 0x14, `+0x11E` = 1 then, for class 0x4F only,
+**The freeze, ported (14z-221c, #363; the maintainer chose "Fix it too (Recommended)"; staged 14z-221c as
+`build/manifest/staged/357_363.patch`, FROZEN as M26 at 14z-222).** vs2's `0x2296C`: sub 08, `+0x140` = 0x14, `+0x11E` = 1 then, for class 0x4F only,
 `+0x11E` cleared and `+0x5C` = 0x1F — the FREEZE TIMER, counted down each frame (native: 0x1F, 0x1D, 0x1C, 0x1B, ... and
 reset by the next 0x4F hit) — then the class map byte (vs2 `0x027FD8[0x4F]` = 0x1B), `bsr 0x027114`, `jmp 0x06D31C` (the
 ice-block spawn). vsavj carries the same freeze for class 0x14 (`PRG:0x023D82`, its twins `0x027EC0` and `0x060ED8`) but not
@@ -1575,7 +1575,7 @@ reads row 0x13 (the deadness a repoint would rest on), what our build's class-0x
 [M: `build/agent221/t357/` (local: `lua/d400_tap.lua`, `run_d4.sh`, `measurer_357.txt`); no gate]
 
 **The port (14z-221c; the maintainer, 2026-11-05: *"we should port the orbs unless we find out we technically cannot"*;
-STAGED for the next freeze as `build/manifest/staged/357_363.patch`).** Vanilla never reads row 0x13: 0 reads of
+staged 14z-221c as `build/manifest/staged/357_363.patch`, FROZEN as M26 at 14z-222).** Vanilla never reads row 0x13: 0 reads of
 `PRG:0x080AF8` on all six replays of `tests/audit_effect_class_rows.sh` (section 1b, opcode-space watch, the row-37
 control 3,872 reads). The handler span is vs2 `PRG:0x090EDA-0x091041` (its 4-row state table `0x090EEA`, two 24-byte
 pc-relative byte tables `0x090FA8`/`0x090FC0`, the eight-orb loop `0x090FEA`; five absolute operands: `0x013724`,

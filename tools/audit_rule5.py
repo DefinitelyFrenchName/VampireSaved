@@ -129,8 +129,10 @@ KNOWN_PAIRS = {
     "aux_poke": {
         "addr", "name", "only_base_slot", "only_variant_slot", "op", "val"
     },
+    # 14z-222 (M26, #357): [[code_ptr]].profile gates the row to one hardware profile (the guard-orb class row is
+    # WIDE-only), as [[site_thunk]].profile does; structural (IGNORE_KEYS), not a tunable.
     "code_ptr": {
-        "addr", "name", "note", "old_hex", "region", "stage"
+        "addr", "name", "note", "old_hex", "profile", "region", "stage"
     },
     "code_word": {
         "addr", "name", "new_hex", "new_hex_variant", "note", "old_hex",
@@ -156,7 +158,7 @@ KNOWN_PAIRS = {
         "note", "only_base_slot", "only_variant_slot", "orc",
         "slot_ptr_table", "slot_rows", "src", "stage"
     },
-    "don_m29": {
+    "don_m30": {
         "escapes", "resolved", "unresolved"
     },
     "file": {
@@ -174,7 +176,7 @@ KNOWN_PAIRS = {
     "hole_b": {
         "end", "start"
     },
-    "hui63": {
+    "hui64": {
         "escapes", "resolved", "unresolved"
     },
     "init_shim": {
@@ -232,13 +234,15 @@ KNOWN_PAIRS = {
     },
     # 14z-220 (M25, #356 and #345 A1b): [[ref_pin]] pins one pointer field (region + off) of a placed region to a fixed
     # target (pin = the mode); addresses, so FACT; its only_variant_slot is a GAMEPLAY key.
+    # 14z-222 (M26, #357): pin_region pins the field to a placed REGION's address (region:offset) instead of a fixed
+    # target — an address, so FACT, like region and target.
     "ref_pin": {
-        "note", "off", "only_variant_slot", "pin", "region", "stage", "target"
+        "note", "off", "only_variant_slot", "pin", "pin_region", "region", "stage", "target"
     },
     "profile": {
         "bank4_word", "bank5_word", "collision_rule", "group", "name"
     },
-    "pyron48": {
+    "pyron49": {
         "escapes", "resolved", "unresolved"
     },
     "reaction_hook": {

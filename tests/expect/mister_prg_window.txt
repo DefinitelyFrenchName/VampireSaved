@@ -1,6 +1,13 @@
 # tests/test_mister_prg_window.sh — the frozen pair. One line per leg,
 # the probe's own last per-frame report. Regenerate DELIBERATELY (--freeze):
 # a moved count on a deterministic simulation is a finding.
+# RE-FROZEN 14z-222 on merged-m26 (build/m3b_merged34) by `tests/test_mister_prg_window.sh --freeze` on the Mac (the M26 freeze's
+# MiSTer romset lane at scratch S2 read the pair moved, build/emu_m26_mister/test_mister_prg_window.log; re-run with --freeze,
+# build/agent222/m26/prgwin_freeze.log, 3,391 s); every structural assertion PASSED, the control leg's line UNCHANGED. WHAT MOVED
+# M25 -> M26 on the pos line: first_addr 4c39c0 -> 4c3c60 and max 4d6dde -> 4d707e (+0x2A0), min 416040 -> 4162b0 (+0x270) — the
+# placements #357's two copies and #363's merged handler moved — and cyc +661, rd_lo +889; blocks, rd_hi, cyc_hi_rd, cyc_hi_wr and
+# first_frame identical. The address fields follow the placement (build/m3b_merged34/patch/placements.json); the small count
+# moves are NOT separated by controls (as at M24 and M25).
 # RE-FROZEN 14z-220 on merged-m25 (build/m3b_merged33) by `tests/test_mister_prg_window.sh --freeze` on the Mac (the M25 freeze's
 # MiSTer romset lane at snapshot S2 read the pair moved, build/emu_m25_mister/test_mister_prg_window.log; its legs went with the
 # snapshot, so the gate was re-run with --freeze, build/agent220/m25/prgwin/freeze.log, 3,398 s); every structural assertion
@@ -82,5 +89,5 @@
 # `blocks`, `first_frame`, `min`): M21's two new thunks are not executed in the frames this replay
 # (11_pick_donovan, 2900 f) reaches, or cost no bus reads there — which of the two is not measured.
 #
-pos frame 2900 wide 1 cyc 97642421 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75763870 blocks 8 first_frame 1119 first_addr 4c39c0 min 416040 max 4d6dde
+pos frame 2900 wide 1 cyc 97643082 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75764759 blocks 8 first_frame 1119 first_addr 4c3c60 min 4162b0 max 4d707e
 neg frame 2900 wide 0 cyc 97337938 cyc_hi_rd 4 cyc_hi_wr 10113 rd_hi 0 rd_lo 75503450 blocks 0 first_frame -1 first_addr 000000 min 7ffffe max 000000

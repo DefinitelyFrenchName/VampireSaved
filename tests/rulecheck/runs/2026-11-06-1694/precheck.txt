@@ -1,0 +1,9 @@
+  FLAG FIGURE: 454
+  FLAG FIGURE: 266
+  FLAG D-ABSOLUTE: 18ab998b66ff08d34f0fc880984847769d991e81 donovan-m30 14z-222 THE M26 FREEZE — #357 (Donovan's guard orbs: vs2's type-0x13 watcher handler PRG:0x090EDA (+0x16...  [build/agent222/m26/rc/freeze/registry_rows.txt]
+  FLAG D-ABSOLUTE: WHOLE-SET key (program 0f5b6866).  [build/agent222/m26/rc/freeze/registry_rows.txt]
+  FLAG D-ABSOLUTE: Reproduced on ERIS (program, set key, every zip member's CRC).  [build/agent222/m26/rc/freeze/registry_rows.txt]
+  FLAG D-ABSOLUTE: WHOLE-SET key (program 41a55597).  [build/agent222/m26/rc/freeze/registry_rows.txt]
+  FLAG D-ABSOLUTE: fd0d06a89f826ece7aaf74dcf8b506b751a5f06d pyron-m31 14z-222 THE M26 FREEZE: the mark only.  [build/agent222/m26/rc/freeze/registry_rows.txt]
+  FLAG D-ABSOLUTE: WHOLE-SET key (program 9d135e7b, UNCHANGED from pyron-m30 — neither change is Pyron's).  [build/agent222/m26/rc/freeze/registry_rows.txt]
+packet_check: 8 flag(s): D-ABSOLUTE 6, FIGURE 2

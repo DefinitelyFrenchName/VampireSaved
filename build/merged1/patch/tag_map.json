@@ -96,8 +96,8 @@
   "type": 68,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4639952,
-  "tag_write_pc": 4639952
+  "thunk": 4640576,
+  "tag_write_pc": 4640576
  },
  {
   "src_addr": 349874,
@@ -106,8 +106,8 @@
   "type": 68,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4639952,
-  "tag_write_pc": 4639952
+  "thunk": 4640576,
+  "tag_write_pc": 4640576
  },
  {
   "src_addr": 350848,
@@ -116,8 +116,8 @@
   "type": 69,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4639968,
-  "tag_write_pc": 4639968
+  "thunk": 4640592,
+  "tag_write_pc": 4640592
  },
  {
   "src_addr": 350896,
@@ -126,8 +126,8 @@
   "type": 69,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4639968,
-  "tag_write_pc": 4639968
+  "thunk": 4640592,
+  "tag_write_pc": 4640592
  },
  {
   "src_addr": 351488,
@@ -136,8 +136,8 @@
   "type": 70,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4639984,
-  "tag_write_pc": 4639984
+  "thunk": 4640608,
+  "tag_write_pc": 4640608
  },
  {
   "src_addr": 352576,
@@ -146,8 +146,8 @@
   "type": 70,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4639984,
-  "tag_write_pc": 4639984
+  "thunk": 4640608,
+  "tag_write_pc": 4640608
  },
  {
   "src_addr": 353760,
@@ -156,8 +156,8 @@
   "type": 71,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640000,
-  "tag_write_pc": 4640000
+  "thunk": 4640624,
+  "tag_write_pc": 4640624
  },
  {
   "src_addr": 355510,
@@ -166,8 +166,8 @@
   "type": 72,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640016,
-  "tag_write_pc": 4640016
+  "thunk": 4640640,
+  "tag_write_pc": 4640640
  },
  {
   "src_addr": 355544,
@@ -176,8 +176,8 @@
   "type": 72,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640016,
-  "tag_write_pc": 4640016
+  "thunk": 4640640,
+  "tag_write_pc": 4640640
  },
  {
   "src_addr": 359762,
@@ -186,8 +186,8 @@
   "type": 64,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640592,
-  "tag_write_pc": 4640592
+  "thunk": 4641216,
+  "tag_write_pc": 4641216
  },
  {
   "src_addr": 360058,
@@ -196,8 +196,8 @@
   "type": 65,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640608,
-  "tag_write_pc": 4640608
+  "thunk": 4641232,
+  "tag_write_pc": 4641232
  },
  {
   "src_addr": 362788,
@@ -206,8 +206,8 @@
   "type": 66,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640624,
-  "tag_write_pc": 4640624
+  "thunk": 4641248,
+  "tag_write_pc": 4641248
  },
  {
   "src_addr": 363852,
@@ -216,8 +216,8 @@
   "type": 67,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640640,
-  "tag_write_pc": 4640640
+  "thunk": 4641264,
+  "tag_write_pc": 4641264
  },
  {
   "src_addr": 368154,
@@ -226,8 +226,8 @@
   "type": 62,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640656,
-  "tag_write_pc": 4640656
+  "thunk": 4641280,
+  "tag_write_pc": 4641280
  },
  {
   "src_addr": 368544,
@@ -236,8 +236,8 @@
   "type": 63,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640672,
-  "tag_write_pc": 4640672
+  "thunk": 4641296,
+  "tag_write_pc": 4641296
  },
  {
   "src_addr": 368556,
@@ -246,8 +246,8 @@
   "type": 75,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640688,
-  "tag_write_pc": 4640688
+  "thunk": 4641312,
+  "tag_write_pc": 4641312
  },
  {
   "src_addr": 372308,
@@ -256,8 +256,8 @@
   "type": 61,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640704,
-  "tag_write_pc": 4640704
+  "thunk": 4641328,
+  "tag_write_pc": 4641328
  },
  {
   "src_addr": 375418,
@@ -266,8 +266,8 @@
   "type": 73,
   "form": "stamp_b_d16",
   "tag": 16,
-  "thunk": 4640720,
-  "tag_write_pc": 4640720
+  "thunk": 4641344,
+  "tag_write_pc": 4641344
  },
  {
   "src_addr": 377192,
@@ -276,8 +276,8 @@
   "type": 66,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4640736,
-  "tag_write_pc": 4640736
+  "thunk": 4641360,
+  "tag_write_pc": 4641360
  },
  {
   "src_addr": 377394,
@@ -286,8 +286,8 @@
   "type": 66,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4640752,
-  "tag_write_pc": 4640752
+  "thunk": 4641376,
+  "tag_write_pc": 4641376
  },
  {
   "src_addr": 380986,
@@ -296,8 +296,8 @@
   "type": 59,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4640832,
-  "tag_write_pc": 4640832
+  "thunk": 4641456,
+  "tag_write_pc": 4641456
  },
  {
   "src_addr": 430224,
@@ -306,8 +306,8 @@
   "type": 66,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641072,
-  "tag_write_pc": 4641072
+  "thunk": 4641696,
+  "tag_write_pc": 4641696
  },
  {
   "src_addr": 430454,
@@ -316,8 +316,8 @@
   "type": 66,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641088,
-  "tag_write_pc": 4641088
+  "thunk": 4641712,
+  "tag_write_pc": 4641712
  },
  {
   "src_addr": 570318,
@@ -326,8 +326,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641472,
-  "tag_write_pc": 4641472
+  "thunk": 4642096,
+  "tag_write_pc": 4642096
  },
  {
   "src_addr": 570470,
@@ -336,8 +336,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 570694,
@@ -346,8 +346,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 570736,
@@ -356,8 +356,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 570778,
@@ -366,8 +366,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 570820,
@@ -376,8 +376,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 570862,
@@ -386,8 +386,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 570904,
@@ -396,8 +396,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 570946,
@@ -406,8 +406,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 571308,
@@ -416,8 +416,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 571350,
@@ -426,8 +426,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 571392,
@@ -436,8 +436,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 571434,
@@ -446,8 +446,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 571476,
@@ -456,8 +456,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 571518,
@@ -466,8 +466,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 571560,
@@ -476,8 +476,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 571602,
@@ -486,8 +486,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 16,
-  "thunk": 4641488,
-  "tag_write_pc": 4641488
+  "thunk": 4642112,
+  "tag_write_pc": 4642112
  },
  {
   "src_addr": 359762,
@@ -496,8 +496,8 @@
   "type": 64,
   "form": "stamp_b_d16",
   "tag": 17,
-  "thunk": 4976752,
-  "tag_write_pc": 4976752
+  "thunk": 4977424,
+  "tag_write_pc": 4977424
  },
  {
   "src_addr": 360058,
@@ -506,8 +506,8 @@
   "type": 65,
   "form": "stamp_b_d16",
   "tag": 17,
-  "thunk": 4976768,
-  "tag_write_pc": 4976768
+  "thunk": 4977440,
+  "tag_write_pc": 4977440
  },
  {
   "src_addr": 362788,
@@ -516,8 +516,8 @@
   "type": 66,
   "form": "stamp_b_d16",
   "tag": 17,
-  "thunk": 4976784,
-  "tag_write_pc": 4976784
+  "thunk": 4977456,
+  "tag_write_pc": 4977456
  },
  {
   "src_addr": 363852,
@@ -526,8 +526,8 @@
   "type": 67,
   "form": "stamp_b_d16",
   "tag": 17,
-  "thunk": 4976800,
-  "tag_write_pc": 4976800
+  "thunk": 4977472,
+  "tag_write_pc": 4977472
  },
  {
   "src_addr": 368154,
@@ -536,8 +536,8 @@
   "type": 62,
   "form": "stamp_b_d16",
   "tag": 17,
-  "thunk": 4976816,
-  "tag_write_pc": 4976816
+  "thunk": 4977488,
+  "tag_write_pc": 4977488
  },
  {
   "src_addr": 368544,
@@ -546,8 +546,8 @@
   "type": 63,
   "form": "stamp_b_d16",
   "tag": 17,
-  "thunk": 4976832,
-  "tag_write_pc": 4976832
+  "thunk": 4977504,
+  "tag_write_pc": 4977504
  },
  {
   "src_addr": 368556,
@@ -556,8 +556,8 @@
   "type": 75,
   "form": "stamp_b_d16",
   "tag": 17,
-  "thunk": 4976848,
-  "tag_write_pc": 4976848
+  "thunk": 4977520,
+  "tag_write_pc": 4977520
  },
  {
   "src_addr": 372308,
@@ -566,8 +566,8 @@
   "type": 61,
   "form": "stamp_b_d16",
   "tag": 17,
-  "thunk": 4976864,
-  "tag_write_pc": 4976864
+  "thunk": 4977536,
+  "tag_write_pc": 4977536
  },
  {
   "src_addr": 375418,
@@ -576,78 +576,78 @@
   "type": 73,
   "form": "stamp_b_d16",
   "tag": 17,
-  "thunk": 4976880,
-  "tag_write_pc": 4976880
+  "thunk": 4977552,
+  "tag_write_pc": 4977552
  },
  {
   "src_addr": 377192,
   "region": "code",
   "tenant": "pyron",
   "type": 66,
-  "form": "stamp_l_ind",
-  "tag": 17,
-  "thunk": 4976896,
-  "tag_write_pc": 4976896
- },
- {
-  "src_addr": 377394,
-  "region": "code",
-  "tenant": "pyron",
-  "type": 66,
-  "form": "stamp_l_ind",
-  "tag": 17,
-  "thunk": 4976912,
-  "tag_write_pc": 4976912
- },
- {
-  "src_addr": 380986,
-  "region": "x05c800",
-  "tenant": "pyron",
-  "type": 59,
-  "form": "stamp_l_ind",
-  "tag": 17,
-  "thunk": 4977008,
-  "tag_write_pc": 4977008
- },
- {
-  "src_addr": 430224,
-  "region": "x069046",
-  "tenant": "pyron",
-  "type": 66,
-  "form": "stamp_l_ind",
-  "tag": 17,
-  "thunk": 4977216,
-  "tag_write_pc": 4977216
- },
- {
-  "src_addr": 430454,
-  "region": "x069046",
-  "tenant": "pyron",
-  "type": 66,
-  "form": "stamp_l_ind",
-  "tag": 17,
-  "thunk": 4977232,
-  "tag_write_pc": 4977232
- },
- {
-  "src_addr": 570318,
-  "region": "x088512",
-  "tenant": "pyron",
-  "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
   "thunk": 4977568,
   "tag_write_pc": 4977568
  },
  {
+  "src_addr": 377394,
+  "region": "code",
+  "tenant": "pyron",
+  "type": 66,
+  "form": "stamp_l_ind",
+  "tag": 17,
+  "thunk": 4977584,
+  "tag_write_pc": 4977584
+ },
+ {
+  "src_addr": 380986,
+  "region": "x05c800",
+  "tenant": "pyron",
+  "type": 59,
+  "form": "stamp_l_ind",
+  "tag": 17,
+  "thunk": 4977680,
+  "tag_write_pc": 4977680
+ },
+ {
+  "src_addr": 430224,
+  "region": "x069046",
+  "tenant": "pyron",
+  "type": 66,
+  "form": "stamp_l_ind",
+  "tag": 17,
+  "thunk": 4977888,
+  "tag_write_pc": 4977888
+ },
+ {
+  "src_addr": 430454,
+  "region": "x069046",
+  "tenant": "pyron",
+  "type": 66,
+  "form": "stamp_l_ind",
+  "tag": 17,
+  "thunk": 4977904,
+  "tag_write_pc": 4977904
+ },
+ {
+  "src_addr": 570318,
+  "region": "x088512",
+  "tenant": "pyron",
+  "type": 65,
+  "form": "stamp_l_ind",
+  "tag": 17,
+  "thunk": 4978240,
+  "tag_write_pc": 4978240
+ },
+ {
   "src_addr": 570470,
   "region": "x088512",
   "tenant": "pyron",
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 570694,
@@ -656,8 +656,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 570736,
@@ -666,8 +666,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 570778,
@@ -676,8 +676,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 570820,
@@ -686,8 +686,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 570862,
@@ -696,8 +696,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 570904,
@@ -706,8 +706,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 570946,
@@ -716,8 +716,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 571308,
@@ -726,8 +726,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 571350,
@@ -736,8 +736,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 571392,
@@ -746,8 +746,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 571434,
@@ -756,8 +756,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 571476,
@@ -766,8 +766,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 571518,
@@ -776,8 +776,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 571560,
@@ -786,8 +786,8 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  },
  {
   "src_addr": 571602,
@@ -796,7 +796,7 @@
   "type": 65,
   "form": "stamp_l_ind",
   "tag": 17,
-  "thunk": 4977584,
-  "tag_write_pc": 4977584
+  "thunk": 4978256,
+  "tag_write_pc": 4978256
  }
 ]

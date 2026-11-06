@@ -32,14 +32,14 @@
 #
 # SHEET: none — the capture sheets for the maintainer are a separate step (14z-219, build/agent219/t356/rig/sheets/); this gate judges piece records only
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged33] [JOBS=4] tests/audit_don_speed_lines.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged34] [JOBS=4] tests/audit_don_speed_lines.sh
 #   emulator tier, MAME; 8 runs
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged33}"
+BUILD="${BUILD:-build/m3b_merged34}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] && [ -f "$BUILD/verify_op.bin" ] || { echo "SKIP: no WIDE build with verify_op.bin at $BUILD"; exit 0; }

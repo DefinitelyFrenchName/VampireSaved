@@ -17,8 +17,8 @@
 #   MAME (non-debug, tests/lua/guard_orb_tap.lua, f2300-7240) on native vsav2 and on ours with the parity gate's
 #   protocol on naming part donovan_15 (Ifrit Sword, guard-cancel events; P2 Demitri): real cursor picks (ours "D D DR
 #   DR"), speed level pinned 6 from f2000, RNG 0000 from f2363, the part's own pokes. Step 2 compares every frame.
-# EXPECTS (frozen 14z-221c on the scratch build build/agent221c/m34x — the change is STAGED for the next freeze,
-#   build/manifest/staged/357_363.patch, so this gate is RED against the frozen merged build until that freeze): both legs
+# EXPECTS (frozen 14z-221c on the scratch build build/agent221c/m34x, whose program 2c594c29 the M26 freeze's
+#   merged-m26 (build/m3b_merged34, 14z-222) carries unchanged; BUILD re-pointed there at that freeze): both legs
 #   complete (END); P1's seq/sub equal on both legs from f2363 (the match anchor) on; every DRAWN class-0x72 piece
 #   (vis 01) equal on both legs frame by frame — slot, sub, x, y — and the drawn sub-0x16 piece-frames number 1,400
 #   on each leg (frozen, measured: 175 frames in nine runs — f2797-2810, 3217-3230, 3636-3650, 4056-4087, 4476-4507,
@@ -36,14 +36,14 @@
 #
 # SHEET: none — the guard's capture for the maintainer is build/agent221c/t357/sheets/357_fixed2_p1.png (local); this gate judges the piece records only
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged33] [KEEP=<dir>: the two traces are copied there] tests/audit_guard_orbs.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged34] [KEEP=<dir>: the two traces are copied there] tests/audit_guard_orbs.sh
 #   emulator tier, MAME; 2 runs
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"; export ROMDIR
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged33}"
+BUILD="${BUILD:-build/m3b_merged34}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] && [ -f "$BUILD/verify_op.bin" ] && [ -f "$BUILD/verify_data.bin" ] \

@@ -8093,3 +8093,15 @@ The operand resolved into his `hitbox_proj` copy, because that region's span con
 showed as one orb per guard event drawn 0xFB lower, in a per-piece diff of native against ours. The 175-frame totals
 were equal on both legs. **A reference that resolves INTO a region is not proof the region holds what the reference
 reads: check the extent the code indexes against the region's end, and compare per piece, not per total.**
+
+## A NEGATIVE CONTROL THAT NAMES AN UNPORTED SITE ROTS THE DAY A PORT TAKES THAT SITE (paid: 14z-222, the M26 freeze)
+
+`tests/test_type_stamp_census.sh` held three vs2 type stamps in spans no tenant ported as its negative control
+(`tools/audit_type_stamps.py` `EXPECT_UNPORTED`): if any of them mapped to a tenant, the region model had drifted. #357
+then ported vs2's guard-orb watcher (`PRG:0x090EDA`, Donovan's `x090eda`), and one of the three, `0x090FF4`, is the
+header stamp of its eight-orb spawn loop. The census went red at the freeze with "region model drifted" although the
+model was right and the frozen inventory still matched (its verify read no drift: `build/manifest/type_stamps.toml`
+still called the row UNPORTED). The staged scratch build never ran the static tier, so the red surfaced only at the freeze.
+**A control anchored to "nobody ports this" is a claim about the port's future: when a port adds a region, grep the
+controls for addresses inside it (`EXPECT_UNPORTED`, deadness rows, "unported" lists) and move or re-anchor them in the
+same change.** Fixed 14z-222: the row names `m5_wide:x090eda+0x11A`; the control keeps `0x0697B8` and `0x00B63C`.

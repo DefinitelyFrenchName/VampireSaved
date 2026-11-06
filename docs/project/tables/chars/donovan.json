@@ -4,7 +4,7 @@
   "anim_nodes": 3722,
   "anim_nodes_differ_unattributed": 0,
   "bank_fields_unattributed": 1,
-  "code_bytes_differ_out_of_scope": 67398,
+  "code_bytes_differ_out_of_scope": 67410,
   "dispatch_unattributed": 0,
   "physics_rows_ported": true,
   "region_bytes_unattributed": 558,
@@ -12,20 +12,20 @@
  },
  "inputs": {
   "bank_map.toml": "414f66951fee3a2ca94932baeb8d3189c1c03aee",
-  "manifest": "ab5fb4e08a07123d50cb2aa5f138d7862ae91cf3",
+  "manifest": "31cf8050097cfd33a78e8068406af16d4135ddb5",
   "overrides": "72b9812942192bf348508ddf7473cbb37b2d5275",
-  "placements.json": "01bf2c6a76a6bbc6368d26bbf278d371afff4878",
+  "placements.json": "cc3c4c1fbd42e7e5a43cd6ce9b4695a7c7e20eda",
   "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
   "reconciliation_donovan.toml": "4a8a07afe4a3a35f85e62c5e3ac50577eacf872f",
-  "regions.json": "23c3b49328a88e1c98fb0a51002457ca48d1025c",
-  "verify_data.bin": "3bf7af1c86176dc80fe245db81ea78e118a782cc"
+  "regions.json": "aa91221b1ef1d741af1449c5416d376b0fd5f2d3",
+  "verify_data.bin": "c6664a9e449ade69d83c5393bd5b7285d5817ab1"
  },
  "overrides": [],
  "schema": 1,
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/don_m29"
+   "set": "build/don_m30"
   },
   "vh": null,
   "vs2": {
@@ -194111,9 +194111,9 @@
      "fields": {
       "ptr": {
        "diff": false,
-       "expected_placed": "0x400310",
+       "expected_placed": "0x400580",
        "fmt": "addr",
-       "ours": "0x400310",
+       "ours": "0x400580",
        "ours_source": "relocated",
        "vh": null,
        "vs2": "0x101aca"
@@ -194131,9 +194131,9 @@
      "fields": {
       "ptr": {
        "diff": false,
-       "expected_placed": "0x40040e",
+       "expected_placed": "0x40067e",
        "fmt": "addr",
-       "ours": "0x40040e",
+       "ours": "0x40067e",
        "ours_source": "relocated",
        "vh": null,
        "vs2": "0x101bc8"
@@ -194151,9 +194151,9 @@
      "fields": {
       "ptr": {
        "diff": false,
-       "expected_placed": "0x400eba",
+       "expected_placed": "0x40112a",
        "fmt": "addr",
-       "ours": "0x400eba",
+       "ours": "0x40112a",
        "ours_source": "relocated",
        "vh": null,
        "vs2": "0x102674"
@@ -194171,9 +194171,9 @@
      "fields": {
       "ptr": {
        "diff": false,
-       "expected_placed": "0x4013c8",
+       "expected_placed": "0x401638",
        "fmt": "addr",
-       "ours": "0x4013c8",
+       "ours": "0x401638",
        "ours_source": "relocated",
        "vh": null,
        "vs2": "0x102b82"
@@ -194350,7 +194350,7 @@
        "diff": true,
        "expected_placed": "0x3fbda2",
        "fmt": "addr",
-       "ours": "0x4034b0",
+       "ours": "0x403720",
        "ours_source": "UNATTRIBUTED",
        "vh": null,
        "vs2": "0x0ca1ca"
@@ -195468,7 +195468,7 @@
        "diff": true,
        "expected_placed": "0x3fcbf2",
        "fmt": "addr",
-       "ours": "0x415ee0",
+       "ours": "0x416150",
        "ours_source": "manifest:sound_table:don_sfx_records (the array is placed by the sound op; the row is its ptr_table)",
        "vh": null,
        "vs2": "0x0cb01a"
@@ -206490,7 +206490,7 @@
     "orc": "0x088512",
     "placed": "0x0d0170",
     "refs": 251,
-    "sha1_ours": "309494cc334a0868bc1c1bea8e064240bd2e57b2",
+    "sha1_ours": "54d8e22622bf275d0c1b5d29deaaa56be0671153",
     "sha1_vs2": "e1f908111c70cbdb0a24209e959c2bc989d055f4",
     "src": "0x088512",
     "variant_sites": 0
@@ -206510,6 +206510,45 @@
     "src": "0x0905ae",
     "variant_sites": 0
    },
+   "x090eda": {
+    "diff": {
+     "bytes_differ": 12,
+     "note": "relocated CODE: pc-relative rewrites, reconciliation retargets and thunks \u2014 attribution is the reconciliation / pointer_flow / pcrel gates' business, out of this map's scope"
+    },
+    "kind": "code",
+    "len": 360,
+    "orc": "0x090ae6",
+    "placed": "0x400310",
+    "refs": 5,
+    "sha1_ours": "7e551ca4a52c6d0fc233ada4250559750ef0ebe2",
+    "sha1_vs2": "216b82e6497de3d31a053d5415cd049b84c73b73",
+    "src": "0x090eda",
+    "variant_sites": 0
+   },
+   "x0d1bbe": {
+    "diff": {
+     "attributed_by": {},
+     "counts": {
+      "attributed": 0,
+      "gfx_remap": 0,
+      "override": 0,
+      "relocated_bad": 0,
+      "relocated_ok": 0,
+      "total": 0,
+      "unattributed": 0
+     },
+     "sites": []
+    },
+    "kind": "data",
+    "len": 256,
+    "orc": "0x0d1450",
+    "placed": "0x400480",
+    "refs": 0,
+    "sha1_ours": "6f52196019012ba8a21a39e85267952a9bb3b757",
+    "sha1_vs2": "6f52196019012ba8a21a39e85267952a9bb3b757",
+    "src": "0x0d1bbe",
+    "variant_sites": 0
+   },
    "x101aca": {
     "diff": {
      "attributed_by": {},
@@ -206527,7 +206566,7 @@
     "kind": "data",
     "len": 4302,
     "orc": "0x101aca",
-    "placed": "0x400310",
+    "placed": "0x400580",
     "refs": 0,
     "sha1_ours": "a34b061531e2452699d34e2ee35afca837f6036e",
     "sha1_vs2": "a34b061531e2452699d34e2ee35afca837f6036e",
@@ -206551,9 +206590,9 @@
     "kind": "data",
     "len": 4872,
     "orc": "0x1de55a",
-    "placed": "0x4013e0",
+    "placed": "0x401650",
     "refs": 403,
-    "sha1_ours": "0113ecf22f154245e6885569ecba0fb4d68f7e76",
+    "sha1_ours": "827dc8f36e3d4cdffeb70ca84bdc7c97a6edd180",
     "sha1_vs2": "77ff59b24c03736c1b8cb83c1b75e12a9b80721d",
     "src": "0x1d7428",
     "variant_sites": 0

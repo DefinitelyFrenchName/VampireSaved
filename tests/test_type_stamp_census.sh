@@ -6,7 +6,7 @@
 # WHAT: the static type-stamp census (tools/audit_type_stamps.py) reproduces the FROZEN
 #   inventory build/manifest/type_stamps.toml — every family stamp, compare, reader and
 #   embedded-walker site, source-address-keyed — with its positive control (the six measured
-#   stamp sites seen) and negative control (the three unported stamps mapping to no tenant).
+#   stamp sites seen) and negative control (the two unported stamps mapping to no tenant; three until #357 ported 0x090FF4, 14z-222).
 # HOW: the scan over vsav2's opcode view and the three extract dirs against the frozen file
 #   (~5 s); controls demand a bogus extra site and tamper the frozen copy.
 # EXPECTS: no drift and both in-scan controls green; the bogus site fails the scan and the
@@ -19,7 +19,7 @@
 # regions.json change, a new form — a loud FAIL that forces re-review
 # instead of silent absorption. The scan carries its own positive control
 # (the six measured stamp sites must be seen) and negative control (the
-# three unported family stamps must map to no tenant), per the
+# two unported family stamps must map to no tenant — three until 14z-222), per the
 # list_type_census.py lesson: a census that cannot see the thing it is
 # looking for reads exactly like a clean result.
 #
@@ -37,8 +37,8 @@
 #   14z-82: the STATIC type-stamp census (tools/audit_type_stamps.py)
 #   reproduces the FROZEN inventory build/manifest/ type_stamps.toml — every
 #   family stamp/ compare/reader/embedded-walker site, source-address-keyed,
-#   positive control on the six measured sites + negative control on the three
-#   unported stamps. Drift = FAIL (re-review, never absorb). 2 verdict
+#   positive control on the six measured sites + negative control on the two
+#   unported stamps (three until 14z-222). Drift = FAIL (re-review, never absorb). 2 verdict
 #   controls. No emulator, ~5 s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

@@ -26,7 +26,7 @@
 set -u
 : "${ROMDIR:?set ROMDIR to the directory holding your OWN reference dumps (vsav.zip vsavj.zip vsav2.zip vhunt2.zip vhunt2r1.zip qsound_hle.zip)}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
-DON="${DON:-build/don_m29}"; HUI="${HUI:-build/hui63}"; PYR="${PYR:-build/pyron48}"
+DON="${DON:-build/don_m30}"; HUI="${HUI:-build/hui64}"; PYR="${PYR:-build/pyron49}"
 
 # ---- PREREQUISITES, for a user regenerating the pages from their own ROMs (14z-121 (7)) ----
 # Nothing copyrighted ships with the repo: the reference dumps are yours, in $ROMDIR; the

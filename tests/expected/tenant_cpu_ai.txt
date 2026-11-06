@@ -7,7 +7,7 @@
 # address, the live (real, opponent +0x121) table and event frames; ours: crouch-block stops by (shadow, opponent
 # +0x121) and event frames — B's event counts are per leg, never compared between the builds).
 # Counts, frames and addresses only, no ROM bytes. VERIFY by re-running.
-BUILD add7bc1aac470f20be2f395c36f3b34144353199
+BUILD de548a9ee2850174bf94d23a2ba11f2a38952215
 LIVE pa_native vsav2 window=2900-22880
 LIVE pa_ours vsavjw window=2900-22880
 LIVE pp_native vsav2 window=2900-22880

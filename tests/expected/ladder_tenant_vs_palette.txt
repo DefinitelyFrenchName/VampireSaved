@@ -11,7 +11,7 @@ ok   phobos_ctl: one copy of pool row 0x10 (PRG:0x3A3EA0) into 0x90C140 before t
 pool phobos_ctl row=0x10 0111 0422 0512 0624 0734 0776 0986 0ba8 0344 0233 0122 0400 0800 0a00 0905 0015
 pal140 phobos_ctl 2700 f111 f422 f512 f624 f734 f776 f986 fba8 f344 f233 f122 f400 f800 fa00 f905 f015
 ok   phobos_ctl: palette RAM 0x90C140 at the VS frame == pool row | 0xF000
-liveness phobos_ctl P2base want=0045cd00 seen=0045cd00
+liveness phobos_ctl P2base want=0045cf70 seen=0045cf70
 ok   phobos_ctl: P2 loaded the venue-selected opponent (id 0x10) at match start
 probe bishamon_ctl hits=1 frame=2415 A0=003a3da0 A1=0090c140
 ok   bishamon_ctl: one copy of pool row 0x08 (PRG:0x3A3DA0) into 0x90C140 before the match

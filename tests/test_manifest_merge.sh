@@ -104,7 +104,10 @@ FROZEN = [
     # each; the two _hit rows differ (TT, Pyron's extra +0x1F test) and fold into one 2-way chain, the two _tail rows
     # are identical and dedupe -> merged +3, shared +1 (844 ops measured, tests/test_tenant_loop.sh; rule-checker
     # run 2026-10-03-580).
-    ("site_thunk",       (25, 18, 11), 38, 9),
+    # RE-FROZEN 14z-222 (M26, was (25,18,11),38,9): +1 HUITZIL = freeze_reaction_4f (#363, the jmp on the dead span
+    # PRG:0x029CBA), declared by huitzil.toml alone -> merged +1, shared unchanged (861 ops measured,
+    # tests/test_tenant_loop.sh).
+    ("site_thunk",       (25, 19, 11), 39, 9),
     # RE-FROZEN 14z-99 (was (0,5,2),5,2): the WINDOW landed donovan's two
     # #103 rows. MEASURED merged=5 shared=2: his x05c800 row dedupes into
     # the existing H<->P shared-source pair (one merged row, shared count
@@ -126,7 +129,9 @@ FROZEN = [
     # one shared row each: per-file (12,12,12), merged +3, shared +2. Rule-checker run 2026-10-05-698.
     # RE-FROZEN 14z-189 (was (9,9,11),25,3): #195's pursuit_mark_tail_pad, declared identically by donovan.toml and
     # pyron.toml -> +1 each, merged +1, shared +1.
-    ("code_word",        (13, 12, 12), 30, 6),
+    # RE-FROZEN 14z-222 (M26, was (13,12,12),30,6): +1 HUITZIL = freeze_reaction_row4f (#363, the victim reaction
+    # table's row 0x4F PRG:0x0238FA), declared by huitzil.toml alone -> merged +1, shared unchanged.
+    ("code_word",        (13, 13, 12), 31, 6),
     # RE-FROZEN 14z-87 (was (21,55,14),87,3 — STALE since 14z-85f: the FG
     # damage fix propagated Donovan's six x028122 work-var port_patch rows
     # to huitzil+pyron verbatim (+6 each, +6 shared) and this gate was not

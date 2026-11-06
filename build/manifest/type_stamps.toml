@@ -1106,7 +1106,7 @@ form = "stamp_l_ind"
 imm = 0x01007216
 type = 114
 ea = "(A4)"
-tenants = ""  # UNPORTED
+tenants = "m5_wide:x090eda+0x11A"  # PORTED 14z-222 (M26, #357): vs2's guard-orb watcher, the eight-orb spawn loop's header stamp; Donovan keeps original numbers (14z-82 scope decision), so his copy stamps type 114 as vs2 does — was the UNPORTED negative control until #357
 
 [[reader]]
 src_addr = 0x05A384

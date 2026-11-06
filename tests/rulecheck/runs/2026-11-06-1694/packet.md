@@ -1,0 +1,96 @@
+THE PACKET
+
+Decision kind: freeze
+Subject: M26 freeze: the four registry rows donovan-m30, huitzil-m37, pyron-m31, merged-m26 (#357 and #363) — re-check after run 2026-11-06-1693
+Claim (the working agent's sentence): Freeze M26 (#357 and #363, both ruled, and the freeze itself ruled: rulings.txt): the four registry rows in registry_rows.txt (donovan-m30, huitzil-m37, pyron-m31, merged-m26) are the builds' measured keys, reproduced on three machines — the six builds' program fingerprint and whole-set key are field-for-field the same on the Mac and on ERIS's independent build from scratch S0 (fingerprints_mac.txt, fingerprints_eris.txt: six rows), and PILOT's build from S2 gives the same program and set key for the four registry tracks and the same program for the stock twin (fingerprints_pilot.txt: five rows; PILOT built no stage-4 and printed no set key for the stock twin); every zip member's name, CRC and size agree, zipmani_mac.txt = zipmani_eris.txt but for the stage-4 directory's name, zipmani.py.txt; the zip containers differ, and on the first four members of the merged set the only differing field is the pack time, zip_container_cause.txt); the merged program 2c594c29 is the one 14z-221c measured #357 and #363 on (build/agent221c/m34x, fingerprints_mac.txt); the build inputs are HEAD plus the staged patch plus the mark — build/manifest/donovan.toml, huitzil.toml, pyron.toml, tools/build_donovan.sh and tests/expected/dead_span_reach.tsv each recomputed as HEAD's with HEAD's build/manifest/staged/357_363.patch applied and version_text M25 -> M26 and compared byte for byte with the tree, the patch itself removed (named_checks.txt, its script named_checks.py.txt, whose three invented content changes each FAIL it, named_checks_plant_named.txt) — and every other change to build/manifest/ and tools/ since HEAD is the re-point sweep's build names, the type-stamp row, the rule-5 key classes, the stamp control and the jtcores pin (tools_since_head_classes.txt, its classifier classify_tools_diff.py), and no line the sweep re-pointed rewrites a past record: every one of the 445 lines the M25 -> M26 sweep changed outside the regenerated indexes is judged by its paragraph, not its own pattern (sweep_context.txt, its script sweep_context_audit.py.txt: a line is FLAGGED when the contiguous lines around it name an earlier session key and a record verb; hunks of unequal size are paired line by line too, and the 20 new lines there naming an M26 build that pair with no old line are listed UNPAIRED and read — each this freeze's own new statement), the 179 flagged each read and classed by what the line states — USAGE 78, CODE 76 (its re-point chain kept as written), PRESENT 13, HEADER 12 of expectations re-frozen on the M26 build — none a past record of the build it now names (sweep_context_read.txt; a falsified line restored in a copy is FLAGGED, sweep_context_plant.txt, and so is the same line placed in a hunk of unequal size, sweep_context_plant_unequal.txt); the three lines it had re-pointed in a past record — tools/move_parity_p2x.py's 'Measured 14z-221 on m3b_merged33', tools/trap_air_static.py's 14z-183 re-derivation on build/m3b_merged33 and tools/proof_sheets.py's 14z-206 record — are restored to HEAD's text (the first two files now equal HEAD), and tests/test_release_binaries.sh's '(M25, the current freeze)' beside its re-pointed default is corrected to M26, that gate's row taken off tests/controls_concurrent_emu.txt with a NOT-listed note since its blob no longer matches its trace (sweep_context_read.txt; named_checks.txt and tree_classes.txt re-run on the corrected tree: 285 changed paths, 0 FAIL, each plant FAILing); the tree still builds them: test_m3a_reproducible rebuilds every track from the tree and its program and member-manifest pins PASS (m3a_pins in the gate, test_m3a_reproducible.log); the four expectation sets are file-for-file equal between the Mac's freeze and ERIS's own at S1 (sets_sha1_mac.txt, sets_sha1_eris.txt: 454 files each, sets_mac_vs_eris.diff empty), an equality that tests only the files each host MEASURED — the 78 .sha1 replays frozen on the builds and their logs — since the .masked specs, .skip markers and masks are carried verbatim from the sets they succeed by tools/freeze_expectation_set.py and so are equal by construction; those carried specs are tested instead by each set's verify run on its build, every .masked spec compared against the vanilla basis it names: SUITE GREEN on all four, 53 + 52 + 52 + 61 masked-class PASS, 0 FAIL (sets_measured_carried.txt); and each is attributed against the set it succeeds (set_delta.txt: huitzil-m37 and pyron-m31 equal huitzil-m36 and pyron-m30, merged-m26 equals merged-m25 but its README's carried header, donovan-m30's 24 changed .sha1 replays the stored pointer RAM:$FF06CC-$FF06CD moved +0x270 and, in 11 of them, #357's watcher running from the first frame its object exists); every fixed site of the four tracks' byte diff is explained (bytediff_fixed_review.txt: UNEXPLAINED 0, its classifier bytediff_review.py.txt; bytediff_head.txt the frozen record's head); the registry notes' figures come from each build against its predecessor (fixed_site_delta.txt and its script: fixed-site ops donovan 200 same, 55 relocated, 1 added; huitzil 286 same, 3 added; merged 269 same, 161 relocated, 3 added; the (kind, length) multisets differ by exactly the designed ops, 0 removed; apd_straddle_*.txt: 15296 merged relocation targets, 15094 content-identical, 202 equal modulo a straddling long, 0 differ; region_shifts.txt; member_delta.txt); pyron-m31 is the mark only and the stock twin and stage-4 are unchanged (fingerprints_mac.txt: pyron48 = pyron49 9d135e7b, m5_stock24 = m5_stock25 a3910ded, the two stage-4 builds 2fa7c2f1; opset_delta.txt 0 added, 0 removed); the freeze's re-frozen expectations went through rule-checker run 2026-11-06-1689, which ended OK (refreeze_run.txt); the freeze battery on ERIS at scratch S3 reads PASS 185, SKIP 4, FAIL 0 (S3_battery_results.tsv, S3_battery_verdict.txt), the four SKIPs host-only rows run on their hosts: test_release_binaries and test_readme_recording PASS on the Mac at S3 (mac_S3_*.results.tsv, mac_S3_*.commit.txt), audit_release_linux_desktop and audit_release_linux_cleanhost PASS through the runner on PILOT at S4 (pilot_S4_*.results.tsv, pilot_S4_*.commit.txt; the Linux binaries checked against merged-m26's records with a control, pilot_binaries.txt) and the Mac's test_mame_parity at S2 PASS (mac_S2_parity.txt), its MiSTer lane at S2 test_mister_sdram_census and test_mister_gfxc_fetch PASS and test_mister_prg_window FAIL on its moved pair, then re-frozen with --freeze (prgwin_freeze_tail.txt, the re-freeze attributed in run 2026-11-06-1689's packet, refreeze_attribution.md); the release tested is the build the freeze commit carries: every platform dir of S3's tracked release/merged-m26 has a manifest and apply_release.py byte-identical to a fresh package of build/m3b_merged34 and all 20 of its patches identical, while the same packaging of build/agent221c/m34x (merged-m26's program, another set key) differs on the manifests and 2 of 20 patches (release_identity.txt, release_identity.sh); and what the freeze commit will carry under release/merged-m26 is what S3 carried: every one of the tree's 152 files there is classed — 91 are the 91 paths S3 tracks, each byte-equal to S3's blob, and 61 are git-ignored (the release binaries, by extension .dll 30, .dylib 4, .exe 2 and the versioned library suffixes, never staged), 0 new, 0 missing (release_census.txt, its script release_census.py.txt; one changed byte in an S3 file FAILs it, release_census_plant_diff.txt, and so does one invented non-ignored file, release_census_plant_new.txt); the MiSTer fork's change is commit e11729fe, doc/mame.xml alone, 16 lines, and the pin's whole range 930818f5..e11729fe is that one commit (jtcores_pin_change.txt, jtcores_range.txt); the concurrent-controls lists are re-traced — static: all 125 multi-control static gates at S2 on PILOT, 659 runs, 117 SAFE, 5 SHARED and 3 HOLLOW kept off (traces/static_overlap_summary.txt, traces/static_classes_summary.txt); emulator: the 46 rows whose scripts changed, at S3 — 7 and then 11 on PILOT (20 and 51 runs), 28 on ERIS (96 runs), every run HONOURED, all 46 SAFE (traces/), test_release_binaries since taken off the list (above) — and test_controls_concurrent PASSed on the tree before that (test_controls_concurrent.log), the emulator census reading 0 rows named after it (sweep_context_read.txt); the strict freeze-cadence static tier on a snapshot of scratch S4, every control executed, read PASS 238, FAIL 3 (static_tier_s4.txt, static_tier_s4_results.tsv): test_rule_checker, for want of this freeze check; test_controls_concurrent, the 39 emulator rows then being re-traced, since re-traced and the gate PASSing on the tree (traces/test_controls_concurrent.log); test_emulator_staleness, the S3 battery's record then on ERIS, and 12 FBNeo gates it named stale on emu/fbneo alone, judged again by the final tier (6); its 12 ondemand gates, deferred at every cadence, read 11 PASS run directly and test_sheet_census FAIL on audit_crash_sweep_emu's missing SHEET line, a red that predates this freeze (ondemand_gates.txt). What this rests on that is NOT tested: (1) nothing was run on hardware and no .rbf was rebuilt (the bitstream needs none: the fork's change touches no HDL, jtcores_range.txt), no release is published, and the release-cadence gates are not part of a freeze; (2) neither byte classifier has a control for a wrong change its classes would accept — bytediff_review.py.txt's RELOC accepts any long whose value moved into placed space, and fixed_site_delta.py.txt's RELOC any 4-byte window moved by exactly +0x270 or +0x2A0 — so an unintended change of that shape would be counted as explained; (3) no gate compares a tracked release with a fresh package of its build (release_identity is a direct check, run once); (4) the attribution tool's SAME, RELOCATED and MOVED labels for ops in placed space are not re-examined byte by byte; (5) the provisional tags exist only locally (the Mac's, cut on scratch S1 for the byte diff, and PILOT's for the release gates), and the real tags are cut on the freeze commit; (6) the final static freeze tier runs after this check on a snapshot of the commit's tree, as a full --strict --cadence freeze --exec-controls all run; it has not run; (7) test_mister_prg_window's two moved counters (cyc +661, rd_lo +889 over 2,900 frames) are not attributed field by field, only to the program having changed; (8) the zip-container cause was read on four members of one zip. (9) the 266 sweep lines outside the regenerated indexes that sweep_context_audit.py.txt does not flag are judged by the absence of an earlier session key or a record verb in their paragraph, not read one by one, and the 96 in the regenerated indexes (counted by sweep_context_audit.py.txt) are right only as their sources are; (10) the corrections after run 2026-11-06-1689 (the four lines and the delisting) were not put before a re-freeze check of their own: they move no expectation, and tree_classes.txt and named_checks.txt were re-run over them. (11) the 11 donovan-m30 replays that still differ with the stored pointer masked are attributed at their first divergent frame only (set_delta.txt): every frame after it is taken to follow from #357's watcher running there, a reading, not compared frame by frame.
+Artifacts (read every one, in full):
+  - build/agent222/m26/rc/freeze/S3_battery_results.tsv
+  - build/agent222/m26/rc/freeze/S3_battery_verdict.txt
+  - build/agent222/m26/rc/freeze/apd_straddle_don.txt
+  - build/agent222/m26/rc/freeze/apd_straddle_hui.txt
+  - build/agent222/m26/rc/freeze/apd_straddle_merged.txt
+  - build/agent222/m26/rc/freeze/bytediff_fixed_review.txt
+  - build/agent222/m26/rc/freeze/bytediff_head.txt
+  - build/agent222/m26/rc/freeze/bytediff_review.py.txt
+  - build/agent222/m26/rc/freeze/charmap_tables_check.txt
+  - build/agent222/m26/rc/freeze/classify_tools_diff.py
+  - build/agent222/m26/rc/freeze/diffs_named_mister_prg_window.txt.diff
+  - build/agent222/m26/rc/freeze/fingerprints_eris.txt
+  - build/agent222/m26/rc/freeze/fingerprints_mac.txt
+  - build/agent222/m26/rc/freeze/fingerprints_pilot.txt
+  - build/agent222/m26/rc/freeze/fixed_site_delta.py.txt
+  - build/agent222/m26/rc/freeze/fixed_site_delta.txt
+  - build/agent222/m26/rc/freeze/jtcores_pin_change.txt
+  - build/agent222/m26/rc/freeze/jtcores_range.txt
+  - build/agent222/m26/rc/freeze/m3a_manifests.txt
+  - build/agent222/m26/rc/freeze/mac_S2_mister.txt
+  - build/agent222/m26/rc/freeze/mac_S2_parity.txt
+  - build/agent222/m26/rc/freeze/mac_S3_test_readme_recording.commit.txt
+  - build/agent222/m26/rc/freeze/mac_S3_test_readme_recording.results.tsv
+  - build/agent222/m26/rc/freeze/mac_S3_test_release_binaries.commit.txt
+  - build/agent222/m26/rc/freeze/mac_S3_test_release_binaries.results.tsv
+  - build/agent222/m26/rc/freeze/manifest_tools_since_head.diff.lines-1-401 (lines 1-401 of build/agent222/m26/rc/freeze/manifest_tools_since_head.diff)
+  - build/agent222/m26/rc/freeze/manifest_tools_since_head.diff.lines-402-802 (lines 402-802 of build/agent222/m26/rc/freeze/manifest_tools_since_head.diff)
+  - build/agent222/m26/rc/freeze/manifest_tools_since_head.txt
+  - build/agent222/m26/rc/freeze/member_delta.txt
+  - build/agent222/m26/rc/freeze/named_checks.py.txt
+  - build/agent222/m26/rc/freeze/named_checks.txt
+  - build/agent222/m26/rc/freeze/named_checks_plant_named.txt
+  - build/agent222/m26/rc/freeze/named_checks_plant_new.txt
+  - build/agent222/m26/rc/freeze/new_paths.txt
+  - build/agent222/m26/rc/freeze/ondemand_gates.txt
+  - build/agent222/m26/rc/freeze/ondemand_test_sheet_census.log
+  - build/agent222/m26/rc/freeze/opset_delta.txt.lines-253-259 (lines 253-259 of build/agent222/m26/rc/freeze/opset_delta.txt)
+  - build/agent222/m26/rc/freeze/pilot_S4_clean.commit.txt
+  - build/agent222/m26/rc/freeze/pilot_S4_clean.results.tsv
+  - build/agent222/m26/rc/freeze/pilot_S4_desk.commit.txt
+  - build/agent222/m26/rc/freeze/pilot_S4_desk.results.tsv
+  - build/agent222/m26/rc/freeze/pilot_binaries.txt
+  - build/agent222/m26/rc/freeze/prgwin_freeze_tail.txt
+  - build/agent222/m26/rc/freeze/refreeze_attribution.md
+  - build/agent222/m26/rc/freeze/refreeze_run.txt
+  - build/agent222/m26/rc/freeze/region_shifts.txt
+  - build/agent222/m26/rc/freeze/registry_rows.txt
+  - build/agent222/m26/rc/freeze/release_blob_check.txt
+  - build/agent222/m26/rc/freeze/release_census.py.txt
+  - build/agent222/m26/rc/freeze/release_census.txt
+  - build/agent222/m26/rc/freeze/release_census_plant_diff.txt
+  - build/agent222/m26/rc/freeze/release_census_plant_new.txt
+  - build/agent222/m26/rc/freeze/release_identity.sh
+  - build/agent222/m26/rc/freeze/release_identity.txt
+  - build/agent222/m26/rc/freeze/rulings.txt
+  - build/agent222/m26/rc/freeze/set_delta.txt
+  - build/agent222/m26/rc/freeze/sets_mac_vs_eris.diff
+  - build/agent222/m26/rc/freeze/sets_measured_carried.txt
+  - build/agent222/m26/rc/freeze/sets_sha1_eris.txt
+  - build/agent222/m26/rc/freeze/sets_sha1_mac.txt
+  - build/agent222/m26/rc/freeze/staged_patch_check.txt
+  - build/agent222/m26/rc/freeze/static_tier_s4.txt
+  - build/agent222/m26/rc/freeze/static_tier_s4_results.tsv
+  - build/agent222/m26/rc/freeze/sweep_context.txt
+  - build/agent222/m26/rc/freeze/sweep_context_audit.py.txt
+  - build/agent222/m26/rc/freeze/sweep_context_plant.txt
+  - build/agent222/m26/rc/freeze/sweep_context_plant_unequal.txt
+  - build/agent222/m26/rc/freeze/sweep_context_read.txt
+  - build/agent222/m26/rc/freeze/test_m3a_reproducible.log
+  - build/agent222/m26/rc/freeze/tools_since_head_classes.txt
+  - build/agent222/m26/rc/freeze/traces/e39_eris_classes_summary.txt
+  - build/agent222/m26/rc/freeze/traces/e39_eris_overlap_summary.txt
+  - build/agent222/m26/rc/freeze/traces/e39_pilot_classes_summary.txt
+  - build/agent222/m26/rc/freeze/traces/e39_pilot_overlap_summary.txt
+  - build/agent222/m26/rc/freeze/traces/emu_classes_summary.txt
+  - build/agent222/m26/rc/freeze/traces/emu_overlap_summary.txt
+  - build/agent222/m26/rc/freeze/traces/list_header_lines.txt
+  - build/agent222/m26/rc/freeze/traces/static_classes_summary.txt
+  - build/agent222/m26/rc/freeze/traces/static_overlap_summary.txt
+  - build/agent222/m26/rc/freeze/traces/test_controls_concurrent.log
+  - build/agent222/m26/rc/freeze/tree_classes.py.txt
+  - build/agent222/m26/rc/freeze/tree_classes.txt
+  - build/agent222/m26/rc/freeze/tree_classes_plant.txt
+  - build/agent222/m26/rc/freeze/tree_classes_plant_build.txt
+  - build/agent222/m26/rc/freeze/tree_classes_plant_sweep.txt
+  - build/agent222/m26/rc/freeze/zip_container_cause.txt
+  - build/agent222/m26/rc/freeze/zipmani.py.txt
+  - build/agent222/m26/rc/freeze/zipmani_eris.txt
+  - build/agent222/m26/rc/freeze/zipmani_mac.txt
+  - build/agent222/m26/rc/freeze/zipmeta.py.txt

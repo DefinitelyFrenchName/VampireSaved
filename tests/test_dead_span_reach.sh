@@ -54,14 +54,14 @@
 #
 # SHEET: none — a static read of program bytes; no emulator leg
 #
-# Usage: [MERGED=build/m3b_merged33] [DON=build/don_m29] [HUI=build/hui63] [PYR=build/pyron48] [STOCK=build/m5_stock24]
+# Usage: [MERGED=build/m3b_merged34] [DON=build/don_m30] [HUI=build/hui64] [PYR=build/pyron49] [STOCK=build/m5_stock25]
 #   tests/test_dead_span_reach.sh       static tier (built images, no ROMDIR, no emulator); ~3 min on the MacBook
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 python3 -c "import capstone" 2>/dev/null || { echo "SKIP: python capstone not installed"; exit 0; }
-MERGED="${MERGED:-build/m3b_merged33}"; DON="${DON:-build/don_m29}"; HUI="${HUI:-build/hui63}"
-PYR="${PYR:-build/pyron48}"; STOCK="${STOCK:-build/m5_stock24}"
+MERGED="${MERGED:-build/m3b_merged34}"; DON="${DON:-build/don_m30}"; HUI="${HUI:-build/hui64}"
+PYR="${PYR:-build/pyron49}"; STOCK="${STOCK:-build/m5_stock25}"
 TAB="tests/expected/dead_span_reach.tsv"
 ROLES="merged donovan huitzil pyron stock"
 TOOL="python3 tools/audit_dead_span.py"
