@@ -84,7 +84,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"; export MAME_BI
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
 EXPECT="$REPO/tests/expected/mizuumi_struct.tsv"
-if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no reference MAME binary at $MAME_BIN"; exit 0; }
 # WHICH ROM RAN (the pattern of audit_mizuumi_attack.sh, rule-checker run 2026-10-08-736 Q1; added here 14z-196): every

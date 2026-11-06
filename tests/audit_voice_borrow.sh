@@ -95,7 +95,7 @@ export MAME_BIN
 RPL=tests/replays/don/90_don_plant.rpl
 PK="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
 WORK="$(mktemp -d)"
-trap 'rm -rf "$WORK"' EXIT INT TERM
+trap 'rm -rf "$WORK"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 fail() { echo "FAIL: $*"; exit 1; }

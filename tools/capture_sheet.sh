@@ -65,7 +65,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 [ -x "$MAME_BIN" ] || { echo "FAIL: no MAME binary at $MAME_BIN (tools/setup_mame.sh)"; exit 1; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 F0="${WINDOW%%-*}"; F1="${WINDOW##*-}"
 PK="1400:ff8782:$ATT;1450:ff8782:$ATT;1500:ff8782:$ATT;1400:ff8b82:$VIC;1450:ff8b82:$VIC;1500:ff8b82:$VIC"
 DF="$(python3 -c "import sys; a,b=int(sys.argv[1]),int(sys.argv[2]); print(';'.join(f'{f}:ff8410-ff8418;{f}:ff8810-ff8818;{f}:ff8934-ff8935' for f in range(a,b+1)))" "$F0" "$F1")"

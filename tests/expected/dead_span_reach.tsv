@@ -1,0 +1,20 @@
+# tests/expected/dead_span_reach.tsv — THE DEAD SPANS A PORT PLACES CODE ON, AND THE TABLE ROWS ALLOWED TO REACH EACH
+# ON THE BUILT IMAGES (14z-221c, GitHub #354). Read by tests/test_dead_span_reach.sh; provenance in PROVENANCE.md.
+#
+# A row is added only once the span is PROVEN DEAD in pristine vsavj (tests/test_dead_span.sh, or its successor for
+# that span) and the port that jumps from it is frozen. Columns, tab-separated:
+#   span     PRG start-end, inclusive, hex without 0x (as tools/audit_dead_span.py --span takes it)
+#   row      the table rows allowed to reach the span, comma list, each TABLE:ROW@SITE/SITE in hex
+#            (tools/audit_dead_span.py --allow-table): the table's base, the row index whose 16-bit word gives a span
+#            address, and the sites that load or read through that base (the row is accepted only while they are
+#            exactly those sites; 14z-221c)
+#   pcidx    bases whose rule-D or rule-R reference (tools/audit_dead_span.py, 14z-221c) is ACCEPTED on the reason the `why`
+#            names, each as BASE@SITE/SITE (accepted only while its readers or loaders are exactly those sites), comma
+#            list of hex without 0x, or - for none
+#   roles    the tracked builds that carry the port (comma list of merged, donovan, huitzil, pyron, stock — the five
+#            tracks of tests/run_all_emulator.sh): on each, exactly those rows reach the span and every one is seen; on every OTHER track
+#            the span must still be DEAD as #294 proved it on pristine vsavj
+#   ticket   the GitHub issue that owns the port
+#   why      prose
+# span	row	pcidx	roles	ticket	why
+024024-024029	02ADEC:13@2ADE4/2ADE8,02A646:8A@29DFA	23F84@23F68,24000@433B8/77516	merged,donovan	294	the per-frame palette table's row 0x13 -> the jump to vs2's per-frame routine ([perframe_hook], build/manifest/donovan.toml; only_variant_slot, so Donovan's solo and the merged build only); rule D's byte table PRG:0x023F84 (read at PRG:0x023F68, indexed by the victim's +0x56) accepted: 0 executions of PRG:0x023F68 over the 64-replay legacy corpus (tests/audit_dead_span_exec.sh, 14z-221c); rule R's value 0x00024000 (two 16.16 speeds, PRG:0x0433B8 and PRG:0x077516) and rule T's row 0x8A of the 8-byte record PRG:0x02A646 (a3 by the lea at PRG:0x029DFA; its rows read as offsets give odd, far targets) accepted as tests/test_dead_span.sh names and checks them

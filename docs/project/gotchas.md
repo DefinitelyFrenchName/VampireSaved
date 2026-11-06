@@ -8067,3 +8067,29 @@ the reader answered "inv_native.fig and inv_ours.fig are binary and unreadable",
 as unshown and Q1 was VIOLATED on them (with four real gaps beside). The re-check gave `.fig.txt` copies and the reader read
 them. **An artifact's extension decides whether a reader can open it: give every text artifact a text extension (`.txt`,
 `.log`, `.tsv`) before `prepare`.**
+
+## A DEAD-SPAN PROOF WITHOUT A RULE FOR PC-INDEXED DATA READS CALLED A BYTE TABLE'S TAIL DEAD (paid: 14z-221c, #363)
+
+`tools/audit_dead_span.py` judged `PRG:0x0236CE-0x0236D3` DEAD: no instruction names it (A), no long equals it (C), no
+jump-table row gives it (T), and it is fenced (L). It is entries 10-15 of a 16-byte table that `move.b $236c4(pc,d0.w),d0`
+reads after `andi.w #$f,d0` at `PRG:0x023694`. Rule T read the base's rows only as jump OFFSETS, and the table's own bytes
+decoded as a `bra.w` that the over-approximate descent "reached", which satisfied the fence. A disassembly of the 0x40
+bytes before the span showed the read. The tool now has rule D: every `(d8,PC,Xn)` base within 0x100 of a span byte, on EITHER side (an index can be
+negative: the base-below-only first version missed three bases just above #363's span, rule-checker run
+2026-11-06-1664), is a reference unless the caller names it with `--allow-pcidx` at its sites and states its bound. The rules also read
+an address as the 68000's 24-bit bus does (an operand's top byte ignored; run -1676), and every instruction form a rule lists
+has a control: capstone names `lea`/`pea` `lea.l`/`pea.l`, and an exact-name test that never matched hid every such base. Rule D also found a reference
+#294's frozen span `0x024024` had never been checked for (the byte table `0x023F84`, read at `0x023F68`); that one is
+accepted on 0 executions of the read over the 64-replay corpus. **A static "nothing reaches it" is only as good as the
+reader shapes it models: read the code before a candidate span yourself, and treat a fence made of decoded data as no
+fence.**
+
+## A CAPPED DATA REGION SILENTLY CUT OFF A TABLE ANOTHER REGION'S OPERAND READS (paid: 14z-221c, #357)
+
+The orbs' motion code in Donovan's `x088512` copy reads vs2's 64-entry table `0x0D1BBE` through `movea.l #$0D1BBE,a1`.
+The operand resolved into his `hitbox_proj` copy, because that region's span contains the table's start. But
+`tools/extract_char.py` caps `hitbox_proj` at 0x1000 bytes, and the table runs 0x16 bytes past the cap, so entries
+0x3A-0x3F read the build's next allocation. No gate saw it: nothing reached those entries until the orbs were ported. It
+showed as one orb per guard event drawn 0xFB lower, in a per-piece diff of native against ours. The 175-frame totals
+were equal on both legs. **A reference that resolves INTO a region is not proof the region holds what the reference
+reads: check the extent the code indexes against the region's end, and compare per piece, not per total.**

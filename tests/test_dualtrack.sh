@@ -187,9 +187,10 @@ prun() {  # prun <rcfile> <command...> — one emulator run, output discarded, i
 }
 prc() {  # prc <rcfile> — stop the gate, as set -e did inline, if that run failed
     # #310 (14z-215): it stopped SILENTLY with the run's status, so a stalled FBNeo leg under stray-byte-growth read as
-    # that control caught (HONOURED); the run measured nothing past this point, and says so
+    # that control caught (HONOURED); the run measured nothing past this point, and says so — under a mode only, since
+    # #310 group 7 batch 2 (14z-221c): tests/lib/controls.sh vs_ctl_nj, silent in a plain run (test_dead_leg_unjudged)
     _prr="$(cat "$1" 2>/dev/null || echo 1)"; [ "$_prr" = 0 ] && return 0
-    echo "NOT JUDGED: the FBNeo run $(basename "$1" .rc) did not complete (exit $_prr: no END line, or the emulator died), so nothing past it was judged (#310)"
+    vs_ctl_nj "the FBNeo run $(basename "$1" .rc) did not complete (exit $_prr: no END line, or the emulator died), so nothing past it was judged (#310)"   # #310 g7 NJ
     echo "FAIL: test_dualtrack — the FBNeo run $(basename "$1" .rc) did not complete"
     exit "$_prr"
 }
@@ -330,7 +331,7 @@ for spec in $LEGACY_ONSETS; do
     prc "$WORK/s_$rp.rc"
     prc "$WORK/w_$rp.rc"
     state_onset "s_$rp" "w_$rp" > "$WORK/so_$rp.txt" || { echo "  FAIL: $rp — dump/classify error"; cat "$WORK/so_$rp.txt"; fail=1
-        echo "NOT JUDGED: $rp's onset could not be classified ($(head -1 "$WORK/so_$rp.txt"): a dump run wrote no dump), so its onset was not judged (#310)"; continue; }
+        vs_ctl_nj "$rp's onset could not be classified ($(head -1 "$WORK/so_$rp.txt"): a dump run wrote no dump), so its onset was not judged (#310)"; continue; }   # #310 g7 NJ
     got="$(awk '$1=="STATE_ONSET"{print $2}' "$WORK/so_$rp.txt")"
     nfl="$(awk '$1=="FLICKER"{print $2}' "$WORK/so_$rp.txt")"; ofl="$(awk '$1=="FLICKER"{print $3}' "$WORK/so_$rp.txt")"
     fltxt=""; [ "${nfl:-0}" != 0 ] && fltxt=" (+$nfl flicker frame(s) at frozen offsets ${ofl} before it)"
@@ -371,8 +372,11 @@ if [ -n "$ctl" ]; then
     cp "$ctl" "$WORK/d_cw_0.log.dump_${cfr}_ff0000.bin"
 else
     cfr=880
+    # #310 g7 (14z-221c): its status was left to set -e, so a dead run stopped the gate silently with the run's status
     FBNEO_DUMPS="$cfr:ff0000-ffffff" FBNEO_ROMPATH="$STOCK" tools/run_replay_fbneo.sh vsavj \
-        "$REPO/tests/replays/05_timeout_idle.rpl" "$WORK/d_cs_0.log" "$WORK/sb_cs" >/dev/null 2>&1
+        "$REPO/tests/replays/05_timeout_idle.rpl" "$WORK/d_cs_0.log" "$WORK/sb_cs" >/dev/null 2>&1 \
+        && [ -s "$WORK/d_cs_0.log.dump_${cfr}_ff0000.bin" ] || { vs_ctl_nj "section 1b's own dump run wrote no dump, so the control was not judged"   # #310 g7 NJ
+        echo "FAIL: test_dualtrack — section 1b's own dump run (05_timeout_idle at $cfr) wrote no dump"; exit 1; }
     cp "$WORK/d_cs_0.log.dump_${cfr}_ff0000.bin" "$WORK/d_cw_0.log.dump_${cfr}_ff0000.bin"
 fi
 python3 - "$WORK/d_cw_0.log.dump_${cfr}_ff0000.bin" <<'PYC'
@@ -438,6 +442,9 @@ if [ -n "$onset" ]; then
     vs_pool_wait
     prc "$WORK/on_s.rc"
     prc "$WORK/on_w.rc"
+    for _on in on_s on_w; do   # #310 g7 (14z-221c): a run that exited 0 and wrote no dump is a dead leg, not a verdict
+        [ -s "$WORK/$_on.log.dump_${onset}_ff0000.bin" ] || vs_ctl_nj "the onset run $_on wrote no dump at $onset"   # #310 g7 NJ
+    done
     python3 - "$WORK" "$onset" "$ONSET_WINDOW_LO" "$ONSET_WINDOW_HI" "$(printf '%s' "$FROZEN_FLICKER" | tr ' ' ',')" <<'PY' || fail=1
 import sys
 W, fr, lo, hi = sys.argv[1], int(sys.argv[2]), int(sys.argv[3], 16), int(sys.argv[4], 16)
@@ -480,6 +487,7 @@ echo "== 4. and it must be DATA, not a different code path =="
 prc "$WORK/tp_s.rc"
 prc "$WORK/tp_w.rc"
 if [ ! -s "$WORK/s.tap" ] || [ ! -s "$WORK/w.tap" ]; then
+    vs_ctl_nj "the write tap produced nothing (a dead instrument)"   # #310 g7 NJ
     echo "  FAIL: the write tap produced nothing — a dead instrument, not a"
     echo "        clean result (FBNEO_HTAP)"
     fail=1

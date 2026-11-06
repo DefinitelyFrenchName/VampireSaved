@@ -13,24 +13,24 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**511 of 512 gates described.**
+**513 of 515 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 64 | 64 | the suite runners and their own ground truth |
+| [runner](#runner) | 65 | 65 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 88 | 88 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 108 | 109 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 109 | 111 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
 
-the suite runners and their own ground truth. 64 of 64 described.
+the suite runners and their own ground truth. 65 of 65 described.
 
 ### `audit_crash_sweep_emu.sh` — audit, emulator
 
@@ -236,9 +236,9 @@ the suite runners and their own ground truth. 64 of 64 described.
 
 **WHAT:** tests/lib/controls.sh `vs_ctl_nj <why>`, which a gate calls beside each liveness check (an emulator that exited non-zero, a trace with no END line, no samples, a reducer's VOID about a leg that never ran): under a CONTROL= mode it prints `NOT JUDGED: under control mode <mode>, <why>` and tests/lib/classify.sh reads the run UNJUDGED; in a plain run it prints nothing. Before it, those gates' modes ended a dead leg in their ordinary FAIL and read HONOURED: a control certified on no measurement.
 
-**HOW:** (1) the helper on its own, in a subshell, with and without a mode. (2) For each row of tests/expected/dead_leg_unjudged.tsv (gate, mode, class, stripped class), the gate's mode is run with MAME_BIN=/usr/bin/false, so every leg dies at once, and its log is classified with vs_classify_control exactly as both runners do; the gate's PLAIN run under the same dead emulator must exit non-zero and print no `NOT JUDGED:` line (a dead emulator never passes a plain run, and the helper is silent there). (3) The in-gate control: each row's gate copied with its `# #310 g7 NJ` lines NEUTERED (vs_ctl_nj made `:`, a printed `NOT JUDGED:` renamed; never deleted, since a tagged line may carry the gate's own command; its REPO line pinned to this repository, the crash sweep's form) must read its frozen pre-fix class under the same dead emulator: HONOURED, or LIES where the batch also made a mode close fire only on its own finding; never UNJUDGED, so the rows read UNJUDGED because of those lines.
+**HOW:** (1) the helper on its own, in a subshell, with and without a mode. (2) For each row of tests/expected/dead_leg_unjudged.tsv (gate, mode, class, stripped class, dead instrument), the gate's mode is run with MAME_BIN=/usr/bin/false and the row's dead instrument (MAME_BIN, or FBNEO_BIN for an FBNeo leg: test_dualtrack, #310 group 7 batch 2, 14z-221c) set to /usr/bin/false, so every leg dies at once, and its log is classified with vs_classify_control exactly as both runners do; the gate's PLAIN run under the same dead emulator must exit non-zero and print no `NOT JUDGED:` line (a dead emulator never passes a plain run, and the helper is silent there). A row whose dead instrument is not MAME_BIN runs its mode once more with ONLY that instrument dead and MAME_BIN unset, and must read the same class: the class comes from the instrument the row names, not from the dead MAME every other run carries (14z-221c, rule-checker run -1665). (3) The in-gate control: each row's gate copied with its `# #310 g7 NJ` lines NEUTERED (vs_ctl_nj made `:`, a printed `NOT JUDGED:` renamed; never deleted, since a tagged line may carry the gate's own command; its REPO line pinned to this repository, the crash sweep's form) must read its frozen pre-fix class under the same dead emulator: HONOURED, or LIES where the batch also made a mode close fire only on its own finding; never UNJUDGED, so the rows read UNJUDGED because of those lines.
 
-**EXPECTS:** (1) silent and 0 with no mode, the one line with a mode; (2) every row reads its frozen class (UNJUDGED) and every plain run is red and silent; (3) every neutered copy reads its frozen stripped class (HONOURED or LIES). A row whose mode is not declared by its gate any more, or whose gate carries no `# #310 g7 NJ` line, FAILs.
+**EXPECTS:** (1) silent and 0 with no mode, the one line with a mode; (2) every row reads its frozen class (UNJUDGED), also with only its named instrument dead, and every plain run is red and silent; (3) every neutered copy reads its frozen stripped class (HONOURED or LIES). A row whose mode is not declared by its gate any more, whose gate carries no `# #310 g7 NJ` line, or whose dead instrument is neither MAME_BIN nor FBNEO_BIN, FAILs. A gate may hold several rows (one per mode, batch 2): each row's runs are kept apart by gate and mode.
 
 ### `test_demand_after_trap.sh` — test, ci_portable
 
@@ -487,6 +487,14 @@ the suite runners and their own ground truth. 64 of 64 described.
 **HOW:** strips heredoc bodies (embedded Python and TOML would give ~16 false `[[table]]` hits) and scans every sh-shebang script for shell-context bashisms; two controls add stub scripts with a bashism and with the assignment chain to the real file list.
 
 **EXPECTS:** PASS when every sh script is clean; a red names the script and the construct. `dash -n` is not a substitute — it passed the very file proven dead.
+
+### `test_signal_traps.sh` — test, ci_portable
+
+**WHAT:** no shell script under tests/ or tools/ carries a trap on INT, TERM, HUP or QUIT whose action runs no `exit` (RESUMES), exits with no non-zero status (EXITS0), or cannot be read (UNREAD) — tools/signal_traps.py. A POSIX shell runs a signal trap's action and RESUMES the script; `trap '<cleanup>' EXIT INT TERM` (228 traps in 221 files at a152efa7) let a gate that the runner's timeout(1) sent TERM run its cleanup and keep running after the runner had recorded TIMEOUT. The accepted form: trap `'<cleanup>'` EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+
+**HOW:** 1. the PREMISE, measured on every shell this host has (sh, bash, dash): a stub with the old form, sent TERM while it sleeps, prints the line after its sleep and exits 0; the same stub in the accepted form does not, exits 143 and runs its cleanup once; and the accepted form's normal-path status is the script's own `exit N` (0, 1, 3). 2. the census over the tree, which must read at least 500 shell files and 400 stopping-signal traps (a blinded scan reads fewer). 3. known answers on synthetic scripts: five bad forms named with their tag, seven good forms not named. 4. the control.
+
+**EXPECTS:** 0 named on the tree. A red names the file, the line and the tag; the fix is the accepted form above (a function action takes `exit 130` / `exit 143` traps of its own the same way).
 
 ### `test_static_confirm.sh` — test, ci_portable
 
@@ -2818,7 +2826,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 108 of 109 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 109 of 111 described.
 
 ### `audit_air_dash_height.sh` — audit, emulator
 
@@ -3494,11 +3502,19 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `test_dead_span.sh` — test, ci_static
 
-**WHAT:** PRG:0x024024-0x024029 of pristine vsavj — a `moveq #$4b,d0 / bra.w $27ec0` tail wedged between rows 0x20 and 0x21 of the victim reaction dispatch (table PRG:0x02385C), after row 0x20's own `bra.w` — can be neither executed nor read, so a jump placed there for #294 (the per-frame palette table PRG:0x02ADEC's row 0x13, whose 16-bit word reaches only PRG:0x022DEC-0x032DEB) touches nothing legacy content reaches. Its twins in vsav2 (PRG:0x022C20) and vhunt2 (PRG:0x022C4E) sit in the same place, after the same `bra.w` — the look of a leftover in all three builds — but the tool does NOT prove them dead (vsav2: two data longs and a palette-offset table's op-view rows; vhunt2: a base from data decoded as code; all over-approximations it cannot exclude), so they are not judged here.
+**WHAT:** PRG:0x024024-0x024029 of pristine vsavj — a `moveq #$4b,d0 / bra.w $27ec0` tail wedged between rows 0x20 and 0x21 of the victim reaction dispatch (table PRG:0x02385C), after row 0x20's own `bra.w` — can be neither executed nor read, so a jump placed there for #294 (the per-frame palette table PRG:0x02ADEC's row 0x13, whose 16-bit word reaches only PRG:0x022DEC-0x032DEB) touches nothing legacy content reaches. Its twins in vsav2 (PRG:0x022C20) and vhunt2 (PRG:0x022C4E) sit in the same place, after the same `bra.w` — the look of a leftover in all three builds — but the tool does NOT prove them dead (vsav2: two data longs and a palette-offset table's op-view rows; vhunt2: a base from data decoded as code; all over-approximations it cannot exclude), so they are not judged here. AND (14z-221c, #363) PRG:0x029CBA-0x029CBF — `move.b #4,$3B5(a6)`, an unreferenced entry fragment whose next instruction `bra.b 0x029C74` joins the routine above it, after that routine's `jmp $73f6a.l` — where #363 puts the jump to its freeze handler (the victim reaction table PRG:0x02385C's row 0x4F, a 16-bit word reaching only PRG:0x01B85C-0x02B85B). Only the six bytes of the one instruction are claimed; the `bra.b` after it stays.
 
-**HOW:** tools/audit_dead_span.py on the decrypted views (tests/lib/decrypt_cache.sh): no instruction decoded at ANY even address of the code window names a span byte (A), no 32-bit value at any 2-aligned offset of either full view equals one (C), no table row inside the jump-table extent gives one (T), and the span is FENCED by reached code — an unconditional transfer ends exactly at its start and the byte after it is reached (L).
+**HOW:** tools/audit_dead_span.py on the decrypted views (tests/lib/decrypt_cache.sh): no instruction decoded at ANY even address of the code window names a span byte (A), no 32-bit value at any 2-aligned offset of either full view equals one (C), no table row inside the jump-table extent gives one (T), and the span is FENCED by reached code — an unconditional transfer ends exactly at its start and the byte after it is reached (L); and since 14z-221c no PC-indexed DATA read can land in it (D: every `(d8,PC,Xn)` base within 0x100 of a span byte, on either side, is a reference; R the same for a register-loaded base; addresses read as the 68000's 24-bit bus does: the tool's header). RULE D CHANGED #294'S PROOF: the byte table PRG:0x023F84, read by `move.b $23f84(pc,d0.w),d0` at PRG:0x023F68 with d0 the victim's +0x56 (unmasked, after `moveq #0`), reaches PRG:0x024024 at index 0xA0. The pre-221c tool had no rule for a data read through a PC-indexed base. That base is ACCEPTED here at its one reader (--allow-pcidx 23f84@23f68) on its corpus bound, not on a static proof: tests/audit_dead_span_exec.sh counts executions of PRG:0x023F68 over the 64-replay legacy corpus (14z-221c); with rules R and T two more references are accepted at their sites, and #363's span carries three bases above it, accepted the same way (ACC294 and ACC363 below).
 
-**EXPECTS:** VERDICT DEAD for vsavj's span. A red names the reference (instruction, long or table row) or the missing fence. Stated, not tested: an address formed at run time from no constant anywhere (the tool's header); the runtime bound (build/agent216/rc294/dead/exec_bound.sh, 14z-216: 0 executions over the 64-replay legacy corpus on MAME) is a separate, weaker instrument — the corpus never reaches the neighbouring rows 0x20/0x21 either. What reaches the span on OUR build after the port is a different question, for the port's own gate.
+**EXPECTS:** VERDICT DEAD for both spans on vsavj, each accepted reference named at exactly its sites. A red names the reference (instruction, long or table row) or the missing fence. Stated, not tested: an address formed at run time from no constant anywhere (the tool's header); the runtime bound (build/agent216/rc294/dead/exec_bound.sh, 14z-216: 0 executions over the 64-replay legacy corpus on MAME) is a separate, weaker instrument — the corpus never reaches the neighbouring rows 0x20/0x21 either. What reaches the span on OUR build after the port is a different question, for the port's own gate.
+
+### `test_dead_span_reach.sh` — test, ci_static
+
+**WHAT:** #294's port puts a jump on six bytes proven dead in PRISTINE vsavj (PRG:0x024024-0x024029, tests/test_dead_span.sh) and points the per-frame palette table PRG:0x02ADEC's row 0x13 at it. test_dead_span reads pristine vsavj only and test_perframe_hook's plants all perturb the port itself, so a later change that made other code in the BUILT image reach the span passed both (#354). This gate reads every span of tests/expected/dead_span_reach.tsv on the five tracked builds (MERGED DON HUI PYR STOCK, tests/run_all_emulator.sh's tracks): on a build the row's roles name, the span is reached by EXACTLY its allowed table rows, each bound to its named reader sites — no instruction names a span address (A), no 32-bit value equals one (C), no other table row gives one (T), no PC-indexed read lands in it through a base within 0x100 of it on either side (D: an index may be negative), no register is loaded with such a base, odd or even, or has such a constant added to it (R), except the bases the row accepts at their named sites; every allowed row is seen; and the fence holds (L: every reached instruction ending at the span start is an unconditional transfer and none straddles it); on every other build the span is DEAD by the same six rules. Addresses are read as the 68000's 24-bit bus sees them: an operand's top byte is ignored, and a data long counts with top byte 0x00 or 0xFF (14z-221c, rule-checker run 2026-11-06-1676; the tool's header).
+
+**HOW:** tools/audit_dead_span.py on each build's verify_op.bin / verify_data.bin (the opcode and data views the build writes), the code ranges the vsavj window 0-0x100000 plus every [[space]] of the three tenant manifests clipped to the image (hole_b, and wide_ext on a WIDE image): `--allow-table <row> --expect only` on a carrying build, the default `--expect dead` elsewhere. Each rule is over-approximate (decode at every even address, every 2-aligned long of both full views, every table base's rows within the jump-table extent), so a false reference can only turn it red.
+
+**EXPECTS:** on merged and Donovan solo, VERDICT REACHED ONLY (allowed PRG:0x02A646 row 0x8A, PRG:0x02ADEC row 0x13 seen 2 of 2, other refs A 0 C 0 T 0 D 0 R 0, fenced yes); on Phobos solo, Pyron solo and the stock twin, VERDICT DEAD. A red names the extra reference (instruction, long or table row), the missing allowed row, or the broken fence. Stated, not tested: an address formed at run time from no constant anywhere (the tool's header); that a base or row the table accepts at its named sites never reaches the span at run time (0x23F84's reader is bounded on pristine vsavj only, tests/audit_dead_span_exec.sh; 0x24000 and row 0x8A of 0x02A646 rest on reading the code); what the jump does at run time (tests/audit_don_row0c.sh); code outside the declared ranges (the vsavj window and the manifests' spaces).
 
 ### `test_defense_rows_census.sh` — test, ci_static
 
@@ -3684,7 +3700,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **EXPECTS:** every event fires, the 180 rows equal to the frozen slot map, the out-of-tree hash equal; the swapped rows fail.
 
-**Not yet described:** `audit_beam_slide.sh`.
+**Not yet described:** `audit_beam_slide.sh`, `audit_guard_orbs.sh`.
 
 ## review-triage
 

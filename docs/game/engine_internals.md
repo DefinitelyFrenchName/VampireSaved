@@ -671,12 +671,29 @@ measured.
 with vs2's `0x22388` and vh2's `0x223B6`, only these two differ in kind: vsavj points both at its default row `0x238FC`
 (the same code as vs2's default `0x22430`), vs2 sends 0x4E to `0x226E0` and 0x4F to `0x2296C` (vh2 `0x2270E`/`0x2299A`,
 the same offsets). Phobos's Plasma Beam (ES) hits with class 0x4F on both games (the victim's `+0x54` tapped 0x4F at every
-hit, `+0x59` = 2 on both): on vs2 `0x2296C` writes sub 08 and the victim is held in place; on vsavj the default row runs
+hit, `+0x59` = 2 on both): on vs2 `0x2296C` writes sub 08 and the victim is FROZEN in the ice block (the maintainer, on
+14z-221b's capture: *"vs2 always freezes (not paralyses: the whole ice block effect) Demitri on each hit, not just the
+finale"*); on vsavj the default row runs
 the pushback slide (seq 02, the `+0x164` step counter, x written by `0x27E22`/`0x281FC`), so Demitri ends 49 px further
 from Phobos than native. No reachable legacy record of either game carries class 0x4E or 0x4F and no vsavj instruction
 writes either as an immediate to `+0x54` (`tools/audit_reaction_classes.py`; a register write is that tool's stated blind
 spot) — so only the tenants reach the two rows. Which tenant records carry them, and what row 0x4E's handler does, are not
 measured.
+
+**The freeze, ported (14z-221c, #363; the maintainer chose "Fix it too (Recommended)"; STAGED for the next freeze as
+`build/manifest/staged/357_363.patch`).** vs2's `0x2296C`: sub 08, `+0x140` = 0x14, `+0x11E` = 1 then, for class 0x4F only,
+`+0x11E` cleared and `+0x5C` = 0x1F — the FREEZE TIMER, counted down each frame (native: 0x1F, 0x1D, 0x1C, 0x1B, ... and
+reset by the next 0x4F hit) — then the class map byte (vs2 `0x027FD8[0x4F]` = 0x1B), `bsr 0x027114`, `jmp 0x06D31C` (the
+ice-block spawn). vsavj carries the same freeze for class 0x14 (`PRG:0x023D82`, its twins `0x027EC0` and `0x060ED8`) but not
+the class-0x4F case, and vsavj's class map holds 0x00 at 0x4F; without the timer the freeze ends at once (measured on
+ours: `+0x5C` stays 0). The row is 16 bits (it reaches only `PRG:0x01B85C-0x02B85B`), so the handler — vs2's on vsavj's
+twins, the map byte as an immediate — is reached through a `jmp` on the dead span `PRG:0x029CBA` (below). Vanilla never
+reads row 0x4F (`tests/audit_effect_class_rows.sh` section 1c: 0 reads on six replays, the table's rows 0x00-0x3F 21 reads
+on `02_demitri_vs_cpu` with the same watch). On the fixed scratch build every traced field of both fighters equals
+native's on every frame f2560-3080 of huitzil_4; the maintainer, on the capture: *"Demitri is frozen indeed"*. Not
+ported: row 0x4E (vs2 `0x0226E0`, no move measured to carry it). Not measured: a tenant victim — vsavj's spawn
+`0x060ED8` tests a 16-bit char-id mask (`#$8448`) where vs2's `0x06D31C` tests 32 bits (`#$84418448`).
+[M: `tests/audit_beam_slide.sh` (re-frozen 14z-221c); `build/agent221c/t363/` (local)]
 
 **A dead tail between the class-0x20 and class-0x21 handlers (14z-216, GitHub #294; static, `tests/test_dead_span.sh`).**
 Class 0x20's handler (vsavj `0x024002`, row 0x20 of `0x2385C`) sets `+0x140` and `+0x14E`, calls `0x3E3A`, then
@@ -686,7 +703,12 @@ would end with — and class 0x21's handler starts at `0x02402A`. Nothing reache
 even address of `0x000000-0x0FFFFF` names one of them, no 32-bit value in either view equals one, no row of the 80-row
 dispatch (or of any table, by the jump-table extent rule) gives one, and they are fenced by reached code (an
 unconditional `bra.w` ends at `0x024024`, `0x02402A` is reached) — `tools/audit_dead_span.py`, whose header states what
-it cannot see (an address formed at run time from no constant). The same idiom occurs six more times in vsavj
+it cannot see (an address formed at run time from no constant). **CORRECTED 14z-221c:** that tool had no rule for a DATA
+read through a PC-indexed base, and one reaches the span: `move.b $23f84(pc,d0.w),d0` at `PRG:0x023F68`, after `moveq
+#0,d0 / move.b $56(a6),d0` (the victim's `+0x56`, unmasked), reads a byte table at `0x023F84` that reaches `0x024024` at
+index 0xA0. The tool's rule D (14z-221c) now counts every `(d8,PC,Xn)` base within 0x100 of a span byte on either side (an index may be negative; rule R the same for a register-loaded base); this one is
+accepted on its runtime bound — `PRG:0x023F68` executes 0 times over the 64-replay legacy corpus
+(`tests/audit_dead_span_exec.sh`) — not proven statically. The same idiom occurs six more times in vsavj
 (`0x024888`, `0x0248A2`, `0x024C00`, `0x025592`, `0x025622`, `0x025AF4`), each reached by fall-through from the
 instruction before it; this is the only copy behind an unconditional branch. vsav2 (`0x022C20`, after the same
 handler's `bra.w` at `0x022C1C`) and vhunt2 (`0x022C4E`) carry it in the same place, but the tool does not prove those
@@ -694,6 +716,19 @@ dead (over-approximated references it cannot exclude). Runtime bound, weaker: `t
 executions over the 64-replay legacy corpus on MAME, where rows 0x20/0x21 are never dispatched either. #294's port puts
 the per-frame palette routine's jump here, within reach of the per-frame table's 16-bit word (`0x022DEC-0x032DEB`);
 other unreached spans in that range (a 14z-216 scratch descent, `build/agent216/rc294/dead/reach.py`, listed fourteen others of six bytes or more after a reached terminator) were not judged.
+
+**A second dead span, `PRG:0x029CBA-0x029CBF` (14z-221c, #363; `tests/test_dead_span.sh`).** `move.b #4,$3B5(a6)`, an
+unreferenced entry fragment after `jmp $73f6a.l` (ending `PRG:0x029CBA`) whose next instruction `bra.b 0x029C74` joins
+the routine above; only the six bytes of the one instruction are claimed. `tools/audit_dead_span.py`: refs A 0 C 0 T 0
+D 0 R 0, fenced, with three bases ABOVE the span accepted at their sites (the two-sided window, rule-checker run
+2026-11-06-1664): `PRG:0x029CC2` and `PRG:0x029D02`, word tables loaded by `lea` at `PRG:0x029944` / `PRG:0x029966` and
+read through `d0.w` after `andi.w #$3e,d0` (index 0..0x3E, never below the base), and `PRG:0x029D92`, the operand of a
+decode of data at `PRG:0x029D82` that the recursive descent never reaches; 0 executions there and at the `bra.b` over the 64-replay corpus. Of the 14z-216 candidates of six bytes or
+more within the reaction table's reach, the first, `PRG:0x0236CE-0x0236D3`, was judged DEAD by the pre-D tool and is NOT: it is
+entries 10-15 of a 16-byte table read by `move.b $236c4(pc,d0.w),d0` after `andi.w #$f,d0` at `PRG:0x023694` (its data
+decodes as a `bra.w` the descent reaches, which faked the fence) — kept as the gate's known-bad control. Of the rest, the
+tool now finds rule-D references for `PRG:0x02A586` and judged the other nine NOT DEAD before rule D (a reference, a
+reached instruction inside, or no fence; `build/agent221c/t363/candidates.txt`, local).
 
 **The paths, tapped (14z-187b, #195; the victim's `+0x26` countdown, `+0x54` class and `+0x117`, PC-attributed by
 `tests/lua/read_tap.lua`; native vs2 against the staged #194 merged build):** Pyron's Cosmo Disruption and Donovan's
@@ -1517,7 +1552,7 @@ records (vsavj: 212 format 2, 23 format 0, 1 format 10). vsavj's is live legacy 
 0x33-0x44 and 0x5D; rows 2-5, the trail pieces', were read by no legacy rig of the census. vsavj has no class 0x72 at all
 (its effect walker table ends at type 0x71). [M: `build/agent219/t345/CENSUS.md` (local)]
 
-### Donovan's guard orbs: a type-0x13 watcher in the `$FFD400` pool that vsavj dispatches to a stub (measured 14z-221, #357)
+### Donovan's guard orbs: a type-0x13 watcher in the `$FFD400` pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c)
 
 At Donovan's guard, native vs2 draws eight small red orbs around the fighters for about 14 frames and ours draws none
 (#357, the maintainer's read on 14z-219's capture sheets). **The orbs are spawned by a WATCHER object**, not by the guard
@@ -1538,6 +1573,25 @@ both legs show the same watcher (P1-owned, 4,883 slot-frames from frame 2363, st
 frames with the record byte in range, first at frame 2796); only the handler differs. Not measured: whether vanilla ever
 reads row 0x13 (the deadness a repoint would rest on), what our build's class-0x72 handler (the port's; vsavj has none) does with sub 0x16, FBNeo, MiSTer.
 [M: `build/agent221/t357/` (local: `lua/d400_tap.lua`, `run_d4.sh`, `measurer_357.txt`); no gate]
+
+**The port (14z-221c; the maintainer, 2026-11-05: *"we should port the orbs unless we find out we technically cannot"*;
+STAGED for the next freeze as `build/manifest/staged/357_363.patch`).** Vanilla never reads row 0x13: 0 reads of
+`PRG:0x080AF8` on all six replays of `tests/audit_effect_class_rows.sh` (section 1b, opcode-space watch, the row-37
+control 3,872 reads). The handler span is vs2 `PRG:0x090EDA-0x091041` (its 4-row state table `0x090EEA`, two 24-byte
+pc-relative byte tables `0x090FA8`/`0x090FC0`, the eight-orb loop `0x090FEA`; five absolute operands: `0x013724`,
+`0x013778`, `0x015702`, `0x01581A` and the data pointer `0x289A68`), vhunt2 twin `0x090AE6` (353 of 360 bytes equal, the
+rest those operands), ported as a WIDE-only root and pointed at by one `[[code_ptr]]` on row 0x13. **The orbs' motion
+then exposed a truncated table:** they move by vs2's class-0x72 sub-0x16 code in Donovan's `x088512` copy (vs2
+`PRG:0x089442`-`0x0894A6`: y += word `2(a1, 4*index)` >> 6, `a1` = vs2's 64-entry cos/sin table `PRG:0x0D1BBE`), and that
+operand resolved into his `hitbox_proj` copy (vs2 `0x0D0CA8`, capped at 0x1000 by `tools/extract_char.py`), which ends at
+`0x0D1CA7`, 0x16 bytes into the table; entries 0x3A-0x3F read the next allocation (an alloc wrapper). On the first
+scratch build one orb in five of the nine guard runs of donovan_15 took y += 0xFB (f2798: 0x006F -> 0x016A, native
+0x0070). Nothing reached those entries before the orbs. The operand is pinned (`[[ref_pin]]` `pin_region`) to a whole
+WIDE-only copy of the table; `hitbox_proj` is untouched. On the fixed scratch build every drawn class-0x72 piece equals
+native's on all 4,941 frames of donovan_15 (1,400 drawn orb piece-frames each); on each spawn frame (nothing drawn) a
+recycled slot keeps its previous occupant's x/y on native and reads 0 on ours (the tenant's `alloc_wrap` clears it,
+[VSE-23]). The maintainer, on the capture: *"looks identical"*.
+[M: `tests/audit_guard_orbs.sh`, `tests/audit_effect_class_rows.sh` section 1b; `build/agent221c/t357/` (local)]
 
 ### Every `$FF9400` type's parameters, decoded and measured (14z-121)
 

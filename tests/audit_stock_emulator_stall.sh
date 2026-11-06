@@ -44,7 +44,7 @@ WIDE="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$REF" ] || { echo "SKIP: reference MAME $REF missing (WIDE=0 tools/setup_mame.sh)"; exit 0; }
 [ -x "$WIDE" ] || { echo "SKIP: WIDE MAME $WIDE missing (tools/setup_mame.sh)"; exit 0; }
 "$REF" -listfull vsavjw 2>/dev/null | grep -q vsavjw && { echo "FAIL: $REF knows vsavjw — it is not the STOCK reference binary"; exit 1; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 RPL=tests/replays/16_xemu_2p.rpl
 FROZEN_DIVERGE=469     # measured 2026-09-11 on merged-m18, identical on three replays
 mkdir -p "$W/rp"; cp "$MERGED/rompath/vsavjw.zip" "$W/rp/vsavj.zip"

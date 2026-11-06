@@ -62,7 +62,7 @@ JOBS="${JOBS:-4}"
 vs_ctl_mode "$0"
 . "$REPO/tests/lib/decrypt_cache.sh"
 EXPECT="$REPO/tests/expected/marionette_cost.tsv"
-if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"
 echo "  host  $(uname -sm); MAME_BIN $MAME_BIN; JOBS $JOBS"
 fail=0

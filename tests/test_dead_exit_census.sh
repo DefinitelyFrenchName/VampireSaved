@@ -42,7 +42,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)" || { echo "FAIL: test_dead_exit_census — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_dead_exit_census — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 
 # ALLOW: <path>|<the matched line, exactly>|<why no mode reaches it> — reviewed exceptions, each re-found on every run

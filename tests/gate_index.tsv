@@ -375,6 +375,7 @@ tests/test_tick_durations.sh	character-data
 tests/audit_tick_cadence.sh	character-data
 tests/test_tickets.sh	docs
 tests/test_tmp_hygiene.sh	runner
+tests/test_signal_traps.sh	runner
 tests/test_controls_concurrent.sh	runner
 tests/test_type_stamp_census.sh	pipeline
 tests/test_vanilla_frame_join.sh	character-data
@@ -433,6 +434,7 @@ tests/test_reaction_classes.sh	character-data
 tests/audit_reaction_class_live.sh	character-data
 tests/test_dead_span.sh	character-data
 tests/test_perframe_hook.sh	character-data
+tests/test_dead_span_reach.sh	character-data	the five track build dirs (no ROMDIR), ~3 min
 tests/audit_dead_span_exec.sh	character-data
 tests/audit_defense_row_reads.sh	character-data
 tests/audit_crouch_flag.sh	character-data
@@ -521,3 +523,4 @@ tests/audit_tenant_cpu_ai.sh	tenant	MAME, vsav2 and a build dir, ~1 min at JOBS=
 tests/test_crash_sweep.sh	runner
 tests/audit_crash_sweep_emu.sh	runner
 tests/audit_beam_slide.sh	character-data
+tests/audit_guard_orbs.sh	character-data

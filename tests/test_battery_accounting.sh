@@ -61,7 +61,7 @@ grep -q '_bat_skipped' "$B" \
 echo "== 3. the accounting logic, driven directly =="
 # Extract the two functions and exercise them against stubs. Extracted, not
 # copied, so the code under test is the shipped code.
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 sed -n '/^_bat_pass=0/,/^}$/p' "$B" > "$T/acct.sh"
 # the second function too
 sed -n '/^bat_group_skip()/,/^}$/p' "$B" >> "$T/acct.sh"

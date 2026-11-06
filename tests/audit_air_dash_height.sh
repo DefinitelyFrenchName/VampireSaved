@@ -33,7 +33,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 [ -x "$MAME_BIN" ] || { vs_ctl_nj "no MAME binary at $MAME_BIN"; echo "FAIL: no MAME binary at $MAME_BIN (tools/setup_mame.sh)"; exit 1; }   # #310 g7 NJ
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { vs_ctl_nj "no $BUILD/rompath/vsavjw.zip"; echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }   # #310 g7 NJ
 W="${KEEP:-$(mktemp -d)}" || { echo "FAIL: audit_air_dash_height — mktemp -d failed (W)"; exit 2; }; mkdir -p "$W"
-[ -n "${KEEP:-}" ] || trap 'rm -rf "$W"' EXIT INT TERM
+[ -n "${KEEP:-}" ] || trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 echo "== audit_air_dash_height (#222): build $BUILD ($(python3 tools/build_fingerprint.py "$BUILD/rompath" --set vsavjw --sha-only 2>/dev/null | cut -c1-8))"
 python3 tools/air_dash_rigs.py gen "$W" > /dev/null || { vs_ctl_nj "rig generation failed"; echo "FAIL: rig generation"; exit 1; }   # #310 g7 NJ
 J="$W/h222.json"

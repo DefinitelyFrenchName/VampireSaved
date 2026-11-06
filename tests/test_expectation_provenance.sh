@@ -40,7 +40,7 @@ rc=0
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 PAGE=tests/expected/PROVENANCE.md
 [ -f "$PAGE" ] || { echo "FAIL: $PAGE is missing"; exit 1; }
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 perturb() {  # perturb <name> <out>
     case "$1" in
     deleted-row) grep -v '^| `registry.tsv`' "$PAGE" > "$2" ;;

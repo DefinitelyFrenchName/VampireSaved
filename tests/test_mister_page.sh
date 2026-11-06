@@ -97,7 +97,7 @@ fail() { echo "  FAIL: $*"; rc=1; }
 [ -f "$GEN" ] || { echo "SKIP: $GEN is absent"; exit 0; }
 [ -f "$DOC" ] || { echo "SKIP: $DOC is absent"; exit 0; }
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 # THE SHADOW GENERATORS, built first (section 3 runs them as controls); under
 # CONTROL=<name> the named copy is what section 1 checks with, and must FAIL.

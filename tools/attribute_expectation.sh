@@ -104,7 +104,7 @@ restore() {
     fi
     rm -f "$now" "$a" "$b"
 }
-trap restore EXIT INT TERM
+trap restore EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 echo "== attributing $GATE: restoring to $SINCE =="
 for p in $PATHS; do printf '   %s\n' "$p"; done

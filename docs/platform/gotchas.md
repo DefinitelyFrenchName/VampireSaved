@@ -3612,7 +3612,16 @@ gate stopped by a runner's timeout keeps running against the `$W` its cleanup ju
 with `kill` (TERM) survived (14z-218, `run_jobs3.sh` on PILOT, ended with KILL). 210 scripts under `tests/` use the
 pattern (`grep -l "trap '[^']*' EXIT INT TERM" tests/*.sh | wc -l` at 14z-218). **The rule:** clean up on EXIT and END
 on the signal: `trap '<cleanup>' EXIT` plus `trap 'exit 143' INT TERM` (the EXIT trap then runs once).
-`tests/test_crash_sweep.sh` does this; the tree-wide pattern is #359.
+`tests/test_crash_sweep.sh` does this; the tree-wide pattern is #359. **Since 14z-221c (#359)** the tree's form is
+`trap '<cleanup>' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM` (225 traps in 218 files rewritten by one script; the
+EXIT trap's action is untouched, so a normal exit keeps its status), and `tests/test_signal_traps.sh`
+(`tools/signal_traps.py`) refuses a trap on INT, TERM, HUP or QUIT whose action runs no `exit`, re-measuring the
+premise on sh, bash and dash each run. Measuring it yourself: a background job of a non-interactive shell starts with
+INT IGNORED (POSIX), and an ignored-at-entry signal cannot be trapped, so only TERM can be shown this way.
+**And under dash an EXIT-only trap does not run on TERM at all** (measured 14z-221c on the MacBook's dash, by #359's
+worker and by `tests/test_signal_traps.sh`'s MEASURE lines: `trap 'echo CLEANUP' EXIT`, TERM'd, exits 143 with the cleanup
+run 1 time under sh and bash, 0 times under dash). PILOT's `/bin/sh` is dash, so a gate with an EXIT-only trap that a
+runner TERMs there leaves its work directory behind; the split form above runs it, since `exit 143` triggers EXIT.
 
 ## GNU `timeout` PUTS ITS COMMAND IN A PROCESS GROUP OF ITS OWN — `kill -- -<pgid>` of the caller's group does not reach it (paid: 14z-218, PILOT)
 

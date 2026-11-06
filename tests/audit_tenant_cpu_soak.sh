@@ -63,7 +63,7 @@ case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD";; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no merged build at $BUILD (rompath/vsavjw.zip)"; exit 1; }
 [ -f "$BUILD/patch/placements.json" ] || { echo "FAIL: no patch/placements.json in $BUILD"; exit 1; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "FAIL: no vsav2.zip in ROMDIR"; exit 1; }
-if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"
 echo "  host $(uname -sm); MAME_BIN $MAME_BIN"
 echo "build under test: $BUILD ($(shasum "$BUILD/prg/vm3j.04d" | cut -c1-8) vm3j.04d), FRAMES=$FRAMES"

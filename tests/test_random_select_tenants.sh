@@ -160,8 +160,9 @@ run() { # run <tag> <rompath dir>
     DUMPS="$spec" REPLAY="$W/hover.rpl" CHECKSUM_OUT="$W/$1/c.log" \
         MAME_SANDBOX="$W/$1/box" MAME_ROMPATH="$2;$ROMDIR" \
         "$REPO/tools/run_mame.sh" vsavjw -autoboot_script "$REPO/tests/lua/replay.lua" \
-        > "$W/$1/mame.log" 2>&1 || { echo "FAIL: $1 — MAME run failed"; tail -3 "$W/$1/mame.log"; fail=1; return 1; }
-    grep -q '^END ' "$W/$1/c.log" || { echo "FAIL: $1 — no END line"; fail=1; return 1; }
+        > "$W/$1/mame.log" 2>&1 || { vs_ctl_nj "$1: the MAME run failed"; echo "FAIL: $1 — MAME run failed"; tail -3 "$W/$1/mame.log"; fail=1; return 1; }   # #310 g7 NJ
+    grep -q '^END ' "$W/$1/c.log" || { vs_ctl_nj "$1: the run wrote no END line"; echo "FAIL: $1 — no END line"; fail=1; return 1; }   # #310 g7 NJ
+    touch "$W/$1/complete"
 }
 seen() { # seen <tag> -> "ids: .. | cursors: .." (P1 $382 and $40 over the samples)
     python3 - "$W/$1" "$FIRST" "$LAST" <<'PY'
@@ -188,7 +189,9 @@ if run ours "$BUILD/rompath"; then
 fi
 
 echo "== 2b. confirm ON a tenant frame: the drawn tenant must LOAD into the match =="
-if [ -d "$W/ours" ]; then
+# #310 g7 (14z-221c): only on a section-2 run that completed (it was `-d "$W/ours"`, so a dead run's empty directory was
+# read for dumps it never wrote: a FileNotFoundError, and a dead emulator read DIED under the mode, never UNJUDGED)
+if [ -f "$W/ours/complete" ]; then
     CF="$(python3 - "$W/ours" "$FIRST" "$LAST" "$TENANTS" <<'PY'
 import sys
 d, a, b = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]); ten = {int(x, 16) for x in sys.argv[4].split()}
@@ -209,7 +212,7 @@ PY
         DUMPS="4300:ff8400-ff8c00" REPLAY="$W/confirm.rpl" CHECKSUM_OUT="$W/confirm/c.log" \
             MAME_SANDBOX="$W/confirm/box" MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
             "$REPO/tools/run_mame.sh" vsavjw -autoboot_script "$REPO/tests/lua/replay.lua" \
-            > "$W/confirm/mame.log" 2>&1 || { echo "FAIL: confirm run — MAME failed"; fail=1; }
+            > "$W/confirm/mame.log" 2>&1 || { vs_ctl_nj "the confirm run failed"; echo "FAIL: confirm run — MAME failed"; fail=1; }   # #310 g7 NJ
         if grep -q '^END ' "$W/confirm/c.log" 2>/dev/null; then
             python3 - "$W/confirm/dump_4300_ff8400.bin" "$cid" "$BUILD" <<'PY' || fail=1
 import sys, struct
@@ -227,7 +230,7 @@ if base != tbl[want]:
 print(f"  ok: confirmed on the '?' cell while it showed {want:#04x} -> P1 id {pid:#04x}, record base {base:#x} (the tenant's own) at frame 4300")
 PY
         else
-            echo "FAIL: confirm run — no END line"; fail=1
+            vs_ctl_nj "the confirm run wrote no END line"; echo "FAIL: confirm run — no END line"; fail=1   # #310 g7 NJ
         fi
     fi
 fi

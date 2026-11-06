@@ -34,7 +34,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)" || { echo "FAIL: test_ctl_show_err — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_ctl_show_err — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 
 CTLS="$REPO/tests/lib/controls.sh"; CLS="$REPO/tests/lib/classify.sh"

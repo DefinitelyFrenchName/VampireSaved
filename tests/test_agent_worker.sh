@@ -39,7 +39,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d)"
-trap 'rm -rf "$W"' EXIT INT TERM
+trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 FIX="tests/agent/worker_fixture"
 SESSION="f155b260-38a2-4bda-b066-6bae9155b4ad"
 DEF=".claude/agents/measurer.md"

@@ -25,10 +25,15 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"; if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-LIVE=02addc; SPAN="024024,024026"
+LIVE=02addc; SPAN="024024,024026,029cba,02a586,02a58a"
 vs_ctl_is live-site && LIVE=3ffffe
-SITES="$SPAN,024002,024020,02402a,$LIVE"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+# 14z-221c (#363): the candidates for the row-0x4F jump (029cba, 02a586/02a58a) beside #294's span; informational
+# neighbours: 029cc0 (the bra after 029cba), the victim reaction dispatcher 02383c and its default row 0238fc, and
+# vsavj's own freeze reaction 023d82 (row 0x14, the handler #363's port is modelled on)
+# 14z-221c: 023f68, the `move.b $23f84(pc,d0.w),d0` whose byte table (indexed by the victim's +0x56, unmasked)
+# tools/audit_dead_span.py rule D finds within 0x100 of #294's span — the read executing 0 times bounds that reference
+SITES="$SPAN,024002,024020,02402a,029cc0,02383c,0238fc,023d82,023f68,$LIVE"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 JOBS=${JOBS:-6}; pool=0
 for lg in tests/expected/vsavj/masked-v2/logs/*.log; do
   n=$(basename "$lg" .log); rpl="tests/replays/$n.rpl"; [ -f "$rpl" ] || continue

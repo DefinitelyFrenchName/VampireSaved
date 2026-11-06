@@ -155,7 +155,7 @@ for d in "$FB" "$MM"; do
 done
 TIMEOUT="$(command -v gtimeout || command -v timeout || true)"
 [ -n "$TIMEOUT" ] || { echo "FAIL: no timeout(1) (brew install coreutils)"; exit 1; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 sha256_of() {
     if command -v shasum >/dev/null 2>&1; then shasum -a 256 "$1" | cut -c1-64

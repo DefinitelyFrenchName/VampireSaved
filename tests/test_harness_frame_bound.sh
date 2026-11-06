@@ -103,7 +103,7 @@ FB="${FBNEO_BIN:-$REPO/emu/fbneo/fbneo}"
 if [ ! -x "$FB" ] || [ -z "${ROMDIR:-}" ]; then
     echo "  note: no built binary or no ROMDIR — structural checks only"
 else
-    T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+    T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
     # 4294967290 + 120 wraps in UINT32; pre-fix this truncated the replay.
     printf '4294967290 p1=A\n' > "$T/wrap.rpl"
     tools/run_replay_fbneo.sh vsavj "$T/wrap.rpl" "$T/w.log" "$T/sb1" \

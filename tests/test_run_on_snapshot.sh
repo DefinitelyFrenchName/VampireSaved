@@ -59,7 +59,7 @@ unset RUN_ON_SNAPSHOT_SELF RUN_ON_SNAPSHOT_HOME
 W="$(mktemp -d)"
 SROOT="$HOME/.cache/vampire-saved/test-snapshots-$$"
 cleanup() { rm -rf "${W:?}" "${SROOT:?}"; }
-trap cleanup EXIT INT TERM
+trap cleanup EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 
 # make_copy <control> — run_on_snapshot.sh with ONE perturbation

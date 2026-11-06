@@ -42,7 +42,7 @@ if [ ! -f "$CACHE_OP" ] || [ ! -f "$CACHE_DAT" ]; then
     echo "SKIP: no build/out decrypted cache (and no ROMDIR to build one)"
     exit 0
 fi
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 echo "== 1. a warm cache delivers the cache's exact bytes =="
 if decrypt_view vsavj "$T/op.bin" "$T/dat.bin"; then

@@ -86,7 +86,7 @@ for e in "$D_EX" "$H_EX" "$P_EX"; do
 done
 
 WORK="$(mktemp -d)"
-trap 'rm -rf "$WORK"' EXIT INT TERM
+trap 'rm -rf "$WORK"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 
 # Section 6's verdict controls PERTURB the generator. They do so on a SHADOW

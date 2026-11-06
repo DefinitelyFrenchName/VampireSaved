@@ -149,12 +149,13 @@ for pair in $ALL; do
     tab="${pair%%:*}"; cid="${pair##*:}"
     [ -n "$WANT" ] && { case " $WANT " in *" $tab "*) ;; *) continue;; esac; }
     for d in $DIRS; do
-        [ -s "$W/${tab}_$d/t.txt" ] || { nope "leg $tab $d: no samples (see $W/${tab}_$d/l.log)"; continue; }
+        [ -s "$W/${tab}_$d/t.txt" ] || { vs_ctl_nj "leg $tab $d: no samples (the leg produced nothing)"; nope "leg $tab $d: no samples (see $W/${tab}_$d/l.log)"; continue; }   # #310 g7 NJ
         python3 tools/vanilla_join_rig.py analyse "$W/${tab}_$d/t.txt" "$W/${tab}_$d.json" "$IMG" "$cid" \
             --tab "$tab" --tsv --airborne >> "$W/got.txt" || nope "analyse $tab $d"
     done
 done
-if grep -v '^#' "$W/got.txt" | grep -q UNFIRED; then nope "some events never fired:"; grep -v '^#' "$W/got.txt" | grep UNFIRED | sed 's/^/        /'
+if grep -v '^#' "$W/got.txt" | grep -q UNFIRED; then vs_ctl_nj "some events never fired (a leg that did not produce the event is VOID)"; nope "some events never fired:"   # #310 g7 NJ
+    grep -v '^#' "$W/got.txt" | grep UNFIRED | sed 's/^/        /'
 else ok "every event entered a chain (no UNFIRED)"; fi
 
 echo "== 3. against the frozen table"
@@ -234,7 +235,7 @@ if [ "$DO_HIT" = 1 ]; then
         if [ "$MODE" = three-hits ]; then three_hits "$W/hit_dmg.tsv" "$W/hit_dmg.sw" && mv "$W/hit_dmg.sw" "$W/hit_dmg.tsv"; fi
         hit_check "$W/hit_chain.tsv" "$W/hit_dmg.tsv" || bad=$((bad + 1))
     else
-        nope "leg LE hit: no samples (see $W/LE_hit/l.log)"
+        vs_ctl_nj "leg LE hit: no samples (the leg produced nothing)"; nope "leg LE hit: no samples (see $W/LE_hit/l.log)"   # #310 g7 NJ
     fi
 else
     echo "  (skipped: CHARS does not include LE)"
@@ -251,7 +252,8 @@ if [ "$DO_HIT" = 1 ] && [ -s "$W/hit_dmg.tsv" ]; then
     three_hits "$W/hit_dmg.tsv" "$W/hit_bad.tsv"
     if hit_check "$W/hit_chain.tsv" "$W/hit_bad.tsv" > /dev/null; then vs_ctl_dead three-hits "the one-hit check passed a three-hit row"; nope "control three-hits"
     else vs_ctl_fired three-hits "the one-hit check refuses Lei-Lei's 6HP rewritten to the workbook's three hits"; fi
-elif [ "$DO_HIT" = 1 ]; then vs_ctl_dead three-hits "no measured hit row to perturb"; nope "control three-hits"
+elif [ "$DO_HIT" = 1 ]; then   # #310 g7 (14z-221c): a dead LE leg is not this control dead — under a mode its DEAD line read LIES
+    vs_ctl_nj "no measured hit row to perturb (the LE hit leg produced nothing)"; [ -n "$MODE" ] || vs_ctl_dead three-hits "no measured hit row to perturb" || true; nope "control three-hits"   # #310 g7 NJ
 fi
 
 [ "$bad" = 0 ] && { echo "PASS: test_vanilla_command_join"; exit 0; }

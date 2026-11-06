@@ -26,7 +26,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 

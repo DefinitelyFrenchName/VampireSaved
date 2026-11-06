@@ -69,7 +69,7 @@ case "$CONTROL" in ""|blind-census|dropped-reader|nearest-decode) ;; *) echo "RE
 MERGED="${MERGED:-$REPO/build/m3b_merged33/verify_op.bin}"
 [ -f "$MERGED" ] || { echo "SKIP: no ported opcode view at $MERGED"; exit 0; }
 EXPECT="$REPO/tests/expected/latch_readers.tsv"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

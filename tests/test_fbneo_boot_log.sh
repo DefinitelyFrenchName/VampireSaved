@@ -36,7 +36,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 . "$REPO/tests/lib/fbneo_boot_log.sh"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 PATCH="$REPO/emu/fbneo-patches/0002-cps2-wide-v1.patch"
 [ -f "$PATCH" ] || { echo "FAIL: no $PATCH"; echo "FAIL: test_fbneo_boot_log"; exit 1; }

@@ -220,6 +220,9 @@ test_dead_span
 # test_perframe_hook — #294's per-frame palette port on the built image is vs2's routine re-pointed, nothing else (14z-216);
 # ROMDIR or a warm decrypt cache, the merged and Donovan solo build dirs, no emulator.
 test_perframe_hook
+# test_dead_span_reach — on each tracked built image, each port's dead span is reached by its one table row and nothing else (#354, 14z-221c);
+# the five track build dirs (MERGED DON HUI PYR STOCK), no ROMDIR, no emulator.
+test_dead_span_reach
 # test_anim_signed_offsets — tools/anim_nodes.py reads the anim index tables' offsets SIGNED (#318);
 # ROMDIR or a warm decrypt cache, no build dir, no emulator.
 test_anim_signed_offsets
@@ -251,7 +254,8 @@ test_mame_ident
 # neutered, HONOURED/PASS); three controls. ~7 min (78 static rows, 421 s measured 14z-218 on the Mac). Freeze cadence.
 test_crash_sweep
 # test_dead_leg_unjudged.sh — #310 group 7 (14z-221): tests/lib/controls.sh vs_ctl_nj — every row of
-# tests/expected/dead_leg_unjudged.tsv (a gate's control mode) reads UNJUDGED with a dead emulator (MAME_BIN=/usr/bin/false),
+# tests/expected/dead_leg_unjudged.tsv (a gate's control mode) reads UNJUDGED with a dead emulator (MAME_BIN=/usr/bin/false,
+# and the row's fifth column, FBNEO_BIN for an FBNeo leg: batch 2, 14z-221c),
 # its plain run red and silent, and without its `# #310 g7 NJ` lines HONOURED again; two controls. Needs ROMDIR, runs no
 # emulator; ~1 min.
 test_dead_leg_unjudged

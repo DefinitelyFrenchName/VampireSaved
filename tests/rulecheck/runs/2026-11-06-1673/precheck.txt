@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: Each run re-measures the premise on sh, bash and dash.  [build/agent221c/rc359/closing_comment_359.md]
+  FLAG D-ABSOLUTE: **Found on the way, not fixed here:** under dash an EXIT-only trap did not run at all on TERM (measured on the Mac's dash; sh and bash ran it).  [build/agent221c/rc359/closing_comment_359.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

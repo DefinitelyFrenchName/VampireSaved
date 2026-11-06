@@ -374,6 +374,9 @@ test_win_stdout_utf8
 test_host_text_opens
 # test_tmp_hygiene.sh — every temporary a tool or gate makes is removed when its maker exits (#303, 14z-207); two controls. ~2 s.
 test_tmp_hygiene
+# test_signal_traps.sh — a shell script that traps INT, TERM, HUP or QUIT ends in that trap (#359, 14z-221c): the premise
+# measured on sh/bash/dash, the census of tests/ and tools/ (tools/signal_traps.py), known answers; one control. ~14 s.
+test_signal_traps
 # test_controls_concurrent.sh — the concurrent-controls list still describes the gates it names (#315, 14z-207), and the scorer
 # certifies only HONOURED control runs (#349, 14z-218); four controls. ~4 s.
 test_controls_concurrent

@@ -119,8 +119,10 @@ exited non-zero, a trace with no END line, no samples, a reducer's VOID about a 
 (UNJUDGED) and in a plain run prints nothing; the mode is `VS_CTL`, else `CONTROL`, so a gate that parses `CONTROL` itself
 only sources the library. It is not called for a mode whose honoured outcome IS a dead or VOID leg. A mode close prints
 `CONTROL FIRED` on its own finding, never on any fail flag. Batched by #310's re-census; each batch's rows are held by
-`tests/test_dead_leg_unjudged.sh` (`tests/expected/dead_leg_unjudged.tsv`): with `MAME_BIN=/usr/bin/false` every row reads
-UNJUDGED, its plain run is red and silent, and its gate with the `# #310 g7 NJ` lines neutered reads the pre-fix class.
+`tests/test_dead_leg_unjudged.sh` (`tests/expected/dead_leg_unjudged.tsv`): with `MAME_BIN=/usr/bin/false` (and the row's
+dead instrument, its fifth column: `FBNEO_BIN` for an FBNeo leg, batch 2, 14z-221c) every row reads UNJUDGED, its plain run
+is red and silent, and its gate with the `# #310 g7 NJ` lines neutered reads its frozen stripped class (the pre-fix class,
+or HONOURED where the batch also added the liveness check the pre-fix gate lacked and crashed without).
 
 ## The pattern that makes the mode cheap to write
 

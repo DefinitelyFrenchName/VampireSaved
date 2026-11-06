@@ -50,7 +50,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 # THE EXECUTABLE FORM: under CONTROL=<name> a known-bad stub JOINS the real
 # file list (VSP_EXTRA_SH) — and the scan below must FAIL.
 VSP_EXTRA_SH=""

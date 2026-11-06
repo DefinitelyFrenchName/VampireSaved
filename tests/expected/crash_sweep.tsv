@@ -109,3 +109,6 @@ test_win_stdout_utf8	static	applier-reconfigure-removed	py	^[^ ]*/oldpy\.py( |$)
 test_win_stdout_utf8	static	guard-removed	py	^[^ ]*/oldpy\.py( |$)	1	"$W/out_oldpy.log"#1	UNJUDGED	HONOURED	proven (build/agent218/t310/mac_F/test_win_stdout_utf8/results.tsv j8)
 test_win_stdout_utf8	static	guard-removed	py	^tools/bundle_win_dlls\.py( |$)	1	"$W/out"#1	DIED	HONOURED	proven (build/agent218/t310/mac_F/test_win_stdout_utf8/results.tsv j5)
 test_win_stdout_utf8	static	reconfigure-removed	py	^tools/apply_release\.py( |$)	1	"$W/apply_cp932.txt"#2	DIED	HONOURED	proven (build/agent218/t310/mac_F/test_win_stdout_utf8/results.tsv j10)
+test_signal_traps	static	resuming-trap	py	^([^ ]*/)?tools/signal_traps\.py( |$)	1	"$W/mode.out"#1	DIED	-	14z-221c (#359): the census crashes in the mode run, the helper re-prints it: DIED (measured, build/agent221c/cs2.log row 89); its NOT JUDGED line keeps it unhonoured with the helper neutered too
+test_signal_traps	static	PLAIN	py	^([^ ]*/)?tools/signal_traps\.py( |$)	1	"$W/s2.out"#1	FAIL	-	14z-221c (#359): the census crashes in the plain run; bad() fails it with the helper neutered too
+test_signal_traps	static	PLAIN	py	^([^ ]*/)?tools/signal_traps\.py( |$)	8	"$W/c.out"#1	FAIL	-	14z-221c (#359): the control's census crashes; vs_ctl_dead fails it with the helper neutered too

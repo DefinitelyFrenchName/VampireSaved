@@ -50,7 +50,7 @@ cd "$REPO"
 rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 echo "== 0. the phantom option is gone from both audits =="
 for f in tests/audit_qs_voice_batch.sh tests/audit_qs_voice_wav.sh; do

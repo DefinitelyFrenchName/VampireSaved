@@ -16,18 +16,18 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**512 scripts** — 154 ci_portable, 97 ci_static, 261 emulator-tier (run by name).
+**515 scripts** — 155 ci_portable, 98 ci_static, 262 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 64 | the suite runners and their own ground truth |
+| [runner](#runner) | 65 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 88 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 109 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 111 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -94,6 +94,7 @@ the suite runners and their own ground truth.
 | `tests/test_session_metrics.sh` | test | ci_portable | — | the session dashboard's collector reads every source as its rule says and labels every figure with its class (`tools/session_metrics.py`, 14z-198, GitHub #264). | 14z-198 |
 | `tests/test_sheet_census.sh` | test | ci_portable | — | EVERY EMULATOR GATE SAYS WHAT ITS COMPARATIVE SHEET SHOWS, OR IS ON THE RETROFIT'S DEBT LIST (GitHub #291 slice S1, 14z-204; the design ruled 2026-10-17: "Declared in each gate (Recommended)"). | 14z-204 |
 | `tests/test_shell_portability.sh` | test | ci_portable | — | a `#!/bin/sh` script must actually be POSIX sh (14z-90, GitHub issue #15). | 14z-90 |
+| `tests/test_signal_traps.sh` | test | ci_portable | — | A SCRIPT THAT TRAPS INT, TERM, HUP OR QUIT ENDS IN THAT TRAP (#359, 14z-221c). ci_portable: no ROM, ~14 s. | 14z-221c |
 | `tests/test_static_confirm.sh` | test | ci_portable | — | the static tier's carry-forward predictor marks a gate STALE by every rule it states (`tools/static_confirm.py`, 14z-185b, GitHub #188 route A — wired 14z-188). | 14z-185b |
 | `tests/test_suite_dispatch.sh` | test | emulator | MAME, a build dir | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |
 | `tests/test_suite_dispatch_selftest.sh` | test | ci_static | ROMDIR | ground truth for the kind->owner table in tests/test_suite_dispatch.sh (14z-90, GitHub issue #7). | 14z-90 |
@@ -434,7 +435,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_air_dash_height.sh` | audit | emulator | MAME, a build dir, ~2 min | PHOBOS'S AIR DASH UNDER vs2's MINIMUM HEIGHT: native refuses it, and since M23 ours does too (GitHub #222, measured in play 14z-191, closed 14z-192). Emulator tier (MAME), ~2 min. | 14z-191 |
 | `tests/audit_air_gc_legacy.sh` | audit | emulator | MAME, FBNeo, a build dir, ~7 s | THE LEGACY CONTROL FOR #182: no original character's AIR block opens the guard window or commits a guard cancel, on pristine vsavj, native vs2 or ours (14z-185, GitHub #182). | 14z-185 |
 | `tests/audit_anakaris_rows.sh` | audit | emulator | MAME, ~3 min | FIVE MIZUUMI PLAYER-STRUCT CANDIDATES ON ANAKARIS, MEASURED ON PRISTINE VSAVJ: +0x152 IS HIS HOVER TIMER, +0x156 AND +0x1A0 THE VICTIM'S CURSE TIMER AND FLAG, +0x1AA THE LOSER'S FLAG THAT PICKS HIS WIN POSE, +0x374 THE X OF HIS MUMMY DROP H… | 14z-215 |
-| `tests/audit_beam_slide.sh` | audit | emulator | MAME, FBNeo, a build dir | #363, FROZEN AS THE BUG STANDS: PHOBOS'S ES PLASMA BEAM SLIDES THE VICTIM ON OURS WHERE NATIVE vs2 HOLDS HIM (14z-221; the maintainer, 2026-11-05: "this finding is indeed mechanical NOT cosmetic, thus of greater severity", then "Yes. | 14z-221 |
+| `tests/audit_beam_slide.sh` | audit | emulator | MAME, FBNeo, a build dir | #363, RE-FROZEN TO NATIVE'S FREEZE (14z-221c): PHOBOS'S ES PLASMA BEAM FREEZES THE VICTIM IN THE ICE BLOCK ON OURS AS ON NATIVE vs2 (frozen as the bug stood 14z-221b; the maintainer, 2026-11-05: | 14z-221c |
 | `tests/audit_bishamon_charge_316.sh` | audit | emulator | MAME, ~2 min | BISHAMON'S [CHARGE]6+K ON PRISTINE VSAVJ: +0x316 COUNTS THE LOGIC PASSES BACK (OR DOWN-BACK) IS HELD, AND ITS VALUE WHEN 6+K COMPLETES PICKS THE IAI GIRI LOW'S LEVEL (0 BELOW 70, 1 BELOW 110, ELSE 2) (measured 14z-215, GitHub #118 batch B7;… | 14z-215 |
 | `tests/audit_chains174.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TENANTS' ONCE NEVER-ENTERED a2 ATTACK CHAINS, ENTERED ON NATIVE AND COMPARED WITH OURS (GitHub #174, 14z-184). | 14z-184 |
 | `tests/audit_chains184.sh` | audit | emulator | MAME, FBNeo, a build dir, ~3 min | THE TENANTS' ONCE NEVER-ENTERED a2 CHAINS WITH NO ATTACK RECORD, ENTERED ON NATIVE AND COMPARED WITH OURS (GitHub #184, 14z-186). | 14z-186 |
@@ -472,6 +473,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_ground_throws.sh` | audit | emulator | MAME, FBNeo, a build dir | THE VSAVJ NORMAL THROWS (ground and air), MEASURED: every vanilla character's throw holds from the press, lands the damage the game staged, and stages the records it does — for the community cross-check (GitHub #229, 14z-195; | 14z-195 |
 | `tests/audit_guard_cancels.sh` | audit | emulator | MAME, FBNeo, a build dir | THE VSAVJ GUARD CANCELS, MEASURED: which 623+button out of a ground block commits a guard cancel for each vanilla character, the chain it enters, and that move's ENGINE TICKS and records, on a hit and on a whiff — for the community cross-ch… | 14z-205 |
 | `tests/audit_guard_mask_reads.sh` | audit | emulator | MAME, a build dir, ~4 min | WHICH LONGWORDS OF THE GUARD-MASH MASK TABLE `PRG:0x028D50` THE ENGINE READS, ours vs vanilla — and that the port's bytes in its FIRST longword sit behind an index the check never produces. (14z-145.) | 14z-145 |
+| `tests/audit_guard_orbs.sh` | audit | emulator | MAME, FBNeo, a build dir | #357: DONOVAN'S GUARD ORBS ON OURS EQUAL NATIVE vs2'S, PIECE BY PIECE (14z-221c; the maintainer, 2026-11-05: "we should port the orbs unless we find out we technically cannot"). | 14z-221c |
 | `tests/audit_guard_reentry.sh` | audit | emulator | MAME, a build dir, ~20 s | THE BLOCK ANIMATION RE-ENTERS ON vsavj, NOT ON vs2, on legacy content (14z-168, GitHub #136): when a block's hit-freeze ends into the blockstun slide (seq 0 -> 2) with BACK still held, vsavj re-enters the block animation (the node counter r… | 14z-168 |
 | `tests/audit_hitbox_parity.sh` | audit | emulator | MAME, a build dir, ~2 min | THE HITBOXES IN PLAY, ours vs native (14z-181, GitHub #136): on every frame where a tenant's naming rig has both legs on the SAME node, the seven resolved hitbox pointers and the node's box-id word are equal — the resolution per node is ide… | 14z-181 |
 | `tests/audit_ladder_pick_store.sh` | audit | emulator | MAME, ~2 min | +0x382 IS THE CHARACTER ID, AND THE 1P ARCADE LADDER WRITES THE CPU SIDE'S BEFORE IT LOADS: the measurements that retracted 14z-87's "voice-class borrow" (GitHub #195, #202; 14z-188), on pristine vsavj. | 14z-87 |
@@ -516,7 +518,8 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_charid_names.sh` | test | ci_portable | — | EVERY IN-TREE CHARACTER-ID -> NAME MAP AGREES WITH THE ATLAS SLOT TABLE (GitHub #218, 14z-191). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-191 |
 | `tests/test_community_crosscheck.sh` | test | ci_static | ROMDIR | OUR DERIVED VANILLA FRAME DATA STILL SAYS WHAT THE COMMUNITY WORKBOOK SAYS (14z-125, the community cross-check). | 14z-125 |
 | `tests/test_crosscheck_229.sh` | test | ci_portable | — | #229'S COLUMN CLASSIFIER RETURNS THE VERDICT IT SHOULD, ON FIXTURES WHOSE VERDICT IS KNOWN (14z-209, CLAUDE.md §4 [VSP-19]: a test's classification code is validated against known ground truth before its verdicts are trusted). | 14z-209 |
-| `tests/test_dead_span.sh` | test | ci_static | ROMDIR | THE SIX BYTES #294'S PORT IS PLACED ON ARE PROVEN DEAD IN PRISTINE vsavj (14z-216, GitHub #294). | 14z-216 |
+| `tests/test_dead_span.sh` | test | ci_static | ROMDIR | THE SIX-BYTE SPANS #294'S AND #363'S PORTS ARE PLACED ON ARE PROVEN DEAD IN PRISTINE vsavj (14z-216, GitHub #294; 14z-221c, GitHub #363). | 14z-216 |
+| `tests/test_dead_span_reach.sh` | test | ci_static | the five track build dirs (no ROMDIR), ~3 min | ON EACH TRACKED BUILT IMAGE, A PORT'S DEAD SPAN IS REACHED BY ITS ALLOWED TABLE ROWS AND NOTHING ELSE (14z-221c, GitHub #354). | 14z-221c |
 | `tests/test_defense_rows_census.sh` | test | ci_static | ROMDIR | THE DEFENSE CURVE AND RALLY THRESHOLD OF EVERY CHARACTER ID, vsavj against vs2 and our build, frozen (14z-168): the 15 legacy characters are identical between the games but for Sasquatch's row, vsavj's variant ids carry COPIES of their base… | 14z-168 |
 | `tests/test_df_field_readers.sh` | test | ci_static | ROMDIR | EVERY PLACED INSTRUCTION THAT NAMES ONE OF vs2's DARK FORCE POWER FIELDS BY DISPLACEMENT, with the access it makes, frozen (14z-168, GitHub #136 / #157's Dark Force tail): | 14z-168 |
 | `tests/test_df_startup_provenance.sh` | test | ci_static | ROMDIR | THE TENANTS' DARK FORCE STARTUP WINDOWS ARE CAPCOM'S OWN, CARRIED FROM vs2/vh2 — the three-way ROM agreement that backs the preservation claim, frozen (14z-126). | 14z-126 |

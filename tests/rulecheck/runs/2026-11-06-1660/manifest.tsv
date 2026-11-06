@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent221c/rc354/audit_dead_span.py.txt	4933513a655b5a2b0b55327e6e6029e923f66b5b
+build/agent221c/rc354/bookkeeping_summary.txt	5887f566b8a099a0abab4faf6fa515ca455e866f
+build/agent221c/rc354/closing_comment_354.md	88d79b89654280896c23a6e52cf1b290d4efb9bf
+build/agent221c/rc354/dead_span_reach.tsv	2ec8a5de6667d75c5e81fa1ef14aeb71e44a51f9
+build/agent221c/rc354/mode_bogus.log	f3a0661bf78a4ab961b36a0e0a881c6ef657130c
+build/agent221c/rc354/mode_fall-through.log	5ebb36ee71b9e31b3ae527f17f5f14ea2ad8a06d
+build/agent221c/rc354/mode_plant-jsr.log	c2bf9834fd97a6452f7081b88615f9d870c1e9fb
+build/agent221c/rc354/mode_plant-jsr_deadinput.log	9cdac9ce8c88f8ece9f14844a96502ae07908577
+build/agent221c/rc354/mode_plant-long.log	a32ceae3835c64235615a3638dae2a4fff17e266
+build/agent221c/rc354/mode_plant-table.log	eb330093ebe53706fa63a8e5d7da3f091f31fa45
+build/agent221c/rc354/mode_row-dropped.log	06f2199c18620cc41ba7843cd5ab507aa8c1281b
+build/agent221c/rc354/modes_classified.txt	05052a772750f6baa2359f6e0514df20cab0fb83
+build/agent221c/rc354/plain.log	be0f2020c07cf5b0d6c77cbd372d5d539f0616c7
+build/agent221c/rc354/plain_deadinput.log	3366116443591115864215fb982b5d273e0b6b38
+build/agent221c/rc354/test_dead_span_reach.sh	d5112418da92c89b522ef0294255a6fbe636a862

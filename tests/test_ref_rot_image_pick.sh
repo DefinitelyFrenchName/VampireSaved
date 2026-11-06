@@ -44,7 +44,7 @@ fail() { echo "  FAIL: $*"; rc=1; }
 
 GATE="$REPO/tests/test_build_ref_rot.sh"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 FR="$T/fakerepo"
 mkdir -p "$FR/tests" "$FR/build/stockx/rompath" "$FR/build/widex/rompath" "$FR/build/plainx/rompath"
 ln -s "$GATE" "$FR/tests/test_build_ref_rot.sh"

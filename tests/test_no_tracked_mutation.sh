@@ -43,7 +43,7 @@ rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 
 echo "== 1. the shadow helper produces a working, ISOLATED copy =="
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 . "$REPO/tests/lib/shadow_tools.sh"
 GEN="$(shadow_tool "$T" gen_donovan_patch.py)"
 if [ -f "$GEN" ] && [ ! -L "$GEN" ]; then

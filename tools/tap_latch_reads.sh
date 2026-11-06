@@ -39,7 +39,7 @@ case "$SET" in
             MRP="$(cd "$RP" && pwd);$ROMDIR" ;;
     *) echo "FAIL: set must be vsav2 or vsavjw"; exit 2 ;;
 esac
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 : > "$OUT"
 for blk in ff87bc ff8bbc; do
     ( cd "$W" && REPLAY="$RPL" POKES="$PK" RTAP="$blk,40" WINDOW="0,$FR" FRAMES="$FR" \

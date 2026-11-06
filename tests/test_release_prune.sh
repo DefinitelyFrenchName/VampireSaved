@@ -25,7 +25,7 @@ fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 for t in freeze/merged-m16 freeze/merged-m19 freeze/merged-m20 freeze/merged-m21 freeze/merged-m22; do
     git rev-parse --verify -q "refs/tags/$t" >/dev/null || { echo "FAIL: tag $t is missing — the fixture rests on it"; exit 1; }
 done
-SH="$REPO/build/.release_prune_$$"; trap 'rm -rf "$SH"' EXIT INT TERM
+SH="$REPO/build/.release_prune_$$"; trap 'rm -rf "$SH"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 mkdir -p "$SH/tools" "$SH/tests/lib"
 printf '#!/bin/sh\ncase "$1" in freeze/merged-m19|freeze/merged-m16) exit 0;; *) exit 1;; esac\n' > "$SH/probe_some.sh"
 printf '#!/bin/sh\nexit 1\n' > "$SH/probe_none.sh"

@@ -63,7 +63,7 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 if [ -n "${1:-}" ]; then OUT="$1"; else   # GitHub #68: not a predictable default; #303 (ruled 2026-10-23, 14z-207):
-    OUT="$(mktemp -d)"; trap 'rm -rf "$OUT"' EXIT INT TERM   # the default folder is removed at exit
+    OUT="$(mktemp -d)"; trap 'rm -rf "$OUT"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM   # the default folder is removed at exit
 fi
 mkdir -p "$OUT"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

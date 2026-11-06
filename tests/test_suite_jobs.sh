@@ -21,7 +21,7 @@ rc=0
 ok() { echo "  ok    $*"; }
 fail() { echo "  FAIL  $*"; rc=1; }
 
-T="${KEEP_T:-$(mktemp -d)}"; [ -n "${KEEP_T:-}" ] || trap 'rm -rf "$T"' EXIT INT TERM; mkdir -p "$T"
+T="${KEEP_T:-$(mktemp -d)}"; [ -n "${KEEP_T:-}" ] || trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; mkdir -p "$T"
 FR="$T/fakerepo"
 mkdir -p "$FR/tools" "$FR/tests/lib" "$FR/tests/replays" "$T/romdir"
 ln -s "$REPO/tests/run_suite.sh" "$FR/tests/run_suite.sh"

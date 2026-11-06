@@ -1,0 +1,5 @@
+  FLAG D-FIGURE: 108  [build/agent221c/rc359/closing_comment_359.md]
+  FLAG D-ABSOLUTE: Each run re-measures the premise on sh, bash and dash.  [build/agent221c/rc359/closing_comment_359.md]
+  FLAG D-ABSOLUTE: PILOT's write traces read all 108 listed gates SAFE.  [build/agent221c/rc359/closing_comment_359.md]
+  FLAG D-ABSOLUTE: About 277 files have EXIT-only traps, so they leave their work directories behind when TERM'd on PILOT.  [build/agent221c/rc359/closing_comment_359.md]
+packet_check: 4 flag(s): D-ABSOLUTE 3, D-FIGURE 1

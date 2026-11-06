@@ -32,7 +32,7 @@ case "$T" in
     *) echo "FAIL: tenant phobos|pyron|donovan"; exit 2 ;;
 esac
 for s in ours native; do [ -f "$K/${T}_${C}_$s/trace.txt" ] && [ -f "$K/${T}_${C}_$s/leg.rpl" ] || { echo "FAIL: no kept leg $K/${T}_${C}_$s"; exit 1; }; done
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 python3 - "$K/${T}_${C}_ours/trace.txt" "$K/${T}_${C}_native/trace.txt" "$BUILD/patch/placements.json" "$R" "$N" "$KTH" "${OFFSETS:-2,8,16}" > "$W/plan.txt" <<'PY'
 import json, sys
 from collections import Counter

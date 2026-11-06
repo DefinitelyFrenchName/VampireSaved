@@ -46,7 +46,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 

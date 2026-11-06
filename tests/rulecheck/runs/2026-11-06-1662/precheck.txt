@@ -1,0 +1,6 @@
+  FLAG D-ABSOLUTE: On a build that carries a row's port, the span must be **reached only** by that row's allowed table rows: no instruction names it, no long equals it, no othe...  [build/agent221c/rc354/closing_comment_354.md]
+  FLAG D-ABSOLUTE: - Three references to #294's span that its 14z-216 proof never checked.  [build/agent221c/rc354/closing_comment_354.md]
+  FLAG D-ABSOLUTE: - the byte table at 0x023F84, read only at 0x023F68, which never executes over the 64-replay corpus;  [build/agent221c/rc354/closing_comment_354.md]
+  FLAG D-ABSOLUTE: # names, each as BASE@SITE/SITE (accepted only while its readers or loaders are exactly those sites), comma  [build/agent221c/rc354/dead_span_reach.tsv]
+  FLAG D-ABSOLUTE: # list of hex without 0x, or - for none  [build/agent221c/rc354/dead_span_reach.tsv]
+packet_check: 5 flag(s): D-ABSOLUTE 5

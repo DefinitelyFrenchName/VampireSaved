@@ -7,21 +7,26 @@
 #   it prints nothing. Before it, those gates' modes ended a dead leg in their ordinary FAIL and read HONOURED: a control
 #   certified on no measurement.
 # HOW: (1) the helper on its own, in a subshell, with and without a mode. (2) For each row of
-#   tests/expected/dead_leg_unjudged.tsv (gate, mode, class, stripped class), the gate's mode is run with MAME_BIN=/usr/bin/false, so every
+#   tests/expected/dead_leg_unjudged.tsv (gate, mode, class, stripped class, dead instrument), the gate's mode is run with
+#   MAME_BIN=/usr/bin/false and the row's dead instrument (MAME_BIN, or FBNEO_BIN for an FBNeo leg: test_dualtrack, #310
+#   group 7 batch 2, 14z-221c) set to /usr/bin/false, so every
 #   leg dies at once, and its log is classified with vs_classify_control exactly as both runners do; the gate's PLAIN run
 #   under the same dead emulator must exit non-zero and print no `NOT JUDGED:` line (a dead emulator never passes a plain
-#   run, and the helper is silent there). (3) The in-gate control: each row's gate copied with its `# #310 g7 NJ` lines
+#   run, and the helper is silent there). A row whose dead instrument is not MAME_BIN runs its mode once more with ONLY
+#   that instrument dead and MAME_BIN unset, and must read the same class: the class comes from the
+#   instrument the row names, not from the dead MAME every other run carries (14z-221c, rule-checker run -1665). (3) The in-gate control: each row's gate copied with its `# #310 g7 NJ` lines
 #   NEUTERED (vs_ctl_nj made `:`, a printed `NOT JUDGED:` renamed; never deleted, since a tagged line may carry the
 #   gate's own command; its REPO line pinned to this repository, the crash sweep's form) must read its frozen pre-fix
 #   class under the same dead emulator: HONOURED, or LIES where the batch also made a mode close fire only on its own
 #   finding; never UNJUDGED, so the rows read UNJUDGED because of those lines.
-# EXPECTS: (1) silent and 0 with no mode, the one line with a mode; (2) every row reads its frozen class (UNJUDGED) and
-#   every plain run is red and silent; (3) every neutered copy reads its frozen stripped class (HONOURED or LIES). A row whose mode is not declared by its gate
-#   any more, or whose gate carries no `# #310 g7 NJ` line, FAILs.
+# EXPECTS: (1) silent and 0 with no mode, the one line with a mode; (2) every row reads its frozen class (UNJUDGED), also
+#   with only its named instrument dead, and every plain run is red and silent; (3) every neutered copy reads its frozen stripped class (HONOURED or LIES). A row whose mode is not declared by its gate
+#   any more, whose gate carries no `# #310 g7 NJ` line, or whose dead instrument is neither MAME_BIN nor FBNEO_BIN, FAILs.
+#   A gate may hold several rows (one per mode, batch 2): each row's runs are kept apart by gate and mode.
 # FOLLOWS: tests/lib/controls.sh tests/lib/classify.sh tests/expected/dead_leg_unjudged.tsv
 #
 # MUST-FIRE: known-bad: nj-stripped — every row's mode run on its gate's copy with the `# #310 g7 NJ` lines neutered (the pre-fix gate) must read its frozen stripped class, not the frozen UNJUDGED, and the gate must FAIL (in-gate: section 3; mode: section 2 runs the stripped copies)
-# MUST-FIRE: known-bad: plain-loud — a copy of tests/lib/controls.sh whose vs_ctl_nj prints in a plain run too, without crashing, must make section 1's plain case print and the plain run of every row whose gate calls vs_ctl_nj outside a mode-only branch print NOT JUDGED (23 of 25 at 14z-221: audit_dispatch_census prints its NOT JUDGED only under a mode, and audit_id_writers' calls outside its mode branch guard a missing or unregistered BUILD and a failed ROM audit, which a dead emulator does not reach), and the gate must FAIL (in-gate: every run builds the copies and checks both cases print; mode: section 1 sources that copy; section 2 runs each row's gate copied with its controls.sh swapped for it)
+# MUST-FIRE: known-bad: plain-loud — a copy of tests/lib/controls.sh whose vs_ctl_nj prints in a plain run too, without crashing, must make section 1's plain case print and the plain run of every row whose gate calls vs_ctl_nj outside a mode-only branch print NOT JUDGED (23 of 25 at 14z-221: audit_dispatch_census prints its NOT JUDGED only under a mode, and audit_id_writers' calls outside its mode branch guard a missing or unregistered BUILD and a failed ROM audit, which a dead emulator does not reach; the count is read at each run, never frozen), and the gate must FAIL (in-gate: every run builds the copies and checks both cases print; mode: section 1 sources that copy; section 2 runs each row's gate copied with its controls.sh swapped for it)
 #
 # WHY: #310 (the 14z-215 re-census, group 7: 104 gates PRESENT): a leg that never finished counted as the control firing.
 #   Ruled 2026-10-31 (maintainer): "5 and 6 now, 7 in batches (Recommended)", whose text read "Group 7 (104 gates) in
@@ -30,7 +35,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)" || { echo "FAIL: test_dead_leg_unjudged — mktemp -d failed (W)"; exit 2; }; trap '[ -n "${KEEP_W:-}" ] || rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_dead_leg_unjudged — mktemp -d failed (W)"; exit 2; }; trap '[ -n "${KEEP_W:-}" ] || rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 T="$REPO/tests/expected/dead_leg_unjudged.tsv"
 [ -f "$T" ] || { echo "FAIL: test_dead_leg_unjudged — no table $T"; exit 1; }
@@ -74,11 +79,12 @@ printf 'CONTROL MODE: x\n%s\nFAIL: stub\n' "$(printf '%s' "$m" | head -1)" > "$W
     && ok "a FAIL log carrying it classifies UNJUDGED" || bad "a FAIL log carrying it does not classify UNJUDGED"
 
 echo "== 2. each row's mode, and its plain run, with a dead emulator"
-rows="$(grep -v '^#' "$T" | awk -F'\t' 'NF >= 4')"
+rows="$(grep -v '^#' "$T" | awk -F'\t' 'NF >= 5')"
 [ -n "$rows" ] || { echo "FAIL: test_dead_leg_unjudged — the table has no rows"; exit 1; }
 mkdir -p "$W/c"
 # the stripped copies (section 3, and section 2 under nj-stripped): the gate without its `# #310 g7 NJ` lines, REPO pinned
-printf '%s\n' "$rows" | while IFS="$(printf '\t')" read -r g m c sc; do
+printf '%s\n' "$rows" | while IFS="$(printf '\t')" read -r g m c sc dv; do
+    [ -f "$W/c/$g/strip.txt" ] && continue   # one copy per gate; a gate may hold several rows
     mkdir -p "$W/c/$g"
     python3 - "$REPO/tests/$g.sh" "$W/c/$g/$g.sh" "$REPO" <<'PY' > "$W/c/$g/strip.txt" 2>&1 || true
 import re, sys
@@ -98,7 +104,8 @@ done
 # plain-loud, section 2's half: each row's gate copied with REPO pinned and its controls.sh swapped for the loud copy, so
 # the plain-run silence check below is shown to see a helper that prints without a mode
 if [ "$loudok" = 1 ]; then
-    printf '%s\n' "$rows" | while IFS="$(printf '\t')" read -r g m c sc; do
+    printf '%s\n' "$rows" | while IFS="$(printf '\t')" read -r g m c sc dv; do
+        [ -f "$W/l/$g/loud.txt" ] && continue   # one copy per gate
         mkdir -p "$W/l/$g"
         python3 - "$REPO/tests/$g.sh" "$W/l/$g/$g.sh" "$REPO" "$LOUDCTL" <<'PY' > "$W/l/$g/loud.txt" 2>&1 || true
 import re, sys
@@ -112,48 +119,62 @@ PY
         if grep -q 'LOUD-FAILED' "$W/l/$g/loud.txt" && vs_ctl_is plain-loud; then echo "REFUSED: plain-loud: $g: $(cat "$W/l/$g/loud.txt")"; exit 3; fi
     done || { echo "REFUSED: plain-loud: a row's loud gate copy could not be made (the REFUSED line above names it)"; exit 3; }
 fi
-loud_plain() {  # loud_plain <script> <out> — plain-loud in-gate: a row's plain run on its loud copy
-    env -u CONTROL PAIRINGS_OUT="$2.lpp" MAME_BIN=/usr/bin/false timeout -k 30 600 sh "$1" < /dev/null > "$2.plain" 2>&1
+loud_plain() {  # loud_plain <script> <out> <dead instrument> — plain-loud in-gate: a row's plain run on its loud copy
+    env -u CONTROL PAIRINGS_OUT="$2.lpp" MAME_BIN=/usr/bin/false "$3=/usr/bin/false" timeout -k 30 600 sh "$1" < /dev/null > "$2.plain" 2>&1
 }
-run_row() {  # run_row <gate> <mode> <script> <out> — the mode run and the plain run, each classified
-    _g=$1; _m=$2; _s=$3; _o=$4
+run_row() {  # run_row <gate> <mode> <script> <out> <dead instrument> — the mode run and the plain run, each classified
+    _g=$1; _m=$2; _s=$3; _o=$4; _dv=$5
     # PAIRINGS_OUT: audit_legacy_pairings keeps every dead leg's sandbox under its output dir (#233), ~2,000 files a run
     # here; this gate's runs keep theirs in its own scratch, never in build/ (the 14z-221 close tier's plan refused on them)
-    CONTROL="$_m" PAIRINGS_OUT="$_o.lp" MAME_BIN=/usr/bin/false timeout -k 30 600 sh "$_s" < /dev/null > "$_o.mode" 2>&1; _st=$?
+    env CONTROL="$_m" PAIRINGS_OUT="$_o.lp" MAME_BIN=/usr/bin/false "$_dv=/usr/bin/false" timeout -k 30 600 sh "$_s" < /dev/null > "$_o.mode" 2>&1; _st=$?
     ( . "$REPO/tests/lib/classify.sh"; vs_classify_control "$_st" "$_o.mode" "$_s" "$_m"; printf '%s\t%s\n' "$VS_CTL_EXEC" "$_st" ) > "$_o.cls"
-    env -u CONTROL PAIRINGS_OUT="$_o.lpp" MAME_BIN=/usr/bin/false timeout -k 30 600 sh "$_s" < /dev/null > "$_o.plain" 2>&1; echo $? > "$_o.pst"
+    env -u CONTROL PAIRINGS_OUT="$_o.lpp" MAME_BIN=/usr/bin/false "$_dv=/usr/bin/false" timeout -k 30 600 sh "$_s" < /dev/null > "$_o.plain" 2>&1; echo $? > "$_o.pst"
+    # a row whose dead instrument is not MAME_BIN: the mode once more with ONLY that instrument dead and MAME_BIN UNSET
+    # (never made dead), so the row's class is shown to come from the instrument it names, not from the dead MAME every
+    # other run carries (14z-221c, rule-checker runs 2026-11-06-1665 and -1666 Q4)
+    if [ "$_dv" != MAME_BIN ]; then
+        env -u MAME_BIN CONTROL="$_m" PAIRINGS_OUT="$_o.lo" "$_dv=/usr/bin/false" timeout -k 30 600 sh "$_s" < /dev/null > "$_o.only" 2>&1; _st=$?
+        ( . "$REPO/tests/lib/classify.sh"; vs_classify_control "$_st" "$_o.only" "$_s" "$_m"; printf '%s\t%s\n' "$VS_CTL_EXEC" "$_st" ) > "$_o.ocls"
+    fi
 }
 pool=0
 printf '%s\n' "$rows" > "$W/rows.tsv"
 nloud=0
-while IFS="$(printf '\t')" read -r g m c sc; do
+while IFS="$(printf '\t')" read -r g m c sc dv; do
+    case "$dv" in MAME_BIN|FBNEO_BIN) ;; *) continue ;; esac   # refused by name below
     s="$REPO/tests/$g.sh"; vs_ctl_is nj-stripped && s="$W/c/$g/$g.sh"; vs_ctl_is plain-loud && s="$W/l/$g/$g.sh"
-    ( run_row "$g" "$m" "$s" "$W/r.$g" ) &
-    ( run_row "$g" "$m" "$W/c/$g/$g.sh" "$W/s.$g" ) &
-    if ! vs_ctl_is plain-loud && [ -f "$W/l/$g/$g.sh" ]; then ( loud_plain "$W/l/$g/$g.sh" "$W/l.$g" ) & pool=$((pool + 1)); fi
+    ( run_row "$g" "$m" "$s" "$W/r.$g.$m" "$dv" ) &
+    ( run_row "$g" "$m" "$W/c/$g/$g.sh" "$W/s.$g.$m" "$dv" ) &
+    if ! vs_ctl_is plain-loud && [ -f "$W/l/$g/$g.sh" ]; then ( loud_plain "$W/l/$g/$g.sh" "$W/l.$g.$m" "$dv" ) & pool=$((pool + 1)); fi
     pool=$((pool + 2)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi
 done < "$W/rows.tsv"
 wait
-while IFS="$(printf '\t')" read -r g m c sc; do
+while IFS="$(printf '\t')" read -r g m c sc dv; do
+    case "$dv" in MAME_BIN|FBNEO_BIN) ;; *) bad "$g@$m: dead instrument '$dv' is neither MAME_BIN nor FBNEO_BIN"; continue ;; esac
     grep -q 'STRIP-FAILED' "$W/c/$g/strip.txt" && { bad "$g: $(cat "$W/c/$g/strip.txt") — the row's gate carries no NJ line, or its REPO line moved"; continue; }
     vs_ctl_declared "$REPO/tests/$g.sh" | grep -qx -- "$m" || { bad "$g: $m is not a declared mode of the gate any more"; continue; }
-    got="$(cut -f1 "$W/r.$g.cls" 2>/dev/null)"; gst="$(cut -f2 "$W/r.$g.cls" 2>/dev/null)"
-    gline="$(grep -a -m1 -E '^(NOT JUDGED|FAIL|CONTROL)' "$W/r.$g.mode" | cut -c1-90)"
+    got="$(cut -f1 "$W/r.$g.$m.cls" 2>/dev/null)"; gst="$(cut -f2 "$W/r.$g.$m.cls" 2>/dev/null)"
+    gline="$(grep -a -m1 -E '^(NOT JUDGED|FAIL|CONTROL)' "$W/r.$g.$m.mode" | cut -c1-90)"
     if [ "$got" = "$c" ]; then ok "$g@$m reads $got under a dead emulator"
     else bad "$g@$m reads ${got:-nothing} under a dead emulator, frozen $c [exit $gst: $gline]"; fi
-    pst="$(cat "$W/r.$g.pst" 2>/dev/null)"
+    if [ "$dv" != MAME_BIN ]; then
+        og="$(cut -f1 "$W/r.$g.$m.ocls" 2>/dev/null)"
+        if [ "$og" = "$c" ]; then ok "$g@$m reads $og with ONLY $dv dead (MAME_BIN unset, never made dead): the class comes from $dv"
+        else bad "$g@$m reads ${og:-nothing} with only $dv dead, frozen $c: the row's dead instrument is not what made it $c"; fi
+    fi
+    pst="$(cat "$W/r.$g.$m.pst" 2>/dev/null)"
     if [ "${pst:-0}" = 0 ]; then bad "$g: its PLAIN run exits 0 with a dead emulator: it passes on no leg"
-    elif grep -qa '^NOT JUDGED: ' "$W/r.$g.plain"; then nloud=$((nloud + 1)); bad "$g: its plain run prints NOT JUDGED (the helper is not silent without a mode)"
+    elif grep -qa '^NOT JUDGED: ' "$W/r.$g.$m.plain"; then nloud=$((nloud + 1)); bad "$g: its plain run prints NOT JUDGED (the helper is not silent without a mode)"
     else ok "$g: plain run red (exit $pst) and silent with a dead emulator"; fi
 done < "$W/rows.tsv"
 
 echo "== 3. in-gate control: each gate with its NJ lines neutered reads its frozen pre-fix class again"
 nfired=0; nrows=0
-while IFS="$(printf '\t')" read -r g m c sc; do
+while IFS="$(printf '\t')" read -r g m c sc dv; do
     nrows=$((nrows + 1))
     grep -q 'STRIP-FAILED' "$W/c/$g/strip.txt" && continue
-    sg="$(cut -f1 "$W/s.$g.cls" 2>/dev/null)"
-    sline="$(grep -a -m1 -E '^(FAIL|CONTROL|  File|[A-Za-z]*Error)' "$W/s.$g.mode" | cut -c1-90)"
+    sg="$(cut -f1 "$W/s.$g.$m.cls" 2>/dev/null)"
+    sline="$(grep -a -m1 -E '^(FAIL|CONTROL|  File|[A-Za-z]*Error)' "$W/s.$g.$m.mode" | cut -c1-90)"
     case "$sc" in HONOURED|LIES) ;; *) bad "$g: the frozen stripped class '$sc' is neither HONOURED nor LIES"; continue ;; esac
     if [ "$sg" = "$sc" ]; then nfired=$((nfired + 1))
     else bad "nj-stripped: $g@$m with its NJ lines neutered reads ${sg:-nothing}, frozen $sc [$sline]"; fi
@@ -166,8 +187,8 @@ if vs_ctl_is plain-loud; then
     else vs_ctl_dead plain-loud "the loud helper did not print where planted (section 1: $loud1, plain runs: $nloud of $nrows)" || fail=1; fi
 else   # in-gate: the same two checks, run on the loud copies, would have failed
     nloud_ig=0
-    while IFS="$(printf '\t')" read -r g m c sc; do
-        grep -qa '^NOT JUDGED: ' "$W/l.$g.plain" 2>/dev/null && nloud_ig=$((nloud_ig + 1))
+    while IFS="$(printf '\t')" read -r g m c sc dv; do
+        grep -qa '^NOT JUDGED: ' "$W/l.$g.$m.plain" 2>/dev/null && nloud_ig=$((nloud_ig + 1))
     done < "$W/rows.tsv"
     if [ "$loud1_ig" = 1 ] && [ "$nloud_ig" -gt 0 ]; then vs_ctl_fired plain-loud "in-gate: the loud helper prints in section 1's plain case and in $nloud_ig of $nrows rows' plain runs, which sections 1 and 2 fail"
     else vs_ctl_dead plain-loud "in-gate: the loud helper did not print where planted (section 1: $loud1_ig, plain runs: $nloud_ig of $nrows)" || fail=1; fi

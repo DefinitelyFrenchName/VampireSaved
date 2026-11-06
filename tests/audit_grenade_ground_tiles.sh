@@ -77,7 +77,7 @@ RPL="tests/replays/hui/83d_hui_grenade_ground.rpl"
 export MAME_BIN
 PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
 FR="$(python3 -c 'print(",".join(str(f) for f in range(3400,3521)))')"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 # JOBS (#334 item 2, 14z-211): the two legs are independent — each runs in its own folder $W/<set><out> (cwd, sandbox,
 # trace) — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). Each leg's exit status

@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3861 |
-| named by a document or manifest only | 2369 |
-| named by both a document/manifest and code | 993 |
-| named by CODE ONLY (the gap list below) | 499 |
+| distinct program-space addresses named | 3906 |
+| named by a document or manifest only | 2373 |
+| named by both a document/manifest and code | 1019 |
+| named by CODE ONLY (the gap list below) | 514 |
 | carried by atlas | 821 |
-| carried by engine_internals | 899 |
-| carried by other docs | 1090 |
+| carried by engine_internals | 933 |
+| carried by other docs | 1096 |
 | carried by manifests | 1906 |
-| carried by code | 1492 |
+| carried by code | 1533 |
 
 ## Addresses
 
@@ -329,9 +329,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01314C` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2]; tests/test_latch_readers.sh |
 | `PRG:0x013194` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2]; tests/test_latch_readers.sh |
 | `PRG:0x01357E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map; tests/audit_rng_draws.sh; tests/test_don_immortal_native.sh; +1 more |
-| `PRG:0x013724` | docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
+| `PRG:0x013724` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c); docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
 | `PRG:0x01374E` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x013778` | docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/reconciliation.toml — map [vs2]; tools/audit_marionette_cost.py; tools/build_donovan.sh |
+| `PRG:0x013778` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c); docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/reconciliation.toml — map [vs2]; tools/audit_marionette_cost.py; tools/build_donovan.sh |
 | `PRG:0x013786` | docs/project/patch_notes.md — 14z-219 — #356: DONOVAN'S DASH SPEED LINES, A TENANT-ONLY COPY OF vs2's EFFECT (BUILT AND STAGED for the M25 freeze) — LANDED at the M25 freeze (the 14z-220 entry above) [vs2]; build/manifest/reconciliation_donovan.toml — map [vs2] |
 | `PRG:0x01378A` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); docs/game/engine_internals.md — The anim walker reads the sprite list from node+4 (measured 14z-70); docs/game/engine_internals.md — The anim walker reads the sprite list from node+4 (measured 14z-70) [vs2] |
 | `PRG:0x013800` | docs/game/engine_internals.md — Per-tenant win-screen checklist; docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation; tests/test_quote_font_window.sh; tools/audit_quote_font.py |
@@ -399,7 +399,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x015696` | build/manifest/reconciliation.toml — map |
 | `PRG:0x0156D6` | docs/game/engine_internals.md — Projectile parameters live in the per-TYPE handler, not in a table family (14z-120 (10), measured on Blizzard Sword) [vs2]; docs/project/tables/reconciliation.md — Structural findings the map rests on; docs/project/tables/reconciliation.md — Structural findings the map rests on [vs2]; build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0156EC` | docs/project/tables/reconciliation.md — Structural findings the map rests on; build/manifest/reconciliation.toml — map |
-| `PRG:0x015702` | docs/game/engine_internals.md — Allocator wrappers and slot recycling (14z-65) [vs2]; docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vh2]; docs/project/patch_notes.md — Stage 4 addendum (session 4 close) [vs2]; docs/project/patch_notes.md — donovan-m2 stage 4 — IN PROGRESS (2026-07-25, session 4); docs/project/tables/reconciliation.md — Structural findings the map rests on; build/manifest/donovan.toml — donovan; +8 more |
+| `PRG:0x015702` | docs/game/engine_internals.md — Allocator wrappers and slot recycling (14z-65) [vs2]; docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c); docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vh2]; docs/project/patch_notes.md — Stage 4 addendum (session 4 close) [vs2]; docs/project/patch_notes.md — donovan-m2 stage 4 — IN PROGRESS (2026-07-25, session 4); docs/project/tables/reconciliation.md — Structural findings the map rests on; +9 more |
 | `PRG:0x015714` | build/manifest/reconciliation.toml — map |
 | `PRG:0x015718` | docs/project/tables/reconciliation.md — Structural findings the map rests on; build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x01572E` | docs/game/engine_internals.md — Allocator wrappers and slot recycling (14z-65) [vs2]; docs/project/patch_notes.md — Stage 4 addendum (session 4 close) [vs2]; docs/project/tables/reconciliation.md — Structural findings the map rests on; build/manifest/donovan.toml — donovan; build/manifest/donovan.toml — port; build/manifest/huitzil.toml — huitzil; +3 more |
@@ -407,7 +407,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x015770` | docs/project/patch_notes.md — where the detail lives; build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x0157C2` | docs/game/engine_internals.md — Every '$FF9400' type's parameters, decoded and measured (14z-121); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0157EE` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x01581A` | docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10); build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
+| `PRG:0x01581A` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c); docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10); build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
 | `PRG:0x015838` | build/manifest/reconciliation.toml — map |
 | `PRG:0x01588E` | docs/game/atlas/select_screen.md — The tables; tools/audit_id_space.py; tools/checkdocs_rom.py; tools/select_wheel.py; tools/wheel_layout.py |
 | `PRG:0x016870` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2] |
@@ -703,6 +703,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01B73C` | build/manifest/huitzil.toml — beam_effect_class31 |
 | `PRG:0x01B73E` | docs/game/atlas/sprite_lists.md — Handler targets; tests/lua/obj_record_full_trace.lua |
 | `PRG:0x01B7CC` | docs/game/atlas/sprite_lists.md — Handler targets; tests/lua/obj_record_full_trace.lua; tools/overlay_port.py |
+| `PRG:0x01B85C` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
 | `PRG:0x01BA52` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76) |
 | `PRG:0x01BA6A` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); tests/test_quote_font_window.sh; tools/audit_quote_font.py; tools/audit_quote_font_window.py |
 | `PRG:0x01BA8E` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); tools/audit_quote_font_window.py |
@@ -961,7 +962,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02290C` | build/manifest/pcrel_escapes.toml — hui63 |
 | `PRG:0x022936` | build/manifest/pcrel_escapes.toml — hui63 |
 | `PRG:0x022960` | build/manifest/pcrel_escapes.toml — hui63 |
-| `PRG:0x02296C` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; tests/audit_beam_slide.sh |
+| `PRG:0x02296C` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; tests/audit_beam_slide.sh; tests/lua/beam_slide_tap.lua |
 | `PRG:0x022994` | build/manifest/pcrel_escapes.toml — hui63 |
 | `PRG:0x02299A` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vh2] |
 | `PRG:0x0229CE` | build/manifest/pcrel_escapes.toml — hui63 |
@@ -1027,12 +1028,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02356E` | build/manifest/pcrel_escapes.toml — hui63 |
 | `PRG:0x023570` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x023624` | build/manifest/pcrel_escapes.toml — hui63 |
+| `PRG:0x023694` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/gotchas.md — A DEAD-SPAN PROOF WITHOUT A RULE FOR PC-INDEXED DATA READS CALLED A BYTE TABLE'S TAIL DEAD (paid: 14z-221c, #363); tests/test_dead_span.sh; tools/audit_dead_span.py |
+| `PRG:0x0236CE` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/gotchas.md — A DEAD-SPAN PROOF WITHOUT A RULE FOR PC-INDEXED DATA READS CALLED A BYTE TABLE'S TAIL DEAD (paid: 14z-221c, #363); tests/test_dead_span.sh; tools/audit_dead_span.py |
+| `PRG:0x0236D3` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/gotchas.md — A DEAD-SPAN PROOF WITHOUT A RULE FOR PC-INDEXED DATA READS CALLED A BYTE TABLE'S TAIL DEAD (paid: 14z-221c, #363); tests/test_dead_span.sh; tools/audit_dead_span.py |
 | `PRG:0x02377A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x02380C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — select_companion_resolve_s2 |
 | `PRG:0x02380E` | build/manifest/pcrel_escapes.toml — hui63 |
 | `PRG:0x02384E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-110b — the 0x51 -> 0x44 state remap: byte detail; docs/project/patch_notes.md — 14z-187 — #194: Pyron's Cosmo Disruption reaction class 0x4F -> 0x44, RULED AND STAGED for the next freeze — LANDED at the M22 freeze (the entry above); docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); +4 more |
-| `PRG:0x023854` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
-| `PRG:0x02385C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/huitzil.toml — hitclass_map_extend; tests/audit_beam_slide.sh; +3 more |
+| `PRG:0x023854` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_effect_class_rows.sh |
+| `PRG:0x02385C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/huitzil.toml — hitclass_map_extend; tests/audit_beam_slide.sh; +4 more |
 | `PRG:0x023874` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x0238A0` | build/manifest/pcrel_escapes.toml — hui63 |
 | `PRG:0x0238FC` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); build/manifest/huitzil.toml — throw_arc_tables; tests/audit_beam_slide.sh |
@@ -1062,14 +1066,17 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x023BEA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x023BF0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x023C16` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
+| `PRG:0x023D82` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x023E6A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_anakaris_rows.sh |
 | `PRG:0x023F1A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_anakaris_rows.sh |
 | `PRG:0x023F24` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_anakaris_rows.sh |
+| `PRG:0x023F68` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/gotchas.md — A DEAD-SPAN PROOF WITHOUT A RULE FOR PC-INDEXED DATA READS CALLED A BYTE TABLE'S TAIL DEAD (paid: 14z-221c, #363); tests/test_dead_span.sh |
+| `PRG:0x023F84` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/gotchas.md — A DEAD-SPAN PROOF WITHOUT A RULE FOR PC-INDEXED DATA READS CALLED A BYTE TABLE'S TAIL DEAD (paid: 14z-221c, #363); tests/test_dead_span.sh; tests/test_dead_span_reach.sh |
 | `PRG:0x023FBC` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x024002` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_dead_span_exec.sh |
 | `PRG:0x024020` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_dead_span_exec.sh |
-| `PRG:0x024024` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-216 — #294: DONOVAN'S PER-FRAME PALETTE ROUTINE (FROZEN as M24 at 14z-216: donovan-m28 / merged-m24); build/manifest/donovan.toml — perframe_hook; build/manifest/donovan.toml — state_hook; tests/audit_dead_span_exec.sh; +7 more |
-| `PRG:0x024029` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/patch_index.md — Romset patch bundles (program + gfx content); tests/test_dead_span.sh |
+| `PRG:0x024024` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/gotchas.md — A DEAD-SPAN PROOF WITHOUT A RULE FOR PC-INDEXED DATA READS CALLED A BYTE TABLE'S TAIL DEAD (paid: 14z-221c, #363); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-216 — #294: DONOVAN'S PER-FRAME PALETTE ROUTINE (FROZEN as M24 at 14z-216: donovan-m28 / merged-m24); build/manifest/donovan.toml — perframe_hook; build/manifest/donovan.toml — state_hook; +9 more |
+| `PRG:0x024029` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/patch_index.md — Romset patch bundles (program + gfx content); tests/test_dead_span.sh; tests/test_dead_span_reach.sh |
 | `PRG:0x02402A` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_dead_span_exec.sh |
 | `PRG:0x02433C` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x0243C2` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
@@ -1217,7 +1224,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0270DC` | build/manifest/reconciliation.toml — map; build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0270FC` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x02710C` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); build/manifest/bank_map.toml — anim_index_a [vs2]; build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; tools/charmap_gen.py |
-| `PRG:0x027114` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2] |
+| `PRG:0x027114` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x02711C` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/project/patch_notes.md — 14z-102 — the #107 row flip — FROZEN in donovan-m10 + every tenant + stock (the shared map), #107 CLOSED; build/manifest/reconciliation.toml — map; build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x027122` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027130` | build/manifest/reconciliation_huitzil.toml — map |
@@ -1321,7 +1328,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027FAA` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/project/patch_notes.md — 14z-143 — PYRON'S CAPTURE ROW '0x11' PORTED: he throws with his own geometry, not Demitri's; build/manifest/pyron.toml — capture_kf_jedah; build/manifest/reconciliation.toml — map; tests/audit_pyron_capture_block.sh |
 | `PRG:0x027FB2` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
 | `PRG:0x027FCE` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
-| `PRG:0x027FD8` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/platform/gotchas.md — encrypted range (14z-68) [vs2]; docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail) [vs2]; +4 more |
+| `PRG:0x027FD8` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/platform/gotchas.md — encrypted range (14z-68) [vs2]; docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); +5 more |
 | `PRG:0x027FDA` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x027FEE` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab) |
 | `PRG:0x027FFE` | build/manifest/reconciliation.toml — map |
@@ -1468,7 +1475,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02987E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2] |
 | `PRG:0x029898` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2] |
 | `PRG:0x029930` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_inputs.sh |
+| `PRG:0x029944` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
 | `PRG:0x029950` | build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
+| `PRG:0x029966` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
 | `PRG:0x029974` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2] |
 | `PRG:0x02997E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x029984` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
@@ -1484,14 +1493,21 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x029BB4` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029C2A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029C6E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); build/manifest/reconciliation.toml — map; tests/audit_air_gc_legacy.sh; tests/audit_guard_cancels.sh; tools/crosscheck_framedata.py; +1 more |
+| `PRG:0x029C74` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_guard_cancels.sh; tests/test_dead_span.sh; tools/gc_rigs.py |
+| `PRG:0x029CBA` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_beam_slide.sh; tests/test_dead_span.sh |
+| `PRG:0x029CBF` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
+| `PRG:0x029CC2` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
+| `PRG:0x029D02` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
+| `PRG:0x029D82` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
+| `PRG:0x029D92` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
 | `PRG:0x029DC2` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x029DCA` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029DD2` | docs/project/patch_notes.md — 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07); build/manifest/reconciliation.toml — map |
 | `PRG:0x029DDA` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029DE2` | build/manifest/reconciliation.toml — map |
-| `PRG:0x029DEA` | build/manifest/reconciliation.toml — map |
+| `PRG:0x029DEA` | build/manifest/reconciliation.toml — map; tests/test_dead_span.sh |
 | `PRG:0x029DF2` | build/manifest/reconciliation.toml — map |
-| `PRG:0x029DFA` | build/manifest/reconciliation.toml — map |
+| `PRG:0x029DFA` | build/manifest/reconciliation.toml — map; tests/test_dead_span.sh |
 | `PRG:0x029E1A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029E42` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029E52` | build/manifest/reconciliation.toml — map |
@@ -1501,7 +1517,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x029EEA` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029EF2` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029F42` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
-| `PRG:0x029F4A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21); docs/game/engine_internals.md — Huitzil's form is a FLIGHT mode; the purple was a palette-sequence collision (measured 14z-69e, fixed 14z-84); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); build/manifest/huitzil.toml — pcrel_escape_fix; +1 more |
+| `PRG:0x029F4A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21); docs/game/engine_internals.md — Huitzil's form is a FLIGHT mode; the purple was a palette-sequence collision (measured 14z-69e, fixed 14z-84); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); build/manifest/huitzil.toml — pcrel_escape_fix; +2 more |
 | `PRG:0x029F60` | docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
 | `PRG:0x029F68` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x029F86` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
@@ -1563,6 +1579,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02A55A` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x02A57C` | docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
 | `PRG:0x02A582` | docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
+| `PRG:0x02A586` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x02A606` | build/manifest/reconciliation.toml — map |
 | `PRG:0x02A610` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
 | `PRG:0x02A670` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Which half-circle spellings vsavj accepts (DERIVED from the command handlers and MEASURED, 14z-211, #329) |
@@ -1613,7 +1630,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02ADB8` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x02ADC8` | docs/project/patch_notes.md — 14z-216 — #294: DONOVAN'S PER-FRAME PALETTE ROUTINE (FROZEN as M24 at 14z-216: donovan-m28 / merged-m24); build/manifest/donovan.toml — perframe_hook |
 | `PRG:0x02ADDC` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-216 — #294: DONOVAN'S PER-FRAME PALETTE ROUTINE (FROZEN as M24 at 14z-216: donovan-m28 / merged-m24); build/manifest/donovan.toml — state_hook; tests/audit_dead_span_exec.sh |
-| `PRG:0x02ADEC` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-216 — #294: DONOVAN'S PER-FRAME PALETTE ROUTINE (FROZEN as M24 at 14z-216: donovan-m28 / merged-m24); build/manifest/donovan.toml — perframe_hook; build/manifest/donovan.toml — state_hook; tests/audit_don_row0c.sh; +4 more |
+| `PRG:0x02ADEC` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-216 — #294: DONOVAN'S PER-FRAME PALETTE ROUTINE (FROZEN as M24 at 14z-216: donovan-m28 / merged-m24); build/manifest/donovan.toml — perframe_hook; build/manifest/donovan.toml — state_hook; tests/audit_don_row0c.sh; +5 more |
 | `PRG:0x02AFA2` | docs/game/atlas/character_tables.md — The per-character palette POINTER tables (measured 14z-76); build/manifest/pyron.toml — sprite; tests/test_effect_palette_table.sh; tools/audit_effect_palette_table.py |
 | `PRG:0x02AFC8` | build/manifest/donovan.toml — perframe_hook |
 | `PRG:0x02AFCE` | build/manifest/donovan.toml — perframe_hook |
@@ -1631,6 +1648,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02B692` | build/manifest/pyron.toml — palette_routine_row_11 |
 | `PRG:0x02B7D8` | docs/project/patch_notes.md — 14z-116 — PYRON'S MEDALLION WHITE-OUT: byte detail (maintainer-chosen fix, field-validated 2026-08-29); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tests/test_wheel_bank5.sh; +1 more |
 | `PRG:0x02B7E8` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; docs/project/patch_notes.md — donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9); build/manifest/donovan.toml — accent_color_aware_3; build/manifest/pyron.toml — palette_routine_row_11; build/manifest/shared_writes.toml — donovan; +1 more |
+| `PRG:0x02B85B` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
 | `PRG:0x02B934` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x02B96A` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail |
 | `PRG:0x02BD72` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail |
@@ -2103,7 +2121,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x05AD12` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05AD3E` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05AE20` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/game/atlas/character_tables.md — Ported-three handler code (bank[0] rows; the "code" manifest entry); build/manifest/bank_map.toml — (top); tools/extract_char.py; tools/scan_code_refs.py |
-| `PRG:0x05AE3C` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
+| `PRG:0x05AE3C` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2] |
 | `PRG:0x05AE50` | docs/game/atlas/character_tables.md — Ported-three handler code (bank[0] rows; the "code" manifest entry) |
 | `PRG:0x05AE54` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05AE8C` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vs2]; docs/game/preserved_data.md — 1. The VS-style Dark Force handler family in vs2 and vh2 — for all 18 characters (measured 14z-69c, 14z-126) [vs2] |
@@ -2254,6 +2272,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x060B86` | build/manifest/type_stamps.toml — reader |
 | `PRG:0x060DC8` | build/manifest/huitzil.toml — throw_arc_tables |
 | `PRG:0x060DD4` | build/manifest/huitzil.toml — throw_arc_tables |
+| `PRG:0x060ED8` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_beam_slide.sh |
 | `PRG:0x060EE0` | build/manifest/huitzil.toml — pcrel_escape_fix |
 | `PRG:0x060EF0` | build/manifest/huitzil.toml — idmask_victim_spawn; build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x061284` | build/manifest/type_stamps.toml — reader |
@@ -2365,6 +2384,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x06D206` | docs/project/gotchas.md — post-increment detection ADDED 14z-69) [vs2]; tests/test_census_regions.sh; tools/census_regions.py |
 | `PRG:0x06D240` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vs2]; docs/project/gotchas.md — check the boundary against the routine's literals (14z-68) [vs2]; docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); tools/build_donovan.sh |
 | `PRG:0x06D282` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vs2] |
+| `PRG:0x06D31C` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; tests/audit_beam_slide.sh |
 | `PRG:0x06D6C0` | docs/project/gotchas.md — (14z-69; this is the real root of the parked effect family); docs/project/porting_code_regions.md — Crypt placement: opcode vs data views [vs2]; tools/census_regions.py; tools/extract_char.py |
 | `PRG:0x06D768` | docs/project/gotchas.md — (14z-69; this is the real root of the parked effect family); docs/project/porting_code_regions.md — Crypt placement: opcode vs data views [vs2]; build/manifest/huitzil.toml — pcrel_escape_fix; tools/build_donovan.sh; tools/extract_char.py; tools/verify_pcrel_data.py |
 | `PRG:0x06D7A0` | build/manifest/huitzil.toml — throw_arc_tables [vs2] |
@@ -2394,13 +2414,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x07FFF0` | docs/project/mister_fit.md — 1. Program ROM (68k) |
 | `PRG:0x080000` | docs/platform/gotchas.md — CPS-2 gfx simms are not tile-contiguous — naive slicing silently "works" on siblings only; tests/audit_mister_map_fit.sh; tests/test_ladder_tenant_vs_palette.sh; tests/test_phasec_image.sh; tests/test_wheel_bank5.sh; tools/audit_pointer_flow.py; +4 more |
 | `PRG:0x080A1E` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x080A80` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) |
+| `PRG:0x080A80` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) |
 | `PRG:0x080A90` | docs/game/engine_internals.md — The chain, end to end; build/manifest/huitzil.toml — grab_hold_keyframes; tools/build_donovan.sh |
 | `PRG:0x080A9C` | build/manifest/huitzil.toml — beam_effect_class16; tests/audit_clone_beam_lines.sh; tools/build_donovan.sh |
-| `PRG:0x080AAC` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357); docs/game/engine_internals.md — The chain, end to end; docs/project/porting_sprite_lists.md — 1. Does the host have the CLASS row?; build/manifest/huitzil.toml — grab_hold_keyframes; tests/audit_effect_class_rows.sh |
+| `PRG:0x080AAC` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c); docs/game/engine_internals.md — The chain, end to end; docs/project/porting_sprite_lists.md — 1. Does the host have the CLASS row?; build/manifest/huitzil.toml — grab_hold_keyframes; tests/audit_effect_class_rows.sh; tests/audit_guard_orbs.sh |
 | `PRG:0x080AEC` | docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); docs/project/patch_index.md — The beam takeover trio (Huitzil — three mechanisms, 14z-71); docs/project/patch_notes.md — 14z-71 — the beam: byte detail; build/manifest/huitzil.toml — beam_effect_class16; build/manifest/shared_writes.toml — huitzil; tests/audit_effect_class_rows.sh |
+| `PRG:0x080AF8` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c); tests/audit_effect_class_rows.sh; tests/audit_guard_orbs.sh |
 | `PRG:0x080B28` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/huitzil.toml — beam_effect_class16; build/manifest/huitzil.toml — beam_effect_class31; build/manifest/shared_writes.toml — huitzil; tests/audit_clone_beam_lines.sh |
-| `PRG:0x080B44` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357); build/manifest/huitzil.toml — grab_hold_keyframes; build/manifest/shared_writes.toml — huitzil; tests/audit_clone_beam_lines.sh; tools/build_donovan.sh |
+| `PRG:0x080B44` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c); build/manifest/huitzil.toml — grab_hold_keyframes; build/manifest/shared_writes.toml — huitzil; tests/audit_clone_beam_lines.sh; tests/audit_guard_orbs.sh; tools/build_donovan.sh |
 | `PRG:0x080B46` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x08237E` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index) |
 | `PRG:0x0823E2` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21); docs/game/engine_internals.md — Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f); docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index); build/manifest/huitzil.toml — obj_hook |
@@ -2427,6 +2448,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x089370` | docs/game/engine_internals.md — In-fight HUD top strip (mugshot beside the timer, name under the bar); tests/test_fbneo_instruments.sh |
 | `PRG:0x08937C` | docs/game/atlas/venue_assets.md — 3. HUD mugshot + name plate — NOT folded; 32-row aliased tables (14z-63); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — hud_name_entry_0f_lo; tests/test_tenant_hud.sh; tools/check_tenant_hud.py |
 | `PRG:0x08939C` | docs/game/engine_internals.md — In-fight HUD top strip (mugshot beside the timer, name under the bar); tests/test_fbneo_instruments.sh |
+| `PRG:0x089442` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) |
+| `PRG:0x0894A6` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) |
 | `PRG:0x089684` | docs/game/atlas/venue_assets.md — 3. HUD mugshot + name plate — NOT folded; 32-row aliased tables (14z-63); docs/game/engine_internals.md — In-fight HUD top strip (mugshot beside the timer, name under the bar); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — hud_name_entry_0f_lo; tests/test_tenant_hud.sh; tools/check_tenant_hud.py; +1 more |
 | `PRG:0x08980E` | build/manifest/type_stamps.toml — reader |
 | `PRG:0x089884` | docs/game/atlas/venue_assets.md — 3. HUD mugshot + name plate — NOT folded; 32-row aliased tables (14z-63); docs/game/engine_internals.md — In-fight HUD top strip (mugshot beside the timer, name under the bar); docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — hud_mug_entry_13; build/manifest/donovan.toml — hud_name_entry_0f_lo; +7 more |
@@ -2506,22 +2529,26 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x08C724` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) |
 | `PRG:0x08E336` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x08E342` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
-| `PRG:0x08EDB6` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vh2] |
+| `PRG:0x08EDB6` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vh2] |
 | `PRG:0x08EDE2` | build/manifest/huitzil.toml — grab_hold_keyframes |
-| `PRG:0x08F1AA` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
-| `PRG:0x08F1D6` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2]; build/manifest/huitzil.toml — grab_hold_keyframes [vs2] |
+| `PRG:0x08F1AA` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2] |
+| `PRG:0x08F1D6` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2]; build/manifest/huitzil.toml — grab_hold_keyframes [vs2]; tests/audit_guard_orbs.sh |
 | `PRG:0x0907F6` | build/manifest/pcrel_escapes.toml — don_m29 |
 | `PRG:0x0908A0` | build/manifest/pcrel_escapes.toml — don_m29 |
 | `PRG:0x09098A` | build/manifest/pcrel_escapes.toml — don_m29 |
-| `PRG:0x090AE6` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vh2] |
+| `PRG:0x090AE6` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vh2] |
 | `PRG:0x090B08` | docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index) [vs2] |
 | `PRG:0x090B0C` | docs/game/engine_internals.md — The child-companion shadow item (14z-68g/q — measured, still open) [vs2] |
 | `PRG:0x090BD2` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x090BE4` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
-| `PRG:0x090EDA` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
-| `PRG:0x090F24` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
-| `PRG:0x090FEA` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
-| `PRG:0x090FF4` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2]; build/manifest/type_stamps.toml — stamp; tools/audit_type_stamps.py |
+| `PRG:0x090EDA` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2]; tests/audit_effect_class_rows.sh; tests/audit_guard_orbs.sh |
+| `PRG:0x090EEA` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2] |
+| `PRG:0x090F24` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2] |
+| `PRG:0x090FA8` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) |
+| `PRG:0x090FC0` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) |
+| `PRG:0x090FEA` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c); docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2] |
+| `PRG:0x090FF4` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2]; build/manifest/type_stamps.toml — stamp; tools/audit_type_stamps.py |
+| `PRG:0x091041` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2] |
 | `PRG:0x0918F0` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/overlay_port.py |
 | `PRG:0x09190A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x09192A` | build/manifest/reconciliation.toml — map |
@@ -2744,7 +2771,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0C010E` | build/manifest/donovan.toml — capture_kf_lilith; build/manifest/huitzil.toml — capture_kf_lilith; build/manifest/pyron.toml — capture_kf_lilith |
 | `PRG:0x0C0A84` | docs/project/patch_notes.md — 14z-219 — #356: DONOVAN'S DASH SPEED LINES, A TENANT-ONLY COPY OF vs2's EFFECT (BUILT AND STAGED for the M25 freeze) — LANDED at the M25 freeze (the 14z-220 entry above) |
 | `PRG:0x0C0D74` | docs/project/patch_notes.md — donovan-m2 stage 4 — dispatch_14 repoint (2026-07-27, session 8) |
-| `PRG:0x0C104C` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
+| `PRG:0x0C104C` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2] |
 | `PRG:0x0C109C` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vs2]; docs/game/preserved_data.md — 1. The VS-style Dark Force handler family in vs2 and vh2 — for all 18 characters (measured 14z-69c, 14z-126) [vs2] |
 | `PRG:0x0C11E4` | docs/project/patch_notes.md — 14z-219 — #356: DONOVAN'S DASH SPEED LINES, A TENANT-ONLY COPY OF vs2's EFFECT (BUILT AND STAGED for the M25 freeze) — LANDED at the M25 freeze (the 14z-220 entry above) |
 | `PRG:0x0C1780` | docs/game/engine_internals.md — The two engines run DIFFERENT Dark Force systems (traced 14z-69c) |
@@ -2798,13 +2825,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0D021E` | docs/project/patch_notes.md — 14z-219 — #345 OPTION A1b: DONOVAN'S TRAIL PIECES TAKE vs2's NO-DRAW TABLE (BUILT AND STAGED for the M25 freeze with #356) — LANDED at the M25 freeze (the 14z-220 entry above) |
 | `PRG:0x0D0C7E` | docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-187 — #194: Pyron's Cosmo Disruption reaction class 0x4F -> 0x44, RULED AND STAGED for the next freeze — LANDED at the M22 freeze (the entry above); build/manifest/pyron.toml — port_patch; tools/audit_index_users.py |
 | `PRG:0x0D0C7F` | build/manifest/pyron.toml — palette_routine_row_11_c [vs2]; build/manifest/pyron.toml — roster21 [vs2]; tests/test_pyron_cosmo.sh |
-| `PRG:0x0D0CA8` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated) |
+| `PRG:0x0D0CA8` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2] |
 | `PRG:0x0D1002` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated) |
 | `PRG:0x0D10F4` | docs/project/mister_core.md — 2. What the roster needs; docs/project/mister_fit.md — 1. Program ROM (68k); docs/project/mister_fit.md — The arithmetic, with the numbers used |
 | `PRG:0x0D143E` | docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); tools/build_donovan.sh |
 | `PRG:0x0D153E` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c) [vs2]; docs/project/doc_audit_14z118.md — 4. Log of the pass (one line per commit); docs/project/inferred_claims.md — What is NOT known — labelled unknowns that stay labelled (no measurement this pass) |
 | `PRG:0x0D17C2` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above); tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh |
 | `PRG:0x0D1822` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above); tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh |
+| `PRG:0x0D1BBE` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2]; docs/project/gotchas.md — A CAPPED DATA REGION SILENTLY CUT OFF A TABLE ANOTHER REGION'S OPERAND READS (paid: 14z-221c, #357) [vs2]; tests/audit_guard_orbs.sh; tools/gen_donovan_patch.py |
+| `PRG:0x0D1CA7` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) |
 | `PRG:0x0D22BE` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2]; tools/dmg_sweep.py |
 | `PRG:0x0D2332` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
 | `PRG:0x0D2350` | docs/project/tables/defense_rows.md — Tenant DEFENSE-side rows — vs2's rows, as ruled, SHIPPED IN M19 (merged-m19) [vh2]; build/manifest/donovan.toml — defense_curve_row [vh2]; build/manifest/huitzil.toml — defense_curve_row [vh2]; build/manifest/huitzil.toml — voice_borrow_voicenums_b [vh2] |
@@ -2904,7 +2933,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0FFF50` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
 | `PRG:0x0FFF60` | docs/project/patch_notes.md — 14z-189 — THE M22 FREEZE (donovan-m26 / huitzil-m33 / pyron-m27 / merged-m22, mark M22): #194 and #195 LANDED |
 | `PRG:0x0FFFFF` | docs/game/atlas/README.md — The three sets (measured M0; every figure still current); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/cps2_wide.md — B4 prg: PASSED, with the control that made it meaningful; docs/project/cps2_wide.md — From HANDOFF.md: «CPS-2 WIDE — the extended hardware profile»; docs/project/gotchas.md — Inside the crypt range the VIEW follows the ACCESS MODE, and the wrong one is plausible garbage (paid again: 14z-142); docs/project/mister_map.md — The minimal, profile-gated proposal — **IMPLEMENTED, slice D4**; +5 more |
-| `PRG:0x100000` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vh2]; docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/platform/gotchas.md — 0x100000 (measured 14z-59k); +41 more |
+| `PRG:0x100000` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vh2]; docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/platform/gotchas.md — 0x100000 (measured 14z-59k); +42 more |
 | `PRG:0x100001` | docs/platform/gotchas.md — The CPS-2 encrypted range is INCLUSIVE of its upper word — 0x100001, not; tests/test_crypt_boundary.sh |
 | `PRG:0x100002` | docs/platform/gotchas.md — 0x100000 (measured 14z-59k) |
 | `PRG:0x100E3C` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; tools/build_donovan.sh |
@@ -3146,14 +3175,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x28521C` | build/manifest/moves_donovan.toml — Change Immortal |
 | `PRG:0x28709C` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated) |
 | `PRG:0x287192` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated) |
+| `PRG:0x289A68` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) |
 | `PRG:0x289B14` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x289EF6` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/project/patch_notes.md — The two rows [vs2]; build/manifest/donovan.toml — weapon_accent_rowd_slot [vs2] |
 | `PRG:0x28D866` | docs/game/engine_internals.md — Per-tenant win-screen checklist |
 | `PRG:0x28DC58` | build/manifest/donovan.toml — obj_bank_word_slot; build/manifest/donovan.toml — select_companion_tbl_b [vs2] |
 | `PRG:0x28DEF8` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; tests/test_don_sword.sh |
 | `PRG:0x28ED08` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x29C0C0` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
-| `PRG:0x29C114` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357) [vs2] |
+| `PRG:0x29C0C0` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2] |
+| `PRG:0x29C114` | docs/game/engine_internals.md — Donovan's guard orbs: a type-0x13 watcher in the '$FFD400' pool that vsavj dispatches to a stub (measured 14z-221, #357; ported 14z-221c) [vs2] |
 | `PRG:0x2A0426` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); tools/gen_donovan_patch.py; tools/overlay_port.py |
 | `PRG:0x2A04FA` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tools/audit_marionette_cost.py; tools/overlay_port.py |
 | `PRG:0x2A05E2` | docs/game/engine_internals.md — The select screen's laws (the atlas is canonical); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — splash_p1; build/manifest/huitzil.toml — splash_p1; build/manifest/pyron.toml — splash_p1; tools/check_tenant_select.py; +1 more |
@@ -3530,8 +3560,12 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0224A8` | tests/test_advancing_guard.sh |
 | `PRG:0x022516` | tests/audit_tenant_cpu_ai.sh |
 | `PRG:0x022666` | tests/audit_column_shock.sh |
+| `PRG:0x0236C4` | tests/test_dead_span.sh; tools/audit_dead_span.py |
 | `PRG:0x0236FE` | tests/audit_tenant_cpu_ai.sh |
+| `PRG:0x02383C` | tests/audit_effect_class_rows.sh |
+| `PRG:0x0238FA` | tests/audit_effect_class_rows.sh |
 | `PRG:0x02392A` | tests/audit_guard_mask_reads.sh |
+| `PRG:0x024000` | tests/test_dead_span.sh; tests/test_dead_span_reach.sh |
 | `PRG:0x024026` | tests/audit_dead_span_exec.sh |
 | `PRG:0x024882` | tests/test_dead_span.sh |
 | `PRG:0x02488D` | tests/test_dead_span.sh |
@@ -3588,8 +3622,13 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x028DEA` | tools/checkdocs_rom.py |
 | `PRG:0x028DEC` | tools/checkdocs_rom.py |
 | `PRG:0x02979A` | tests/audit_command_throws.sh; tests/audit_es_ex.sh; tests/audit_ground_throws.sh; tests/audit_vanilla_pursuits.sh; tools/command_throw_rigs.py; tools/crosscheck_framedata.py |
+| `PRG:0x029940` | tests/test_dead_span.sh |
+| `PRG:0x029962` | tests/test_dead_span.sh |
 | `PRG:0x029AB2` | tests/test_qs_songs.sh |
-| `PRG:0x029C74` | tests/audit_guard_cancels.sh; tools/gc_rigs.py |
+| `PRG:0x029CBC` | tests/audit_beam_slide.sh |
+| `PRG:0x029CC0` | tests/audit_beam_slide.sh |
+| `PRG:0x029E0A` | tests/test_dead_span.sh |
+| `PRG:0x02A646` | tests/test_dead_span.sh; tests/test_dead_span_reach.sh |
 | `PRG:0x02ADB6` | tests/audit_don_row0b.sh |
 | `PRG:0x02AE10` | tests/audit_don_row0c.sh |
 | `PRG:0x02AE12` | tests/audit_don_row0c.sh; tests/test_m3a_reproducible.sh |
@@ -3604,14 +3643,17 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x02CD9A` | tests/audit_tenant_cpu_ai.sh |
 | `PRG:0x02E14C` | tests/audit_command_throws.sh |
 | `PRG:0x02EEBB` | tests/lua/scroll3_watch.lua; tests/test_m2b_scroll3.sh |
+| `PRG:0x02F429` | tests/test_dead_span.sh |
 | `PRG:0x030000` | tests/test_shared_writes.sh; tools/extract_char.py |
 | `PRG:0x0301E6` | tools/audit_effect_rects.py |
 | `PRG:0x03021F` | tools/audit_effect_rects.py |
+| `PRG:0x030A99` | tests/test_dead_span.sh |
 | `PRG:0x032000` | tests/test_hui_walk.sh |
 | `PRG:0x03975A` | tests/lua/index_watch.lua |
 | `PRG:0x03CB00` | tests/test_qs_songs.sh |
 | `PRG:0x03D97A` | tests/audit_continue_switch.sh; tests/audit_don_vs_cpu.sh; tests/audit_region_movability.sh; tests/audit_tenant_continue_switch.sh; tests/test_ladder_tenant_vs_palette.sh; tests/test_pyron_blink.sh; +2 more |
 | `PRG:0x041A04` | tools/specials_a_rigs.py |
+| `PRG:0x0433B8` | tests/test_dead_span.sh |
 | `PRG:0x045000` | tests/test_merged_render_content.sh |
 | `PRG:0x0486A0` | tests/test_merged_render_content.sh |
 | `PRG:0x0502A9` | tests/test_checkdocs_rom.sh |
@@ -3702,6 +3744,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x06D91C` | tools/gen_donovan_patch.py; tools/verify_pcrel_data.py |
 | `PRG:0x06E346` | tools/build_donovan.sh |
 | `PRG:0x06E78A` | tests/test_capture_pose_sources.sh |
+| `PRG:0x077516` | tests/test_dead_span.sh |
 | `PRG:0x07D180` | tests/test_map_table_readers.sh |
 | `PRG:0x07D182` | tests/test_map_table_readers.sh |
 | `PRG:0x07D18E` | tests/test_map_table_readers.sh |
@@ -3712,6 +3755,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x080B40` | tests/audit_effect_class_rows.sh |
 | `PRG:0x0837D4` | tools/overlay_port.py |
 | `PRG:0x088C58` | tests/test_m2a_stage4_code.sh |
+| `PRG:0x089484` | tests/audit_guard_orbs.sh |
 | `PRG:0x08968A` | tools/checkdocs_rom.py |
 | `PRG:0x08968C` | tools/checkdocs_rom.py |
 | `PRG:0x08968E` | tools/checkdocs_rom.py |
@@ -3733,6 +3777,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x08C612` | tests/audit_ranking_tenant.sh |
 | `PRG:0x08C678` | tools/overlay_port.py |
 | `PRG:0x08C740` | tests/test_map_table_readers.sh |
+| `PRG:0x08F222` | tests/audit_guard_orbs.sh |
 | `PRG:0x0905AE` | tools/build_donovan.sh |
 | `PRG:0x0926F4` | tools/build_donovan.sh |
 | `PRG:0x092750` | tools/build_donovan.sh |

@@ -51,7 +51,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 fail=0
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 # THE EXECUTABLE FORM: under CONTROL=stripped-pin the first pinned in-class
 # gate loses its pin lines in a COPY of tests/ and section 1 scans the copy —

@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-610 entries (49 game / 154 platform / 407 project), counted from the buckets at generation.
+612 entries (49 game / 154 platform / 409 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
@@ -231,7 +231,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - AN EXCEPTION RAISED IN `sitecustomize.py` DOES NOT CRASH PYTHON — `site.py` catches it, prints "Error in sitecustomize", and the program runs (paid: 14z-218, the Mac; `tests/lib/crash_sweep.sh`)
 - AN APOSTROPHE INSIDE `${VAR:?message}` OPENS A QUOTE — the whole script fails to parse, at a line far below (paid: 14z-221, #310)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 407 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 409 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -640,3 +640,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A VERDICT THAT COUNTS ONLY THE LEGS THAT WROTE OUTPUT PASSES ON ZERO LEGS (paid: 14z-221, #310 group 7)
 - A PLANTED COPY THAT CRASHES FIRES ITS CONTROL FOR THE WRONG REASON — the control must see its own plant's effect (paid: 14z-221, #310 group 7)
 - A RULE-CHECKER READER TOOK A `.fig` TEXT FILE FOR BINARY — name a text artifact `.txt` (paid: 14z-221b, #363's rule-checker run 2026-11-05-1646)
+- A DEAD-SPAN PROOF WITHOUT A RULE FOR PC-INDEXED DATA READS CALLED A BYTE TABLE'S TAIL DEAD (paid: 14z-221c, #363)
+- A CAPPED DATA REGION SILENTLY CUT OFF A TABLE ANOTHER REGION'S OPERAND READS (paid: 14z-221c, #357)

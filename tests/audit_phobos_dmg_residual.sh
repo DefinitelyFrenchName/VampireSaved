@@ -71,7 +71,7 @@ EXPECT="$REPO/tests/expected/phobos_dmg_residual.tsv"
 [ -f "$BUILD/verify_data.bin" ] || { echo "SKIP: no data image at $BUILD/verify_data.bin"; exit 0; }
 [ -f "$REPO/build/out/vsav2_data.bin" ] || { echo "SKIP: no vs2 data image (build/out/vsav2_data.bin)"; exit 0; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
@@ -119,17 +119,17 @@ done; done
 for v in $PINS; do lleg "$v" vsavj & lleg "$v" vsav2 & wait; done
 for v in $PINS; do for g in vsavj vsav2; do
     f="$W/legacy.$v.$g/f.ft"
-    [ -s "$f" ] || { bad "legacy pin $v $g: the leg produced no trace — VOID"; continue; }
+    [ -s "$f" ] || { vs_ctl_nj "legacy pin $v $g: the leg produced no trace"; bad "legacy pin $v $g: the leg produced no trace — VOID"; continue; }   # #310 g7 NJ
     ids="$(awk '$1=="F" && $2==2300 {for(i=3;i<=NF;i++){split($i,kv,"="); if(kv[1]=="id") a=kv[2]; if(kv[1]=="p2id") b=kv[2]}; printf "%02x %02x", a, b}' "$f")"
-    [ "$ids" = "01 03" ] || bad "legacy pin $v $g: ids at 2300 read '$ids', not Demitri 01 against Victor 03 — the real picks did not land"
+    [ "$ids" = "01 03" ] || { vs_ctl_nj "legacy pin $v $g: the real picks did not land (ids '$ids')"; bad "legacy pin $v $g: ids at 2300 read '$ids', not Demitri 01 against Victor 03 — the real picks did not land"; }   # #310 g7 NJ
 done; done
 n=0
 for p in $PARTS; do for v in $PINS; do for l in native ours; do
     f="$W/$p.$v.$l/f.ft"
-    [ -s "$f" ] || { bad "$p pin $v $l: the leg produced no trace — VOID"; continue; }
+    [ -s "$f" ] || { vs_ctl_nj "$p pin $v $l: the leg produced no trace"; bad "$p pin $v $l: the leg produced no trace — VOID"; continue; }   # #310 g7 NJ
     n=$((n + 1))
     ids="$(awk '$1=="F" && $2==2300 {for(i=3;i<=NF;i++){split($i,kv,"="); if(kv[1]=="id") a=kv[2]; if(kv[1]=="p2id") b=kv[2]}; printf "%02x %02x", a, b}' "$f")"
-    [ "$ids" = "10 01" ] || bad "$p pin $v $l: ids at 2300 read '$ids', not Phobos 10 against Demitri 01 — the pick did not land"
+    [ "$ids" = "10 01" ] || { vs_ctl_nj "$p pin $v $l: the pick did not land (ids '$ids')"; bad "$p pin $v $l: ids at 2300 read '$ids', not Phobos 10 against Demitri 01 — the pick did not land"; }   # #310 g7 NJ
 done; done; done
 [ "$fail" = 0 ] || { echo "FAIL: audit_phobos_dmg_residual"; exit 1; }
 ok "$n legs ran; every leg is Phobos (0x10) against Demitri (0x01) by its own trace at 2300"

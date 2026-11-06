@@ -85,7 +85,7 @@ PY
 echo "== 3. CONTROLS — each field, perturbed, must be REFUSED =="
 # Without these, section 2 passes on a tree that happens to agree, which is
 # indistinguishable from a builder that still reads nothing.
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 python3 - <<'PY' || rc=1
 import sys
 sys.path.insert(0, "tools")

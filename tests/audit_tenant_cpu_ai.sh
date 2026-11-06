@@ -104,7 +104,7 @@ SETKEY="$(python3 "$REPO/tools/build_fingerprint.py" "$BUILD/rompath;$ROMDIR" --
 [ -n "$SETKEY" ] || { echo "FAIL: no whole-set key for the build at $BUILD (tools/build_fingerprint.py)"; exit 1; }
 REGNAME="$(awk -F'\t' -v k="$SETKEY" '$1 == k && $1 !~ /^#/ {print $2}' "$REPO/tests/expected/registry.tsv")"
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else
-    W="$(mktemp -d)" || { echo "FAIL: audit_tenant_cpu_ai — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM; fi
+    W="$(mktemp -d)" || { echo "FAIL: audit_tenant_cpu_ai — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"
 echo "  rom   $(echo "$romchk" | grep 'all match' | head -1); vsav2.zip sha1 $(python3 -c 'import hashlib,sys; print(hashlib.sha1(open(sys.argv[1],"rb").read()).hexdigest())' "$ROMDIR/vsav2.zip")"
 echo "  build $BUILD: whole-set key $SETKEY (registry row: ${REGNAME:-none})"

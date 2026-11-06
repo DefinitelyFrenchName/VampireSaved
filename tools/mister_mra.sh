@@ -112,7 +112,7 @@ while ! mkdir "$LOCK" 2>/dev/null; do
     sleep 1; _waited=$((_waited + 1))
 done
 echo $$ > "$LOCK/pid"; HAVE_LOCK=1
-trap unlock EXIT INT TERM
+trap unlock EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 PIN="$(sed -n 's/^PINNED="\([0-9a-f]*\)".*/\1/p' "$REPO/tools/setup_jtcores.sh")"
 [ -n "$PIN" ] || { echo "cannot read PINNED from tools/setup_jtcores.sh" >&2; exit 1; }
 
@@ -242,7 +242,7 @@ restore() {
     git -C "$SCRATCH" checkout --quiet -- "cores/$CORE/cfg/mame2mra.toml" 2>/dev/null || true
     git -C "$SCRATCH" checkout --quiet -- "doc/mame.xml" 2>/dev/null || true
 }
-trap 'restore; unlock' EXIT INT TERM
+trap 'restore; unlock' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 # `if`, not `[ … ] && { … }`: an AND-OR list whose test fails is a portability
 # trap under `set -e` (its behaviour differs between shells), and this is the
 # one place a silent early exit would leave the scratch clone perturbed.

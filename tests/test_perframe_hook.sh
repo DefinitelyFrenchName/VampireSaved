@@ -38,7 +38,7 @@ case "$SOLO" in /*) ;; *) SOLO="$REPO/$SOLO" ;; esac
 for b in "$BUILD" "$SOLO"; do
     [ -f "$b/verify_op.bin" ] || { echo "FAIL: test_perframe_hook (no $b/verify_op.bin)"; exit 1; }
 done
-W="$(mktemp -d)" || { echo "FAIL: test_perframe_hook — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_perframe_hook — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 . "$REPO/tests/lib/decrypt_cache.sh"
 decrypt_view vsavj "$W/vj_op.bin" "$W/vj_data.bin" || { echo "FAIL: test_perframe_hook (no vsavj view)"; exit 1; }
 decrypt_view vsav2 "$W/v2_op.bin" "$W/v2_data.bin" || { echo "FAIL: test_perframe_hook (no vsav2 view)"; exit 1; }

@@ -61,10 +61,11 @@ romfp="$(python3 "$REPO/tools/build_fingerprint.py" "$ROMDIR" --set vsavj --sha-
 regfp="$(awk -F'\t' '$2 == "vsavj" && $1 !~ /^#/ {print $1}' "$REPO/tests/expected/registry.tsv")"
 [ -n "$romfp" ] && [ "$romfp" = "$regfp" ] || { echo "FAIL: vsavj program fingerprint '$romfp' is not the registry's vsavj row '$regfp'"; exit 1; }
 echo "  rom   $(echo "$romchk" | grep 'all match' | head -1); vsavj program fingerprint $romfp = registry vsavj row; zips $(python3 -c 'import hashlib,sys; print(" ".join(f"{z}.zip=" + hashlib.sha1(open(f"{sys.argv[1]}/{z}.zip","rb").read()).hexdigest() for z in ("vsavj","vsav","qsound_hle")))' "$ROMDIR")"
-if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"
 echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
-. "$REPO/tests/lib/mame_ident.sh"; vs_mame_ident "$MAME_BIN" || { echo "FAIL: the MAME binary is not the pinned release (above)"; exit 1; }
+. "$REPO/tests/lib/mame_ident.sh"; vs_mame_ident "$MAME_BIN" || { vs_ctl_nj "the MAME binary is not the pinned release, so no leg ran"   # #310 g7 NJ
+    echo "FAIL: the MAME binary is not the pinned release (above)"; exit 1; }
 . "$REPO/tests/lib/decrypt_cache.sh"
 decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 || { echo "FAIL: no vsavj opcode view (decrypt cache)"; exit 1; }
 
@@ -105,8 +106,8 @@ done < "$W/legs.txt"
 wait
 fail=0
 while read -r tag r fr lv; do
-    grep -q '^FIELDSUMMARY' "$W/$tag.fields" 2>/dev/null || { echo "  FAIL  $tag: no FIELDSUMMARY (see $W/f$tag/mame.log) — VOID"; fail=1; }
-    grep -q '^END ' "$W/$tag.tap" 2>/dev/null || { echo "  FAIL  $tag: no tap END line (see $W/t$tag/mame.log) — VOID"; fail=1; }
+    grep -q '^FIELDSUMMARY' "$W/$tag.fields" 2>/dev/null || { vs_ctl_nj "$tag: no FIELDSUMMARY (the field leg did not complete)"; echo "  FAIL  $tag: no FIELDSUMMARY (see $W/f$tag/mame.log) — VOID"; fail=1; }   # #310 g7 NJ
+    grep -q '^END ' "$W/$tag.tap" 2>/dev/null || { vs_ctl_nj "$tag: no tap END line (the tap leg did not complete)"; echo "  FAIL  $tag: no tap END line (see $W/t$tag/mame.log) — VOID"; fail=1; }   # #310 g7 NJ
 done < "$W/legs.txt"
 [ "$fail" = 0 ] || { echo "FAIL: audit_extra_pass (a leg did not complete)"; exit 1; }
 echo "  ok    twenty legs complete"

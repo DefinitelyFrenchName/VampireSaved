@@ -118,7 +118,7 @@ timing_fail() {
 
 RUNNER="$REPO/tests/run_all_static.sh"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 # A SHADOW RUNNER THAT ABORTED IS NOT ITS PERTURBATION CAUGHT (#310 group 5, 14z-215). Under a control mode the shadow
 # drives every section, and each section captures the runner's output and prints only what it greps, so the shell's own
@@ -132,7 +132,7 @@ T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
 # it still streams as the runner writes it (the --confirm plan's progress lines, #259).
 if [ -n "${VS_CTL:-}" ]; then
     : > "$T/shadow_err.log"
-    trap 'cat "$T/shadow_err.log" 2>/dev/null; rm -rf "$T"' EXIT INT TERM
+    trap 'cat "$T/shadow_err.log" 2>/dev/null; rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
     sh() {
         _she_t="$T/she.$(command sh -c 'echo "$PPID"')"; _she_s=0   # unique per live caller; inside $T, which the trap removes
         mkfifo "$_she_t.f"; tee "$_she_t" < "$_she_t.f" >&2 & _she_p=$!

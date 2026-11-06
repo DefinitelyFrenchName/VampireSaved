@@ -427,7 +427,7 @@ if [ "$DRY" = 0 ]; then
         VS_RUN_TMP="$REPO/build/tmp/emu_$STAMP.$$"
         mkdir -p "$VS_RUN_TMP" && [ -d "$VS_RUN_TMP" ] || { echo "FAIL: could not create this run's temp directory $VS_RUN_TMP"; exit 1; }
         export TMPDIR="$VS_RUN_TMP"
-        trap 'vs_tmp_clean' EXIT INT TERM
+        trap 'vs_tmp_clean' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
     fi
     _tmp_need=2; [ "$CONTROLS" = 1 ] && [ "$RUN_JOBS" -gt 1 ] && _tmp_need=10; _tmp_need="${VS_TMP_MIN_GB:-$_tmp_need}"
     _tmp_free="$(df -Pk "${TMPDIR:-/tmp}" 2>/dev/null | awk 'NR==2{print $4}')"
@@ -454,7 +454,7 @@ if [ "$DRY" = 0 ] && [ -f tools/run_record.py ] && git rev-parse --git-dir >/dev
             || echo "run record: the START record FAILED — see $LOGDIR/run_record_start.log"
     fi
     if [ -f "$LOGDIR/run_record_start.json" ]; then
-        trap 'python3 tools/run_record.py write "$LOGDIR/run_record_end.json" --phase end --start "$LOGDIR/run_record_start.json" -- tests/run_all_emulator.sh $_ORIG_ARGS > "$LOGDIR/run_record_end.log" 2>&1 || echo "run record: the END record FAILED — see $LOGDIR/run_record_end.log"; vs_tmp_clean' EXIT INT TERM
+        trap 'python3 tools/run_record.py write "$LOGDIR/run_record_end.json" --phase end --start "$LOGDIR/run_record_start.json" -- tests/run_all_emulator.sh $_ORIG_ARGS > "$LOGDIR/run_record_end.log" 2>&1 || echo "run record: the END record FAILED — see $LOGDIR/run_record_end.log"; vs_tmp_clean' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
     fi
 fi
 

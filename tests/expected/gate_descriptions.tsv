@@ -227,6 +227,7 @@ declares	test_ctl_show_err
 declares	test_dead_exit_census
 declares	test_dead_leg_unjudged
 declares	test_dead_span
+declares	test_dead_span_reach
 declares	test_decode_stage_banners
 declares	test_decrypt_cache
 declares	test_decrypt_oracle
@@ -477,6 +478,7 @@ declares	test_shared_writes
 declares	test_sheet_census
 declares	test_shell_portability
 declares	test_shim_charid
+declares	test_signal_traps
 declares	test_sim_wram_contract
 declares	test_skill_guides
 declares	test_state_open_lists
@@ -515,3 +517,4 @@ declares	test_wide_render_content
 declares	test_win_quote_decode
 declares	test_win_stdout_utf8
 undeclared	audit_beam_slide
+undeclared	audit_guard_orbs

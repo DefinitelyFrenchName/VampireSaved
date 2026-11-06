@@ -63,7 +63,7 @@ V2OP="$REPO/build/out/vsav2_opcodes.bin"; VJOP="$REPO/build/out/vsavj_opcodes.bi
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 [ -f "$BUILD/verify_op.bin" ] && [ -f "$V2OP" ] && [ -f "$VJOP" ] || { echo "SKIP: no opcode images (build/out, $BUILD/verify_op.bin)"; exit 0; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

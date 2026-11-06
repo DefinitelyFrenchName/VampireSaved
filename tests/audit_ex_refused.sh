@@ -59,7 +59,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$BUILD/rompath/vsavjw.zip" ] && [ -f "$BUILD/verify_data.bin" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 case "$CONTROL" in ""|stock-kept) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 . "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

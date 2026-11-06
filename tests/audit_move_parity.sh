@@ -162,7 +162,7 @@ case "$CONTROL" in
     *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;;
 esac
 
-if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"   # KEEP (14z-186, #193): the legs' traces kept for reading
 # the no-translation fixture is built HERE, not beside its control section: when it
 # was created later, the control MODE found no file, every comparison silently

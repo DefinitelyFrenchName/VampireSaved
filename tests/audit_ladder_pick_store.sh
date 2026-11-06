@@ -39,7 +39,7 @@ cd "$REPO"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
-if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"
 R90="$REPO/tests/replays/don/90_don_plant.rpl"; R2P="$REPO/tests/replays/16_xemu_2p.rpl"
 D="3460:ff8400-ff8bff;3470:ff8400-ff8bff;4200:ff8400-ff8bff"

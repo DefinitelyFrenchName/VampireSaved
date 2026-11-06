@@ -105,7 +105,7 @@ command -v go >/dev/null 2>&1 || {
     [ -x "$JTF" ] || { echo "SKIP: no go toolchain and no prebuilt jtframe"; exit 0; }; }
 
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/mister_mra_map.XXXXXX")" || { echo "FAIL: test_mister_mra_map — mktemp -d failed (WORK)"; exit 2; }
-trap 'rm -rf "$WORK"' EXIT INT TERM
+trap 'rm -rf "$WORK"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 MRA="$REPO/tools/mister_mra.sh"
 SRC="$REPO/emu/jtcores"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

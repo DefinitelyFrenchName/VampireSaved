@@ -83,7 +83,7 @@ python3 -c 'import PIL' 2>/dev/null || { echo "SKIP: python3 has no PIL on this 
 ls "/run/user/$(id -u)"/.mutter-Xwaylandauth.* >/dev/null 2>&1 || { echo "SKIP: no live GNOME session for this user (/run/user/$(id -u)/.mutter-Xwaylandauth.*)"; exit 0; }
 [ -n "${ROMDIR:-}" ] && [ -d "$ROMDIR" ] || { echo "FAIL: set ROMDIR to the reference dumps"; exit 1; }
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 # a control mode writes privately, its mesa cache too (#321, 14z-210: modes side by side wiped and wrote one OUT and
 # one ~/.cache/mesa_shader_cache); the plain run keeps build/desktop_release, its registered output
 OUT="$REPO/build/desktop_release"; [ -n "${CONTROL:-}" ] && { OUT="$W/out"; export XDG_CACHE_HOME="$W/xdg_cache"; }

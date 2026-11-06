@@ -82,6 +82,14 @@ vs_pool_start "$JOBS"
 vs_pool_run leg_tap
 vs_pool_run leg_probe
 vs_pool_wait
+# #310 g7 (14z-221c): a leg with no END line never finished; until then the verdict below opened the missing trace and
+# died of FileNotFoundError, so a dead emulator read DIED under the mode, never UNJUDGED
+fail=0
+grep -q '^END ' "$W/base.txt" 2>/dev/null || { vs_ctl_nj "the register tap leg did not complete (no END line)"   # #310 g7 NJ
+    echo "FAIL test_down_flash_mechanism: the register tap leg did not complete (no END line in base.txt; see o1)"; fail=1; }
+grep -q '^END ' "$W/probe.log" 2>/dev/null || { vs_ctl_nj "the palette probe leg did not complete (no END line)"   # #310 g7 NJ
+    echo "FAIL test_down_flash_mechanism: the palette probe leg did not complete (no END line in probe.log; see o2)"; fail=1; }
+[ "$fail" = 0 ] || exit 1
 
 python3 - "$W/base.txt" "$W/probe.log" "$MODE" <<'PY'
 import sys

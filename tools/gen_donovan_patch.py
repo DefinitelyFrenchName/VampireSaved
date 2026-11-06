@@ -2570,7 +2570,18 @@ def main():
                                         f"target {ref['target']:#x} is not the "
                                         f"row's {_int(_pin['target']):#x}")
                             continue
-                        newt = _int(_pin["pin"])
+                        if "pin_region" in _pin:
+                            # pin_region (14z-221c, #357): the operand takes a PLACED region's address instead of a
+                            # fixed one — the case where the resolved host region is too SHORT for what the operand
+                            # reads (Donovan's hitbox_proj copy, capped at 0x1000, ends 0x16 bytes into vs2's
+                            # 64-entry motion table 0x0D1BBE; a WIDE-only root carries the whole table)
+                            _prn, _, _pro = str(_pin["pin_region"]).partition(":")
+                            if _prn not in placed:
+                                fail.append(f"ref_pin {name}+{ref['off']:#x}: pin_region '{_prn}' not placed")
+                                continue
+                            newt = placed[_prn] + _int(_pro or "0")
+                        else:
+                            newt = _int(_pin["pin"])
                         notes.append(f"# {name}+{ref['off']:#x}: ref_pin "
                                      f"{ref['target']:#x} -> {newt:#x} "
                                      f"({_pin.get('note', '')})")
@@ -6778,6 +6789,11 @@ def main():
                 if args.stage < _int(cp.get("stage", 4)):
                     continue
                 nm = cp["name"]
+                # profile (14z-221c, #357): a row whose region exists only under a build profile (a WIDE-only root)
+                # is skipped elsewhere, as [[site_thunk]]'s profile key does; no row before #357's carried the key
+                if cp.get("profile") and cp["profile"] != args.profile:
+                    notes.append(f"# code_ptr {nm}: SKIPPED (profile {cp['profile']!r} != {args.profile!r})")
+                    continue
                 addr = _int(cp["addr"])
                 old = bytes.fromhex(cp["old_hex"])
                 if len(old) != 4:

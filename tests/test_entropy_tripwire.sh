@@ -16,7 +16,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)" || { echo "FAIL: test_entropy_tripwire — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_entropy_tripwire — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 rc=0
 python3 -c 'import os,sys; open(sys.argv[1],"wb").write(os.urandom(65536))' "$W/planted.bin"
 

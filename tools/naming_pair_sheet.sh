@@ -43,7 +43,7 @@ RIG_DIR="${RIG_DIR:-$REPO/tests/replays/naming}"   # another rig directory (e.g.
 J="$RIG_DIR/${T}_$P.json"; R="$RIG_DIR/${T}_$P.rpl"
 [ -f "$J" ] && [ -f "$R" ] || { echo "FAIL: no naming part ${T}_$P"; exit 1; }
 case "$T" in donovan) CUR="D D DR DR" ;; huitzil) CUR="D D D" ;; pyron) CUR="D D D D" ;; *) echo "FAIL: tenant $T"; exit 1 ;; esac
-if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 FRAMES="$(printf '%s\n' "$@" | sed 's/^[^:]*://' | tr '\n' ',' | tr -s ',' | sed 's/,$//')"
 FR=$(python3 -c "print(max(int(x) for x in '$FRAMES'.split(','))+2)")
 base="$(python3 -c "import json;print(';'.join(json.load(open('$J'))['pokes']))")"

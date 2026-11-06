@@ -4,29 +4,57 @@
 # (build/agent215/t310/census57/group7.tsv, local) whose dead-emulator run read HONOURED at HEAD d3e8810d
 # (build/agent221/t310g7/base/classes.tsv, local), and audit_dispatch_census's drift-clock (read LIES: a PASS on 0 legs).
 # Each row's gate carries `# #310 g7 NJ` on the lines that make it UNJUDGED; the gate's nj-stripped control removes them.
-# gate	mode	class	stripped class (the gate with its NJ lines neutered)
-audit_air_dash_height	native-dash-planted	UNJUDGED	HONOURED
-audit_crouch_flag	down-removed	UNJUDGED	HONOURED
-audit_df_meter	swing-planted	UNJUDGED	HONOURED
-audit_df_modes	power-armed	UNJUDGED	HONOURED
-audit_dispatch_census	drift-clock	UNJUDGED	HONOURED
-audit_entrance_draw	variant-lost	UNJUDGED	HONOURED
-audit_ex_refused	stock-kept	UNJUDGED	HONOURED
-audit_ff8130_writers	lane-blind	UNJUDGED	HONOURED
-audit_guard_corpus	known-crash	UNJUDGED	HONOURED
-audit_id_writers	word-write-variant	UNJUDGED	HONOURED
-audit_kill_poke_shape	two-byte-flowed	UNJUDGED	HONOURED
-audit_ladder_selector	mask-not-load-bearing	UNJUDGED	HONOURED
-audit_lag_budget	lag-planted	UNJUDGED	HONOURED
-audit_legacy_pairings	shared-sandbox	UNJUDGED	HONOURED
-audit_move_parity_attribution	p2-record-unswapped	UNJUDGED	HONOURED
-audit_pass_overrun	overrun-planted	UNJUDGED	HONOURED
-audit_qs_voice_wav	truncated-window	UNJUDGED	HONOURED
-audit_voice_borrow	foreign-ring-id	UNJUDGED	HONOURED
-test_crash_guard	drift-clock	UNJUDGED	HONOURED
-test_hui_air	ground-dash	UNJUDGED	HONOURED
-test_meter_gain	perturbed-net	UNJUDGED	HONOURED
-test_pod_black_foot_palette	neighbour-poke-disjoint	UNJUDGED	HONOURED
-test_pyron_medallion_2p	accent-lost	UNJUDGED	HONOURED
-test_shadow_tenant	four-presses-morph	UNJUDGED	HONOURED
-test_vanilla_aerial_join	swapped-directions	UNJUDGED	HONOURED
+# Batch 2 (14z-221c): the four candidates whose dead-emulator baseline DIED on a traceback (audit_pyron_ring,
+# audit_tech_roll, test_down_flash_mechanism, test_random_select_tenants: each read a leg's missing output; each now checks
+# its legs first), audit_column_flash under its current mode name (the baseline ran the census's flash-gone, renamed
+# flash-planted at 14z-216, so it read REFUSED), test_dualtrack on a dead FBNeo (its leg is FBNeo; its NOT JUDGED lines,
+# printed in plain runs too since 14z-215, became vs_ctl_nj), and four group-7 gates with two PRESENT modes that are not
+# on tests/controls_concurrent_emu.txt (audit_extra_pass, test_obj_records, test_rehit_ring, test_vanilla_command_join)
+# and two that are (audit_phobos_dmg_residual, audit_tick_phase: their rows there need a PILOT re-trace),
+# one row per mode. The fifth column names the instrument made dead with /usr/bin/false (MAME_BIN is always dead too).
+# A batch-2 stripped class is the neutered copy's measured class: the copy keeps the new liveness checks, so where the
+# baseline DIED it reads HONOURED (the pre-fix gate's own class is the baseline's, build/agent221/t310g7/base/classes.tsv).
+# gate	mode	class	stripped class (the gate with its NJ lines neutered)	dead instrument
+audit_air_dash_height	native-dash-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_column_flash	flash-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_crouch_flag	down-removed	UNJUDGED	HONOURED	MAME_BIN
+audit_df_meter	swing-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_df_modes	power-armed	UNJUDGED	HONOURED	MAME_BIN
+audit_dispatch_census	drift-clock	UNJUDGED	HONOURED	MAME_BIN
+audit_entrance_draw	variant-lost	UNJUDGED	HONOURED	MAME_BIN
+audit_ex_refused	stock-kept	UNJUDGED	HONOURED	MAME_BIN
+audit_extra_pass	other-level	UNJUDGED	HONOURED	MAME_BIN
+audit_extra_pass	unpinned-equals-6	UNJUDGED	HONOURED	MAME_BIN
+audit_ff8130_writers	lane-blind	UNJUDGED	HONOURED	MAME_BIN
+audit_guard_corpus	known-crash	UNJUDGED	HONOURED	MAME_BIN
+audit_id_writers	word-write-variant	UNJUDGED	HONOURED	MAME_BIN
+audit_kill_poke_shape	two-byte-flowed	UNJUDGED	HONOURED	MAME_BIN
+audit_ladder_selector	mask-not-load-bearing	UNJUDGED	HONOURED	MAME_BIN
+audit_lag_budget	lag-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_legacy_pairings	shared-sandbox	UNJUDGED	HONOURED	MAME_BIN
+audit_move_parity_attribution	p2-record-unswapped	UNJUDGED	HONOURED	MAME_BIN
+audit_pass_overrun	overrun-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_phobos_dmg_residual	legacy-same	UNJUDGED	HONOURED	MAME_BIN
+audit_phobos_dmg_residual	residual-gone	UNJUDGED	HONOURED	MAME_BIN
+audit_pyron_ring	stream-shifted	UNJUDGED	HONOURED	MAME_BIN
+audit_qs_voice_wav	truncated-window	UNJUDGED	HONOURED	MAME_BIN
+audit_tech_roll	tap-must-not-roll	UNJUDGED	HONOURED	MAME_BIN
+audit_tick_phase	flat-pass	UNJUDGED	HONOURED	MAME_BIN
+audit_tick_phase	quantum-off	UNJUDGED	HONOURED	MAME_BIN
+audit_voice_borrow	foreign-ring-id	UNJUDGED	HONOURED	MAME_BIN
+test_crash_guard	drift-clock	UNJUDGED	HONOURED	MAME_BIN
+test_down_flash_mechanism	normal-base-satisfies	UNJUDGED	HONOURED	MAME_BIN
+test_dualtrack	stray-byte-growth	UNJUDGED	HONOURED	FBNEO_BIN
+test_hui_air	ground-dash	UNJUDGED	HONOURED	MAME_BIN
+test_meter_gain	perturbed-net	UNJUDGED	HONOURED	MAME_BIN
+test_obj_records	flipped-tile-code	UNJUDGED	HONOURED	MAME_BIN
+test_obj_records	wrong-page-geometry	UNJUDGED	HONOURED	MAME_BIN
+test_pod_black_foot_palette	neighbour-poke-disjoint	UNJUDGED	HONOURED	MAME_BIN
+test_pyron_medallion_2p	accent-lost	UNJUDGED	HONOURED	MAME_BIN
+test_random_select_tenants	no-tenant-drawn	UNJUDGED	HONOURED	MAME_BIN
+test_rehit_ring	clear-on-attack-node	UNJUDGED	HONOURED	MAME_BIN
+test_rehit_ring	missing-contact	UNJUDGED	HONOURED	MAME_BIN
+test_shadow_tenant	four-presses-morph	UNJUDGED	HONOURED	MAME_BIN
+test_vanilla_aerial_join	swapped-directions	UNJUDGED	HONOURED	MAME_BIN
+test_vanilla_command_join	swapped-commands	UNJUDGED	HONOURED	MAME_BIN
+test_vanilla_command_join	three-hits	UNJUDGED	HONOURED	MAME_BIN

@@ -106,7 +106,7 @@ done
 wait
 for pair in "0x0a SA" "0x0f JE" "0x05 MO"; do
     id=${pair%% *}; ch=${pair##* }
-    [ -s "$W/$ch.tap" ] && [ -s "$W/$ch.ft" ] || { echo "  FAIL $ch: a leg produced no log (see $W/$ch.*.out)"; fail=1; continue; }
+    [ -s "$W/$ch.tap" ] && [ -s "$W/$ch.ft" ] || { vs_ctl_nj "$ch: a leg produced no log"; echo "  FAIL $ch: a leg produced no log (see $W/$ch.*.out)"; fail=1; continue; }   # #310 g7 NJ
     # THE EXECUTABLE MODE: reduce the targeted character from the PERTURBED tap,
     # so its section 1-4 verdict fails and the gate FAILs.
     TAP="$W/$ch.tap"

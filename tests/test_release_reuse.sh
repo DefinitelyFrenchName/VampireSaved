@@ -31,7 +31,7 @@ rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 ok()   { echo "  ok: $*"; }
 
-T="$(mktemp -d)" || { echo "FAIL: test_release_reuse — mktemp -d failed (T)"; exit 2; }; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)" || { echo "FAIL: test_release_reuse — mktemp -d failed (T)"; exit 2; }; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 # A SHADOW RUNNER THAT ABORTED IS NOT ITS PERTURBATION CAUGHT (#310 group 5, 14z-215). Under a control mode the shadow
 # drives every section, and each section captures the runner's output and prints only what it greps, so the shell's own
@@ -47,7 +47,7 @@ T="$(mktemp -d)" || { echo "FAIL: test_release_reuse — mktemp -d failed (T)"; 
 # carries an excepthook (TB-HOOK below) writing any traceback to $T/shadow_tb.log, which the EXIT trap re-prints.
 if [ -n "${VS_CTL:-}" ]; then
     : > "$T/shadow_err.log"
-    trap 'cat "$T/shadow_err.log" 2>/dev/null; [ -s "$T/shadow_tb.log" ] && { vs_ctl_show_err "$T/shadow_tb.log" || :; }; rm -rf "$T"' EXIT INT TERM
+    trap 'cat "$T/shadow_err.log" 2>/dev/null; [ -s "$T/shadow_tb.log" ] && { vs_ctl_show_err "$T/shadow_tb.log" || :; }; rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
     sh() {
         _she_t="$T/she.$(command sh -c 'echo "$PPID"')"; _she_s=0   # unique per live caller; inside $T, which the trap removes
         mkfifo "$_she_t.f"; tee "$_she_t" < "$_she_t.f" >&2 & _she_p=$!

@@ -55,7 +55,7 @@ vs_ctl_mode "$0"
 [ -f "$BUILD/rompath/vsavjw.zip" ] && [ -f "$BUILD/patch/patch.json" ] || { echo "SKIP: no merged build with its patch at $BUILD"; exit 0; }
 [ -f "$SOLO/rompath/vsavjw.zip" ] || { echo "SKIP: no solo Pyron build at $SOLO"; exit 0; }
 python3 tools/audit_roms.py "$ROMDIR" > /dev/null || { echo "FAIL: ROM audit (CLAUDE.md §3)"; exit 1; }
-if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"
 echo "== audit_facing_hook_ab: build $BUILD ($(python3 tools/build_fingerprint.py --set vsavjw --sha-only "$BUILD/rompath" 2>/dev/null || echo ?)), solo $SOLO"
 

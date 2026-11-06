@@ -60,7 +60,7 @@ if [ ! -d "$EXTRACT" ]; then
 fi
 
 WORK="$(mktemp -d)" || { echo "FAIL: test_thunk_addr_literal — mktemp -d failed (WORK)"; exit 2; }
-trap 'rm -rf "$WORK"' EXIT INT TERM
+trap 'rm -rf "$WORK"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 
 # gen <outdir> <manifest> -> runs the generator; exit code is DATA, not an error

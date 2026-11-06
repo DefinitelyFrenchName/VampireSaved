@@ -105,7 +105,7 @@ KFO_MODE="${VS_CTL:-}"; export KFO_MODE
 # SHARED CACHE, never a direct decrypt — tests/test_decrypt_cache.sh section 5
 # fails any converted gate that shells out to tools/cps2_decrypt.py itself.
 . "$REPO/tests/lib/decrypt_cache.sh"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 decrypt_view vsavj "$W/vj_op.bin" "$W/vj_dat.bin" \
     || { echo "FAIL: vsavj decrypt view"; exit 1; }
 

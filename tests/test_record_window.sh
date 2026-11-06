@@ -81,7 +81,7 @@ RPL="${REC_REPLAY:-tests/replays/26_don_arcade_mash.rpl}"  # truncated in sectio
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 [ -f "$RPL" ] || { echo "SKIP: no replay $RPL"; exit 0; }
 
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 RP="$PWD/$BUILD/rompath;$ROMDIR"
 rc=0
 fail() { echo "  FAIL: $*"; rc=1; }

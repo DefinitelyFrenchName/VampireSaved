@@ -294,7 +294,7 @@ if [ "$LIST" = 1 ]; then
     exit 0
 fi
 
-WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT INT TERM
+WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 # A FAILING GATE'S FULL LOG SURVIVES THE RUN (14z-150). $WORK is a mktemp dir
 # the EXIT trap deletes, so until now a red printed its last four lines and the
 # rest went with it — and `FAIL: see above` is what those four lines often are.
@@ -326,7 +326,7 @@ if [ -f tools/run_record.py ] && git rev-parse --git-dir >/dev/null 2>&1; then
         -- tests/run_all_static.sh $_ORIG_ARGS > "$RUNREC/start.log" 2>&1 \
         || { echo "run record: the START record FAILED — see $RUNREC/start.log"; RUNREC=""; }
 fi
-trap 'rm -rf "$WORK"; [ -z "$RUNREC" ] || python3 tools/run_record.py write "$RUNREC/run_record_end.json" --phase end --start "$RUNREC/run_record_start.json" -- tests/run_all_static.sh $_ORIG_ARGS > "$RUNREC/end.log" 2>&1 || echo "run record: the END record FAILED — see $RUNREC/end.log"' EXIT INT TERM
+trap 'rm -rf "$WORK"; [ -z "$RUNREC" ] || python3 tools/run_record.py write "$RUNREC/run_record_end.json" --phase end --start "$RUNREC/run_record_start.json" -- tests/run_all_static.sh $_ORIG_ARGS > "$RUNREC/end.log" 2>&1 || echo "run record: the END record FAILED — see $RUNREC/end.log"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 # THE RESULTS FILE (14z-188, #188): one row per gate this run judged, what --confirm reads back.
 RESULTS_OUT="${STATIC_RESULTS_OUT:-}"
 # The path is THIS run's: a gate that starts the runner itself (a synthetic repo's tier) must not

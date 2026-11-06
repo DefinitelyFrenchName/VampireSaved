@@ -65,6 +65,7 @@ declares	audit_ground_throws
 declares	audit_guard_cancels
 declares	audit_guard_corpus
 declares	audit_guard_mask_reads
+declares	audit_guard_orbs
 declares	audit_guard_reentry
 declares	audit_hitbox_parity
 declares	audit_hitclass_map_cost

@@ -59,7 +59,7 @@ PKGS="libc6 libgcc-s1 libstdc++6 libatomic1 libnsl2 zlib1g libexpat1 libglib2.0-
  libxext6 libxrender1 libxcursor1 libxfixes3 libxi6 libxrandr2 libxss1 libwayland-client0 libwayland-cursor0
  libwayland-egl1 libdrm2 libgbm1 libasound2t64 libpulse0 libudev1 python3 xvfb"
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 # a control mode writes privately (#321, 14z-210); the plain run keeps build/cleanhost_release, its registered output
 OUT="$REPO/build/cleanhost_release"; [ -n "${CONTROL:-}" ] && OUT="$W/out"
 rm -rf "$OUT"; mkdir -p "$OUT"

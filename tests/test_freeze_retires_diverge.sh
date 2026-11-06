@@ -46,7 +46,7 @@ cd "$REPO"
 rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 FR="$T/fakerepo"
 mkdir -p "$FR/tools" "$FR/tests/lib" "$FR/tests/replays" "$FR/tests/expected" "$T/romdir"
 ln -s "$REPO/tests/run_suite.sh" "$FR/tests/run_suite.sh"

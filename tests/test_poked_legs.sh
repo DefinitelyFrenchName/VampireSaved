@@ -43,7 +43,7 @@ WIDE_DATA="${WIDE_DATA:-$REPO/build/m3b_merged33/verify_data.bin}"
 [ -f "$WIDE_DATA" ] || { echo "SKIP: no WIDE data view at $WIDE_DATA"; exit 0; }
 EXPECT="$REPO/tests/expected/poked_legs.tsv"
 ACCEPT="$REPO/tests/expected/poked_legs_accepted.tsv"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

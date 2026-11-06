@@ -72,7 +72,7 @@ if [ "${RUN_ON_SNAPSHOT_SELF:-}" != "$0" ]; then
     exec sh "$RUN_ON_SNAPSHOT_SELF" "$@"
 fi
 SELF_REPO="${RUN_ON_SNAPSHOT_HOME:-$(cd "$(dirname "$0")/.." && pwd)}"
-trap 'rm -f "${RUN_ON_SNAPSHOT_SELF:-/nonexistent}"' EXIT INT TERM
+trap 'rm -f "${RUN_ON_SNAPSHOT_SELF:-/nonexistent}"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 REPO="$SELF_REPO"; COMMIT=HEAD; KEEP=0; NOROM=0; EMU=auto
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -115,7 +115,7 @@ mkdir "$REC" 2>/dev/null || { rmdir "$SNAP"; refuse "$REC is held by another run
 # a refusal can come while a setup step runs in the background (#317): wait for it, so nothing writes into the
 # snapshot after its removal
 cleanup() { wait 2>/dev/null || true; rm -f "${RUN_ON_SNAPSHOT_SELF:-/nonexistent}"; if [ "$KEEP" = 0 ] && [ -n "$SNAP" ] && [ -d "$SNAP" ]; then rm -rf "$SNAP"; fi; }
-trap cleanup EXIT INT TERM
+trap cleanup EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 say() { echo "$*"; echo "$*" >> "$REC/record.txt"; }
 cow() { cp -Rc "$1" "$2" 2>/dev/null || cp -Rp "$1" "$2"; }   # copy-on-write where the filesystem has it (both keep mtimes)
 

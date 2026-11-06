@@ -61,7 +61,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 fail=0
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 MANIFEST=build/manifest/donovan.toml
 perturb_no_id_by_profile() {  # perturb_no_id_by_profile <out> — the declaration removed
     grep -v '^id_by_profile = ' "$MANIFEST" > "$1"

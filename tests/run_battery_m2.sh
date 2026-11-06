@@ -90,7 +90,7 @@ cd "$REPO"
 # counted as a PASS toward "BATTERY GREEN".
 . "$REPO/tests/lib/classify.sh"
 _bat_pass=0; _bat_skip=0; _bat_skipped=""
-_BAT_TMP="$(mktemp -d)"; trap 'rm -rf "$_BAT_TMP"' EXIT INT TERM
+_BAT_TMP="$(mktemp -d)"; trap 'rm -rf "$_BAT_TMP"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 bat() {   # bat <gate.sh> [args...]
     _bat_name="$(basename "$1" .sh)"

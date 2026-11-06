@@ -62,7 +62,7 @@ else
 fi
 
 echo "== 3. a second IN-PLACE run is refused =="
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 mkdir -p "$T/prg"; touch "$T/prg/.select_port.done"
 VS2="${ROMDIR:-}/vsav2.zip"
 if [ ! -f "$VS2" ]; then

@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-221b CLOSE, 2026-11-05)
+# NEXT SESSION — orientation (rewritten at the 14z-221c CLOSE, 2026-11-06)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -19,16 +19,15 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
-idle`). Idle at the 14z-221b close; its checkout `~/vampire-saved` moved to `main` at the close (it had held scratch commit
-`6993aef7`, #363's write trace): check it is on `main` before other work. **ERIS** (WSL2, 24 threads, 47 GB) runs the release shape;
-UNREACHABLE all of 14z-221 (ssh timed out), its checkout last at
-snapshot S7 `37150456` (detached): move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
+idle`). Idle at the 14z-221c close, its checkout `~/vampire-saved` on `a152efa7` (`main` before this close; the scratch refs
+`refs/scratch/t359` and `refs/scratch/t221c` deleted): move it to the new `main` before other work. **ERIS** (WSL2, 24 threads,
+47 GB) runs the release shape; reached all of 14z-221c, its checkout `~/vampire-saved` on `a152efa7`: move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
 commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS)
 or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shell splits it at a pipe and mangles quotes), and
 a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-221b's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-221c's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
@@ -59,35 +58,28 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-3. **THE M25 RELEASE, WHEN THE MAINTAINER ASKS FOR IT** (M25 frozen 14z-220 at `91bde83b`, tags `freeze/donovan-m29`,
+1. **#357 AND #363 ARE STAGED FOR THE NEXT FREEZE** (`build/manifest/staged/357_363.patch`; STATE 14z-221c (1), (2)).
+   The maintainer confirmed both on captures (#357: *"looks identical"*; #363: *"Demitri is frozen indeed"*). The freeze
+   applies the patch and must: re-extract Donovan (`build/m5_wide/extract`); re-freeze `test_tenant_loop` (op counts
+   donovan 360 -> 363, huitzil 381 -> 384, two tenants 642 -> 648, three tenants 855 -> 861, measured on the scratch builds);
+   carry #363's row of `tests/expected/dead_span_reach.tsv` (it is in the patch). Until then `tests/audit_guard_orbs.sh` and
+   `tests/audit_beam_slide.sh` are RED against the frozen builds (both are frozen on the scratch build `build/agent221c/m34x`,
+   local). #358 closes with #363 (the maintainer, 2026-11-05: *"#358 can be closed when we close #363"*). Ask the
+   maintainer when to freeze; the M25 release (item 2) is separate.
+2. **THE M25 RELEASE, WHEN THE MAINTAINER ASKS FOR IT** (M25 frozen 14z-220 at `91bde83b`, tags `freeze/donovan-m29`,
    `freeze/huitzil-m36`, `freeze/pyron-m30`, `freeze/merged-m25`; `release/merged-m25` packaged). #345, #346 and #356 carry
    done-awaiting-release comments and close with that release.
-4. **#357 — the maintainer's call (put 14z-221 after rule-checker run 2026-11-04-1637 OK, the attribution on the issue):**
-   port the type-0x13 guard-orb watcher (row 0x13 of the `$FFD400` walker, Huitzil's row-16 precedent) or leave it open;
-   `docs/game/engine_internals.md` «Donovan's guard orbs». **#358 — the maintainer's read of the beam sheets**
-   (`build/agent221/t358/sheets/358_beam_3row_p1.png`, `_p2.png`, `358_zoom_corner.png`, local; STATE_HISTORY 14z-221 (4), STATE 14z-221b (1)): the
-   intro difference is the entrance draw (the maintainer: *"the captures do represent two of these intros"*); the
-   beam's difference is not draw order (14z-221b): the OBJ order is the same on both games; on ours Demitri slides
-   0x51 px at f2642-2654 where native's does not, the camera follows, and Cecil is moved to the screen's left edge, under
-   Phobos's legs (STATE 14z-221b (1)). The maintainer: *"this finding is indeed mechanical NOT cosmetic, thus of greater
-   severity"*. Its cause, measured: rows 0x4E/0x4F of vsavj's reaction table `0x2385C` are default rows where vs2/vh2 have
-   handlers; the beam hits with class 0x4F (engine_internals, "Rows 0x4E and 0x4F"); `tests/audit_beam_slide.sh` holds
-   the bug as it stands and goes RED when #363 is fixed (the fix re-freezes it to native's hold). Open: which tenant records carry
-   0x4E/0x4F and the live register-write census. The slide is #363 (bug); #358 stays open as its look, to be re-captured
-   and closed if Cecil matches native once #363 is fixed (the maintainer: *"If Cecil looks are solved via the new bug
-   then #358 could be closed"*). A fix needs the maintainer's word ([VSP-10]).
-5. **#310 — GROUP 7, BATCH 2** (batch 1, 25 modes, landed 14z-221: `tests/test_dead_leg_unjudged.sh` and its table, STATE_HISTORY
-   14z-221 (5)). Next: `test_dualtrack` (its leg is FBNeo, so the proof needs a dead FBNeo, not `MAME_BIN=/usr/bin/false`),
-   the six held out before the baseline (four MiSTer gates, which need verilator, though `test_mister_obj_oracle` and
-   `test_mister_tenant_oracle` have a MAME leg too; `test_release_roundtrip`; `audit_stock_emulator_stall`, whose stock
-   binary is `MAME_REF_BIN`), the four baseline rows that DIED on a traceback (`audit_pyron_ring`, `audit_tech_roll`, `test_down_flash_mechanism`,
-   `test_random_select_tenants`), `audit_column_flash`'s header-only mode (REFUSED), then the group's gates with more than one
-   PRESENT mode (`build/agent215/t310/census57/group7.tsv`, `build/agent221/t310g7/base/classes.tsv`, local). Each new row
-   joins the table and is proven by the same gate.
-6. **#359** (cleanup traps on `EXIT INT TERM` with no `exit`; 210 scripts).
-7. **Ask the maintainer for the order of the rest.** Open tickets (GitHub severity labels): bugs: #345 (frozen, awaits the
-   release), #363 (item 4); evolution: #348, #352, #354; cosmetic: #344, #346, #356 (both frozen, await the release), #357, #358,
-   #360 (#356's Dark Force phase); test-integrity: #310, #359. Parked: #123, #124, #125, #128.
+3. **#310 — GROUP 7, BATCH 3** (batches 1 and 2 landed, 43 rows: `tests/test_dead_leg_unjudged.sh`, STATE 14z-221c (5)).
+   Left: the six held out (four MiSTer gates needing verilator, `test_release_roundtrip`, `audit_stock_emulator_stall`
+   on `MAME_REF_BIN`), podman's, the 14 two-mode gates on the concurrent list, and every gate with three or more modes
+   (`build/agent215/t310/census57/group7.tsv`, local). A row's dead instrument goes in the table's fifth column; the gate
+   then runs its mode with only that instrument dead.
+4. **A FINDING TO PUT TO THE MAINTAINER (not yet a ticket): under dash an EXIT-only trap does not run on TERM**
+   (`docs/platform/gotchas.md`, measured on the Mac's dash; PILOT's `/bin/sh` is dash). About 277 scripts carry an
+   EXIT-only trap and would leave their work directories behind when TERM'd on PILOT. Ask whether to file it.
+5. **Ask the maintainer for the order of the rest.** Open tickets (GitHub severity labels): bugs: #345 (frozen, awaits the
+   release), #363 (staged, item 1); evolution: #348, #352; cosmetic: #344, #346, #356 (frozen, await the release), #357
+   (staged, item 1), #358 (closes with #363), #360; test-integrity: #310. Parked: #123, #124, #125, #128.
 
 ## PARKED (not open work)
 
@@ -96,30 +88,26 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A dead emulator is a cheap proof of a control's liveness handling**: `MAME_BIN=/usr/bin/false` with `CONTROL=<mode>`,
-  classified by `tests/lib/classify.sh`, must read UNJUDGED; `tests/test_dead_leg_unjudged.sh` holds the batch's rows. It
-  kills only legs launched through `MAME_BIN`: FBNeo (`test_dualtrack`), a second stock MAME at `MAME_REF_BIN` and the
-  Verilator legs need their own dead instrument.
-- **A control's FAIL proves nothing until its log shows the plant's own effect** (`docs/project/gotchas.md`, "A PLANTED
-  COPY THAT CRASHES FIRES ITS CONTROL FOR THE WRONG REASON"): a plant that crashes reads HONOURED when the crash is quoted
-  inside the gate's own FAIL line; have the gate check the effect and print FIRED or DEAD itself.
-- **A stripped-copy control NEUTERS its tagged lines, never deletes them**: a tag marks a line, and the line may carry the
-  gate's own command.
-- **A verdict over a glob must know how many entries it expects** (`audit_dispatch_census` passed on zero legs).
-- **An apostrophe inside `${VAR:?message}` opens a quote** (`docs/platform/gotchas.md`): bisect a `sh -n` error with
-  `head -N | sh -n`.
-- **PILOT is reached with a bundle on a commit it already has** (`git bundle create … <scratch ref> ^<a commit PILOT has>`), and a
-  long run is launched with `setsid nohup timeout` from a script, watched by an until-loop on a DONE marker.
+- **`tools/audit_dead_span.py` reads six rules now** (A, C, T, D, R, L; its header): D and R look 0x100 to BOTH sides of a
+  base (an index may be negative), R takes a base of either parity and `adda.l`/`addi.l #imm`, the fence judges every
+  reached instruction ending at the span start and refuses a straddler, and an accepted base or row is bound to its named
+  sites (`BASE@SITE/SITE`). The 68000's bus has 24 bits: an operand is read with its top byte ignored, a data long counts with top byte 0x00 or
+  0xFF (a full mask of every long finds chance hits in random data). Each listed instruction form has a control in `tests/test_dead_span_reach.sh`: capstone names
+  `lea`/`pea` as `lea.l`/`pea.l`, and an exact-name test that never matched once hid every such base.
+- **A capped data region can cut a table off** (`docs/project/gotchas.md`): Donovan's `hitbox_proj` copy (0x1000) ended
+  inside vs2's motion table `0x0D1BBE`, so the guard orbs read our own code bytes; a per-piece diff found it where totals
+  were equal.
+- **A cleanup trap is `trap '<cleanup>' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM`** (#359;
+  `tests/test_signal_traps.sh` refuses any other stopping-signal trap).
+- **A dead-leg proof for a non-MAME leg** puts the instrument in `tests/expected/dead_leg_unjudged.tsv`'s fifth column; the
+  gate also runs that mode with only that instrument dead and MAME_BIN unset.
+- **A heredoc delimiter inside a python heredoc ends the shell heredoc early**: write such scripts to a scratch file.
 
-## WHAT CLOSED THIS SITTING (14z-221, and 14z-221b after its close)
+## WHAT CLOSED THIS SITTING (14z-221c)
 
-- **14z-221b:** #358's beam difference re-read as the victim's slide (the draw-order reading retracted); #363 filed (bug)
-  and #358 kept as its look; `tests/audit_beam_slide.sh` frozen on rule-checker run `2026-11-05-1649` (after `-1646`,
-  `-1647` and `-1648` VIOLATED, each resolved by work; `-1645` withdrawn unspawned); the slide captured for the maintainer
-  (`build/agent221/t358/sheets/slide/`, local; their read pending); the census made rerunnable (`FIELDS_EXTRA` on
-  `tests/audit_move_parity.sh`, `tools/move_parity_p2x.py`); both gates write-traced SAFE on PILOT.
-
-- **Closed done:** #361 (rule-checker run `2026-11-04-1633`), #362 (run `-1640`; committed `d3e8810d`).
-- **Put to the maintainer:** #357 (port the guard-orb watcher or leave it; run `-1637`), #358 (the beam sheets; their draw-order reading retracted after the close).
-- **#310 group 7 batch 1:** 25 modes UNJUDGED on a dead leg, `tests/test_dead_leg_unjudged.sh`, the table frozen on run
-  `2026-11-05-1644`; progress comment posted on #310.
+- **Closed done:** #354 (the built-image reach gate; rule-checker run `2026-11-06-1679`), #359 (the split traps and
+  `tests/test_signal_traps.sh`; run `2026-11-06-1673`).
+- **Staged for the next freeze:** #357 (the guard orbs) and #363 (the freeze reaction), both confirmed by the maintainer on
+  captures.
+- **#310 group 7 batch 2:** 18 rows over 12 gates, run `2026-11-06-1668`; progress comment on #310.
+- **The four emulator gates this sitting changed** re-traced SAFE on PILOT (`tests/controls_concurrent_emu.txt`).

@@ -60,7 +60,7 @@ VJ=build/out/vsavj_data.bin
 V2=build/out/vsav2_data.bin
 [ -f "$VJ" ] && [ -f "$V2" ] || { echo "SKIP: need $VJ and $V2"; exit 0; }
 
-T=$(mktemp -d); trap 'rm -rf "$T"' EXIT INT TERM
+T=$(mktemp -d); trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 DEC="python3 tools/decode_stage_banners.py"
 rc=0
 say() { printf '%s\n' "$*"; }

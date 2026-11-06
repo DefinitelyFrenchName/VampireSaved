@@ -97,7 +97,7 @@ fail=0
 ok()  { echo "  PASS $1"; }
 bad() { echo "  FAIL $1"; fail=1; }
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 # Under a mode a SKIP would read as LIES, so REFUSE when a fresh run's prerequisites
 # are absent and no finished run was supplied via --sim-dir/--mame-log.

@@ -100,6 +100,13 @@ for leg in cosmo:pyron/71_pyron_cosmo:5200 mash:pyron/70_pyron_mash:8400; do
     done
 done
 wait
+# #310 g7 (14z-221c): a tap run that wrote no END line is a leg that never finished; until then the reducer below read
+# the missing ring.txt and died of FileNotFoundError, so a dead emulator read DIED under the mode, never UNJUDGED
+for name in cosmo mash; do for side in merged solo; do
+    grep -q '^END' "$W/${name}_$side/ring.txt" 2>/dev/null || { vs_ctl_nj "${name}_$side: the tap run did not complete (no END line)"   # #310 g7 NJ
+        echo "FAIL: ${name}_$side: the tap run did not complete (no END line; see its out)"; fail=1; }
+done; done
+[ "$fail" = 0 ] || { echo "FAIL: pyron ring audit"; exit 1; }
 
 python3 - "$W" <<'PY' || fail=1
 import re, sys

@@ -86,7 +86,7 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 CAPM_MODE="${VS_CTL:-}"; export CAPM_MODE
 
 . "$REPO/tests/lib/decrypt_cache.sh"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 decrypt_view vsavj "$W/vj_op.bin" "$W/vj.bin" || { echo "FAIL: vsavj decrypt view"; exit 1; }
 decrypt_view vsav2 "$W/v2_op.bin" "$W/v2.bin" || { echo "FAIL: vsav2 decrypt view"; exit 1; }
 

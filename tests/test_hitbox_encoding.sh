@@ -91,7 +91,7 @@ BUILD="${BUILD:-build/don_m29}"
 EX="$BUILD/extract"
 [ -f "$EX/regions.json" ] || { echo "SKIP: no $EX/regions.json"; exit 0; }
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
-W="$(mktemp -d)" || { echo "FAIL: test_hitbox_encoding — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_hitbox_encoding — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 . "$REPO/tests/lib/instr_align.sh"

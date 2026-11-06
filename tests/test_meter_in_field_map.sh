@@ -37,7 +37,7 @@ rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 
 TSV="tests/fields_m2a.tsv"
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 echo "== 1. the four meter fields are mapped, at the atlas's addresses =="
 python3 - <<'PY' || rc=1

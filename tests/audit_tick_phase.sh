@@ -14,7 +14,7 @@
 # EXPECTS: the residue classes exact, the constants equal to the measured periods and round
 #   start; the flat trace and the wrong quantum fail. WHY a shift must be a multiple of 39
 #   rather than 3 is recorded as its own ticket, not explained here.
-# FOLLOWS: emu/mame-patches/ tests/lua/field_trace.lua tools/name_moves.py tools/run_mame.sh
+# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
 # SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
@@ -74,7 +74,8 @@ CONTROL="${CONTROL:-}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 case "$CONTROL" in ""|flat-pass|quantum-off) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
@@ -101,7 +102,7 @@ leg lvl8 ""
 leg lvl6 "$LVL6"
 wait
 for l in lvl8 lvl6; do
-    _rc="$(cat "$W/$l/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "$l: the emulator exited $_rc"
+    _rc="$(cat "$W/$l/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "$l: the emulator exited $_rc (no FIELDSUMMARY or END line)"; bad "$l: the emulator exited $_rc"; }   # #310 g7 NJ
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_tick_phase (a leg did not run)"; exit 1; }
 if [ "$CONTROL" = flat-pass ]; then
@@ -153,7 +154,7 @@ PY
 for spec in "lvl8 3 1 3 8" "lvl6 13 3 4,5 6"; do
     set -- $spec
     _l="$1"; _p="$2"; _nc="$3"; _gs="$4"; _lv="$5"
-    period "$W/$_l.tr" "$_p" "$_nc" "$_l" > "$W/$_l.per" 2>&1 || { bad "$_l: $(cat "$W/$_l.per")"; continue; }
+    period "$W/$_l.tr" "$_p" "$_nc" "$_l" > "$W/$_l.per" 2>&1 || { grep -q '^VOID: ' "$W/$_l.per" && vs_ctl_nj "$(grep -m1 '^VOID: ' "$W/$_l.per")"; bad "$_l: $(cat "$W/$_l.per")"; continue; }   # #310 g7 NJ
     _lvls="$(awk '$1=="LEVELS"{print $2}' "$W/$_l.per")"
     _n="$(awk '$1=="N"{print $2}' "$W/$_l.per")"; _d="$(awk '$1=="N"{print $4}' "$W/$_l.per")"
     _got="$(awk '$1=="N"{print $6}' "$W/$_l.per")"; _cl="$(awk '$1=="N"{print $10}' "$W/$_l.per")"

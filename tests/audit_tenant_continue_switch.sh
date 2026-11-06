@@ -57,7 +57,7 @@ case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD";; esac
 [ -f "$BUILD/prg/vm3j.04d" ] || { echo "FAIL: no prg/vm3j.04d in $BUILD"; exit 1; }
 case "$EXPECT" in held|draw) ;; *) echo "FAIL: EXPECT must be held or draw"; exit 1;; esac
 echo "build under test: $BUILD ($(shasum "$BUILD/prg/vm3j.04d" | cut -c1-8) vm3j.04d), EXPECT=$EXPECT"
-if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"
 RPL="$REPO/tests/replays/don/202_don_continue_switch.rpl"
 N=7000

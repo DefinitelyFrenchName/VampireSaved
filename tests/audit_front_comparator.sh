@@ -77,7 +77,7 @@ cd "$REPO"
 RPL="tests/replays/37_victor_ko_vsavj.rpl"
 [ -f "$RPL" ] || { echo "SKIP: no $RPL"; exit 0; }
 EXP="tests/expected/front_comparator.txt"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 decrypt_view vsavj "$W/op.bin" "$W/data.bin"
 
 FIELDS="ff841c:l:p1node,ff881c:l:p2node,ff8127:b:front,ff8534:b:p1cap,ff8934:b:p2cap"

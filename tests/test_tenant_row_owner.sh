@@ -91,7 +91,7 @@ fi
 # or silently reverted. See tests/lib/shadow_tools.sh for why the shadow is a
 # repo ROOT and not just a copy of the file.
 WORK="$(mktemp -d)"
-trap 'rm -rf "$WORK"' EXIT INT TERM
+trap 'rm -rf "$WORK"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 . "$REPO/tests/lib/shadow_tools.sh"
 GEN="$(shadow_tool "$WORK" gen_donovan_patch.py)"; export GEN
 restore() { shadow_restore "$WORK" gen_donovan_patch.py; }

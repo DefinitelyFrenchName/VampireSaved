@@ -40,7 +40,7 @@ rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 
 REAL="$REPO/tools/freeze_masked_basis.sh"
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 FR="$T/fakerepo"
 mkdir -p "$FR/tools" "$FR/tests/replays" "$T/romdir"
 

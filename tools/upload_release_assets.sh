@@ -90,7 +90,7 @@ if [ "$PLAN" = 1 ]; then
     echo "prune plan for $TAG: ${t:-none}" | tr '\n' ' '; echo
     exit 0
 fi
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 verify_rows() {  # verify_rows <dir> — every sha256 row's file present and matching; prints BAD lines
     d="$1"

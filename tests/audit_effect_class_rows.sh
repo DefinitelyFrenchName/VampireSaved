@@ -148,6 +148,9 @@ FZ_JOBS="${JOBS:-4}"   # --freeze-clock's ia_freeze width, its default (4) kept 
 . "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
 vs_pool_start "$JOBS"
 for r in $REPLAYS; do vs_pool_run watch_run "$r" 80aec 4 r,o "row16_$r"; done
+for r in $REPLAYS; do vs_pool_run watch_run "$r" 80af8 4 r,o "row19_$r"; done
+for r in $REPLAYS; do vs_pool_run watch_run "$r" 238fa 2 r,o "rx4f_$r"; done
+vs_pool_run watch_run 02_demitri_vs_cpu 2385c 80 r,o ctl_rx
 vs_pool_run watch_run 02_demitri_vs_cpu 80b40 4 r,o ctl_row37
 for r in $REPLAYS; do vs_pool_run watch_run "$r" ff3578 a rw "scratch_$r"; done
 for ts in 0:1afba 2:1afbc 4:1afbe 6:1afc0 8:1afc2; do
@@ -175,6 +178,38 @@ if [ "$c" -gt 100 ] 2>/dev/null; then
 else
     echo "  FAIL: control read the shared reader $c times — instrument is blind,"
     echo "        every zero above is meaningless"; fail=1
+fi
+
+# ── 1b. effect-class row 19 (0x13) is DEAD in vanilla (14z-221c, #357) ─
+# slot 0x080AAC + 19*4 = 0x080AF8: Donovan's guard-orb watcher (vs2 type 0x13, handler vs2 PRG:0x090EDA). Same
+# instrument, same legs, same control as row 16 (section 1's row-37 reads).
+echo "1b. effect-class row 19 (0x080AF8, #357's guard-orb watcher) is never dispatched by vanilla"
+for r in $REPLAYS; do
+    n=$(watch "$r" 80af8 4 r,o "row19_$r")
+    if [ "$n" = "0" ]; then echo "  ok: $r -> 0 reads"
+    else echo "  FAIL: $r -> $n reads of the row #357 repoints"; fail=1; fi
+done
+
+# ── 1c. victim reaction-table row 0x4F is DEAD in vanilla (14z-221c, #363) ─
+# The victim reaction dispatch (vsavj PRG:0x023854 `move.w $2385c(pc,d0.w),d1 / jmp $2385c(pc,d1.w)`, d0 = 2 x the
+# class +0x54) reads a 16-bit row of the 80-row table PRG:0x02385C; row 0x4F is PRG:0x0238FA (the default row, as 0x4E).
+# #363 repoints it, so vanilla must never land class 0x4F. Control: rows 0x00-0x3F of the same table (PRG:0x02385C,
+# 0x80 bytes), read on every reaction, same instrument, same leg.
+echo "1c. reaction-table row 0x4F (0x0238FA, #363's freeze row) is never read by vanilla"
+for r in $REPLAYS; do
+    n=$(watch "$r" 238fa 2 r,o "rx4f_$r")
+    if [ "$n" = "0" ]; then echo "  ok: $r -> 0 reads"
+    else echo "  FAIL: $r -> $n reads of the row #363 repoints"; fail=1; fi
+done
+echo "   positive control (rows 0x00-0x3F of the same table — same instrument, same leg):"
+# The table is read once per REACTION (a hit landing), not per object per frame as row 37 is: 21 reads on
+# 02_demitri_vs_cpu measured 14z-221c, where the dispatch PRG:0x02383C executes 1,314 times over the 64-replay corpus
+# (tests/audit_dead_span_exec.sh). A blind opcodes-space watch reads exactly 0, so liveness is > 0.
+c=$(watch 02_demitri_vs_cpu 2385c 80 r,o ctl_rx)
+if [ "$c" -gt 0 ] 2>/dev/null; then
+    echo "  ok: $c reads — the watch on the reaction table DOES fire, so the zeros above are a finding"
+else
+    echo "  FAIL: control read the reaction table $c times — instrument is blind, every zero above is meaningless"; fail=1
 fi
 
 # ── 2. the type-12 handler's A5 scratch is untouched by vanilla ────────

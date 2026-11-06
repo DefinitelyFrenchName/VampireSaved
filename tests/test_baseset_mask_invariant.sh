@@ -94,7 +94,7 @@ PY
 echo "== VERDICT CONTROL — a mispaired spec must be CAUGHT =="
 # Without this the section above passes on a tree that happens to be correct,
 # which is indistinguishable from a checker that never compares anything.
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 mkdir -p "$T/expected/setA" "$T/expected/vsavj/basisX"
 printf 'aaaa-bbbb\n' > "$T/expected/setA/mask"
 printf 'cccc-dddd\n' > "$T/expected/vsavj/basisX/MASK"

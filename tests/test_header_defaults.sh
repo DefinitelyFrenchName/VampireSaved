@@ -45,7 +45,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 rc=0
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 mkdir -p "$T/tests" "$T/tools"
 cp tools/audit_header_defaults.py "$T/tools/"
 mk_stale() {  # mk_stale <dir> — the known-bad stub: a Usage line naming a non-default dir

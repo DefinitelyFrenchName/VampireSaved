@@ -76,7 +76,7 @@ EXPECT="$REPO/tests/expected/column_flash.tsv"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
@@ -107,13 +107,13 @@ tap ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/ours.rpl" &
 wait
 for l in native ours; do
     _t="$W/tap_$l/t.tap"
-    grep -q '^END ' "$_t" 2>/dev/null || bad "$l: the write tap never reached its END line — VOID"
-    awk '$1=="W" && $2 < 100 {n++} END {exit n ? 0 : 1}' "$_t" 2>/dev/null || bad "$l: the write tap logged no boot clear of the row — a dead tap"
-    awk '$1=="W" && $2 >= 2780 {n++} END {exit n ? 0 : 1}' "$_t" 2>/dev/null || bad "$l: no write to row 11 from 2780 — the leg did not reach the move"
+    grep -q '^END ' "$_t" 2>/dev/null || { vs_ctl_nj "$l: the write tap never reached its END line"; bad "$l: the write tap never reached its END line — VOID"; }   # #310 g7 NJ
+    awk '$1=="W" && $2 < 100 {n++} END {exit n ? 0 : 1}' "$_t" 2>/dev/null || { vs_ctl_nj "$l: the write tap logged no boot clear (a dead tap)"; bad "$l: the write tap logged no boot clear of the row — a dead tap"; }   # #310 g7 NJ
+    awk '$1=="W" && $2 >= 2780 {n++} END {exit n ? 0 : 1}' "$_t" 2>/dev/null || { vs_ctl_nj "$l: the leg did not reach the move"; bad "$l: no write to row 11 from 2780 — the leg did not reach the move"; }   # #310 g7 NJ
 done
 for l in native ours; do
     for f in $FRAMES_AT; do
-        [ -s "$W/$l/dump_${f}_90c000.bin" ] || bad "$l: no palette dump at frame $f (exit $(cat "$W/$l/rc" 2>/dev/null)) — VOID"
+        [ -s "$W/$l/dump_${f}_90c000.bin" ] || { vs_ctl_nj "$l: no palette dump at frame $f"; bad "$l: no palette dump at frame $f (exit $(cat "$W/$l/rc" 2>/dev/null)) — VOID"; }   # #310 g7 NJ
     done
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_column_flash"; exit 1; }

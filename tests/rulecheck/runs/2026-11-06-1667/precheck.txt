@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: # audit_tech_roll, test_down_flash_mechanism, test_random_select_tenants: each read a leg's missing output; each now checks  [build/agent221c/rc310/dead_leg_unjudged.tsv]
+  FLAG D-ABSOLUTE: The fifth column names the instrument made dead with /usr/bin/false (MAME_BIN is always dead too).  [build/agent221c/rc310/dead_leg_unjudged.tsv]
+packet_check: 2 flag(s): D-ABSOLUTE 2

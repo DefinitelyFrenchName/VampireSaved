@@ -75,23 +75,23 @@ bad() { echo "  FAIL $1"; fail=1; }
 : "${MAME_BIN:=$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN (tools/setup_mame.sh)"; exit 77; }
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 echo "== produce BOTH artifacts from the same machine at frame $FRAME =="
 REPLAY="$RPL" DUMP_FRAMES="$FRAME" TRACE_OUT="$W/lua.txt" \
 MAME_SANDBOX="$W/box1" MAME_BIN="$MAME_BIN" \
 MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
     "$REPO/tools/run_mame.sh" vsavjw -autoboot_script "$REPO/tests/lua/obj_records_dump.lua" \
-    > "$W/lua.log" 2>&1 || { echo "FAIL: the lua OBJ dump did not complete"; tail -3 "$W/lua.log"; exit 1; }
+    > "$W/lua.log" 2>&1 || { vs_ctl_nj "the lua OBJ dump did not complete"; echo "FAIL: the lua OBJ dump did not complete"; tail -3 "$W/lua.log"; exit 1; }   # #310 g7 NJ
 
 mkdir -p "$W/oram"
 DUMPS="$FRAME:700000-711fff" MAME_BIN="$MAME_BIN" \
 MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
     "$REPO/tools/run_replay_mame.sh" vsavjw "$RPL" "$W/oram/out.log" "$W/box2" \
-    > "$W/oram.log" 2>&1 || { echo "FAIL: the raw ORAM dump did not complete"; tail -3 "$W/oram.log"; exit 1; }
+    > "$W/oram.log" 2>&1 || { vs_ctl_nj "the raw ORAM dump did not complete"; echo "FAIL: the raw ORAM dump did not complete"; tail -3 "$W/oram.log"; exit 1; }   # #310 g7 NJ
 
 DUMP="$W/oram/dump_${FRAME}_700000.bin"
-[ -s "$DUMP" ] || { echo "FAIL: no ORAM dump at $DUMP"; exit 1; }
+[ -s "$DUMP" ] || { vs_ctl_nj "no ORAM dump at frame $FRAME"; echo "FAIL: no ORAM dump at $DUMP"; exit 1; }   # #310 g7 NJ
 
 echo "== 1 the walkers agree, byte for byte =="
 grep -a "^F$FRAME " "$W/lua.txt" > "$W/lua_f.txt" || true
@@ -112,7 +112,7 @@ if [ "$pyrc" != 0 ]; then
     fi
 fi
 LN=$(wc -l < "$W/lua_f.txt"); PN=$(wc -l < "$W/py_f.txt")
-[ "$LN" -gt 0 ] || bad "1z the lua produced NO records — the rig is not reaching the list"
+[ "$LN" -gt 0 ] || { vs_ctl_nj "the lua produced no records (the rig is not reaching the list)"; bad "1z the lua produced NO records — the rig is not reaching the list"; }   # #310 g7 NJ
 if diff -q "$W/lua_f.txt" "$W/py_f.txt" >/dev/null 2>&1; then
     ok "1a python walker == lua walker, $PN lines, byte for byte"
 else

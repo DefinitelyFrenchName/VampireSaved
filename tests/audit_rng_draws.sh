@@ -63,7 +63,7 @@ vs_ctl_mode "$0"
 [ -f "$BUILD/patch/placements.json" ] || { echo "SKIP: no placements.json at $BUILD"; exit 0; }
 [ -f "$BUILD/verify_op.bin" ] || { echo "SKIP: no verify_op.bin (the program image) at $BUILD"; exit 0; }
 for x in "$HUI" "$DON" "$PYR"; do [ -f "$x/extract/regions.json" ] || { echo "SKIP: no $x/extract/regions.json"; exit 0; }; done
-if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

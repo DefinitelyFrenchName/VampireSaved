@@ -51,6 +51,7 @@ declares	audit_ground_throws
 declares	audit_guard_cancels
 declares	audit_guard_corpus
 declares	audit_guard_mask_reads
+declares	audit_guard_orbs
 declares	audit_guard_reentry
 declares	audit_hitbox_parity
 declares	audit_hitclass_map_cost
@@ -163,6 +164,7 @@ declares	test_ctl_show_err
 declares	test_dead_exit_census
 declares	test_dead_leg_unjudged
 declares	test_dead_span
+declares	test_dead_span_reach
 declares	test_defense_rows_census
 declares	test_demand_after_trap
 declares	test_df_field_readers
@@ -286,6 +288,7 @@ declares	test_shadow_tenant
 declares	test_sheet_census
 declares	test_shell_portability
 declares	test_shim_charid
+declares	test_signal_traps
 declares	test_sim_wram_contract
 declares	test_skill_guides
 declares	test_state_open_lists

@@ -99,6 +99,14 @@ leg apyr 11 03 "$W/roll.rpl"
 leg purs 01 03 "$W/pursroll.rpl"
 leg tap  01 03 "$W/tap.rpl"
 wait
+# #310 g7 (14z-221c): a leg with no FIELDSUMMARY never finished; until then the verdict below opened the missing
+# field.txt and died of FileNotFoundError, so a dead emulator read DIED under the mode, never UNJUDGED
+fail=0
+for leg in ctl rdon rhui rpyr adon ahui apyr purs tap; do
+    grep -q '^FIELDSUMMARY' "$W/$leg/field.txt" 2>/dev/null || { vs_ctl_nj "$leg: the field trace did not complete (no FIELDSUMMARY)"   # #310 g7 NJ
+        echo "FAIL: $leg: the field trace did not complete (no FIELDSUMMARY; see $W/$leg/out)"; fail=1; }
+done
+[ "$fail" = 0 ] || { echo "FAIL: tech-roll audit"; exit 1; }
 
 python3 - "$W" "$MODE" <<'PY' || { echo "FAIL: tech-roll audit"; exit 1; }
 import sys

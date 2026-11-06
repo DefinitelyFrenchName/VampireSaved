@@ -62,7 +62,7 @@ BUILD="${BUILD:-build/m3b_merged33}"
 [ -d "$BUILD" ] && BUILD="$(cd "$BUILD" && pwd)"
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
 [ -f "$BUILD/verify_op.bin" ] || { echo "FAIL: no $BUILD/verify_op.bin (the build's opcode view: the hooks are read from it)"; exit 1; }
-if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
