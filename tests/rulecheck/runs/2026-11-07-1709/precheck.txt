@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: EXPECTS gives each span's verdict per track: #363's is REACHED ONLY on merged and Phobos solo, DEAD on Donovan solo, Pyron solo and the stock twin.  [build/agent223/t366/closing_366.md]
+  FLAG D-ABSOLUTE: The gate is session-cadence, so a close re-runs it only when a path it follows changes.  [build/agent223/t366/closing_366.md]
+  FLAG D-ABSOLUTE: The control modes still plant on the first span only.  [build/agent223/t366/closing_366.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

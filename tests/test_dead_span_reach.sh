@@ -1,10 +1,11 @@
 #!/bin/sh
 # test_dead_span_reach.sh — ON EACH TRACKED BUILT IMAGE, A PORT'S DEAD SPAN IS REACHED BY ITS ALLOWED TABLE ROWS AND NOTHING ELSE (14z-221c, GitHub #354).
 #
-# WHAT: #294's port puts a jump on six bytes proven dead in PRISTINE vsavj (PRG:0x024024-0x024029, tests/test_dead_span.sh)
-#   and points the per-frame palette table PRG:0x02ADEC's row 0x13 at it. test_dead_span reads pristine vsavj only and
-#   test_perframe_hook's plants all perturb the port itself, so a later change that made other code in the BUILT image
-#   reach the span passed both (#354). This gate reads every span of tests/expected/dead_span_reach.tsv on the five
+# WHAT: a port puts a jump on six bytes proven dead in PRISTINE vsavj (tests/test_dead_span.sh) and points one table row
+#   at it — two spans since M26: #294's PRG:0x024024-0x024029 (the per-frame palette table PRG:0x02ADEC's row 0x13) and
+#   #363's PRG:0x029CBA-0x029CBF (the victim reaction table PRG:0x02385C's row 0x4F). test_dead_span reads pristine vsavj
+#   only and the ports' own gates perturb the port itself, so a later change that made other code in the BUILT image
+#   reach a span passed both (#354). This gate reads every span of tests/expected/dead_span_reach.tsv on the five
 #   tracked builds (MERGED DON HUI PYR STOCK, tests/run_all_emulator.sh's tracks): on a build the row's roles name, the
 #   span is reached by EXACTLY its allowed table rows, each bound to its named reader sites — no instruction names a span
 #   address (A), no 32-bit value equals one (C), no other table row gives one (T), no PC-indexed read lands in it through
@@ -18,13 +19,19 @@
 #   image (hole_b, and wide_ext on a WIDE image): `--allow-table <row> --expect only` on a carrying build, the default
 #   `--expect dead` elsewhere. Each rule is over-approximate (decode at every even address, every 2-aligned long of both
 #   full views, every table base's rows within the jump-table extent), so a false reference can only turn it red.
-# EXPECTS: on merged and Donovan solo, VERDICT REACHED ONLY (allowed PRG:0x02A646 row 0x8A, PRG:0x02ADEC row 0x13
-#   seen 2 of 2, other refs A 0 C 0 T 0 D 0 R 0, fenced yes); on Phobos solo, Pyron solo and the stock twin, VERDICT DEAD. A red names the extra
+#   The controls: in-gate, each is planted on EVERY span, on the first build the span's roles name, and reads FIRED only
+#   when it fails each span by its own rule (14z-223, GitHub #366: planted on the first span only, the fall-through plant
+#   was blind on #363's span and no run showed it); as a mode it plants on the first span only.
+# EXPECTS: #294's span: on merged and Donovan solo, VERDICT REACHED ONLY (allowed PRG:0x02A646 row 0x8A, PRG:0x02ADEC
+#   row 0x13 seen 2 of 2, other refs A 0 C 0 T 0 D 0 R 0, fenced yes); on Phobos solo, Pyron solo and the stock twin,
+#   VERDICT DEAD. #363's span: on merged and Phobos solo, VERDICT REACHED ONLY (allowed PRG:0x02385C row 0x4F seen 1 of 1,
+#   other refs A 0 C 0 T 0 D 0 R 0, fenced yes); on Donovan solo, Pyron solo and the stock twin, VERDICT DEAD. A red names the extra
 #   reference (instruction, long or table row), the missing allowed row, or the broken fence. Stated, not tested: an
 #   address formed at run time from no constant anywhere (the tool's header); that a base or row the table accepts at
 #   its named sites never reaches the span at run time (0x23F84's reader is bounded on pristine vsavj only,
-#   tests/audit_dead_span_exec.sh; 0x24000 and row 0x8A of 0x02A646 rest on reading the code); what the jump does at run time
-#   (tests/audit_don_row0c.sh); code outside the declared ranges (the vsavj window and the manifests' spaces).
+#   tests/audit_dead_span_exec.sh; 0x24000 and row 0x8A of 0x02A646 rest on reading the code, and so do #363's three
+#   bases above its span, 0x029CC2, 0x029D02 and 0x029D92, as tests/test_dead_span.sh names them); what each jump does
+#   at run time (tests/audit_don_row0c.sh, tests/audit_beam_slide.sh); code outside the declared ranges (the vsavj window and the manifests' spaces).
 #
 # MUST-FIRE: perturbed-copy: plant-jsr — the first span's first carrying build with a `jsr <span start>.l` planted in memory at the top of its last code range must be REACHED OTHERWISE with an A reference (mode: the tool's --plant jsr on that build)
 # MUST-FIRE: perturbed-copy: plant-long — the same build with the span start planted as a long near the end of its data view must be REACHED OTHERWISE with a C reference (mode: --plant long)
@@ -47,15 +54,16 @@
 # MUST-FIRE: perturbed-copy: second-entry-alias — second-entry with the long 0xFF<span start - 2>, a 24-bit alias, must be REACHED OTHERWISE by the fence: the descent's entries are read as the 68000's bus does (14z-221c, rule-checker run 2026-11-06-1677; mode: --plant second-entry-alias)
 # MUST-FIRE: perturbed-copy: straddle — the same build with a 4-byte `move.w #imm,d0` written at the span start - 2 and a long naming it, so a reached instruction straddles the span's first byte, must be REACHED OTHERWISE with the FENCE line naming it STRADDLING (14z-221c, rule-checker run 2026-11-06-1664; mode: --plant straddle)
 # MUST-FIRE: perturbed-copy: row-dropped — the same build with the allowed row given its neighbour's word must be REACHED OTHERWISE, the allowed row seen 0 times ("exactly one" fails on none; mode: --plant unallow)
-# MUST-FIRE: perturbed-copy: fall-through — the same build with two nops over the fence before the span must be REACHED OTHERWISE, not fenced (mode: --plant fallthrough)
-# MEASURES: judged-pairs — 5 the (span, build) pairs given a verdict: the table's one frozen span on the five tracked builds
+# MUST-FIRE: perturbed-copy: fall-through — the same build with nops over every reached instruction ending at the span start, each whole (a 4-byte bra.w on #294's span, a 6-byte jmp.l on #363's; 14z-223, #366), must be REACHED OTHERWISE, not fenced (mode: --plant fallthrough)
+# MEASURES: judged-pairs — 10 the (span, build) pairs given a verdict: the table's two frozen spans (#294's, #363's) on the five tracked builds
 # FOLLOWS: tools/audit_dead_span.py tools/_minitoml.py tests/expected/dead_span_reach.tsv build/manifest/donovan.toml
 #   build/manifest/huitzil.toml build/manifest/pyron.toml tests/lib/controls.sh
 #
 # SHEET: none — a static read of program bytes; no emulator leg
 #
 # Usage: [MERGED=build/m3b_merged34] [DON=build/don_m30] [HUI=build/hui64] [PYR=build/pyron49] [STOCK=build/m5_stock25]
-#   tests/test_dead_span_reach.sh       static tier (built images, no ROMDIR, no emulator); ~3 min on the MacBook
+#   tests/test_dead_span_reach.sh       static tier (built images, no ROMDIR, no emulator); ~19 min on the MacBook (18:42 measured
+#   14z-223 with the controls on both spans; 10:31 with them on the first span only)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
@@ -174,17 +182,23 @@ while IFS="$(printf '\t')" read -r span row pcidx roles ticket why; do
 done < "$W/rows.tsv"
 echo "MEASURED: judged-pairs = $pairs"
 
-echo "== 2. controls: each must fire in-gate on span $C_SPAN, $C_ROLE (the modes above prove them as modes)"
-if has_views "$(dir_of "$C_ROLE")"; then
-    for c in $CTL; do
-        name="${c%%:*}"; rest="${c#*:}"; plant="${rest%%:*}"; key="${rest#*:}"
-        judge "$C_ROLE" "$C_SPAN" "$C_ROW" "$C_PX" "$C_ROLES" "$plant"
-        if [ "$jrc" -ne 0 ] && fired_for "$key"; then vs_ctl_fired "$name" "$(verdict)"
-        else tail -8 "$W/out" | sed 's/^/  | /'; vs_ctl_dead "$name" "the $plant plant did not fail the span by its own rule (rc $jrc: $(verdict))"; fail=1; fi
-    done
-else
-    bad "the controls' build $C_ROLE has no views — the controls ran nothing"
-fi
+# every control on EVERY span, each on the first build its roles name, FIRED only when it fails each span by its own
+# rule (14z-223, GitHub #366: the fall-through plant nopped 4 bytes, and #363's fence is a 6-byte jmp.l, so on that span
+# it fenced nothing — while the controls planted on the first span only, no run could show it)
+echo "== 2. controls: each must fire in-gate on every span of $TAB, on the first build its roles name (the modes above prove them as modes on span $C_SPAN)"
+for c in $CTL; do
+    name="${c%%:*}"; rest="${c#*:}"; plant="${rest%%:*}"; key="${rest#*:}"
+    cok=""; cbad=""
+    while IFS="$(printf '\t')" read -r span row pcidx roles ticket why; do
+        role="${roles%%,*}"
+        if ! has_views "$(dir_of "$role")"; then cbad="$cbad; #$ticket span $span: no views at $role — the control ran nothing there"; continue; fi
+        judge "$role" "$span" "$row" "$pcidx" "$roles" "$plant"
+        if [ "$jrc" -ne 0 ] && fired_for "$key"; then cok="$cok; #$ticket on $role: $(verdict)"
+        else tail -8 "$W/out" | sed 's/^/  | /'; cbad="$cbad; #$ticket span $span on $role: rc $jrc: $(verdict)"; fi
+    done < "$W/rows.tsv"
+    if [ -z "$cbad" ]; then vs_ctl_fired "$name" "${cok#; }"
+    else vs_ctl_dead "$name" "the $plant plant did not fail every span by its own rule: ${cbad#; }"; fail=1; fi
+done
 
 [ "$fail" -eq 0 ] && echo "PASS" || echo "FAIL"
 exit "$fail"

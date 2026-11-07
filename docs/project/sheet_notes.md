@@ -495,8 +495,8 @@ Setup: Three Blizzard Sword rigs (speed 6, RNG pinned): the frames where a doubl
 
 **Why the gate looks the way it does.** 29 of #136's 108 DIFF rows begin on a frame where the pass counter does not
 step on one leg, right after a double-pass frame. On three Blizzard Sword frames a double-pass activation runs past
-the frame, so one frame completes no logic pass: twice on native vs2 (`donovan_2`, `donovan_11`), once on ours
-(`donovan_10`). It is not a port cost: native loses the pass in two of the three parts, and the scheduler's idle time
+the frame, so one frame completes no logic pass: twice on native vs2 (`donovan_2`, `donovan_11`), and on ours never
+since M25 (`donovan_10` until M23, `donovan_2` in M24; #345's option A1b removed it). It is not a port cost: native loses the pass in two of the three parts, and the scheduler's idle time
 per event window is equal on both builds within about 1%. The host engine's clock governs; the maintainer, #114: "we
 must respect the fact that we are porting the character to a different engine and the engine, being vanilla vsav,
 takes precedence."

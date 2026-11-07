@@ -434,7 +434,7 @@ tests/test_reaction_classes.sh	character-data
 tests/audit_reaction_class_live.sh	character-data
 tests/test_dead_span.sh	character-data
 tests/test_perframe_hook.sh	character-data
-tests/test_dead_span_reach.sh	character-data	the five track build dirs (no ROMDIR), ~3 min
+tests/test_dead_span_reach.sh	character-data	the five track build dirs (no ROMDIR), ~19 min
 tests/audit_dead_span_exec.sh	character-data
 tests/audit_defense_row_reads.sh	character-data
 tests/audit_crouch_flag.sh	character-data

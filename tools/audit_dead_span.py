@@ -65,7 +65,8 @@ instrument (build/agent216/rc294/dead/exec_bound.sh); MAME read taps are blind t
          past the span (a 16-bit row reaches only +-32K) -> T fires
   unallow      each --allow-table row overwritten with the word of the row before it (opcode view) -> the allowed
                row no longer reaches the span (#354: "exactly one" must also fail on NONE)
-  fallthrough  two `nop`s written over the 4 bytes ending at the span start (the fence's bra.w) -> L fires
+  fallthrough  `nop`s written over every reached instruction ending at the span start, each whole (the fence's bra.w
+               or jmp.l; found by the descent on the unplanted image, 14z-223, #366) -> L fires
 --expect live: exit 0 only when the verdict is NOT DEAD (the known-live control span).
 --expect only (14z-221c, GitHub #354 — a span a BUILT image reaches on purpose): exit 0 only when A and C are empty,
   every T row is an --allow-table row, EVERY --allow-table row is seen giving a span address, and the span is fenced
@@ -276,9 +277,16 @@ def main():
                     sys.exit("audit_dead_span: --plant unallow needs an allowed row above row 0")
                 op[b + 2 * r:b + 2 * r + 2] = op[b + 2 * r - 2:b + 2 * r]
                 print(f"# PLANT unallow: table PRG:0x{b:06X} row 0x{r:X} given row 0x{r - 1:X}'s word (in memory only)")
-        else:
-            op[slo - 4:slo] = b'\x4e\x71\x4e\x71'
-            print(f"# PLANT fallthrough: two nops at PRG:0x{slo - 4:06X}-0x{slo - 1:06X} (in memory only)")
+        else:   # every reached instruction ending at the span start, overwritten WHOLE with nops, found by the same
+            # descent on the unplanted image (14z-223, GitHub #366: #363's fence is a 6-byte jmp.l, and nopping only the 4
+            # bytes before the span left its jmp opcode in place, so the plant fenced nothing and L never fired)
+            pre = judge(op, da, slo, shi, ranges, allow, {}, allow_sites)[8][0]
+            if not pre:
+                sys.exit("audit_dead_span: --plant fallthrough found no reached instruction ending at the span start")
+            for x in pre:
+                op[x:slo] = b'\x4e\x71' * ((slo - x) // 2)
+            print(f"# PLANT fallthrough: nops over PRG:0x{min(pre):06X}-0x{slo - 1:06X}, every reached instruction ending at "
+                  f"the span start ({', '.join(f'PRG:0x{x:06X}' for x in pre)}), whole (in memory only)")
     elif a.plant:
         top = (ranges[-1][1] - 0x10) & ~1
         if a.plant == 'jsr':

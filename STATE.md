@@ -38,6 +38,29 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-223 — **#365 and #366 closed done (rule-checker run -1712 after -1710; -1709 and -1711 withdrawn unspawned): the reach gate's fall-through control was blind on #363's span, fixed, and every control now plants on every span; `test_release_binaries` re-traced on PILOT and listed again.** Opus 5.5, transcript `aef5e221`.
+
+### opened with
+The maintainer: **"read handoff.md, state.md and docs/next_session.md"**, then **"I agree with the order for items 1,2,3 then
+let's focus on bugs and test integrity"**. Working evidence: `build/agent223/` (local; #365/#366 in `t366/`).
+
+### (1) #366 AND #365 — TWO STALE HEADERS, A MISSING SHEET LINE, AND A BLIND CONTROL
+- **#366:** `tests/test_dead_span_reach.sh`'s header now states both frozen spans and judged-pairs 10;
+  `tests/audit_pass_overrun.sh`'s says ours has no overrun since M25, as `tests/expected/pass_overrun.tsv` holds (the claim
+  grepped out of `tests/ci_emulator.tsv`, `docs/game/engine_internals.md`, `docs/project/sheet_notes.md`).
+- **The issue's open question, controls on every span: yes, measured.** Run by hand on #363's span, 21 of the 22 plants
+  fired; fall-through did not, because it nopped the 4 bytes before the span and #363's fence is a 6-byte `jmp.l` at
+  `PRG:0x029CB4`. `tools/audit_dead_span.py --plant fallthrough` now overwrites every reached instruction ending at the span
+  start, whole; the gate plants every control on every span (modes on the first). PASS, 22 of 22 FIRED on both spans; wall
+  18:42, against 10:31. Gotcha in `docs/project/gotchas.md`.
+- **#365:** `tests/audit_crash_sweep_emu.sh` declares `# SHEET: none — …`; `tests/test_sheet_census.sh` PASS, 0 on the
+  debt list.
+
+### (2) THE CONCURRENT-CONTROLS ROWS — PILOT at scratch `3d90dfaa`
+`test_dead_span_reach` (static list, its script changed) 22 HONOURED SAFE; `test_release_binaries` (emulator list, off since
+its 14z-222 header correction) 4 HONOURED SAFE and listed again. PILOT's local provisional tag `freeze/merged-m26`
+(`564775cf`) deleted and origin's tags fetched; PILOT is left detached at `3d90dfaa`.
+
 ## Session 14z-222 — **M26 FROZEN at `bb10ce97` (#357 Donovan's guard orbs and #363 Phobos's Plasma Beam freezing its victim; tags `freeze/donovan-m30`, `huitzil-m37`, `pyron-m31`, `merged-m26`) and RELEASED: `freeze/merged-m26` published on GitHub with merged-m24's zips pruned, after every release gate passed on the Mac, ERIS and PILOT; #345, #346, #356, #357, #358 and #363 closed done on rule-checker run -1708 after -1697 to -1707; #365 and #366 filed.** Opus 5.5 at effort High, transcript `356b9b97` (compacted twice).
 
 ### opened with

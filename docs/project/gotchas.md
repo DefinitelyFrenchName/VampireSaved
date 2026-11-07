@@ -8105,3 +8105,15 @@ still called the row UNPORTED). The staged scratch build never ran the static ti
 **A control anchored to "nobody ports this" is a claim about the port's future: when a port adds a region, grep the
 controls for addresses inside it (`EXPECT_UNPORTED`, deadness rows, "unported" lists) and move or re-anchor them in the
 same change.** Fixed 14z-222: the row names `m5_wide:x090eda+0x11A`; the control keeps `0x0697B8` and `0x00B63C`.
+
+## A CONTROL PLANTED ON THE FIRST ROW ONLY CANNOT SHOW IT IS BLIND ON THE NEXT (paid: 14z-223, #366)
+
+`tests/test_dead_span_reach.sh` judges every span of `tests/expected/dead_span_reach.tsv`, but planted its 22 controls on
+the FIRST span only (#294's). Its fall-through plant (`tools/audit_dead_span.py --plant fallthrough`) wrote two `nop`s over
+the 4 bytes before the span, sized for #294's fence, a `bra.w`. #363's span, added at M26, is fenced by a 6-byte
+`jmp $73f6a.l` at `PRG:0x029CB4`: the plant overwrote the jmp's operand and left its opcode, so the fence still held and
+the control could never fire there. Every run read 22 of 22 FIRED, all on the first span. Found only when each plant
+was run by hand on the second span (21 of 22 fired). Fixed 14z-223: the plant overwrites every reached instruction
+ending at the span start, whole, and the gate plants every control on every span. **A control sized or anchored to one
+row of a table is a claim about every row: when a table a gate reads gains a row, run the controls on it too, and plant
+what the row's own code holds, not a fixed shape.**

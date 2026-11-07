@@ -4,8 +4,8 @@
 # repo: DefinitelyFrenchName/VampireSaved
 # issues: 366
 number	state	reason	closed	labels	title
-366	OPEN	-	-	bug,severity: low,test-integrity	Two gate headers state facts their frozen data no longer holds: test_dead_span_reach (one span, 5 pairs; now two spans, 10) and audit_pass_overrun (ours donovan_2 since M24; now none)
-365	OPEN	-	-	bug,severity: low,test-integrity	test_sheet_census FAILs: audit_crash_sweep_emu has no # SHEET: line (an ondemand gate, so no tier ran it)
+366	CLOSED	COMPLETED	2026-11-07	bug,severity: low,test-integrity	Two gate headers state facts their frozen data no longer holds: test_dead_span_reach (one span, 5 pairs; now two spans, 10) and audit_pass_overrun (ours donovan_2 since M24; now none)
+365	CLOSED	COMPLETED	2026-11-07	bug,severity: low,test-integrity	test_sheet_census FAILs: audit_crash_sweep_emu has no # SHEET: line (an ondemand gate, so no tier ran it)
 364	OPEN	-	-	bug,severity: low,test-integrity	Under dash (PILOT's /bin/sh) an EXIT-only cleanup trap does not run when a gate is TERM'd: its work directory is left behind (~277 scripts)
 363	CLOSED	COMPLETED	2026-11-07	bug,needs-maintainer-ruling	Phobos's Plasma Beam (ES) knocks the victim back 49 px further than native vs2: vsavj's reaction-table rows 0x4E/0x4F are default rows (the pushback slide) where vs2/vh2 hold the victim
 362	CLOSED	COMPLETED	2026-11-04	bug	test_crash_sweep writes its perturbed gate copies into the live tests/ directory, where concurrently running gates can read them; test_gate_descriptions' modes do not refuse a vanished target

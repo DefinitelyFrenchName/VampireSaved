@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-223): the packet check flagged closing_366.md's "a close re-runs it only when a path it follows changes", which left out that a freeze or a release runs the gate every time; the wording corrected and the packet re-prepared.

@@ -809,7 +809,8 @@ step: a ZERO-PASS frame. In the #136 corpus (30 parts, both games, level 6) it h
 Blizzard Sword frames only — twice on native vsav2 (donovan_2 at 3098, donovan_11 at 4580), ~~once on
 ours (donovan_10 at 2977)~~ once on ours until M23 (donovan_10 at 2977); SINCE M24 (14z-216, #294 runs vs2's per-frame
 palette routine for Donovan) once on ours at donovan_2 3094 and none on donovan_10, as native — accepted 2026-11-01
-("#294's lag frame"); donovan_11's 4580 stays native-only — and after it the rest of the part stays one engine pass out
+("#294's lag frame"); SINCE M25 (14z-220, #345's option A1b) NONE on ours in any of the three parts
+(`tests/expected/pass_overrun.tsv`, `tests/audit_pass_overrun.sh`; 14z-223, #366); donovan_11's 4580 stays native-only — and after it the rest of the part stays one engine pass out
 of step with its (per-frame) inputs (on M24, under the parity gates' 0000 RNG pin, 32 of donovan_2's and donovan_10's events read IDENT with native again; donovan_2's
 23 still DIFF under a non-zero RNG word, the overrun falling differently — #345, `tests/audit_rng_forms.sh`). ON SCREEN (#345,
 the maintainer's reading of the every-frame comparative sheets of Blizzard Sword [HP]'s end, `build/agent216/s345/e2_d2_f3109.png`,

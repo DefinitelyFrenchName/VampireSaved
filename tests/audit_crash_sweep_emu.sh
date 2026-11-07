@@ -13,6 +13,8 @@
 # FOLLOWS: tests/test_crash_sweep.sh tools/crash_sweep.py tests/lib/crash_sweep.sh tests/lib/controls.sh
 #   tests/lib/classify.sh tests/expected/crash_sweep.tsv
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: known-bad: helper-neutered — as tests/test_crash_sweep.sh's: every emulator site row's kb leg (the helper neutered) must read HONOURED (in-gate; mode: the fx legs run the neutered copy, so the gate FAILs)
 # MUST-FIRE: perturbed-copy: row-dropped — as tests/test_crash_sweep.sh's: the table without its first site row leaves that site UNCOVERED (in-gate; mode: the check reads that copy, so the gate FAILs)
 # MUST-FIRE: shadow-tool: shim-inert — as tests/test_crash_sweep.sh's: a never-planting shim makes the first emulator row's fx leg read HONOURED with no planted call (in-gate; mode: every row runs that copy, so the gate FAILs)

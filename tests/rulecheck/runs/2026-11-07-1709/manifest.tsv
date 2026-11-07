@@ -1,0 +1,22 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent223/t366/closing_365.md	b2beb69c8b57cb9b1a459b53caa9b6ca633ad41e
+build/agent223/t366/closing_366.md	70e5cb30658a679b5fa8fe83ab59e1c1de8331dc
+build/agent223/t366/staged.diff.txt	b1fb115076da3f52df5c9672ff75b2e3a0e32768
+build/agent223/t366/audit_dead_span.py.txt	eec2da77cb52f4409ec45e062c53b3c95902a3ac
+build/agent223/t366/test_dead_span_reach.sh.txt	5573fa7822867479f02944f1a26a1ebc74d0470f
+build/agent223/t366/audit_pass_overrun.sh.txt	fe4e0bd85634e9fa03d04c49b1c2aa23accee92d
+build/agent223/t366/audit_crash_sweep_emu.sh.txt	710d78b85b1e08fdfaf861e6b3f786740a74d834
+build/agent223/t366/reach_before.log	b475acafec70bb04ed2c1d1396151918891badc7
+build/agent223/t366/reach_after.log	6856fc5aa0d08334e3a7f840a78f409aa0f97506
+build/agent223/t366/mode_fall-through.log	8453119622c243e3185231d6380992cd0906d7e6
+build/agent223/t366/dead_span.log	4cc299017ac10e14b7fbbee0cb0e66ccf4a5593d
+build/agent223/t366/sheet_census.log	70b28666d156ef515bb93bc49be14e3e5d46f7df
+build/agent223/t366/span2_plants_before_fix/fallthrough.out	f3eaf70eeaa4d830d766aef88cd287facc710cc5
+build/agent223/t366/span2_plants_before_fix/jsr.out	1220e2656a36c6beca1eb382af6454f416f4f205
+build/agent223/t366/span2_plants.sh	d258a007e2996906596b6f8467253e9161d9dd55
+build/agent223/t366/pilot/rt223_meta/prep	524afa49485f0c11ad17cdfe6aad5073d3ec84a2
+build/agent223/t366/pilot/rt223_meta/classes.tsv	1df1ba60c29102fea15493c24dfb38aef5dd509d
+build/agent223/t366/pilot/rt223_meta/score_static.txt	551644db964f7eb6df9eec8311bacee613c284a1
+build/agent223/t366/pilot/rt223_meta/score_emu.txt	3be97f75e912af5c504eb4d36ebf51e145f209a9
+tests/expected/pass_overrun.tsv	e0913fd71f06a39bec1db2aedde172fc789a1a03
+tests/expected/dead_span_reach.tsv	0300fb463683d8a6a26b30f057339da6743a8a6e

@@ -1,15 +1,16 @@
 #!/bin/sh
-# audit_pass_overrun.sh — THE BLIZZARD SWORD CPU OVERRUNS, ours vs native, frozen AS MEASURED (14z-168, GitHub #136): on three Blizzard Sword frames of the whole #136 corpus a double-pass activation runs past the frame, so one frame completes NO logic pass — twice on native vsav2 (donovan_2, donovan_11), once on ours (donovan_10 until M23; donovan_2 since M24, #294, accepted 2026-11-01) — and the rest of each part stays one engine pass out of step with its inputs. Per event window the scheduler's idle time is equal on both builds within about 1%.
+# audit_pass_overrun.sh — THE BLIZZARD SWORD CPU OVERRUNS, ours vs native, frozen AS MEASURED (14z-168, GitHub #136): on three Blizzard Sword frames of the whole #136 corpus a double-pass activation runs past the frame, so one frame completes NO logic pass — twice on native vsav2 (donovan_2, donovan_11), and on ours none since M25 (donovan_10 until M23; donovan_2 in M24, #294, accepted 2026-11-01; removed by #345's option A1b at M25, 14z-220) — and the rest of each part stays one engine pass out of step with its inputs. Per event window the scheduler's idle time is equal on both builds within about 1%.
 #
 # WHAT: the Blizzard Sword CPU overruns, ours vs native, frozen as measured: on three frames
 #   of the #136 corpus a double-pass activation runs past the frame so one frame completes
-#   no logic pass — twice on native, once on ours (since M24 both on donovan_2, native alone on donovan_11) — and the scheduler's idle time per event
+#   no logic pass — twice on native, never on ours since M25 (M24's donovan_2 overrun removed by #345's A1b) — and the scheduler's idle time per event
 #   window is equal on both builds within about 1%; not a port cost, the host clock governs.
 # HOW: 12 MAME runs (task-table taps and pass-counter traces of donovan_2, donovan_10 and
 #   donovan_11 on both legs with the parity gate's pins); the zero-pass frames after the
 #   round start and the idle-spin dispatches per frame per event window are frozen; the
 #   control removes one pass-counter step from our trace.
-# EXPECTS: the overrun rows (native donovan_2 and donovan_11; ours donovan_2 since M24, donovan_10 until M23) and idle rows
+# EXPECTS: the overrun rows (native donovan_2 and donovan_11; ours none on all three parts since M25 — donovan_2 in M24,
+#   donovan_10 until M23) and idle rows
 #   equal; the planted zero-pass frame changes a row and fails.
 # FOLLOWS: build/manifest/ docs/platform/gotchas.md emu/mame-patches/
 #   tests/expected/pass_overrun.tsv tests/lua/field_trace.lua tests/lua/read_tap.lua

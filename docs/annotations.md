@@ -23,13 +23,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3913 |
-| named by a document or manifest only | 2371 |
+| distinct program-space addresses named | 3914 |
+| named by a document or manifest only | 2372 |
 | named by both a document/manifest and code | 1030 |
 | named by CODE ONLY (the gap list below) | 512 |
 | carried by atlas | 821 |
 | carried by engine_internals | 933 |
-| carried by other docs | 1110 |
+| carried by other docs | 1111 |
 | carried by manifests | 1932 |
 | carried by code | 1542 |
 
@@ -1037,7 +1037,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02380E` | build/manifest/pcrel_escapes.toml — hui64 |
 | `PRG:0x02384E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-110b — the 0x51 -> 0x44 state remap: byte detail; docs/project/patch_notes.md — 14z-187 — #194: Pyron's Cosmo Disruption reaction class 0x4F -> 0x44, RULED AND STAGED for the next freeze — LANDED at the M22 freeze (the entry above); docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); +4 more |
 | `PRG:0x023854` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); build/manifest/huitzil.toml — port_patch; tests/audit_effect_class_rows.sh |
-| `PRG:0x02385C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/huitzil.toml — freeze_reaction_row4f; build/manifest/huitzil.toml — hitclass_map_extend; +6 more |
+| `PRG:0x02385C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/huitzil.toml — freeze_reaction_row4f; build/manifest/huitzil.toml — hitclass_map_extend; +7 more |
 | `PRG:0x023874` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x0238A0` | build/manifest/pcrel_escapes.toml — hui64 |
 | `PRG:0x0238FA` | HANDOFF.md — Running a CPS-2 WIDE build (playtest); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-221c — #363: PHOBOS'S PLASMA BEAM FREEZES ITS VICTIM (BUILT AND STAGED for the next freeze with #357) — LANDED at the M26 freeze (the 14z-222 entry above); docs/project/patch_notes.md — 14z-222 — THE M26 FREEZE: #357 AND #363 LANDED (donovan-m30 / huitzil-m37 / pyron-m31 / merged-m26); build/manifest/huitzil.toml — freeze_reaction_row4f; tests/audit_effect_class_rows.sh; +1 more |
@@ -1496,13 +1496,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x029C2A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029C6E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); build/manifest/reconciliation.toml — map; tests/audit_air_gc_legacy.sh; tests/audit_guard_cancels.sh; tools/crosscheck_framedata.py; +1 more |
 | `PRG:0x029C74` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); build/manifest/huitzil.toml — port_patch; tests/audit_guard_cancels.sh; tests/test_dead_span.sh; tools/gc_rigs.py |
-| `PRG:0x029CBA` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); HANDOFF.md — Build registry [vs2]; HANDOFF.md — Running a CPS-2 WIDE build (playtest); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-221c — #363: PHOBOS'S PLASMA BEAM FREEZES ITS VICTIM (BUILT AND STAGED for the next freeze with #357) — LANDED at the M26 freeze (the 14z-222 entry above); docs/project/patch_notes.md — 14z-222 — THE M26 FREEZE: #357 AND #363 LANDED (donovan-m30 / huitzil-m37 / pyron-m31 / merged-m26); +6 more |
-| `PRG:0x029CBF` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-221c — #363: PHOBOS'S PLASMA BEAM FREEZES ITS VICTIM (BUILT AND STAGED for the next freeze with #357) — LANDED at the M26 freeze (the 14z-222 entry above); build/manifest/huitzil.toml — port_patch; tests/test_dead_span.sh |
+| `PRG:0x029CB4` | docs/project/gotchas.md — A CONTROL PLANTED ON THE FIRST ROW ONLY CANNOT SHOW IT IS BLIND ON THE NEXT (paid: 14z-223, #366) |
+| `PRG:0x029CBA` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); HANDOFF.md — Build registry [vs2]; HANDOFF.md — Running a CPS-2 WIDE build (playtest); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-221c — #363: PHOBOS'S PLASMA BEAM FREEZES ITS VICTIM (BUILT AND STAGED for the next freeze with #357) — LANDED at the M26 freeze (the 14z-222 entry above); docs/project/patch_notes.md — 14z-222 — THE M26 FREEZE: #357 AND #363 LANDED (donovan-m30 / huitzil-m37 / pyron-m31 / merged-m26); +7 more |
+| `PRG:0x029CBF` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-221c — #363: PHOBOS'S PLASMA BEAM FREEZES ITS VICTIM (BUILT AND STAGED for the next freeze with #357) — LANDED at the M26 freeze (the 14z-222 entry above); build/manifest/huitzil.toml — port_patch; tests/test_dead_span.sh; tests/test_dead_span_reach.sh |
 | `PRG:0x029CC0` | build/manifest/huitzil.toml — port_patch; tests/audit_beam_slide.sh |
-| `PRG:0x029CC2` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
-| `PRG:0x029D02` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
+| `PRG:0x029CC2` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh; tests/test_dead_span_reach.sh |
+| `PRG:0x029D02` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh; tests/test_dead_span_reach.sh |
 | `PRG:0x029D82` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
-| `PRG:0x029D92` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh |
+| `PRG:0x029D92` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_dead_span.sh; tests/test_dead_span_reach.sh |
 | `PRG:0x029DC2` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x029DCA` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029DD2` | docs/project/patch_notes.md — 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07); build/manifest/reconciliation.toml — map |
