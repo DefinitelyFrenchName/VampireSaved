@@ -2,17 +2,19 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 364
+# issues: 366
 number	state	reason	closed	labels	title
+366	OPEN	-	-	bug,severity: low,test-integrity	Two gate headers state facts their frozen data no longer holds: test_dead_span_reach (one span, 5 pairs; now two spans, 10) and audit_pass_overrun (ours donovan_2 since M24; now none)
+365	OPEN	-	-	bug,severity: low,test-integrity	test_sheet_census FAILs: audit_crash_sweep_emu has no # SHEET: line (an ondemand gate, so no tier ran it)
 364	OPEN	-	-	bug,severity: low,test-integrity	Under dash (PILOT's /bin/sh) an EXIT-only cleanup trap does not run when a gate is TERM'd: its work directory is left behind (~277 scripts)
-363	OPEN	-	-	bug,needs-maintainer-ruling	Phobos's Plasma Beam (ES) knocks the victim back 49 px further than native vs2: vsavj's reaction-table rows 0x4E/0x4F are default rows (the pushback slide) where vs2/vh2 hold the victim
+363	CLOSED	COMPLETED	2026-11-07	bug,needs-maintainer-ruling	Phobos's Plasma Beam (ES) knocks the victim back 49 px further than native vs2: vsavj's reaction-table rows 0x4E/0x4F are default rows (the pushback slide) where vs2/vh2 hold the victim
 362	CLOSED	COMPLETED	2026-11-04	bug	test_crash_sweep writes its perturbed gate copies into the live tests/ directory, where concurrently running gates can read them; test_gate_descriptions' modes do not refuse a vanished target
 361	CLOSED	COMPLETED	2026-11-04	bug	The tier classifier misses audit_crash_sweep_emu's emulator call (test_crash_sweep.sh --tier emulator), so the emulator runner reads it a DEAD ROW
 360	OPEN	-	-	bug,cosmetic	In Dark Force, two of Donovan's dash speed lines alternate one frame out of phase with native vs2
 359	CLOSED	COMPLETED	2026-11-06	bug,test-integrity	Cleanup traps on EXIT INT TERM with no exit let a TERM'd gate keep running (210 scripts)
-358	OPEN	-	-	bug,cosmetic	Phobos's Plasma Beam (ES) [PP]: fewer visible effect pieces on our build than native vs2 (177 vs 240 piece-frames; lead from #356)
-357	OPEN	-	-	bug,cosmetic	Donovan's guard: native vs2 draws eight red class-0x72 orbs around the fighters that our build lacks
-356	OPEN	-	-	bug,cosmetic	Speed-line effects native vs2 draws are missing on our build (Donovan's Blizzard Sword swing; dashes and more to census)
+358	CLOSED	COMPLETED	2026-11-07	bug,cosmetic	Phobos's Plasma Beam (ES) [PP]: fewer visible effect pieces on our build than native vs2 (177 vs 240 piece-frames; lead from #356)
+357	CLOSED	COMPLETED	2026-11-07	bug,cosmetic	Donovan's guard: native vs2 draws eight red class-0x72 orbs around the fighters that our build lacks
+356	CLOSED	COMPLETED	2026-11-07	bug,cosmetic	Speed-line effects native vs2 draws are missing on our build (Donovan's Blizzard Sword swing; dashes and more to census)
 355	CLOSED	COMPLETED	2026-11-02	bug	close.py red_base takes a plan-refused tier's header-only results file as the re-run's --confirm base
 354	CLOSED	COMPLETED	2026-11-06	enhancement	no gate checks what reaches #294's dead span PRG:0x024024 in the built image
 353	CLOSED	COMPLETED	2026-11-03	bug	run_all_emulator.sh --log on an existing directory appends to its results.tsv: a re-run inherits the earlier run's verdicts
@@ -22,8 +24,8 @@ number	state	reason	closed	labels	title
 349	CLOSED	COMPLETED	2026-11-02	bug	controls_overlap.py reads a gate SAFE when all its control runs were REFUSED (only SKIP reads HOLLOW)
 348	OPEN	-	-	evolution	No gate checks a tracked release/<name> is the package of its build; the Linux release gates do not follow release/<name>
 347	CLOSED	COMPLETED	2026-11-03	bug	run_all_emulator.sh --stale --freeze refuses when any stale gate is outside a freeze (the audit names at its default cadence)
-346	OPEN	-	-	bug,cosmetic	Donovan's Blizzard Sword snowflake drags a blue ice streak on our build that native vs2 does not draw
-345	OPEN	-	-	bug,severity: medium	Donovan's Blizzard Sword overruns its frame at different frames than native vs2: two move-parity events differ (donovan_2:2, donovan_11:12)
+346	CLOSED	COMPLETED	2026-11-07	bug,cosmetic	Donovan's Blizzard Sword snowflake drags a blue ice streak on our build that native vs2 does not draw
+345	CLOSED	COMPLETED	2026-11-07	bug,severity: medium	Donovan's Blizzard Sword overruns its frame at different frames than native vs2: two move-parity events differ (donovan_2:2, donovan_11:12)
 344	OPEN	-	-	cosmetic	Donovan's body and sword colours inside Dark Force differ from vs2's (rows 0x0A/0x0C)
 343	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	audit_tenant_timeout's 'round 2 spawns live' check passes on the next match's refill (after $FF810E = 0xFF), not on a round 2
 342	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	$FF8120 is the winner's PERFECT flag, not the round winner's side: ram.md row wrong, three gates' winner checks measure 'winner unhurt'

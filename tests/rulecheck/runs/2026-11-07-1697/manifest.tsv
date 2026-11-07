@@ -1,0 +1,25 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent222/m26/release/close/closing_345.md	dc9a2d9c437e20d3109bdcc09dd3c6ae897234cf
+build/agent222/m26/release/close/closing_346.md	3c81a87bf0dfe26094cf8955855fca6ffa4a6e4b
+build/agent222/m26/release/close/closing_356.md	7ccfc1b026fbe24d15646b9e3c402a147679ce74
+build/agent222/m26/release/close/closing_357.md	48f796fe49799884da4d3119d3ed6e0f94f96687
+build/agent222/m26/release/close/closing_358.md	021979e27b6bb13c20ae2d8b6dae2928cbfb1eac
+build/agent222/m26/release/close/closing_363.md	4c3326965739e50156a557802f6849edd74045d8
+build/agent222/m26/release/close/issue345.md	40c0430de5777be6d73516d096e474c1f27180cb
+build/agent222/m26/release/close/issue346.md	c88319a5e674c5876c77e1170d13e28d4726186b
+build/agent222/m26/release/close/issue356.md	765171c6c7a9e073a6298281a6a132456763a588
+build/agent222/m26/release/close/issue357.md	068aa1359ab2311d5ecd05ff5562ac18ef53a80c
+build/agent222/m26/release/close/issue358.md	e3acd187d696d5c3e75050b07af1d11fb0e535d5
+build/agent222/m26/release/close/issue363.md	a3f51582c64943429ec5bced2a309ce03daaa68b
+build/agent222/m26/release/upload.log	669ec07588653be9b6571ec3dcd121c3077b71e5
+build/agent222/m26/release/close/closures_evidence.txt	77df10f25379bfbc0ec2507077f2b14147779cee
+build/agent222/m26/release/close/zips_vs_tree.txt	ad806a4a79405933802ea82fd51530ebd38ee651
+build/agent222/m26/release/close/applied_all9.txt	8e24d3c31f3fb3bcab3d78cb17eb7511f404dccf
+build/agent222/m26/release/close/maintainer_words.txt	1b5910843876ff83bd39c8b2f03c710845a77f12
+DECISIONS_HISTORY.md.lines-9772-9831 (lines 9772-9831 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted; A1b freezes in M25 with #3", and the entries after it up to line 9831)	36ae0a0d3d54525624ad64d6dbb8ee2feb41a779
+tests/audit_don_trail_nodraw.sh.lines-20-31 (lines 20-31 of tests/audit_don_trail_nodraw.sh)	629cfff76d5a486aa8c68e5d36a0a0871633c459
+tests/audit_don_speed_lines.sh.lines-25-36 (lines 25-36 of tests/audit_don_speed_lines.sh)	6c6b884211762bf359b1afec48473a37223b64d7
+tests/audit_guard_orbs.sh.lines-26-37 (lines 26-37 of tests/audit_guard_orbs.sh)	56dc5ea03dc49bf4487a7549b5674db6659d8371
+tests/audit_beam_slide.sh.lines-30-41 (lines 30-41 of tests/audit_beam_slide.sh)	19daa70edf7145b62397ecb6f494e1a0a61376fb
+tests/audit_rng_forms.sh.lines-29-40 (lines 29-40 of tests/audit_rng_forms.sh)	52c130177202b0da699d0f3b4e65cf5e27b8e977
+tests/audit_move_parity.sh.lines-100-111 (lines 100-111 of tests/audit_move_parity.sh)	91f5e8bb162d8d704cf71492a0e1cba6c389f44b

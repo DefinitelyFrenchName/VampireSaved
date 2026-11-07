@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-221c CLOSE, 2026-11-06)
+# NEXT SESSION — orientation (rewritten at the 14z-222 CLOSE, 2026-11-07)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -19,15 +19,16 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
-idle`). Idle at the 14z-221c close, its checkout `~/vampire-saved` on `a152efa7` (`main` before this close; the scratch refs
-`refs/scratch/t359` and `refs/scratch/t221c` deleted): move it to the new `main` before other work. **ERIS** (WSL2, 24 threads,
-47 GB) runs the release shape; reached all of 14z-221c, its checkout `~/vampire-saved` on `a152efa7`: move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
+idle`). Idle at the 14z-222 close, its checkout `~/vampire-saved` detached at `bb10ce97` (the freeze commit) with a LOCAL tag
+`freeze/merged-m26` (`564775cf`, never pushed, not origin's tag object): delete that tag before PILOT fetches tags, then move
+the checkout to the new `main`. **ERIS** (WSL2, 24 threads,
+47 GB) runs the release shape; idle at the 14z-222 close, its checkout `~/vampire-saved` detached at `bb10ce97`: move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
 commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS)
 or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shell splits it at a pipe and mangles quotes), and
 a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-221c's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-222's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
@@ -55,40 +56,28 @@ STATE 14z-221c's CLOSE section. A red tier is re-run on THE RED RUN'S results (#
 file it leaves behind outside `build/`, and `build/`'s top-level directories are classed in `tests/expected/build_dirs.tsv`
 (a new one fails `test_build_dirs`; `build/tmp/` was added as scratch this sitting).
 
+
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **FREEZE M26, THEN RELEASE IT** (the maintainer, after the 14z-221c close: *"let's freeze and then release, so the release
-   includes #363"*; record the ruling in `DECISIONS_HISTORY.md` at this session's close). M26 = M25 plus #357 (the guard orbs)
-   and #363 (the freeze reaction), both confirmed by the maintainer on captures (#357: *"looks identical"*; #363: *"Demitri is
-   frozen indeed"*); M25's release was never published, so the M26 release replaces it and still carries #345, #346 and #356.
-   **The freeze** (the M25 freeze, STATE_HISTORY 14z-220 (1)-(3), is the worked example): apply
-   `build/manifest/staged/357_363.patch` and remove it; the mark M26; build the six builds on the Mac and independently on
-   ERIS; re-extract Donovan (`build/m5_wide/extract`); re-freeze `test_tenant_loop` (op counts donovan 360 -> 363, huitzil
-   381 -> 384, two tenants 642 -> 648, three tenants 855 -> 861, measured on the scratch builds); the registry rows, the four
-   expectation sets (`tools/freeze_expectation_set.py`), `tools/freeze_bytediff.py`; the re-point sweep and every expectation
-   that names a placed address (regions placed after the new ones move); `tests/audit_guard_orbs.sh` and
-   `tests/audit_beam_slide.sh` re-pointed from the scratch build `build/agent221c/m34x` to the frozen merged build, and #363's
-   row of `tests/expected/dead_span_reach.tsv` (in the patch) judged there; the freeze battery on ERIS (~5 h); both
-   concurrent-controls lists re-traced on PILOT; the MiSTer tail (the jtcores fork's catalogue, patch mirror, pin); the freeze
-   rule-checker; the strict freeze-cadence static tier with `ROMDIR`; then the tags and the commit.
-   **The release** (14z-217's M24 release is the worked example): the full emulator scope with `--controls`, the macOS and
-   Windows binaries, `tools/package_release_platforms.py`, `tools/upload_release_assets.sh --prune`; then close #345, #346,
-   #356, #357, #363 and #358 (it closes with #363, the maintainer: *"#358 can be closed when we close #363"*).
-2. **THE M25 RELEASE** is folded into item 1 (M26 replaces it).
-3. **#310 — GROUP 7, BATCH 3** (batches 1 and 2 landed, 43 rows: `tests/test_dead_leg_unjudged.sh`, STATE 14z-221c (5)).
-   Left: the six held out (four MiSTer gates needing verilator, `test_release_roundtrip`, `audit_stock_emulator_stall`
+1. **#366 and #365 — two small test-integrity fixes found at the M26 release** (STATE 14z-222 (4)). #366: correct
+   `tests/test_dead_span_reach.sh`'s header (two spans and 10 judged pairs since M26, #363's span among them) and
+   `tests/audit_pass_overrun.sh`'s EXPECTS line (ours `none` on all three parts since M25), and decide whether the reach
+   gate plants a control on every span, not only the first. #365: give `tests/audit_crash_sweep_emu.sh` its `# SHEET:` line,
+   then run `tests/test_sheet_census.sh` (ondemand: no tier runs it). Both gates may be on the concurrent-controls lists:
+   an edit means a PILOT re-trace or a delisting.
+2. **`test_release_binaries` is OFF the emulator concurrent-controls list** (`tests/controls_concurrent_emu.txt`, its
+   `# NOT listed (14z-222 …)` note): its header was corrected after the PILOT trace. Re-trace it on PILOT and list it again.
+3. **#310 — GROUP 7, BATCH 3** (batches 1 and 2 landed, 43 rows: `tests/test_dead_leg_unjudged.sh`, STATE_HISTORY 14z-221c
+   (5)). Left: the six held out (four MiSTer gates needing verilator, `test_release_roundtrip`, `audit_stock_emulator_stall`
    on `MAME_REF_BIN`), podman's, the 14 two-mode gates on the concurrent list, and every gate with three or more modes
    (`build/agent215/t310/census57/group7.tsv`, local). A row's dead instrument goes in the table's fifth column; the gate
    then runs its mode with only that instrument dead.
-4. **#364 — under dash an EXIT-only cleanup trap does not run on TERM** (filed after the 14z-221c close, the maintainer:
-   *"File the ticket then"*; `docs/platform/gotchas.md`). About 277 scripts leave their work directory behind when TERM'd
-   on PILOT. The fix is #359's pattern beside each EXIT-only trap; then `tests/test_signal_traps.sh` refuses the form.
-   **Its row and the refreshed `docs/project/tickets_github.tsv` are UNCOMMITTED in the working tree**: they ride this
-   session's close.
-5. **Ask the maintainer for the order of the rest.** Open tickets (GitHub severity labels): bugs: #345 (frozen, awaits the
-   release), #363 (staged, item 1); evolution: #348, #352; cosmetic: #344, #346, #356 (frozen, await the release), #357
-   (staged, item 1), #358 (closes with #363), #360; test-integrity: #310, #364. Parked: #123, #124, #125, #128.
+4. **#364 — under dash an EXIT-only cleanup trap does not run on TERM** (`docs/platform/gotchas.md`). About 277 scripts
+   leave their work directory behind when TERM'd on PILOT. The fix is #359's pattern beside each EXIT-only trap; then
+   `tests/test_signal_traps.sh` refuses the form.
+5. **Ask the maintainer for the order of the rest.** Open tickets: bugs/test-integrity #310, #364, #365, #366; evolution
+   #348, #352; cosmetic #344, #360. Parked: #123, #124, #125, #128.
 
 ## PARKED (not open work)
 
@@ -97,26 +86,25 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **`tools/audit_dead_span.py` reads six rules now** (A, C, T, D, R, L; its header): D and R look 0x100 to BOTH sides of a
-  base (an index may be negative), R takes a base of either parity and `adda.l`/`addi.l #imm`, the fence judges every
-  reached instruction ending at the span start and refuses a straddler, and an accepted base or row is bound to its named
-  sites (`BASE@SITE/SITE`). The 68000's bus has 24 bits: an operand is read with its top byte ignored, a data long counts with top byte 0x00 or
-  0xFF (a full mask of every long finds chance hits in random data). Each listed instruction form has a control in `tests/test_dead_span_reach.sh`: capstone names
-  `lea`/`pea` as `lea.l`/`pea.l`, and an exact-name test that never matched once hid every such base.
-- **A capped data region can cut a table off** (`docs/project/gotchas.md`): Donovan's `hitbox_proj` copy (0x1000) ended
-  inside vs2's motion table `0x0D1BBE`, so the guard orbs read our own code bytes; a per-piece diff found it where totals
-  were equal.
-- **A cleanup trap is `trap '<cleanup>' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM`** (#359;
-  `tests/test_signal_traps.sh` refuses any other stopping-signal trap).
-- **A dead-leg proof for a non-MAME leg** puts the instrument in `tests/expected/dead_leg_unjudged.tsv`'s fifth column; the
-  gate also runs that mode with only that instrument dead and MAME_BIN unset.
-- **A heredoc delimiter inside a python heredoc ends the shell heredoc early**: write such scripts to a scratch file.
+- **A release-cadence static tier runs every control** (601 at M26): run it `--jobs 8` (50 min) with a cap well over two
+  hours; serial, it was stopped at a 2 h cap after 97 gates. `--confirm` is refused at release cadence (#269), so a red is
+  fixed and the whole tier re-run.
+- **Run the release's static tier after every emulator release record is in.** `test_emulator_staleness` reads each gate's
+  NEWEST row by `results.tsv` mtime: ERIS's host-bound SKIP rows, finished later than the Mac's and PILOT's PASS runs of the
+  same gates, were the newest, so those host gates were re-run after ERIS.
+- **The uploader creates the release with `--verify-tag`**: the freeze tag must be on `origin` first. Push the jtcores fork's
+  pinned commit before the tag, so the published tag never names a missing submodule commit.
+- **The build each host's release runs judged** is recorded as `build MERGED <fingerprint>` in each run's
+  `identity.tsv`/`identity_end.tsv`. The fingerprint covers the zip container, so it differs between hosts whose 25 members
+  are equal (`build/agent222/m26/release/close/build_identity.txt`).
+- **A closing comment's coverage limits come from the gate's WHOLE header**, in every form: "Not covered", "NOT COVERED",
+  "WHAT IT DOES NOT COVER", "Stated, not tested", "MEASURED, not asserted", "Not compared", "deliberately absent". Twelve
+  rule-checker runs at this release each found one form or one gate missed.
 
-## WHAT CLOSED THIS SITTING (14z-221c)
+## WHAT CLOSED THIS SITTING (14z-222)
 
-- **Closed done:** #354 (the built-image reach gate; rule-checker run `2026-11-06-1679`), #359 (the split traps and
-  `tests/test_signal_traps.sh`; run `2026-11-06-1673`).
-- **Staged for the next freeze:** #357 (the guard orbs) and #363 (the freeze reaction), both confirmed by the maintainer on
-  captures.
-- **#310 group 7 batch 2:** 18 rows over 12 gates, run `2026-11-06-1668`; progress comment on #310.
-- **The four emulator gates this sitting changed** re-traced SAFE on PILOT (`tests/controls_concurrent_emu.txt`).
+- **M26 frozen** at `bb10ce97` (#357, #363) and **released** on `freeze/merged-m26` (merged-m24's zips pruned; M25 never
+  published, its changes ship here).
+- **Closed done:** #345, #346, #356, #357, #358, #363 (rule-checker run `2026-11-07-1708` after -1697 to -1707; the
+  maintainer's Cecil reading posted on #358).
+- **Filed:** #365, #366.

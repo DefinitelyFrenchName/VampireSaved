@@ -1,0 +1,38 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent222/m26/release/close/closing_345.md	ef7abf75944e44814e5f9eba75763f484dbd5970
+build/agent222/m26/release/close/closing_346.md	2190f0ed7d998216a68fe583b80f76e86df43938
+build/agent222/m26/release/close/closing_356.md	a087f3d6fc2374660fa91748e673e15f9d8f1d74
+build/agent222/m26/release/close/closing_357.md	917fdecffd2709ab8265f8782934cd5f591ff415
+build/agent222/m26/release/close/closing_358.md	f177835b5f745ffcd6560421cab6a976fe4ba94e
+build/agent222/m26/release/close/closing_363.md	ebfcf02d53c65b9e7cedd57435d34c98d30590f9
+build/agent222/m26/release/close/issue345.md	40c0430de5777be6d73516d096e474c1f27180cb
+build/agent222/m26/release/close/issue346.md	c88319a5e674c5876c77e1170d13e28d4726186b
+build/agent222/m26/release/close/issue356.md	765171c6c7a9e073a6298281a6a132456763a588
+build/agent222/m26/release/close/issue357.md	068aa1359ab2311d5ecd05ff5562ac18ef53a80c
+build/agent222/m26/release/close/issue358.md	e3acd187d696d5c3e75050b07af1d11fb0e535d5
+build/agent222/m26/release/close/issue363.md	a3f51582c64943429ec5bced2a309ce03daaa68b
+build/agent222/m26/release/upload.log	669ec07588653be9b6571ec3dcd121c3077b71e5
+build/agent222/m26/release/close/closures_evidence.txt	4600e3007a304f9db150710fed5b0672bde2c2b0
+build/agent222/m26/release/close/zips_vs_tree.txt	ad806a4a79405933802ea82fd51530ebd38ee651
+build/agent222/m26/release/close/applied_all9.txt	8e24d3c31f3fb3bcab3d78cb17eb7511f404dccf
+build/agent222/m26/release/close/build_identity.txt	180feeafd7c61298341c37539b0709807f17bb72
+build/agent222/m26/release/close/gate_rows.txt	87ea942ef620aa94dd10e571c894e8ef8fdb7836
+build/agent222/m26/release/close/maintainer_words.txt	ec7192793fb3df7639ca01be16859650232141f1
+build/agent222/m26/release/close/dead_span_reach_head.log	6c24ccf679991026f8818507e33ab44908ef95bd
+build/agent222/m26/release/close/dead_span_reach_at_bb10ce97.tsv	0300fb463683d8a6a26b30f057339da6743a8a6e
+build/agent222/m26/release/close/provenance.txt	36fea7b1bcf2e281a110dd2b6f9da37e0d7c23e9
+DECISIONS_HISTORY.md.lines-9772-9831 (lines 9772-9831 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted; A1b freezes in M25 with #3", and the entries after it up to line 9831)	36ae0a0d3d54525624ad64d6dbb8ee2feb41a779
+tests/expected/registry.tsv.lines-201-201 (lines 201-201 of tests/expected/registry.tsv)	71cf0a89e01f849cf050ad07f70b104ce0c88daa
+tests/audit_don_trail_nodraw.sh.lines-1-33 (lines 1-33 of tests/audit_don_trail_nodraw.sh)	c0cf6df57c0d28b5229cf61c53881b076620ee41
+tests/audit_don_speed_lines.sh.lines-1-36 (lines 1-36 of tests/audit_don_speed_lines.sh)	765f6243901f5e9ceb379363225a865a380f56ed
+tests/audit_guard_orbs.sh.lines-1-40 (lines 1-40 of tests/audit_guard_orbs.sh)	b68d476f1a009aae11df8227af8dadc88a707ff2
+tests/audit_beam_slide.sh.lines-1-44 (lines 1-44 of tests/audit_beam_slide.sh)	463462ce1020138b46258752c78fb16f8214e2e9
+tests/audit_rng_forms.sh.lines-1-40 (lines 1-40 of tests/audit_rng_forms.sh)	20e6df47f6f76d93a9af5f93cdc003d8c662d0a1
+tests/audit_move_parity.sh.lines-1-140 (lines 1-140 of tests/audit_move_parity.sh)	4bfd82772983a5846f1d074470cd96bfd19188f9
+tests/audit_pass_overrun.sh.lines-1-44 (lines 1-44 of tests/audit_pass_overrun.sh)	1fb1bfd67408d29df28ba577e105b52a64d82e05
+tests/audit_move_parity_attribution.sh.lines-1-56 (lines 1-56 of tests/audit_move_parity_attribution.sh)	aad849b2ea22d88ff72272ef0c3be39dd396f704
+tests/audit_lag_budget.sh.lines-1-45 (lines 1-45 of tests/audit_lag_budget.sh)	c2c49ed493347262bc58e6b4a30441d32331afe7
+tests/audit_merged_legacy.sh.lines-1-130 (lines 1-130 of tests/audit_merged_legacy.sh)	3a8bf3638dceeaf2e0fb262f8894a12348146a66
+tests/audit_effect_class_rows.sh.lines-1-81 (lines 1-81 of tests/audit_effect_class_rows.sh)	f701db58570f423ef7b4906979a73c9782f6b126
+tests/test_dead_span.sh.lines-1-44 (lines 1-44 of tests/test_dead_span.sh)	c673a22912f2992e885cca0034da9a2a0a561f69
+tests/test_dead_span_reach.sh.lines-1-58 (lines 1-58 of tests/test_dead_span_reach.sh)	732d6f4f17f49e1004a2483c2055c4adf6d4fb47

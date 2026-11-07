@@ -1,0 +1,35 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent222/m26/release/close/closing_345.md	9694a6ab4c61ce134c798f61e309327f62377502
+build/agent222/m26/release/close/closing_346.md	cb53bbf7be98b1b245fa72c1291f687cae040894
+build/agent222/m26/release/close/closing_356.md	d81b0a67066849f33bedb7aac1bc511182151b71
+build/agent222/m26/release/close/closing_357.md	b9d933299ee178beaa51e1b5627f483ae373c354
+build/agent222/m26/release/close/closing_358.md	f177835b5f745ffcd6560421cab6a976fe4ba94e
+build/agent222/m26/release/close/closing_363.md	5fb35042b4a909067b77ecbf08b77b8565e28cd9
+build/agent222/m26/release/close/issue345.md	40c0430de5777be6d73516d096e474c1f27180cb
+build/agent222/m26/release/close/issue346.md	c88319a5e674c5876c77e1170d13e28d4726186b
+build/agent222/m26/release/close/issue356.md	765171c6c7a9e073a6298281a6a132456763a588
+build/agent222/m26/release/close/issue357.md	068aa1359ab2311d5ecd05ff5562ac18ef53a80c
+build/agent222/m26/release/close/issue358.md	e3acd187d696d5c3e75050b07af1d11fb0e535d5
+build/agent222/m26/release/close/issue363.md	a3f51582c64943429ec5bced2a309ce03daaa68b
+build/agent222/m26/release/upload.log	669ec07588653be9b6571ec3dcd121c3077b71e5
+build/agent222/m26/release/close/closures_evidence.txt	119f7a643e0042f6f697c51b5ca7ff0097303d65
+build/agent222/m26/release/close/zips_vs_tree.txt	ad806a4a79405933802ea82fd51530ebd38ee651
+build/agent222/m26/release/close/applied_all9.txt	8e24d3c31f3fb3bcab3d78cb17eb7511f404dccf
+build/agent222/m26/release/close/build_identity.txt	180feeafd7c61298341c37539b0709807f17bb72
+build/agent222/m26/release/close/gate_rows.txt	87ea942ef620aa94dd10e571c894e8ef8fdb7836
+build/agent222/m26/release/close/maintainer_words.txt	ec7192793fb3df7639ca01be16859650232141f1
+DECISIONS_HISTORY.md.lines-9772-9831 (lines 9772-9831 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-03 (14z-219) — #345: the built A1b's timing is accepted; A1b freezes in M25 with #3", and the entries after it up to line 9831)	36ae0a0d3d54525624ad64d6dbb8ee2feb41a779
+tests/expected/registry.tsv.lines-201-201 (lines 201-201 of tests/expected/registry.tsv)	71cf0a89e01f849cf050ad07f70b104ce0c88daa
+tests/audit_don_trail_nodraw.sh.lines-20-31 (lines 20-31 of tests/audit_don_trail_nodraw.sh)	629cfff76d5a486aa8c68e5d36a0a0871633c459
+tests/audit_don_speed_lines.sh.lines-25-36 (lines 25-36 of tests/audit_don_speed_lines.sh)	6c6b884211762bf359b1afec48473a37223b64d7
+tests/audit_guard_orbs.sh.lines-26-37 (lines 26-37 of tests/audit_guard_orbs.sh)	56dc5ea03dc49bf4487a7549b5674db6659d8371
+tests/audit_beam_slide.sh.lines-30-41 (lines 30-41 of tests/audit_beam_slide.sh)	19daa70edf7145b62397ecb6f494e1a0a61376fb
+tests/audit_rng_forms.sh.lines-29-40 (lines 29-40 of tests/audit_rng_forms.sh)	52c130177202b0da699d0f3b4e65cf5e27b8e977
+tests/audit_move_parity.sh.lines-100-118 (lines 100-118 of tests/audit_move_parity.sh)	9141af43128d0652c9635cacb31d8b0ef95f9ff8
+tests/audit_pass_overrun.sh.lines-1-30 (lines 1-30 of tests/audit_pass_overrun.sh)	ffd32c90367d614d513ed8d3b8f5584c4fa918c9
+tests/audit_move_parity_attribution.sh.lines-1-40 (lines 1-40 of tests/audit_move_parity_attribution.sh)	b5122c5c9960373c8d51dacc37f33f1373ba9469
+tests/audit_lag_budget.sh.lines-1-44 (lines 1-44 of tests/audit_lag_budget.sh)	bdf9e3691eca0ff1aafb56e8a225b3b2292a01ad
+tests/audit_merged_legacy.sh.lines-1-16 (lines 1-16 of tests/audit_merged_legacy.sh)	8ec289c1040fe3b5975ab598c471a59819080a24
+tests/audit_effect_class_rows.sh.lines-1-30 (lines 1-30 of tests/audit_effect_class_rows.sh)	17d002b5dbaab3165811be70bdd5cdbe7b9460df
+tests/test_dead_span.sh.lines-1-32 (lines 1-32 of tests/test_dead_span.sh)	40826cd170beea3e787722756dca6a23d3dcada6
+tests/test_dead_span_reach.sh.lines-1-32 (lines 1-32 of tests/test_dead_span_reach.sh)	319e91b8d1ace6694f721d6bb1daa888b9f88a68
