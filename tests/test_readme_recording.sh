@@ -330,10 +330,10 @@ PY
 check_playback() { # <label>: prints FAIL lines, returns 1 on any
     _bad=0
     grep -q "^END $N\$" "$W/$1.log" 2>/dev/null \
-        || { echo "FAIL: $1 did not reach frame $N (last line: $(tail -1 "$W/$1.log" 2>/dev/null))"; _bad=1; }
+        || { vs_ctl_nj "$1 did not reach frame $N"; echo "FAIL: $1 did not reach frame $N (last line: $(tail -1 "$W/$1.log" 2>/dev/null))"; _bad=1; }   # #310 g7 NJ
     _pb="$(grep -o 'Total playback frames: [0-9]*' "$W/$1.out" | tail -1 | awk '{print $4}')"
     if [ -z "$_pb" ]; then
-        echo "FAIL: $1: MAME reported no playback ($(tail -1 "$W/$1.out"))"; _bad=1
+        vs_ctl_nj "$1: MAME reported no playback"; echo "FAIL: $1: MAME reported no playback ($(tail -1 "$W/$1.out"))"; _bad=1   # #310 g7 NJ
     elif [ "$_pb" -lt "$N" ]; then
         echo "FAIL: $1: MAME played back $_pb recorded frames, fewer than the $N the recording ran"; _bad=1
     fi

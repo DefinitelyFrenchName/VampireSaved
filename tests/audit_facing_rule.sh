@@ -18,7 +18,7 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/facing_rule.tsv
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/lua/read_tap.lua
 #   tests/replays/naming/ tools/audit_facing_rules.py tools/build_fingerprint.py tools/name_moves.py
-#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh tests/lib/controls.sh
 #
 # SHEET: legs vs2,ours — moments: each write to Demitri's +0x5D from 3850 (the n-th write of each leg paired) and his x at 3924 and 3946, each picture proven on the x that leg's field trace sampled there — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); the writer PC (ours writes from the thunk's placement)
 #
@@ -73,6 +73,7 @@ BUILD="${BUILD:-build/m3b_merged34}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/facing_rule.tsv"
 CONTROL="${CONTROL:-}"
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_nj only (#310 g7): this gate parses CONTROL itself
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
@@ -202,9 +203,9 @@ sample n.x vsav2  "$ROMDIR" "$W/native.rpl" "$pk" "$W/native.x.txt"
 tap o.f vsavjw "$ORP"    "$W/ours.rpl"   "$pk" ff885c,2 "$W/ours.face.txt"
 sample o.x vsavjw "$ORP"    "$W/ours.rpl"   "$pk" "$W/ours.x.txt"
 wait
-for t in n.f n.x o.f o.x; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "run $t exited $_rc (an emulator that crashed is not evidence)"; done
+for t in n.f n.x o.f o.x; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "run $t exited $_rc"; bad "run $t exited $_rc (an emulator that crashed is not evidence)"; }; done   # #310 g7 NJ
 for leg in native ours; do
-    for k in face x; do [ -s "$W/$leg.$k.txt" ] || { bad "$leg: tap $k produced nothing"; }; done
+    for k in face x; do [ -s "$W/$leg.$k.txt" ] || { vs_ctl_nj "$leg: tap $k produced nothing"; bad "$leg: tap $k produced nothing"; }; done   # #310 g7 NJ
     reduce "$leg" "$W/$leg.face.txt" "$W/$leg.x.txt" > "$W/$leg.rows" 2> "$W/$leg.err" || bad "$leg: $(cat "$W/$leg.err")"
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_facing_rule (a leg did not run or was VOID)"; exit 1; }

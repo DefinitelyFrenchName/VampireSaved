@@ -117,10 +117,10 @@ print(';'.join(p))")"
 done
 wait
 for l in leilei_vsavj leilei_ours huitzil_native huitzil_ours donovan_native donovan_ours pyron_native pyron_ours; do
-    command grep -q '^END' "$W/rt_$l.txt" 2>/dev/null || bad "$l: the tap has no END line (see $W/$l/mame.log)"
+    command grep -q '^END' "$W/rt_$l.txt" 2>/dev/null || { vs_ctl_nj "$l: the tap has no END line"; bad "$l: the tap has no END line (see $W/$l/mame.log)"; }   # #310 g7 NJ
 done
 for l in leilei_ours huitzil_ours donovan_ours pyron_ours; do
-    command grep -q 'load of vsavjw\.ini' "$W/$l/mame.log" || bad "$l: the MAME log does not name the vsavjw set"
+    command grep -q 'load of vsavjw\.ini' "$W/$l/mame.log" || { vs_ctl_nj "$l: the MAME log does not name the vsavjw set"; bad "$l: the MAME log does not name the vsavjw set"; }   # #310 g7 NJ
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_rng_draws"; exit 1; }
 ok "8 legs complete; the ours legs ran the vsavjw set"

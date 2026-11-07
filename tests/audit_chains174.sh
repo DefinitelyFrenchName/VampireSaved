@@ -129,7 +129,7 @@ PY
 done
 wait
 for t in $TENANTS; do for leg in native ours; do
-    command grep -q FIELDSUMMARY "$W/tr_$t.$leg.txt" 2>/dev/null || bad "$t $leg: no complete trace (see $t.$leg/mame.log)"
+    command grep -q FIELDSUMMARY "$W/tr_$t.$leg.txt" 2>/dev/null || { vs_ctl_nj "$t $leg: no complete trace"; bad "$t $leg: no complete trace (see $t.$leg/mame.log)"; }   # #310 g7 NJ
 done; done
 [ "$fail" = 0 ] || { echo "FAIL: audit_chains174"; exit 1; }
 

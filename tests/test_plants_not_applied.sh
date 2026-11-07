@@ -84,7 +84,7 @@ PY
 # ---- the plants, one function per gate: each runs the gate copy <g> on its plants and sets one class variable each
 prove_latch() {  # prove_latch <gate copy> — sets LA1 LA2 LA3
     _t="$W/latch"; rm -rf "$_t"; mkdir -p "$_t/tests/lib" "$_t/tools" "$_t/romdir" "$_t/b/rompath"
-    cp "$1" "$_t/tests/audit_latch_reads.sh"; ln -s "$REPO/tests/lib/jobs.sh" "$_t/tests/lib/jobs.sh"; ln -s "$REPO/tests/replays" "$_t/tests/replays"
+    cp "$1" "$_t/tests/audit_latch_reads.sh"; ln -s "$REPO/tests/lib/jobs.sh" "$_t/tests/lib/jobs.sh"; ln -s "$REPO/tests/lib/controls.sh" "$_t/tests/lib/controls.sh"; ln -s "$REPO/tests/replays" "$_t/tests/replays"
     : > "$_t/romdir/vsav2.zip"; : > "$_t/b/rompath/vsavjw.zip"; printf '#!/bin/sh\nexit 0\n' > "$_t/mame"; chmod +x "$_t/mame"
     _g="$_t/tests/audit_latch_reads.sh"; _env="ROMDIR=$_t/romdir MAME_BIN=$_t/mame BUILD=b LEGS=phobos-real JOBS=1"
     # 1: the tap's target line moved (the same window written ${blk}), so the mode's sed matches nothing

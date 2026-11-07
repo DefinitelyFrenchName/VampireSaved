@@ -25,7 +25,7 @@
 #   all four controls fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/throw_registration.tsv
 #   tests/lua/read_tap.lua tests/replays/judge/02_throw.rpl tests/replays/naming/ tools/name_moves.py tools/run_mame.sh
-#   tools/setup_mame.sh tests/lib/sheet.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh tests/lib/controls.sh
 #
 # SHEET: legs vsavj,vs2,ours — moments: per part, each throw contact the frozen rows hold (the k-th contact on each leg, at its own frame), each picture EVENT-PROVEN on that leg's live-pair read tap in a window around the contact — not comparable: each game's stage and palette, and the victim's art (each game's own copy; [VSP-168]); the pair's addresses (vsavj's live pair against vs2's) and the meter steps are judged as rows, against the frozen file, not between the pictures
 #
@@ -109,6 +109,7 @@ BUILD="${BUILD:-build/m3b_merged34}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/throw_registration.tsv"
 CONTROL="${CONTROL:-}"
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_nj only (#310 g7): this gate parses CONTROL itself
 PARTS="${PARTS:-pyron_3 huitzil_3 donovan_5 donovan_2_ko legacy_demitri}"
 FLOOR=2300
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
@@ -271,10 +272,10 @@ wait
 : > "$W/got.tsv"
 for p in $PARTS; do
     for leg in $(legs_of "$p"); do
-        for f in m1 m2 pair; do [ -s "$W/$p.$leg.$f.txt" ] || { bad "$p $leg: tap $f produced nothing"; continue 2; }; done
+        for f in m1 m2 pair; do [ -s "$W/$p.$leg.$f.txt" ] || { vs_ctl_nj "$p $leg: tap $f produced nothing"; bad "$p $leg: tap $f produced nothing"; continue 2; }; done   # #310 g7 NJ
         dead="-"
         if [ "$leg" = ours ]; then
-            dead="$W/$p.ours.dead.txt"; [ -s "$dead" ] || { bad "$p ours: the dead-pair tap produced nothing"; continue; }
+            dead="$W/$p.ours.dead.txt"; [ -s "$dead" ] || { vs_ctl_nj "$p ours: the dead-pair tap produced nothing"; bad "$p ours: the dead-pair tap produced nothing"; continue; }   # #310 g7 NJ
             if [ "$CONTROL" = dead-reader-planted ]; then plant_reader "$dead" "$dead"; fi
         fi
         if ! reduce "$p" "$leg" "$W/$p.$leg.m1.txt" "$W/$p.$leg.m2.txt" "$W/$p.$leg.pair.txt" "$dead" > "$W/$p.$leg.rows" 2> "$W/$p.$leg.err"; then

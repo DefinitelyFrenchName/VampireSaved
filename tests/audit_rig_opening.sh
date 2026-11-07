@@ -17,7 +17,7 @@
 #   after; the swapped opening fails, the floor-less rig pins at 2370 and fails.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/rig_opening.tsv
 #   tests/lua/field_trace.lua tests/replays/naming/ tools/name_moves.py tools/run_mame.sh
-#   tools/setup_mame.sh tests/lib/sheet.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh tests/lib/controls.sh
 #
 # SHEET: legs vs2,ours — moments: the nine sample frames the gate compares on huitzil_5 (before the first position pin the entrances differ, after it the legs agree), and the round start — not comparable: the round-start entrance before the first pin, which the two games draw differently by design; each game's stage and palette, and P2's art
 #
@@ -70,6 +70,7 @@ BUILD="${BUILD:-build/m3b_merged34}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/rig_opening.tsv"
 CONTROL="${CONTROL:-}"
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_nj only (#310 g7): this gate parses CONTROL itself
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
@@ -158,7 +159,7 @@ sample native vsav2  "$ROMDIR" "$W/native.rpl" "$pk"
 sample ours   vsavjw "$BUILD/rompath;$ROMDIR" "$W/ours.rpl" "$pk"
 wait
 for leg in native ours; do
-    _rc="$(cat "$W/$leg/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "$leg: the emulator exited $_rc"
+    _rc="$(cat "$W/$leg/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "$leg: the emulator exited $_rc"; bad "$leg: the emulator exited $_rc"; }   # #310 g7 NJ
     reduce "$leg" "$W/$leg.tr" "$SAMPLES" > "$W/$leg.rows" 2> "$W/$leg.err" || bad "$leg: $(cat "$W/$leg.err")"
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_rig_opening (a leg did not run or was VOID)"; exit 1; }

@@ -78,6 +78,7 @@ The runner's verdict on a control run (`vs_classify_control`, one copy, in
 | REFUSED | the gate printed `REFUSED: CONTROL=` | declared in the header, never read by the gate |
 | DIED | the shell's own error line, or a traceback | a crash is not a verdict ([VSP-108]) |
 | DIED | an environment error anywhere in the log (`No space left on device`, `mktemp: `, `cannot create …`, `Permission denied`, `Read-only file system`, `Too many open files`, `Cannot allocate memory`, `Disk quota exceeded`: `tests/lib/classify.sh` `VS_ENV_ERR`) | the host stopped the run, not its perturbation (#321, 14z-210: 28 modes read HONOURED on a full `/tmp`) |
+| DIED | no `NOT JUDGED: ` line, the log ENDS on a tool's own error lines (`awk: can't open file`, `sed: …`, `cp: …: No such file or directory`, ` source line number N`: `tests/lib/classify.sh` `VS_TOOL_ERR`), and the line before them is not the gate's own FAIL | the gate died under `set -e` on a tool's failure before its own verdict — not the perturbation; a gate that printed its FAIL and then ran a diagnostic that failed exited by its own hand (GitHub #367, 14z-223; a `set -e` death that prints nothing is not caught) |
 | UNJUDGED | a FAIL whose log has a line starting `NOT JUDGED: ` | the mode run measured nothing (#310, 14z-210) |
 | TIMEOUT | the wrapper's exits | as for any gate |
 

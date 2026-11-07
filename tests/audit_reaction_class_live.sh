@@ -15,7 +15,7 @@
 #   every path the corpus does not run.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/reaction_class_live.tsv
 #   tests/lua/read_tap.lua tests/replays/ tools/name_moves.py tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/controls.sh
 #
 # SHEET: no-picture — a corpus-wide census: 153 read-tap runs judge that no read lands in a window (an absence), with no frame to show
 #
@@ -70,6 +70,7 @@ CONTROL="${CONTROL:-}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 case "$CONTROL" in ""|planted-38|range-silent) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -143,8 +144,9 @@ for d in "$W"/*/*/; do
     run="$(basename "$(dirname "$d")")/$(basename "$d")"
     [ "$(basename "$(dirname "$d")")" = rpl ] && continue
     tap="$d/t.tap"
+    [ -s "$tap" ] || { vs_ctl_nj "$run: no tap"; echo "FAIL: $run: no tap at $tap (exit $(cat "$d/rc" 2>/dev/null || echo none)) — a dead tap is not evidence"; exit 1; }   # #310 g7 NJ
     fr="$(awk '$1=="END" { print $2 }' "$tap" 2>/dev/null)"
-    [ -n "$fr" ] || { bad "$run: no END line (exit $(cat "$d/rc" 2>/dev/null || echo none)) — a dead tap is not evidence"; continue; }
+    [ -n "$fr" ] || { vs_ctl_nj "$run: no END line"; bad "$run: no END line (exit $(cat "$d/rc" 2>/dev/null || echo none)) — a dead tap is not evidence"; continue; }   # #310 g7 NJ
     if [ "$CONTROL" = range-silent ]; then silence_p2 "$tap" "$tap.sil" && mv "$tap.sil" "$tap"; fi
     _dw="$(dead_windows "$tap" "$fr")"
     [ -z "$_dw" ] || bad "$run: ${_dw}— that window is dead"

@@ -6072,6 +6072,14 @@ as a reference the gate's FOLLOWS did not cover, so `test_gate_follows` went red
 the directory would make the gate re-run on every Lua change; the list now names the three files literally (STATE
 14z-197 row (13)). Spell a path the extractor must see as a literal, not as a stem plus a variable.
 
+PAID AGAIN 14z-223 (#310 group 7 batch 4): eleven gates gained `. "$REPO/tests/lib/controls.sh"` for `vs_ctl_nj`, and
+none declared it, so `test_gate_follows` named all eleven UNCOVERED on the confirm tier. The same edit broke a gate
+nobody had touched: `tests/test_plants_not_applied.sh` runs `audit_latch_reads` in a PARTIAL tree it builds by hand
+(`jobs.sh` and `tests/replays` linked, nothing else), so the copy died on the missing source line and its
+`latch-fix-reverted` control went DEAD. A new source line is a new INPUT twice over: declare it in the gate's FOLLOWS, and
+grep for every gate that copies the edited gate into a tree of its own (`command grep -ln 'tests/<gate>.sh' tests/`) and
+give that tree the new file, before the tier.
+
 ## A RIG'S SHARED PIN INSIDE A COMPARED WINDOW ERASES A HIT ON BOTH LEGS — and the frozen row then agrees with itself (paid: 14z-181, GitHub #136, rule-checker run 2026-09-25-148)
 
 `tests/audit_df_moves.sh` compares ours against native by the hits it reads as DROPS of P2's
@@ -8117,3 +8125,14 @@ was run by hand on the second span (21 of 22 fired). Fixed 14z-223: the plant ov
 ending at the span start, whole, and the gate plants every control on every span. **A control sized or anchored to one
 row of a table is a claim about every row: when a table a gate reads gains a row, run the controls on it too, and plant
 what the row's own code holds, not a fixed shape.**
+
+## A CLASSIFIER RULE PROVEN ON ONE KIND OF LOG MISREADS THE OTHER KIND (paid: 14z-223, #367)
+
+#367's first rule read a control mode DIED when its log's last line was a tool's error: a gate that `set -e` ends on an
+`awk: can't open file` never prints its verdict. Replayed over the 1,382 kept honoured mode logs (`build/emu_*/`), it
+changed no verdict, so it looked safe. But every one of those logs was a LIVE run. `tests/test_dead_leg_unjudged.sh`
+runs every row on a DEAD emulator, and two shapes there were misread. `test_hui_air` prints `NOT JUDGED`, its own FAIL,
+then a diagnostic `grep` of the dead leg's missing log, and exits 1; that read DIED. Its neutered copy, the same without
+the NOT JUDGED line, read DIED too. Fixed by reading the rule after NOT-JUDGED and sparing a gate whose own FAIL line comes
+just before the trailing tool errors. **Prove a classifier rule on every population of logs it will judge: live and dead
+runs, plain and mode, the gates and their neutered copies. Not only on the corpus you happen to have kept.**

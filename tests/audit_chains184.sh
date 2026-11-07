@@ -134,9 +134,9 @@ PY
 done
 wait
 for t in $TENANTS; do
-    for leg in native ours; do command grep -q FIELDSUMMARY "$W/tr_$t.$leg.txt" 2>/dev/null || bad "$t $leg: no complete trace (see $t.$leg/mame.log)"; done
+    for leg in native ours; do command grep -q FIELDSUMMARY "$W/tr_$t.$leg.txt" 2>/dev/null || { vs_ctl_nj "$t $leg: no complete trace"; bad "$t $leg: no complete trace (see $t.$leg/mame.log)"; }; done   # #310 g7 NJ
     nt="$(command grep -c ' PC 02713c ' "$W/tap_$t.txt" 2>/dev/null || true)"
-    [ "${nt:-0}" -gt 0 ] || bad "$t: the tap recorded no write from the chain-start instruction (see $t.tap/mame.log)"
+    [ "${nt:-0}" -gt 0 ] || { vs_ctl_nj "$t: the tap recorded no write from the chain-start instruction"; bad "$t: the tap recorded no write from the chain-start instruction (see $t.tap/mame.log)"; }   # #310 g7 NJ
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_chains184"; exit 1; }
 # the tap run and the traced native run are SEPARATE runs: prove they played identically, and that the tap run finished

@@ -1,0 +1,6 @@
+  FLAG FIGURE: 47
+  FLAG D-FIGURE: 17  [build/agent223/t310b3/comment_310.md]
+  FLAG D-ABSOLUTE: In each gate a leg that never ran ended the gate on its liveness check, and a mode counted that exit as its control firing.  [build/agent223/t310b3/comment_310.md]
+  FLAG D-ABSOLUTE: - **The 31 group-7 gates on the emulator concurrent list (121 census rows).** An edit to any of them means a PILOT re-trace.  [build/agent223/t310b3/comment_310.md]
+  FLAG D-ABSOLUTE: The table kills the binary outright, so only the first liveness exit each gate reaches is exercised.  [build/agent223/t310b3/comment_310.md]
+packet_check: 5 flag(s): D-ABSOLUTE 3, D-FIGURE 1, FIGURE 1

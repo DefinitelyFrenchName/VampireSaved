@@ -15,7 +15,7 @@
 #   real-path swap reads 00 where the row says 01 and fails, the moved windows read VOID.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/latch_reads.tsv tests/lib/jobs.sh
 #   tests/lua/read_tap.lua tests/replays/ tests/test_latch_readers.sh tools/run_mame.sh
-#   tools/setup_mame.sh tools/tap_latch_reads.sh
+#   tools/setup_mame.sh tools/tap_latch_reads.sh tests/lib/controls.sh
 #
 # SHEET: none — each leg shape's in-play latch readers are frozen on their own; no leg of ours is compared with a native leg
 #
@@ -73,6 +73,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 BUILD="${BUILD:-build/m3b_merged34}"
 EXPECT="$REPO/tests/expected/latch_reads.tsv"
 CONTROL="${CONTROL:-}"
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_nj only (#310 g7): this gate parses CONTROL itself
 LEGS="${LEGS:-phobos-real phobos-over-donovan phobos-over-demitri donovan-over-demitri donovan-victim donovan-pod-hit donovan-pod-nohit pyron-over-demitri ours-phobos}"
 FLOOR=2000      # in play: after the confirm (1300), the pokes (1500) and the load
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
@@ -143,7 +144,7 @@ done
 vs_pool_wait
 for name in $LEGS; do
     if [ "$(cat "$W/$name.rc" 2>/dev/null)" != 0 ]; then
-        bad "$name: $(tail -1 "$W/$name.log")"
+        [ "$CONTROL" = tap-window-moved ] || vs_ctl_nj "leg $name did not complete"; bad "$name: $(tail -1 "$W/$name.log")"   # #310 g7 NJ
         # #310 groups 5-6 (14z-215): under tap-window-moved the leg ran the perturbed COPY of the tap, and the mode's
         # finding is a COMPLETED leg whose rows differ — a leg that did not complete is not it. The copy's own output
         # at column 0 (a traceback reads DIED), then NOT JUDGED (a shell error or a VOID reads UNJUDGED), never HONOURED.

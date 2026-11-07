@@ -164,7 +164,7 @@ dleg native & dleg ours & wait
 echo "== 3. the rows (every line of every trace, tools/dmg_sweep.py)"
 if python3 "$REPO/tools/dmg_sweep.py" rows "$W" "$RD/donovan_p12.json" > "$W/rows.tsv" 2> "$W/problems.txt"
 then ok "$(wc -l < "$W/rows.tsv" | tr -d ' ') hit rows; every trace complete, every leg's forced ids as traced, Demitri (0x01) the attacker at every hit"
-else bad "the reader found structural problems:"; sed 's/^/        /' "$W/problems.txt"; fi
+else grep -q ': no trace$' "$W/problems.txt" && vs_ctl_nj "the reader found legs with no trace"; bad "the reader found structural problems:"; sed 's/^/        /' "$W/problems.txt"; fi   # #310 g7 NJ
 python3 "$REPO/tools/dmg_sweep.py" rows "$W" "$RD/donovan_p12.json" --perturb engines-agree > "$W/agree.tsv" 2>/dev/null || true
 if python3 "$REPO/tools/dmg_sweep.py" rows "$W" "$RD/donovan_p12.json" --perturb attacker-swapped > /dev/null 2> "$W/swapped.txt"; then sw=0; else sw=1; fi
 if [ "$MODE" = attacker-swapped ]; then
@@ -238,6 +238,7 @@ cleg() {  # cleg <vsavj|vsav2> <tag> <ROMPOKE>
 cleg vsavj base "" & cleg vsavj same "$J_2,$J_5,$J_623" & cleg vsavj swap "$JV_2,$JV_5,$JV_623" &
 cleg vsav2 base "" & cleg vsav2 same "$V_2,$V_5,$V_623" & cleg vsav2 swap "$VJ_2,$VJ_5,$VJ_623" & wait
 for g in vsavj vsav2; do
+    for _t in base same swap; do [ -s "$W/C.$g.$_t/f.ft" ] || { vs_ctl_nj "the counterfactual leg $g $_t wrote no trace"; echo "FAIL: audit_dmg_legacy_sweep (the counterfactual leg $g $_t wrote no trace, see C.$g.$_t/mame.log)"; exit 1; }; done   # #310 g7 NJ
     python3 "$REPO/tools/dmg_sweep.py" nodes "$REPO/build/out/${g}_data.bin" "$g" "$W/C.$g.base/f.ft" > "$W/C.$g.base.hits"
     for t in same swap; do python3 "$REPO/tools/dmg_sweep.py" nodes "$REPO/build/out/${g}_data.bin" "$g" "$W/C.$g.$t/f.ft" > "$W/C.$g.$t.hits"; done
     sed "s/^/     $g base: /" "$W/C.$g.base.hits"

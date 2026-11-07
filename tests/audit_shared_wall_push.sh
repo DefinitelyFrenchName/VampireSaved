@@ -264,14 +264,14 @@ for p in $PARTS; do
     eval "_g=\$GEOM_$p"; set -- $_g; lo=$2; hi=$3; en=$4
     case "$p" in legacy_lilith) a=vsavj; b=vsav2 ;; *) a=ours; b=vsav2 ;; esac
     for leg in $a $b; do
-        [ -s "$W/$p.$leg.txt" ] || { bad "$p $leg: no tap"; continue; }
+        [ -s "$W/$p.$leg.txt" ] || { vs_ctl_nj "$p $leg: no tap"; bad "$p $leg: no tap"; continue; }   # #310 g7 NJ
         if vs_ctl_is flag-planted && [ "$leg" != vsav2 ]; then
             plant "$W/$p.$leg.txt" "$lo" > "$W/$p.$leg.pl" && mv "$W/$p.$leg.pl" "$W/$p.$leg.txt"
         fi
         if vs_ctl_is early-split && [ "$p" = legacy_lilith ] && [ "$leg" = vsav2 ]; then
             plant_split "$W/$p.$leg.txt" 3100 > "$W/$p.$leg.pl" && mv "$W/$p.$leg.pl" "$W/$p.$leg.txt"
         fi
-        [ -s "$W/$p.$leg.ft.txt" ] || { bad "$p $leg: no field trace"; continue; }
+        [ -s "$W/$p.$leg.ft.txt" ] || { vs_ctl_nj "$p $leg: no field trace"; bad "$p $leg: no field trace"; continue; }   # #310 g7 NJ
     done
     [ "$fail" = 0 ] || break
     if vs_ctl_is legs-swapped; then la=$b; lb=$a; else la=$a; lb=$b; fi
@@ -307,6 +307,7 @@ echo "== 2b. the second instrument agrees with the taps"
 # the taps' end and split rows, re-labelled, must equal the field trace's (the same rig, a different reader)
 sed -e 's/	end	/	field-end	/' -e 's/	first-split	/	field-first-split	/' "$W/got.tsv" | grep -E '	field-(end|first-split)	' | sort > "$W/tap_view.tsv"
 sort "$W/field.tsv" > "$W/field_view.tsv"
+[ -s "$W/field_view.tsv" ] || { vs_ctl_nj "the field trace gave no rows to compare"; echo "  FAIL  field_trace gave no rows to compare with the taps (a dead leg)"; echo "FAIL: audit_shared_wall_push"; exit 1; }   # #310 g7 NJ
 if [ -s "$W/field_view.tsv" ] && diff "$W/tap_view.tsv" "$W/field_view.tsv" > "$W/agree.diff"; then ok "field_trace agrees with the taps on $(wc -l < "$W/field_view.tsv" | tr -d ' ') rows"
 else bad "field_trace and the taps disagree"; sed 's/^/        /' "$W/agree.diff"; fi
 for p in $PARTS; do

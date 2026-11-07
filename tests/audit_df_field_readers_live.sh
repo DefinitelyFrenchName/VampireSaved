@@ -16,7 +16,7 @@
 #   the corpus never runs.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_field_readers_live.tsv
 #   tests/lua/read_tap.lua tests/replays/naming/donovan_ tests/replays/naming/huitzil_ tests/replays/naming/pyron_ tools/audit_df_field_readers.py
-#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
+#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/controls.sh
 #
 # SHEET: none — runs our build only, matched against the static reader census; no reference leg
 #
@@ -75,6 +75,7 @@ case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/df_field_readers_live.tsv"
 JOBS="${JOBS:-6}"
 CONTROL="${CONTROL:-}"
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_nj only (#310 g7): this gate parses CONTROL itself
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 for f in verify_op.bin patch/placements.json patch/patch.json; do
@@ -133,7 +134,8 @@ silence_p2() {  # silence_p2 <tap in> <tap out>: every access to P2's range dele
 }
 for r in $RUNS; do
     _rc="$(cat "$W/$r/rc" 2>/dev/null || echo none)"
-    grep -q '^END ' "$W/$r.tap" 2>/dev/null || bad "$r: the tap has no END line (exit $_rc) — a dead tap is not evidence"
+    grep -q '^END ' "$W/$r.tap" 2>/dev/null || { vs_ctl_nj "$r: the tap has no END line (exit $_rc)"; bad "$r: the tap has no END line (exit $_rc) — a dead tap is not evidence"; }   # #310 g7 NJ
+    [ -s "$W/$r.tap" ] || { vs_ctl_nj "$r: the run wrote no tap"; echo "FAIL: audit_df_field_readers_live ($r wrote no tap at $W/$r.tap)"; exit 1; }   # #310 g7 NJ
     if [ "$CONTROL" = range-silent ]; then silence_p2 "$W/$r.tap" "$W/$r.sil" && mv "$W/$r.sil" "$W/$r.tap"; fi
     _d="$(dead_ranges "$W/$r.tap")"
     [ -z "$_d" ] || bad "$r: no write in the ${_d}range — that tap range is dead (the block clears must hit both)"

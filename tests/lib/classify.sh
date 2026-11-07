@@ -136,6 +136,20 @@ vs_classify() {
 # concurrent controls, 28 modes that take 30-1,600 s read HONOURED in 0-1 s (some logs hold only the mktemp line); the
 # clean rerun's 227 control logs carry none of these (build/agent210/t321e2/env_signatures.txt).
 VS_ENV_ERR='No space left on device|^mktemp: |cannot create (regular file|directory) |: cannot create /|Permission denied|Read-only file system|Too many open files|Cannot allocate memory|Disk quota exceeded'
+# A GATE THAT DIED ON A TOOL'S ERROR, NOT ON ITS VERDICT (14z-223, GitHub #367): under `set -e` a tool that fails (awk on
+# a file a dead leg never wrote, a cp into a missing directory) ends the gate with the tool's status before the gate prints
+# its own verdict, so the log ENDS on the tool's own error lines with no FAIL line of the gate's just before them. A gate
+# that reaches its verdict prints its FAIL line last (or just before a diagnostic it runs after it). audit_marionette_cost's three modes read HONOURED that way on a dead emulator (`awk: can't open file`,
+# exit 2). Over the 1,383 kept emulator-runner mode logs (build/emu_*/), none of the 1,382 honoured ones ends on such a
+# line (build/agent223/t367/scan.py). Not caught: a `set -e` death that prints nothing (`grep -q`, a failed `[ ]` test).
+# Read AFTER the NOT-JUDGED branch: a gate that printed `NOT JUDGED:` judged nothing, and a diagnostic it runs after its own
+# FAIL (test_hui_air greps the dead leg's missing log, then exits 1) leaves a tool's error last without a crash (14z-223).
+VS_TOOL_ERR="^(awk|gawk|mawk|sed|gsed|grep|egrep|sort|cut|head|tail|wc|tr|python3?|perl|cat|cmp|diff|xxd|od|uniq|join|paste|find|ls|stat|cp|mv|rm|mkdir|unzip|zip|sha1sum|shasum|md5sum)(: | \\(.*\\): )|can't open file|: No such file or directory\$|^ source line number [0-9]+\$"
+_vs_last_line() { awk 'NF { l = $0 } END { print l }' "$1"; }
+# _vs_tool_death <log>: prints the last line and succeeds when the log ENDS on tool-error lines (VS_TOOL_ERR) and the line
+# before them is not the gate's own FAIL — a gate that printed its FAIL and then ran a diagnostic that failed (test_hui_air
+# greps a dead leg's missing log after `FAIL: float replay guard tripped:`) exited by its own hand (14z-223)
+_vs_tool_death() { VS_TOOL_ERR="$VS_TOOL_ERR" awk 'NF { a[++n] = $0 } END { re = ENVIRON["VS_TOOL_ERR"]; if (!n || a[n] !~ re) exit 1; i = n; while (i > 0 && a[i] ~ re) i--; if (i > 0 && a[i] ~ /^ *FAIL/) exit 1; print a[n] }' "$1"; }
 vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate script as invoked>] [<control name>]
     _cst="$1"; _clog="$2"; _cgate="${3:-}"; _cname="${4:-}"
     if grep -qa '^REFUSED: CONTROL=' "$_clog"; then
@@ -170,6 +184,8 @@ vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate sc
             VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="a SKIP with exit $_cst is not a verdict: $(grep -aE -m1 '^ *SKIP' "$_clog" | cut -c1-90)"
         elif grep -qa '^NOT JUDGED: ' "$_clog"; then   # NOT-JUDGED (#310)
             VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="the mode run measured nothing: $(grep -a -m1 '^NOT JUDGED: ' "$_clog" | cut -c13-92)"
+        elif _vs_tool_death "$_clog" > /dev/null; then   # TOOL-ERROR (#367)
+            VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a gate that died on a tool's error is not a verdict (exit $_cst): $(_vs_tool_death "$_clog" | cut -c1-90)"
         else
             VS_CTL_EXEC=HONOURED; VS_CTL_EXEC_DETAIL="reached the gate's own FAIL (exit $_cst)"
         fi ;;

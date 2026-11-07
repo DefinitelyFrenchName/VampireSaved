@@ -97,7 +97,7 @@ echo "  rom   $(echo "$romchk" | grep 'all match' | head -1); vsavj program fing
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"
 echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
-. "$REPO/tests/lib/mame_ident.sh"; vs_mame_ident "$MAME_BIN" || { echo "FAIL: the MAME binary is not the pinned release (above)"; exit 1; }
+. "$REPO/tests/lib/mame_ident.sh"; vs_mame_ident "$MAME_BIN" || { vs_ctl_nj "the MAME binary is not the pinned release"; echo "FAIL: the MAME binary is not the pinned release (above)"; exit 1; }   # #310 g7 NJ
 
 F="ff8109:b:timer"; RT=""
 for s in 1 2; do
@@ -136,7 +136,7 @@ for l in $LEGS; do
     grep -q '^FIELDSUMMARY' "$W/$n.fields" 2>/dev/null || { echo "  FAIL  $n: no FIELDSUMMARY (see $W/$n/mame.log) — VOID"; fail=1; }
     grep -q '^END ' "$W/tap$n.tap" 2>/dev/null || { echo "  FAIL  tap$n: no END line (see $W/tap$n/mame.log) — VOID"; fail=1; }
 done
-[ "$fail" = 0 ] || { echo "FAIL: audit_mizuumi_attack (a leg did not complete)"; exit 1; }
+[ "$fail" = 0 ] || { vs_ctl_nj "a leg did not complete"; echo "FAIL: audit_mizuumi_attack (a leg did not complete)"; exit 1; }   # #310 g7 NJ
 echo "  ok    ten legs complete"
 
 check() {  # check <perturbation: none|previous-press-key|hit-vs-start|cpu-side|isolated-presses>

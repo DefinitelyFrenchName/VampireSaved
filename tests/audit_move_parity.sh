@@ -16,7 +16,7 @@
 #   DIFF's cause is audit_move_parity_attribution's question.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/move_parity_events.tsv
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/replays/naming/ tools/move_parity.py
-#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh tests/lib/controls.sh
 #
 # SHEET: legs vs2,ours — moments: one per event, at its first divergent frame for a DIFF and mid-window otherwise — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168])
 # SHEET-VERDICTS: NOT-IN-DF = an event labelled "in DF" ran without the Dark Force flag up on both legs, so it is not compared
@@ -161,6 +161,7 @@ case "$CONTROL" in
     ""|unpinned-level|no-translation|pins-ignored|stock-starved|movement-x|white-pin|field-dropped) ;;
     *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;;
 esac
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
 
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"   # KEEP (14z-186, #193): the legs' traces kept for reading
@@ -384,8 +385,8 @@ done
 wait
 for part in $SET; do
     t="${part%_*}"; p="${part##*_}"
-    [ -s "$W/tr_${t}_${p}_native.txt" ] || bad "$part: native leg produced no samples"
-    [ -s "$W/tr_${t}_${p}_ours.txt" ]   || bad "$part: ours leg produced no samples"
+    [ -s "$W/tr_${t}_${p}_native.txt" ] || { vs_ctl_nj "$part: native leg produced no samples"; bad "$part: native leg produced no samples"; }   # #310 g7 NJ
+    [ -s "$W/tr_${t}_${p}_ours.txt" ]   || { vs_ctl_nj "$part: ours leg produced no samples"; bad "$part: ours leg produced no samples"; }   # #310 g7 NJ
 done
 [ "$fail" = 0 ] || { echo "FAIL: a leg did not run"; exit 1; }
 ok "$n legs ran"

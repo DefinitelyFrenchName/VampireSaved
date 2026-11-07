@@ -82,8 +82,8 @@ leg held "$BASEP"
 leg released "$BASEP;6100:ff8b82:03"
 fail=0
 for l in held released; do
-    grep -q '^END ' "$W/${l}_tap.txt" 2>/dev/null || { echo "  FAIL  $l: no END line in the tap (see $W/${l}_tap/mame.log) — VOID"; fail=1; }
-    [ -f "$W/${l}_dmp/dump_6990_ff8800.bin" ] || { echo "  FAIL  $l: dumps incomplete (see $W/${l}_dmp/mame.log) — VOID"; fail=1; }
+    grep -q '^END ' "$W/${l}_tap.txt" 2>/dev/null || { vs_ctl_nj "$l: no END line in the tap"; echo "  FAIL  $l: no END line in the tap (see $W/${l}_tap/mame.log) — VOID"; fail=1; }   # #310 g7 NJ
+    [ -f "$W/${l}_dmp/dump_6990_ff8800.bin" ] || { vs_ctl_nj "$l: dumps incomplete"; echo "  FAIL  $l: dumps incomplete (see $W/${l}_dmp/mame.log) — VOID"; fail=1; }   # #310 g7 NJ
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_tenant_continue_switch (a leg did not complete)"; exit 1; }
 echo "  ok    two legs complete"

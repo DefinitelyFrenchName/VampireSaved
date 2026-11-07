@@ -16,7 +16,7 @@
 #   and exception-free; the planted pre-fix shape fails. A red is the remap class back.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/column_shock.tsv
 #   tests/lua/field_trace.lua tests/lua/read_tap.lua tests/replays/naming/ tools/name_moves.py
-#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh tests/lib/controls.sh
 #
 # SHEET: legs vs2,ours — moments: the column's timeline on each leg (the special, each hit, Donovan's and the victim's return to neutral), the column KO's death frame, and the first hit on the airborne victim, each on that leg's own field trace — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); the +0x5C write taps are not drawn (read taps prove no frame), their hit frames are the timeline's
 #
@@ -71,6 +71,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 case "$CONTROL" in ""|old-shock|air-marker) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -149,7 +150,7 @@ tap n2 vsav2  "$ROMDIR" "$W/native.rpl" "$pk" ff885c,2 "$W/native.p2.txt"
 tap o1 vsavjw "$ORP"    "$W/ours.rpl"   "$pk" ff845c,2 "$W/ours.p1.txt"
 tap o2 vsavjw "$ORP"    "$W/ours.rpl"   "$pk" ff885c,2 "$W/ours.p2.txt"
 wait
-for t in n1 n2 o1 o2; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "run $t exited $_rc (an emulator that crashed is not evidence)"; done
+for t in n1 n2 o1 o2; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "run $t exited $_rc"; bad "run $t exited $_rc (an emulator that crashed is not evidence)"; }; done   # #310 g7 NJ
 [ "$fail" = 0 ] || { echo "FAIL: audit_column_shock"; exit 1; }
 : > "$W/got.tsv"
 for leg in native ours; do for who in p1 p2; do
@@ -172,7 +173,7 @@ pk_t="$(pokes_for "$j" 2990)"
 trace nt vsav2  "$ROMDIR" "$W/native.rpl" "$pk_t" "$W/native.ft"
 trace ot vsavjw "$ORP"    "$W/ours.rpl"   "$pk_t" "$W/ours.ft"
 wait
-for t in nt ot; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "trace $t exited $_rc"; done
+for t in nt ot; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "trace $t exited $_rc"; bad "trace $t exited $_rc"; }; done   # #310 g7 NJ
 [ "$fail" = 0 ] || { echo "FAIL: audit_column_shock"; exit 1; }
 python3 - "$W" >> "$W/got.tsv" 2> "$W/err" <<'PY' || bad "timeline: $(cat "$W/err")"
 import sys
@@ -221,7 +222,7 @@ ko_trace() {  # ko_trace <name> <set> <rompath> <rpl> <out.ft>   (background)
 ko_trace kn vsav2  "$ROMDIR" "$W/native.rpl" "$W/ko_native.ft"
 ko_trace ko vsavjw "$ORP"    "$W/ours.rpl"   "$W/ko_ours.ft"
 wait
-for t in kn ko; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "KO trace $t exited $_rc"; done
+for t in kn ko; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "KO trace $t exited $_rc"; bad "KO trace $t exited $_rc"; }; done   # #310 g7 NJ
 python3 - "$W" >> "$W/got.tsv" 2> "$W/err" <<'PY' || bad "KO: $(cat "$W/err")"
 import sys
 W = sys.argv[1]
@@ -264,7 +265,7 @@ air_trace() {  # air_trace <name> <set> <rompath> <rpl> <out.ft>   (background)
 air_trace an vsav2  "$ROMDIR" "$W/air_native.rpl" "$W/air_native.ft"
 air_trace ao vsavjw "$ORP"    "$W/air_ours.rpl"   "$W/air_ours.ft"
 wait
-for t in an ao; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "air trace $t exited $_rc"; done
+for t in an ao; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "air trace $t exited $_rc"; bad "air trace $t exited $_rc"; }; done   # #310 g7 NJ
 python3 - "$W" >> "$W/got.tsv" 2> "$W/err" <<'PY' || bad "air: $(cat "$W/err")"
 import sys
 W = sys.argv[1]

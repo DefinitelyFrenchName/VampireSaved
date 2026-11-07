@@ -97,7 +97,7 @@ regfp="$(awk -F'\t' '$2 == "vsavj" && $1 !~ /^#/ {print $1}' "$REPO/tests/expect
 [ -n "$romfp" ] && [ "$romfp" = "$regfp" ] || { echo "FAIL: vsavj program fingerprint '$romfp' is not the registry's vsavj row '$regfp'"; exit 1; }
 echo "  rom   $(echo "$romchk" | grep 'all match' | head -1); vsavj program fingerprint $romfp = registry vsavj row; zips $(python3 -c 'import hashlib,sys; print(" ".join(f"{z}.zip=" + hashlib.sha1(open(f"{sys.argv[1]}/{z}.zip","rb").read()).hexdigest() for z in ("vsavj","vsav","qsound_hle")))' "$ROMDIR")"
 echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
-. "$REPO/tests/lib/mame_ident.sh"; vs_mame_ident "$MAME_BIN" || { echo "FAIL: the MAME binary is not the pinned release (above)"; exit 1; }
+. "$REPO/tests/lib/mame_ident.sh"; vs_mame_ident "$MAME_BIN" || { vs_ctl_nj "the MAME binary is not the pinned release"; echo "FAIL: the MAME binary is not the pinned release (above)"; exit 1; }   # #310 g7 NJ
 
 # ADDRESSES ARE COMPUTED from the block base, never concatenated (14z-189: "ff84"+"39f" read a wrong address as 0).
 F="ff8109:b:timer"; RT=""
@@ -150,7 +150,7 @@ done
 for l in $TLEGS; do t="${l%%:*}"; nl=$((nl + 1))
     grep -q '^END ' "$W/$t.tap" 2>/dev/null || { echo "  FAIL  $t: no END line (see $W/$t/mame.log) — VOID"; fail=1; }
 done
-[ "$fail" = 0 ] || { echo "FAIL: audit_mizuumi_struct (a leg did not complete)"; exit 1; }
+[ "$fail" = 0 ] || { vs_ctl_nj "a leg did not complete"; echo "FAIL: audit_mizuumi_struct (a leg did not complete)"; exit 1; }   # #310 g7 NJ
 echo "  ok    $nl legs complete"
 
 # the poked leg: its pokes are computed from the real 03 leg, so it runs after it
@@ -167,7 +167,7 @@ ent = [f"{f}:ff8530:{v:04x}" for f, v in fr] + [f"{fr[0][0]}-{fr[299][0]}:ff855a
 open(sys.argv[2], "w").write(";".join(ent))
 PY
 leg poked03 03_two_player_vs 12000 "$(cat "$W/pokes.txt")"
-grep -q '^FIELDSUMMARY' "$W/poked03.fields" 2>/dev/null || { echo "  FAIL  poked03: no FIELDSUMMARY (see $W/poked03/mame.log) — VOID"; exit 1; }
+grep -q '^FIELDSUMMARY' "$W/poked03.fields" 2>/dev/null || { vs_ctl_nj "poked03: no FIELDSUMMARY"; echo "  FAIL  poked03: no FIELDSUMMARY (see $W/poked03/mame.log) — VOID"; exit 1; }   # #310 g7 NJ
 echo "  ok    the poked leg complete ($(tr ';' '\n' < "$W/pokes.txt" | wc -l | tr -d ' ') poke entries)"
 # the +0x3B6 poke leg (14z-196, HOMING item 4's poke-3b6; the 14z-194 pilot's eris_poke3b6.sh pattern): replay 03 with
 # the TIME-OVER WINNER's +0x3B6 poked to 0x5A on 41 frames around 03's time-over — both DERIVED from the real 03 leg —
@@ -183,7 +183,7 @@ w = 1 if t0["hp1"] > t0["hp2"] else 2
 open(sys.argv[2], "w").write(f"{t0['f'] - 13}-{t0['f'] + 27}:{0xff8400 + (w - 1) * 0x400 + 0x3b6:06x}:5a")
 PY
 leg poke3b6 03_two_player_vs 12000 "$(cat "$W/pokes3b6.txt")"
-grep -q '^FIELDSUMMARY' "$W/poke3b6.fields" 2>/dev/null || { echo "  FAIL  poke3b6: no FIELDSUMMARY (see $W/poke3b6/mame.log) — VOID"; exit 1; }
+grep -q '^FIELDSUMMARY' "$W/poke3b6.fields" 2>/dev/null || { vs_ctl_nj "poke3b6: no FIELDSUMMARY"; echo "  FAIL  poke3b6: no FIELDSUMMARY (see $W/poke3b6/mame.log) — VOID"; exit 1; }   # #310 g7 NJ
 echo "  ok    the +0x3B6 poke leg complete (POKES $(cat "$W/pokes3b6.txt"))"
 
 check() {  # check <swap 0|1> <the 03 leg's name> <out.tsv> [<invert 02's roles 0|1>] — prints [tag] ok/FAIL lines, writes the counts, exits 1 on any FAIL

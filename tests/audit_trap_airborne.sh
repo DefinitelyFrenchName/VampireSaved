@@ -77,7 +77,7 @@ legs() {
             "$REPO/tools/run_mame.sh" "$set_" -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$_d/$leg/mame.log" 2>&1; rm -rf "$_d/$leg/sb" ) </dev/null &
     done
     wait
-    for leg in native merged; do [ -s "$_d/$leg.ft" ] || bad "$leg (P2 up at $_j): no samples"; done
+    for leg in native merged; do [ -s "$_d/$leg.ft" ] || { vs_ctl_nj "$leg (P2 up at $_j): no samples"; bad "$leg (P2 up at $_j): no samples"; }; done   # #310 g7 NJ
 }
 # rows <dir>: the per-leg step rows from <dir>/{native,merged}.ft to <dir>/rows.tsv
 rows() {

@@ -191,7 +191,7 @@ echo "== 1. the field values, live (tests/lua/field_trace.lua on the same inputs
     FIELD_OUT="$W/ft.txt" FIELD_FROM=3000 FIELD_TO=3000 FRAMES=3001 \
     "$REPO/tools/run_mame.sh" vsavj -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/ft.log" 2>&1 ) </dev/null
 FT="$(awk '$1 == "F" && $2 == 3000' "$W/ft.txt")"
-[ -n "$FT" ] || { echo "FAIL: field_trace produced no sample at 3000 ($W/ft.log)"; exit 1; }
+[ -n "$FT" ] || { vs_ctl_nj "field_trace produced no sample at 3000"; echo "FAIL: field_trace produced no sample at 3000 ($W/ft.log)"; exit 1; }   # #310 g7 NJ
 x="$(printf '%s' "$FT" | sed 's/.* x=\(-*[0-9]*\).*/\1/')"; x2="$(printf '%s' "$FT" | sed 's/.*x2=\(-*[0-9]*\).*/\1/')"
 tm="$(printf '%s' "$FT" | sed 's/.*timer=\(-*[0-9]*\).*/\1/')"
 ok "f3000: x=$x x2=$x2 timer=$tm"
@@ -278,7 +278,7 @@ echo "== 4b. the event basis (D2): a leg re-run under its own tap instrument, pr
 E="$W/ev"; mkdir -p "$E/legs" "$E/files" "$W/evgate"
 ( cd "$W/evgate" && MAME_SANDBOX="$W/evgate/sb" MAME_ROMPATH="$ROMDIR" REPLAY="$REPO/$RPL" RTAP="ff8410,2" WINDOW="2000,2100" \
     TRACE_OUT="$W/evgate/t.txt" FRAMES=2200 "$REPO/tools/run_mame.sh" vsavj -autoboot_script "$REPO/tests/lua/read_tap.lua" > "$W/evgate/m.log" 2>&1 ) </dev/null
-[ -s "$W/evgate/t.txt" ] || { echo "FAIL: the fixture's read_tap run wrote no log ($W/evgate/m.log)"; exit 1; }
+[ -s "$W/evgate/t.txt" ] || { vs_ctl_nj "the fixture's read_tap run wrote no log"; echo "FAIL: the fixture's read_tap run wrote no log ($W/evgate/m.log)"; exit 1; }   # #310 g7 NJ
 cp "$RPL" "$E/legs/ev.v.rpl"; cp "$W/evgate/t.txt" "$E/files/gate.tap"
 awk '$1 == "W" {$2 = $2 + 1} {print}' "$W/evgate/t.txt" > "$E/files/shift.tap"
 awk '$1 == "W" && $2 >= 2195 && !done {$8 = "deadbeef"; done = 1} {print}' "$W/evgate/t.txt" > "$E/files/value.tap"
@@ -461,7 +461,7 @@ ifl() {  # ifl <frame> -> ff8410:w=<x>,ff8810:w=<x2> at that frame of the live t
     awk -v f="$1" '$1 == "F" && $2 == f {x = $0; sub(/.* x=/, "", x); sub(/ .*/, "", x); y = $0; sub(/.*x2=/, "", y); sub(/ .*/, "", y); print "ff8410:w=" x ",ff8810:w=" y}' "$W/ft4.txt"
 }
 I63="$(ifl 2363)"; I81="$(ifl 2381)"
-[ -n "$I63" ] && [ -n "$I81" ] || { echo "FAIL: field_trace gave no vsav2 sample at 2363/2381 ($W/ft4.log)"; exit 1; }
+[ -n "$I63" ] && [ -n "$I81" ] || { vs_ctl_nj "field_trace gave no vsav2 sample at 2363/2381"; echo "FAIL: field_trace gave no vsav2 sample at 2363/2381 ($W/ft4.log)"; exit 1; }   # #310 g7 NJ
 cp "$IRPL" "$B/legs/gi.n.rpl"
 { echo "sheet${T}gi${T}round intro${T}-${T}-${T}-"
   echo "leg${T}gi${T}n${T}vs2${T}vsav2${T}$ROMDIR${T}legs/gi.n.rpl${T}$IPK${T}2382${T}-${T}-"
@@ -487,7 +487,7 @@ echo "== 6b. who plays whom, read from the game's state (the maintainer, 14z-206
     FIELD_OUT="$W/ft3.txt" FIELD_FROM=2900 FIELD_TO=2900 FRAMES=3001 \
     "$REPO/tools/run_mame.sh" vsavj -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/ft3.log" 2>&1 ) </dev/null
 FW="$(awk '$1 == "F" && $2 == 2900' "$W/ft3.txt")"
-[ -n "$FW" ] || { echo "FAIL: field_trace produced no sample at 2900 ($W/ft3.log)"; exit 1; }
+[ -n "$FW" ] || { vs_ctl_nj "field_trace produced no sample at 2900"; echo "FAIL: field_trace produced no sample at 2900 ($W/ft3.log)"; exit 1; }   # #310 g7 NJ
 c1="$(printf '%s' "$FW" | sed 's/.* c1=\([0-9]*\).*/\1/')"; c2="$(printf '%s' "$FW" | sed 's/.* c2=\([0-9]*\).*/\1/')"
 lv="$(printf '%s' "$FW" | sed 's/.* lv=\([0-9]*\).*/\1/')"
 WHO="$(printf '%02x/%02x/%d' "$c1" "$c2" "$lv")"; WHO_SWAP="$(printf '%02x/%02x/%d' "$c2" "$c1" "$lv")"
@@ -504,7 +504,7 @@ echo "== 7. S4-D: a span — about 9 frames of a judged event, each proven on th
 ( cd "$W" && MAME_SANDBOX="$W/ft2" MAME_ROMPATH="$ROMDIR" REPLAY="$REPO/$RPL" FIELDS="ff8410:w:x,ff8810:w:x2,ff8109:b:timer" \
     FIELD_OUT="$W/ft2.txt" FIELD_FROM=2980 FIELD_TO=3000 FRAMES=3001 \
     "$REPO/tools/run_mame.sh" vsavj -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/ft2.log" 2>&1 ) </dev/null
-[ "$(awk '$1 == "F"' "$W/ft2.txt" | wc -l | tr -d ' ')" = 21 ] || { echo "FAIL: field_trace gave no 21-frame trace ($W/ft2.log)"; exit 1; }
+[ "$(awk '$1 == "F"' "$W/ft2.txt" | wc -l | tr -d ' ')" = 21 ] || { vs_ctl_nj "field_trace gave no 21-frame trace"; echo "FAIL: field_trace gave no 21-frame trace ($W/ft2.log)"; exit 1; }   # #310 g7 NJ
 D="$W/span"; mkdir -p "$D/legs"; cp "$S/legs/gt.v.rpl" "$S/legs/gt.v.log" "$D/legs/"
 cp "$W/ft2.txt" "$D/legs/gt.v.trace"
 awk '$1 == "F" && $2 == 2995 {sub(/ x=-*[0-9]+/, " x=12345")} {print}' "$W/ft2.txt" > "$D/legs/gt.w.trace"

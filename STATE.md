@@ -61,6 +61,39 @@ let's focus on bugs and test integrity"**. Working evidence: `build/agent223/` (
 its 14z-222 header correction) 4 HONOURED SAFE and listed again. PILOT's local provisional tag `freeze/merged-m26`
 (`564775cf`) deleted and origin's tags fetched; PILOT is left detached at `3d90dfaa`.
 
+### (3) #310 GROUP 7 BATCH 3 — 48 ROWS OVER 7 GATES; #367 FILED
+- The seven group-7 MAME gates with two or more modes off the concurrent lists (`audit_ladder_pick_store`,
+  `audit_marionette_cost`, the three `audit_mizuumi_*`, `audit_tick_cadence`, `test_proof_sheets`): all 48 modes read
+  HONOURED on a dead emulator at `c5fe01b4`; each liveness exit now calls `vs_ctl_nj` (`# #310 g7 NJ`), and all 48 read
+  UNJUDGED; live, all seven PASS plainly and all 48 modes read HONOURED. `tests/expected/dead_leg_unjudged.tsv` 91 rows,
+  `tests/test_dead_leg_unjudged.sh` PASS. One defect of my own, found by a reader and fixed: `audit_tick_cadence`'s tagged
+  binary check ran before `controls.sh` was sourced (moved; run dead with a missing binary, UNJUDGED).
+- **#367 filed:** `tests/lib/classify.sh` reads a `set -e` gate that dies on a tool error as HONOURED
+  (`audit_marionette_cost`'s pre-fix exit 2 after `awk: can't open file`; batch 3 fixed that gate's path).
+- Rule-checker run -1718 OK after -1714 to -1717 (-1713 withdrawn unspawned); the progress comment posted on #310.
+  Left of group 7 (the 14z-215 census, which predates later modes): 31 concurrent-list gates (121 rows), podman's 2 rows,
+  the six held out.
+
+### (4) #367 — THE CLASSIFIER'S TOOL-ERROR RULE; #310 GROUP 7 BATCH 4 — 112 ROWS OVER 29 GATES; #368 FILED
+The maintainer: **"continue with both #367 and the next batches of #310 unless there's a blocker. PILOT and ERIS are
+available to be put to good use"**.
+- **#367:** `tests/lib/classify.sh` reads DIED a mode whose log ends on a tool's error lines with no gate FAIL just before
+  them and no `NOT JUDGED:` line; `tests/test_emulator_runner.sh` section 14o and its `tool-honoured` control; the replay
+  over 1,382 kept honoured mode logs changes no verdict. Its first form misread two dead-run shapes (`test_hui_air`), found
+  by the dead-leg gate and fixed (gotcha in `docs/project/gotchas.md`). `test_emulator_runner` re-traced SAFE on PILOT.
+- **Batch 4:** the 30 group-7 gates on the emulator concurrent list; two workers tagged disjoint halves, one combined dead
+  run checked them (113 UNJUDGED, 8 correctly HONOURED: evidence a dead MAME_BIN does not remove). 112 rows, the table at
+  203, `tests/test_dead_leg_unjudged.sh` PASS. Live on ERIS (28 gates) and the Mac (`test_readme_recording`): every plain run
+  PASSes, every mode HONOURED but one. Concurrent controls re-traced at scratch `1ecdcc22`: PILOT 15 SAFE, ERIS 13 SAFE.
+- **#368 filed:** `audit_flicker_attribution`'s `shared-sandbox` control has fired on a dead leg in every kept release tier,
+  never on the frozen-basis check it names; now UNJUDGED live, the gate HOLLOW and off the emulator concurrent list.
+- **Two reds on the confirm tier, both mine, fixed:** the eleven gates that gained the `controls.sh` source line did not
+  declare it in `# FOLLOWS:` (`test_gate_follows`), and `tests/test_plants_not_applied.sh`'s hand-built copy of
+  `audit_latch_reads` lacked the file, so its `latch-fix-reverted` control went DEAD. Both gates PASS after the fix; the
+  twelve changed scripts re-traced at scratch `f329dc8d`, all SAFE and every control HONOURED (PILOT five plus
+  `test_plants_not_applied`, ERIS six), rows re-pointed. Gotcha
+  appended in `docs/project/gotchas.md`.
+
 ## Session 14z-222 — **M26 FROZEN at `bb10ce97` (#357 Donovan's guard orbs and #363 Phobos's Plasma Beam freezing its victim; tags `freeze/donovan-m30`, `huitzil-m37`, `pyron-m31`, `merged-m26`) and RELEASED: `freeze/merged-m26` published on GitHub with merged-m24's zips pruned, after every release gate passed on the Mac, ERIS and PILOT; #345, #346, #356, #357, #358 and #363 closed done on rule-checker run -1708 after -1697 to -1707; #365 and #366 filed.** Opus 5.5 at effort High, transcript `356b9b97` (compacted twice).
 
 ### opened with

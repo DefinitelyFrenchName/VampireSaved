@@ -11,7 +11,9 @@
 #   decrypt cache is built before the tier; since 14z-210 (#321): a listed gate's controls run beside one another in a
 #   pool (an unlisted gate's, and any gate's at --jobs 1, one after another) without deadlocking a full pool, and
 #   --order starts a pooled lane longest first; and a control mode that says `NOT JUDGED: ` reads UNJUDGED (#310);
-#   and a control mode stopped by its host (a full disk, a failed mktemp, a refused write) reads DIED (#321); and with
+#   and a control mode stopped by its host (a full disk, a failed mktemp, a refused write) reads DIED (#321); and one
+#   that died under set -e on a tool's error, the tool's line last in its log, reads DIED while a tool error before the
+#   gate's own FAIL stays honoured, and a NOT JUDGED log stays UNJUDGED (#367, section 14o); and with
 #   no TMPDIR from the caller a gate's temp files go to the run's own directory under build/tmp/, removed at the end,
 #   and a run with less free space there than it needs refuses to start (#321); and a selected gate whose worker
 #   died before writing its row is a FAIL of its own, never a GREEN on fewer rows (#321). Since 14z-215 (#310 group 3)
@@ -41,6 +43,7 @@
 # MUST-FIRE: shadow-tool: decrypt-warm-off — a copy of the runner whose DECRYPT-WARM call is disabled must leave a gate that reads build/out directly on a cold cache, and section 17 must FAIL (mode: that copy is the runner every section drives; #305, 14z-209)
 # MUST-FIRE: shadow-tool: unjudged-honoured — a copy of tests/lib/classify.sh whose NOT-JUDGED branch is disabled must read a control mode that FAILs after printing `NOT JUDGED: ` as an honoured PASS, and section 14c must FAIL (mode: that copy is the classifier every section's runner sources; #310, 14z-210)
 # MUST-FIRE: shadow-tool: env-honoured — a copy of tests/lib/classify.sh whose ENV-ERROR branch is disabled must read a control mode that FAILs on `mktemp: No space left on device` as an honoured PASS, and section 14k must FAIL (mode: that copy is the classifier every section's runner sources; #321, 14z-210)
+# MUST-FIRE: shadow-tool: tool-honoured — a copy of tests/lib/classify.sh whose TOOL-ERROR branch is disabled must read a control mode that dies under `set -e` on `awk: can't open file` (exit 2, the tool's error its last line) as an honoured PASS, and section 14o must FAIL (mode: that copy is the classifier every section's runner sources; #367, 14z-223)
 # MUST-FIRE: shadow-tool: jobs-leak — a copy of the runner whose own job count is named JOBS again must hand a caller-exported JOBS=7 to a gate as its --jobs 2, and section 20 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
 # MUST-FIRE: shadow-tool: concurrent-off — a copy of the runner whose CONCURRENT-CONTROLS test is always false must run a listed gate's two controls one after another, and section 18 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
 # MUST-FIRE: shadow-tool: order-ignored — a copy of the runner whose ORDER-SORT step is disabled must start a pooled lane's gates in registry order under --order, and section 19 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
@@ -224,6 +227,7 @@ mkdir -p "$FR/tests/lib"
 CLSLIB="$REPO/tests/lib/classify.sh"
 vs_ctl_is unjudged-honoured && CLSLIB="$T/classify_unjudged.sh"
 vs_ctl_is env-honoured && CLSLIB="$T/classify_env.sh"
+vs_ctl_is tool-honoured && CLSLIB="$T/classify_tool.sh"
 ln -s "$CLSLIB" "$FR/tests/lib/classify.sh"
 CTLLIB="$REPO/tests/lib/controls.sh"; MEASLIB="$REPO/tests/lib/measures.sh"
 if vs_ctl_is lane-var-shared; then CTLLIB="$T/controls_lanevar.sh"; MEASLIB="$T/measures_lanevar.sh"; fi
@@ -232,6 +236,8 @@ sed "s@        elif grep -qa '^NOT JUDGED: ' \"\$_clog\"; then   # NOT-JUDGED (#
 cmp -s "$REPO/tests/lib/classify.sh" "$T/classify_unjudged.sh" && fail "could not disable the NOT-JUDGED branch — the line moved"
 sed "s@        elif grep -qaE \"\$VS_ENV_ERR\" \"\$_clog\"; then   # ENV-ERROR (#321)@        elif false; then   # ENV-ERROR disabled@" "$REPO/tests/lib/classify.sh" > "$T/classify_env.sh"
 cmp -s "$REPO/tests/lib/classify.sh" "$T/classify_env.sh" && fail "could not disable the ENV-ERROR branch — the line moved"
+sed "s@        elif _vs_tool_death \"\$_clog\" > /dev/null; then   # TOOL-ERROR (#367)@        elif false; then   # TOOL-ERROR disabled@" "$REPO/tests/lib/classify.sh" > "$T/classify_tool.sh"
+cmp -s "$REPO/tests/lib/classify.sh" "$T/classify_tool.sh" && fail "could not disable the TOOL-ERROR branch — the line moved"
 ln -s "$CTLLIB" "$FR/tests/lib/controls.sh"   # the controls reader beside it (14z-147)
 ln -s "$MEASLIB" "$FR/tests/lib/measures.sh"   # the measurement reader too (14z-180): the runner must survive a gate that declares nothing
 
@@ -881,6 +887,44 @@ if ! vs_ctl_is env-honoured; then
         || { vs_ctl_dead env-honoured "the classifier without the branch read g_cenv@flip '$v14n'"; fail "env-honoured"; }
 fi
 rm -f "$FR/tests/g_cenv.sh" "$FR/tests/g_cenvfail.sh" "$FR/tests/g_cenvlike.sh"
+
+echo "14o. a control mode that dies on a tool's error under set -e is DIED, never honoured (#367, 14z-223)"
+# audit_marionette_cost under `set -eu`: a dead leg wrote no output, its next awk printed `awk: can't open file ...` /
+# ` source line number 1` and set -e ended the gate with exit 2 before its verdict; three modes read HONOURED. A tool error
+# earlier in a log that ends on the gate's own FAIL, and a FAIL that merely names a missing file, stay honoured.
+mkc g_ctool    'echo "== 3. the in-gate controls"; echo "awk: can\x27t open file /tmp/t/ctl_drift.txt"; echo " source line number 1"; exit 2' "PASS: fine" "CONTROL FIRED: flip — caught"
+mkc g_ctoolmid 'echo "grep: /tmp/t/opt.txt: No such file or directory"; echo "FAIL: caught — the planted frame moved"; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+mkc g_ctoollike 'echo "FAIL: caught — the rig reports: No such file or directory"; echo "FAIL: g_ctoollike (control mode)"; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+# test_hui_air's shape on a dead emulator: NOT JUDGED, its own FAIL, then a diagnostic grep of the dead leg's missing log
+# a gate's own FAIL, then a diagnostic whose tool fails, no NOT JUDGED: it exited by its own hand, honoured
+mkc g_ctooldiag 'echo "FAIL: caught — the planted frame moved:"; echo "grep: /tmp/t/g.log: No such file or directory"; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+mkc g_ctoolnj  'echo "NOT JUDGED: under control mode flip, the replay did not complete"; echo "FAIL: replay guard tripped:"; echo "grep: /tmp/t/g.log: No such file or directory"; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+reg "$(row g_ctool mame release - '')" "$(row g_ctoolmid mame release - '')" "$(row g_ctoollike mame release - '')" "$(row g_ctoolnj mame release - '')" "$(row g_ctooldiag mame release - '')"
+run --lane mame --controls --log "$T/l14o" >/dev/null 2>&1 || true
+v14o="$(awk -F'\t' '$1=="g_ctool@flip"{print $4"|"$6}' "$T/l14o/results.tsv")"
+case "$v14o" in
+    FAIL\|*DIED*"tool's error"*) ok "g_ctool@flip -> FAIL (DIED: a gate that died on a tool's error is not a verdict)" ;;
+    PASS\|*) fail "g_ctool@flip -> '$v14o', expected FAIL / DIED"
+             vs_ctl_is tool-honoured && vs_ctl_fired tool-honoured "with the TOOL-ERROR branch disabled, a mode that died on awk's error under set -e reads an honoured PASS" ;;
+    *) fail "g_ctool@flip -> '$v14o', expected FAIL / DIED" ;;
+esac
+v14p="$(awk -F'\t' '$1=="g_ctoolmid@flip"{print $4}' "$T/l14o/results.tsv")"
+[ "$v14p" = PASS ] && ok "g_ctoolmid@flip -> PASS (a tool error before the gate's own FAIL line stays honoured)" || fail "g_ctoolmid@flip -> '$v14p', expected PASS"
+v14q="$(awk -F'\t' '$1=="g_ctoollike@flip"{print $4}' "$T/l14o/results.tsv")"
+[ "$v14q" = PASS ] && ok "g_ctoollike@flip -> PASS (a FAIL that only names a missing file stays honoured)" || fail "g_ctoollike@flip -> '$v14q', expected PASS"
+v14t="$(awk -F'\t' '$1=="g_ctooldiag@flip"{print $4}' "$T/l14o/results.tsv")"
+[ "$v14t" = PASS ] && ok "g_ctooldiag@flip -> PASS (a diagnostic's tool error after the gate's own FAIL stays honoured)" || fail "g_ctooldiag@flip -> '$v14t', expected PASS"
+v14s="$(awk -F'\t' '$1=="g_ctoolnj@flip"{print $4"|"$6}' "$T/l14o/results.tsv")"
+case "$v14s" in FAIL\|*UNJUDGED*|FAIL\|*"measured nothing"*) ok "g_ctoolnj@flip -> FAIL (UNJUDGED: NOT JUDGED is read before a diagnostic's tool error)" ;; *) fail "g_ctoolnj@flip -> '$v14s', expected FAIL / UNJUDGED" ;; esac
+if ! vs_ctl_is tool-honoured; then
+    rm -f "$FR/tests/lib/classify.sh"; ln -s "$T/classify_tool.sh" "$FR/tests/lib/classify.sh"
+    run --lane mame --controls --log "$T/l14r" >/dev/null 2>&1 || true
+    rm -f "$FR/tests/lib/classify.sh"; ln -s "$CLSLIB" "$FR/tests/lib/classify.sh"
+    v14r="$(awk -F'\t' '$1=="g_ctool@flip"{print $4}' "$T/l14r/results.tsv" 2>/dev/null)"
+    [ "$v14r" = PASS ] && vs_ctl_fired tool-honoured "a classifier without the TOOL-ERROR branch reads a mode that died on awk's error under set -e as an honoured PASS — section 14o catches it" \
+        || { vs_ctl_dead tool-honoured "the classifier without the branch read g_ctool@flip '$v14r'"; fail "tool-honoured"; }
+fi
+rm -f "$FR/tests/g_ctool.sh" "$FR/tests/g_ctoolmid.sh" "$FR/tests/g_ctoollike.sh" "$FR/tests/g_ctoolnj.sh" "$FR/tests/g_ctooldiag.sh"
 
 echo "15. the commit of record and --stale (14z-180, GitHub #171 slice Q4)"
 # commit.txt: HEAD on its first line when the tree is a git checkout, `no-git` otherwise;

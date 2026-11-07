@@ -94,7 +94,7 @@ for part in $PARTS; do
     done
 done
 wait
-for part in $PARTS; do for leg in native ours; do [ -s "$W/$part.$leg.ft" ] || bad "$part $leg: no samples"; done; done
+for part in $PARTS; do for leg in native ours; do [ -s "$W/$part.$leg.ft" ] || { vs_ctl_nj "$part $leg: no samples"; bad "$part $leg: no samples"; }; done; done   # #310 g7 NJ
 [ $fail = 0 ] || { echo "FAIL: audit_hitbox_parity (a leg did not run)"; exit 1; }
 echo "== 2. identity, and the rows over the node-equal frames"
 : > "$W/rows.tsv"; : > "$W/rows_pert.tsv"; TOT=0

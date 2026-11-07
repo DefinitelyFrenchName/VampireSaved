@@ -62,7 +62,7 @@ the suite runners and their own ground truth.
 | `tests/test_crash_sweep.sh` | test | ci_static | ROMDIR | EVERY CALL OF vs_ctl_show_err IS PROVEN BY A PLANTED CRASH (#310, 14z-218). Freeze cadence. | 14z-218 |
 | `tests/test_ctl_show_err.sh` | test | ci_portable | — | A PERTURBED COPY THAT CRASHED IS NOT THE CONTROL FIRING (#310 group 5, 14z-215). ci_portable: no ROM, ~3 s. | 14z-215 |
 | `tests/test_dead_exit_census.sh` | test | ci_portable | — | NO CONTROL MODE'S DEAD BRANCH IS PRINTED IN WORDS ONLY (#310 group 2, 14z-215). ci_portable: no ROM, ~2 s. | 14z-215 |
-| `tests/test_dead_leg_unjudged.sh` | test | ci_static | ROMDIR | A DEAD EMULATOR LEG IS NOT THE CONTROL FIRING (#310 group 7, 14z-221). Needs ROMDIR (the gates' own ROM checks), runs no emulator: ~1 min. | 14z-221 |
+| `tests/test_dead_leg_unjudged.sh` | test | ci_static | ROMDIR | A DEAD EMULATOR LEG IS NOT THE CONTROL FIRING (#310 group 7, 14z-221). Needs ROMDIR (the gates' own ROM checks), runs no emulator: ~4-5 min (91 rows on the MacBook, 14z-223: 3:56, then 5:18 under load). | 14z-221 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_emu_run_compare.sh` | test | ci_portable | — | two emulator-tier runs are compared per row over what BOTH ran and BOTH passed (`tools/emu_run_compare.py`, 14z-193, GitHub #122). | 14z-193 |
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~85 s (measured 14z-218 on the Mac, sections 24-25 added; ~72 s at 14z-210; ~26 s at 14z-162, before sections 18-19). | 14z-128 |

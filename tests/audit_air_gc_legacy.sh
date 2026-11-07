@@ -192,9 +192,9 @@ done
 wait
 [ "$fail" = 0 ] || { echo "FAIL: audit_air_gc_legacy"; exit 1; }
 for c in $CHARS; do
-    [ "$c" = phobos ] || { grep -q 'load of vsavjw\.ini' "$W/$c.ours/mame.log" && ok "$c ours: MAME ran the vsavjw set" || bad "$c ours: the MAME log does not name the vsavjw set"; }
+    [ "$c" = phobos ] || { grep -q 'load of vsavjw\.ini' "$W/$c.ours/mame.log" && ok "$c ours: MAME ran the vsavjw set" || { vs_ctl_nj "$c ours: the MAME log does not name the vsavjw set"; bad "$c ours: the MAME log does not name the vsavjw set"; }; }   # #310 g7 NJ
     for leg in $(legs_of "$c"); do
-        [ -s "$W/$c.$leg.txt" ] || { bad "$c $leg: no tap (see $W/$c.$leg/mame.log)"; continue; }
+        [ -s "$W/$c.$leg.txt" ] || { vs_ctl_nj "$c $leg: no tap"; bad "$c $leg: no tap (see $W/$c.$leg/mame.log)"; continue; }   # #310 g7 NJ
         if vs_ctl_is air-window-planted && [ "$leg" = vsavj ]; then plant_window "$W/$c.$leg.txt" > "$W/p" && mv "$W/p" "$W/$c.$leg.txt"; fi
         if vs_ctl_is ground-window-removed; then strip_ground_window "$W/$c.$leg.txt" > "$W/p" && mv "$W/p" "$W/$c.$leg.txt"; fi
         if vs_ctl_is air-commit-planted && [ "$leg" = vsav2 ]; then plant_commit "$W/$c.$leg.txt" > "$W/p" && mv "$W/p" "$W/$c.$leg.txt"; fi

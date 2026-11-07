@@ -91,7 +91,7 @@ echo "  rom   $(echo "$romchk" | grep 'all match' | head -1); vsavj program fing
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM; fi
 W="$(cd "$W" && pwd)"
 echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
-. "$REPO/tests/lib/mame_ident.sh"; vs_mame_ident "$MAME_BIN" || { echo "FAIL: the MAME binary is not the pinned release (above)"; exit 1; }
+. "$REPO/tests/lib/mame_ident.sh"; vs_mame_ident "$MAME_BIN" || { vs_ctl_nj "the MAME binary is not the pinned release"; echo "FAIL: the MAME binary is not the pinned release (above)"; exit 1; }   # #310 g7 NJ
 
 # ADDRESSES ARE COMPUTED from the block base, never concatenated (14z-189: "ff84"+"39f" read a wrong address as 0).
 F="ff8109:b:timer"; RT=""
@@ -129,7 +129,7 @@ for r in 03 37 sweep; do
     grep -q '^FIELDSUMMARY' "$W/$r.fields" 2>/dev/null || { echo "  FAIL  $r: no FIELDSUMMARY (see $W/$r/mame.log) — VOID"; fail=1; }
     grep -q '^END ' "$W/tap$r.tap" 2>/dev/null || { echo "  FAIL  tap$r: no END line (see $W/tap$r/mame.log) — VOID"; fail=1; }
 done
-[ "$fail" = 0 ] || { echo "FAIL: audit_mizuumi_inputs (a leg did not complete)"; exit 1; }
+[ "$fail" = 0 ] || { vs_ctl_nj "a leg did not complete"; echo "FAIL: audit_mizuumi_inputs (a leg did not complete)"; exit 1; }   # #310 g7 NJ
 echo "  ok    six legs complete"
 
 check() {  # check <perturbation: none|opposite-flip|wrong-run|no-edge-mask|lag-120> — ok/FAIL lines and a CTL summary line

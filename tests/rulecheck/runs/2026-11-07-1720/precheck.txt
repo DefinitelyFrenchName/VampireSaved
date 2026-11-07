@@ -1,0 +1,6 @@
+  FLAG D-ABSOLUTE: **Two misreads found and fixed while proving it**, both by running the dead-leg gate over all its rows:  [build/agent223/t367/closing_367.md]
+  FLAG D-FIGURE: 104  [build/agent223/t310b4/comment_310_b4.md]
+  FLAG D-FIGURE: 111  [build/agent223/t310b4/comment_310_b4.md]
+  FLAG D-ABSOLUTE: Two workers made the edits on disjoint gate lists, and one combined run checked them all.  [build/agent223/t310b4/comment_310_b4.md]
+  FLAG D-ABSOLUTE: Group A on PILOT: 15 gates, 75 runs, all HONOURED, all SAFE.  [build/agent223/t310b4/comment_310_b4.md]
+packet_check: 5 flag(s): D-ABSOLUTE 3, D-FIGURE 2

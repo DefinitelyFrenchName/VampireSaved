@@ -141,10 +141,10 @@ for r in cosmo ifrit lsword; do for side in native ours; do leg "$r" "$side" & d
 tapleg p1 & tapleg p2 &
 wait
 for t in p1 p2; do
-    grep -q '^END ' "$W/tap_mark_$t.txt" 2>/dev/null && ok "pyron_4 mark tap, Pyron on $t: complete" || bad "pyron_4 mark tap, Pyron on $t: no END line (see $W/tap_$t/mame.log)"
+    grep -q '^END ' "$W/tap_mark_$t.txt" 2>/dev/null && ok "pyron_4 mark tap, Pyron on $t: complete" || { vs_ctl_nj "pyron_4 mark tap, Pyron on $t: no END line"; bad "pyron_4 mark tap, Pyron on $t: no END line (see $W/tap_$t/mame.log)"; }   # #310 g7 NJ
 done
 for r in cosmo ifrit lsword; do for side in native ours; do
-    grep -q FIELDSUMMARY "$W/tr_$r.$side.txt" 2>/dev/null && ok "$r $side: complete trace" || bad "$r $side: no complete trace (see $W/$r.$side/mame.log)"
+    grep -q FIELDSUMMARY "$W/tr_$r.$side.txt" 2>/dev/null && ok "$r $side: complete trace" || { vs_ctl_nj "$r $side: no complete trace"; bad "$r $side: no complete trace (see $W/$r.$side/mame.log)"; }   # #310 g7 NJ
 done; done
 [ "$fail" = 0 ] || { echo "FAIL: audit_pursuit_flag (a leg did not complete — VOID)"; exit 1; }
 

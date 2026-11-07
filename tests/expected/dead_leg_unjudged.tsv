@@ -14,35 +14,193 @@
 # one row per mode. The fifth column names the instrument made dead with /usr/bin/false (MAME_BIN is always dead too).
 # A batch-2 stripped class is the neutered copy's measured class: the copy keeps the new liveness checks, so where the
 # baseline DIED it reads HONOURED (the pre-fix gate's own class is the baseline's, build/agent221/t310g7/base/classes.tsv).
+# Batch 3 (14z-223): the seven group-7 MAME gates with two or more modes that are not on tests/controls_concurrent_emu.txt
+# (audit_ladder_pick_store, audit_marionette_cost, audit_mizuumi_attack, audit_mizuumi_inputs, audit_mizuumi_struct,
+# audit_tick_cadence, test_proof_sheets: 48 modes, test_proof_sheets' tags-dropped added since the census), every mode
+# HONOURED on a dead emulator at HEAD c5fe01b4 (build/agent223/t310b3/base/classes.tsv, local). audit_marionette_cost
+# reached that HONOURED by a crash: under `set -eu` its section-3 awk read a control leg's missing output and exited 2;
+# it now checks both control legs' output first. Its stripped class is the neutered copy's measured class, as batch 2's: the
+# copy keeps that check, so it reads HONOURED; the pre-fix gate's HONOURED was tests/lib/classify.sh reading the awk crash's
+# exit 2 as the gate's own FAIL, which is DIED by "a crash is not a verdict" (GitHub #367). audit_release_linux_cleanhost (podman) is not in this batch: its
+# instrument is found on PATH, not through a *_BIN variable, and it runs on Linux with podman only.
+# Batch 4 (14z-223): the group-7 gates on tests/controls_concurrent_emu.txt, 29 gates and 112 rows (two workers' edits,
+# checked by one combined dead run, build/agent223/t310b4/after/classes.tsv, local). On a dead emulator at c5fe01b4 their
+# modes read HONOURED, or DIED on a Traceback or (by #367's rule) a tool error; six gates now check a dead leg's output
+# before reading it. Not rows: audit_victim_parity chains-planted, test_readme_recording unencoded-launcher, crlf-argv and
+# rec-log-missing, and test_release_binaries' four modes — each fires on evidence no dead MAME_BIN removes (a static check,
+# a host-text guard, or the release binaries the gate runs itself), so it reads HONOURED dead, correctly; and
+# audit_latch_reads tap-window-moved, already UNJUDGED before the batch (its own NOT JUDGED line).
+# audit_release_linux_desktop (PILOT's desktop only) is left with the podman gate.
 # gate	mode	class	stripped class (the gate with its NJ lines neutered)	dead instrument
 audit_air_dash_height	native-dash-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_air_gc_legacy	air-commit-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_air_gc_legacy	air-window-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_air_gc_legacy	ground-commit-removed	UNJUDGED	HONOURED	MAME_BIN
+audit_air_gc_legacy	ground-window-removed	UNJUDGED	HONOURED	MAME_BIN
+audit_air_gc_legacy	positive-stripped	UNJUDGED	HONOURED	MAME_BIN
+audit_chains174	order-swapped	UNJUDGED	HONOURED	MAME_BIN
+audit_chains174	pins-ignored	UNJUDGED	HONOURED	MAME_BIN
+audit_chains174	pins-shifted	UNJUDGED	HONOURED	MAME_BIN
+audit_chains174	wrong-target	UNJUDGED	HONOURED	MAME_BIN
+audit_chains174	x-moved	UNJUDGED	HONOURED	MAME_BIN
+audit_chains184	node-moved	UNJUDGED	HONOURED	MAME_BIN
+audit_chains184	order-swapped	UNJUDGED	HONOURED	MAME_BIN
+audit_chains184	outcome-flipped	UNJUDGED	HONOURED	MAME_BIN
+audit_chains184	passage-counted	UNJUDGED	HONOURED	MAME_BIN
+audit_chains184	tap-shifted	UNJUDGED	HONOURED	MAME_BIN
+audit_chains184	wrong-target	UNJUDGED	HONOURED	MAME_BIN
+audit_chains184	x-moved	UNJUDGED	HONOURED	MAME_BIN
 audit_column_flash	flash-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_column_flash_cause	mask-bit-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_column_flash_cause	revert-ignored	UNJUDGED	HONOURED	MAME_BIN
+audit_column_shock	air-marker	UNJUDGED	HONOURED	MAME_BIN
+audit_column_shock	old-shock	UNJUDGED	HONOURED	MAME_BIN
 audit_crouch_flag	down-removed	UNJUDGED	HONOURED	MAME_BIN
+audit_df_field_readers_live	missed-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_df_field_readers_live	range-silent	UNJUDGED	HONOURED	MAME_BIN
 audit_df_meter	swing-planted	UNJUDGED	HONOURED	MAME_BIN
 audit_df_modes	power-armed	UNJUDGED	HONOURED	MAME_BIN
+audit_df_moves	contact-emptied	UNJUDGED	HONOURED	MAME_BIN
+audit_df_moves	form-moved	UNJUDGED	HONOURED	MAME_BIN
+audit_df_moves	hit-dropped	UNJUDGED	HONOURED	MAME_BIN
+audit_df_moves	idle-leg	UNJUDGED	HONOURED	MAME_BIN
+audit_df_moves	mode-lost	UNJUDGED	HONOURED	MAME_BIN
+audit_df_moves	palette-blind	UNJUDGED	HONOURED	MAME_BIN
+audit_df_moves	pin-in-window	UNJUDGED	HONOURED	MAME_BIN
+audit_df_moves	pins-unpinned	UNJUDGED	HONOURED	MAME_BIN
+audit_df_moves	rng-dead	UNJUDGED	HONOURED	MAME_BIN
+audit_df_moves	sword-poke-planted	UNJUDGED	HONOURED	MAME_BIN
 audit_dispatch_census	drift-clock	UNJUDGED	HONOURED	MAME_BIN
+audit_dmg_legacy_sweep	attacker-swapped	UNJUDGED	HONOURED	MAME_BIN
+audit_dmg_legacy_sweep	counterfactual-skipped	UNJUDGED	HONOURED	MAME_BIN
+audit_dmg_legacy_sweep	engines-agree	UNJUDGED	HONOURED	MAME_BIN
+audit_dmg_legacy_sweep	ours-diverged	UNJUDGED	HONOURED	MAME_BIN
+audit_dmg_legacy_sweep	ours-records-swapped	UNJUDGED	HONOURED	MAME_BIN
+audit_dmg_legacy_sweep	zip-check-blind	UNJUDGED	HONOURED	MAME_BIN
 audit_entrance_draw	variant-lost	UNJUDGED	HONOURED	MAME_BIN
 audit_ex_refused	stock-kept	UNJUDGED	HONOURED	MAME_BIN
 audit_extra_pass	other-level	UNJUDGED	HONOURED	MAME_BIN
 audit_extra_pass	unpinned-equals-6	UNJUDGED	HONOURED	MAME_BIN
+audit_facing_hook_ab	r5-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_facing_hook_ab	read-dropped	UNJUDGED	HONOURED	MAME_BIN
+audit_facing_hook_ab	stream-shifted	UNJUDGED	HONOURED	MAME_BIN
+audit_facing_hook_ab	variant-inert	UNJUDGED	HONOURED	MAME_BIN
+audit_facing_rule	branch-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_facing_rule	rule5-flipped	UNJUDGED	HONOURED	MAME_BIN
+audit_facing_sweep	flip	UNJUDGED	HONOURED	MAME_BIN
+audit_facing_sweep	perturb	UNJUDGED	HONOURED	MAME_BIN
 audit_ff8130_writers	lane-blind	UNJUDGED	HONOURED	MAME_BIN
+audit_flicker_attribution	shared-sandbox	UNJUDGED	HONOURED	MAME_BIN
+audit_flicker_attribution	wrong-window	UNJUDGED	HONOURED	MAME_BIN
+audit_forced_pick_fidelity	retyped-prologue	UNJUDGED	HONOURED	MAME_BIN
+audit_forced_pick_fidelity	same-leg	UNJUDGED	HONOURED	MAME_BIN
+audit_forced_pick_fidelity	wrong-cursor	UNJUDGED	HONOURED	MAME_BIN
 audit_guard_corpus	known-crash	UNJUDGED	HONOURED	MAME_BIN
+audit_guard_reentry	act-late	UNJUDGED	HONOURED	MAME_BIN
+audit_guard_reentry	vs2-pattern	UNJUDGED	HONOURED	MAME_BIN
+audit_hitbox_parity	ids-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_hitbox_parity	no-translation	UNJUDGED	HONOURED	MAME_BIN
+audit_hitbox_parity	pointer-planted	UNJUDGED	HONOURED	MAME_BIN
 audit_id_writers	word-write-variant	UNJUDGED	HONOURED	MAME_BIN
 audit_kill_poke_shape	two-byte-flowed	UNJUDGED	HONOURED	MAME_BIN
+audit_ladder_pick_store	base-misnamed	UNJUDGED	HONOURED	MAME_BIN
+audit_ladder_pick_store	poke-legs-swapped	UNJUDGED	HONOURED	MAME_BIN
+audit_ladder_pick_store	store-pc-moved	UNJUDGED	HONOURED	MAME_BIN
 audit_ladder_selector	mask-not-load-bearing	UNJUDGED	HONOURED	MAME_BIN
 audit_lag_budget	lag-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_latch_reads	real-instead-of-poked	UNJUDGED	HONOURED	MAME_BIN
 audit_legacy_pairings	shared-sandbox	UNJUDGED	HONOURED	MAME_BIN
+audit_marionette_cost	drift-clock	UNJUDGED	HONOURED	MAME_BIN
+audit_marionette_cost	first-frame-skip	UNJUDGED	HONOURED	MAME_BIN
+audit_marionette_cost	site-removed	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_attack	chained-counted	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_attack	chained-writes-shifted	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_attack	cpu-side	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_attack	hit-vs-start	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_attack	hits-shifted	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_attack	isolated-presses	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_attack	neighbour-word	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_attack	previous-press-key	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_attack	reads-shifted	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_attack	unstarted-write	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_attack	writes-shifted	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_inputs	lag-120	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_inputs	never-swap	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_inputs	no-edge-mask	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_inputs	opposite-flip	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_inputs	other-side	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_inputs	wrong-run	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_struct	p2-confirm	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_struct	poke-3b6	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_struct	refutation-pokes	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_struct	roles-inverted	UNJUDGED	HONOURED	MAME_BIN
+audit_mizuumi_struct	sides-swapped	UNJUDGED	HONOURED	MAME_BIN
+audit_move_parity	field-dropped	UNJUDGED	HONOURED	MAME_BIN
+audit_move_parity	movement-x	UNJUDGED	HONOURED	MAME_BIN
+audit_move_parity	no-translation	UNJUDGED	HONOURED	MAME_BIN
+audit_move_parity	pins-ignored	UNJUDGED	HONOURED	MAME_BIN
+audit_move_parity	stock-starved	UNJUDGED	HONOURED	MAME_BIN
+audit_move_parity	unpinned-level	UNJUDGED	HONOURED	MAME_BIN
+audit_move_parity	white-pin	UNJUDGED	HONOURED	MAME_BIN
 audit_move_parity_attribution	p2-record-unswapped	UNJUDGED	HONOURED	MAME_BIN
 audit_pass_overrun	overrun-planted	UNJUDGED	HONOURED	MAME_BIN
 audit_phobos_dmg_residual	legacy-same	UNJUDGED	HONOURED	MAME_BIN
 audit_phobos_dmg_residual	residual-gone	UNJUDGED	HONOURED	MAME_BIN
+audit_pursuit_flag	expect-flipped	UNJUDGED	HONOURED	MAME_BIN
+audit_pursuit_flag	flag-zeroed	UNJUDGED	HONOURED	MAME_BIN
+audit_pursuit_flag	inert-as-same	UNJUDGED	HONOURED	MAME_BIN
+audit_pursuit_flag	record4-marked	UNJUDGED	HONOURED	MAME_BIN
 audit_pyron_ring	stream-shifted	UNJUDGED	HONOURED	MAME_BIN
 audit_qs_voice_wav	truncated-window	UNJUDGED	HONOURED	MAME_BIN
+audit_reaction_class_live	planted-38	UNJUDGED	HONOURED	MAME_BIN
+audit_reaction_class_live	range-silent	UNJUDGED	HONOURED	MAME_BIN
+audit_rig_opening	entrance-swapped	UNJUDGED	HONOURED	MAME_BIN
+audit_rig_opening	pin-before-round	UNJUDGED	HONOURED	MAME_BIN
+audit_rng_draws	block	UNJUDGED	HONOURED	MAME_BIN
+audit_rng_draws	drop	UNJUDGED	HONOURED	MAME_BIN
+audit_rng_draws	map	UNJUDGED	HONOURED	MAME_BIN
+audit_rng_draws	relabel	UNJUDGED	HONOURED	MAME_BIN
+audit_rng_draws	strip	UNJUDGED	HONOURED	MAME_BIN
+audit_shared_wall_push	early-split	UNJUDGED	HONOURED	MAME_BIN
+audit_shared_wall_push	flag-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_shared_wall_push	legs-swapped	UNJUDGED	HONOURED	MAME_BIN
 audit_tech_roll	tap-must-not-roll	UNJUDGED	HONOURED	MAME_BIN
+audit_tenant_continue_switch	base-misnamed	UNJUDGED	HONOURED	MAME_BIN
+audit_tenant_continue_switch	legs-swapped	UNJUDGED	HONOURED	MAME_BIN
+audit_tenant_continue_switch	repick-misplaced	UNJUDGED	HONOURED	MAME_BIN
+audit_throw_registration	dead-reader-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_throw_registration	double-write	UNJUDGED	HONOURED	MAME_BIN
+audit_throw_registration	legs-swapped	UNJUDGED	HONOURED	MAME_BIN
+audit_throw_registration	pair-swapped	UNJUDGED	HONOURED	MAME_BIN
+audit_tick_cadence	frame-counter-decider	UNJUDGED	HONOURED	MAME_BIN
+audit_tick_cadence	supervisor-stack	UNJUDGED	HONOURED	MAME_BIN
+audit_tick_cadence	twin-pc	UNJUDGED	HONOURED	MAME_BIN
 audit_tick_phase	flat-pass	UNJUDGED	HONOURED	MAME_BIN
 audit_tick_phase	quantum-off	UNJUDGED	HONOURED	MAME_BIN
+audit_trap_air_hit	air-class	UNJUDGED	HONOURED	MAME_BIN
+audit_trap_air_hit	air-grounded	UNJUDGED	HONOURED	MAME_BIN
+audit_trap_air_hit	box-drift	UNJUDGED	HONOURED	MAME_BIN
+audit_trap_air_hit	dome-drift	UNJUDGED	HONOURED	MAME_BIN
+audit_trap_air_hit	merge-corrupt	UNJUDGED	HONOURED	MAME_BIN
+audit_trap_air_hit	ours-drift	UNJUDGED	HONOURED	MAME_BIN
+audit_trap_air_hit	stale-image	UNJUDGED	HONOURED	MAME_BIN
+audit_trap_airborne	air-class	UNJUDGED	HONOURED	MAME_BIN
+audit_trap_airborne	air-hit	UNJUDGED	HONOURED	MAME_BIN
+audit_trap_airborne	grounded-hit	UNJUDGED	HONOURED	MAME_BIN
+audit_victim_parity	extract-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_victim_parity	hit-dropped	UNJUDGED	HONOURED	MAME_BIN
+audit_victim_parity	label-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_victim_parity	no-translation	UNJUDGED	HONOURED	MAME_BIN
+audit_victim_parity	p1-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_victim_parity	pin-in-window	UNJUDGED	HONOURED	MAME_BIN
+audit_victim_parity	tenant-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_victim_parity	timing-planted	UNJUDGED	HONOURED	MAME_BIN
+audit_victim_parity	unpinned-level	UNJUDGED	HONOURED	MAME_BIN
 audit_voice_borrow	foreign-ring-id	UNJUDGED	HONOURED	MAME_BIN
 test_crash_guard	drift-clock	UNJUDGED	HONOURED	MAME_BIN
+test_don_immortal_native	jedah-artefact	UNJUDGED	HONOURED	MAME_BIN
+test_don_immortal_native	unmatched-modes	UNJUDGED	HONOURED	MAME_BIN
+test_don_immortal_native	unpinned-rng	UNJUDGED	HONOURED	MAME_BIN
 test_down_flash_mechanism	normal-base-satisfies	UNJUDGED	HONOURED	MAME_BIN
 test_dualtrack	stray-byte-growth	UNJUDGED	HONOURED	FBNEO_BIN
 test_hui_air	ground-dash	UNJUDGED	HONOURED	MAME_BIN
@@ -50,8 +208,27 @@ test_meter_gain	perturbed-net	UNJUDGED	HONOURED	MAME_BIN
 test_obj_records	flipped-tile-code	UNJUDGED	HONOURED	MAME_BIN
 test_obj_records	wrong-page-geometry	UNJUDGED	HONOURED	MAME_BIN
 test_pod_black_foot_palette	neighbour-poke-disjoint	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	build-blind	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	cap-ignored	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	count-only	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	fighters-blind	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	fingerprint-blind	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	frame-blind	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	inputs-unbounded	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	intro-blind	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	no-split	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	relative-unresolved	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	rompath-unresolved	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	span-blind	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	strip-ignored	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	tag-key-blind	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	tags-dropped	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	undefined-tag	UNJUDGED	HONOURED	MAME_BIN
+test_proof_sheets	who-swapped	UNJUDGED	HONOURED	MAME_BIN
 test_pyron_medallion_2p	accent-lost	UNJUDGED	HONOURED	MAME_BIN
 test_random_select_tenants	no-tenant-drawn	UNJUDGED	HONOURED	MAME_BIN
+test_readme_recording	truncated-inp	UNJUDGED	HONOURED	MAME_BIN
+test_readme_recording	used-nvram	UNJUDGED	HONOURED	MAME_BIN
 test_rehit_ring	clear-on-attack-node	UNJUDGED	HONOURED	MAME_BIN
 test_rehit_ring	missing-contact	UNJUDGED	HONOURED	MAME_BIN
 test_shadow_tenant	four-presses-morph	UNJUDGED	HONOURED	MAME_BIN

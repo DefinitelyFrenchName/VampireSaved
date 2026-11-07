@@ -91,6 +91,7 @@ for spec in ring_build:"$BUILD":ring ring_logicoff:"$W/v_logicoff":ring ring_unh
 done
 wait
 
+for _l in ring_build ring_logicoff ring_unhooked ring_solo tap_mash_build tap_mash_logicoff tap_mash_unhooked tap_arc110_build tap_arc110_logicoff tap_arc110_unhooked; do case $_l in ring_*) _o="$W/$_l/ring.txt" ;; *) _o="$W/$_l/t.tap" ;; esac; [ -s "$_o" ] || { vs_ctl_nj "the leg $_l wrote no output"; echo "FAIL: audit_facing_hook_ab — the leg $_l wrote no output ($_o; see $W/$_l/mame.log)"; exit 1; }; done   # #310 g7 NJ
 fail=0
 _fz=""; [ -n "${FREEZE:-}" ] && [ -z "${VS_CTL:-}" ] && _fz=--freeze
 python3 tools/facing_hook_ab.py check "$W" "$EXPECT" --control "${VS_CTL:-}" $_fz || fail=1

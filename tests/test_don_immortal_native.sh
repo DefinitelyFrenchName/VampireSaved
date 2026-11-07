@@ -181,7 +181,7 @@ run_one() {   # run_one <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
 }
 run_check() {   # run_check <name>
     [ "$(ls "$WORK/$1"/dump_*_ff8800.bin 2>/dev/null | wc -l)" -ge 150 ] \
-        || { echo "FAIL: leg $1 produced no dumps (see $WORK/$1/mame.log)"; exit 1; }
+        || { vs_ctl_nj "leg $1 produced no dumps"; echo "FAIL: leg $1 produced no dumps (see $WORK/$1/mame.log)"; exit 1; }   # #310 g7 NJ
 }
 run() {   # run <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
     _legs="$_legs run:$1"; vs_pool_run run_one "$@"
@@ -198,7 +198,7 @@ tapleg_one() {   # tapleg_one <name> <set> <rompath> <rpl file> <pokes> [mame_bi
 }
 tapleg_check() {   # tapleg_check <name>
     grep -q '^END 2668 ' "$WORK/$1/tap.log" 2>/dev/null \
-        || { echo "FAIL: tap leg $1 did not reach frame 2668 (see $WORK/$1/mame.log)"; exit 1; }
+        || { vs_ctl_nj "tap leg $1 did not reach frame 2668"; echo "FAIL: tap leg $1 did not reach frame 2668 (see $WORK/$1/mame.log)"; exit 1; }   # #310 g7 NJ
 }
 tapleg() {   # tapleg <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
     _legs="$_legs tap:$1"; vs_pool_run tapleg_one "$@"

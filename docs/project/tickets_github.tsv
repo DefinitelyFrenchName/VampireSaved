@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 366
+# issues: 368
 number	state	reason	closed	labels	title
+368	OPEN	-	-	bug,test-integrity	audit_flicker_attribution's shared-sandbox control fires on a dead leg, never on the frozen-basis check it names
+367	CLOSED	COMPLETED	2026-11-07	bug,test-integrity	classify.sh reads a set -e gate that dies on a tool error (awk: can't open file, exit 2) as HONOURED
 366	CLOSED	COMPLETED	2026-11-07	bug,severity: low,test-integrity	Two gate headers state facts their frozen data no longer holds: test_dead_span_reach (one span, 5 pairs; now two spans, 10) and audit_pass_overrun (ours donovan_2 since M24; now none)
 365	CLOSED	COMPLETED	2026-11-07	bug,severity: low,test-integrity	test_sheet_census FAILs: audit_crash_sweep_emu has no # SHEET: line (an ondemand gate, so no tier ran it)
 364	OPEN	-	-	bug,severity: low,test-integrity	Under dash (PILOT's /bin/sh) an EXIT-only cleanup trap does not run when a gate is TERM'd: its work directory is left behind (~277 scripts)

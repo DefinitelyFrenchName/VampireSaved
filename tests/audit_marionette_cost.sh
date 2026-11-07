@@ -135,6 +135,9 @@ echo "== 3. the in-gate controls: the witness leg under the OLD clock (1800 fram
 run_leg "ctl" "tests/replays/$WREPLAY.rpl" 1800 "$W/ctl_drift.txt" frame_done 1800 &
 ref_leg "ctl" "tests/replays/$WREPLAY.rpl" 1800 "$W/ctl_ref.txt" "" 1800 &
 wait
+# a control leg that wrote nothing is a dead emulator, not a verdict: under `set -e` the awk reads below died with exit 2,
+# which a mode read as the gate's own FAIL (14z-223, #310 group 7 batch 3)
+for _o in ctl_drift ctl_ref; do [ -s "$W/$_o.txt" ] || { vs_ctl_nj "the control leg $_o wrote no output"; echo "  FAIL: the control leg $_o wrote no output (see $W/$_o.txt.log)"; exit 1; }; done   # #310 g7 NJ
 ctl_set="$(awk -v a="$(printf '%06x' 0x$WITNESS_SET)" '$1=="SITE" && $2==a {print $4}' "$W/ctl_drift.txt")"
 ce="$(awk '$1=="EMUFRAMES" {print $2}' "$W/ctl_drift.txt")"
 cg="$(awk '$1=="GAMECLOCK" {print $3}' "$W/ctl_drift.txt")"
@@ -274,7 +277,7 @@ if bad:
     print("INCOMPLETE " + " ".join(bad))
 PY
 sed 's/^/    /' "$W/dyn.txt"
-grep -q '^INCOMPLETE' "$W/dyn.txt" && { echo "  FAIL: incomplete legs"; fail=1; }
+grep -q '^INCOMPLETE' "$W/dyn.txt" && { vs_ctl_nj "incomplete legs: $(grep '^INCOMPLETE' "$W/dyn.txt" | cut -c1-120)"; echo "  FAIL: incomplete legs"; fail=1; }   # #310 g7 NJ
 if grep -q "^WITNESS $WREPLAY setter 1 " "$W/dyn.txt"; then
     echo "  ok    the witness replay armed Shadow under the instrument (setter executed once)"
 else

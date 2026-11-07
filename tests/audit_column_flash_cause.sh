@@ -88,12 +88,12 @@ leg bad vsavjw "$BUILD/rompath;$ROMDIR" "$W/ours.rpl" 02ad64,02ad78 "02adb4:ef92
 wait
 for l in native ours bad; do
     _t="$W/$l/u.tap"
-    grep -q '^END ' "$_t" 2>/dev/null || bad "$l: the tap never reached its END line — VOID"
-    awk '$1=="W" && $2 < 100 {n++} END {exit n ? 0 : 1}' "$_t" 2>/dev/null || bad "$l: no boot write to the palette — a dead tap"
+    grep -q '^END ' "$_t" 2>/dev/null || { vs_ctl_nj "$l: the tap never reached its END line"; bad "$l: the tap never reached its END line — VOID"; }   # #310 g7 NJ
+    awk '$1=="W" && $2 < 100 {n++} END {exit n ? 0 : 1}' "$_t" 2>/dev/null || { vs_ctl_nj "$l: no boot write to the palette (a dead tap)"; bad "$l: no boot write to the palette — a dead tap"; }   # #310 g7 NJ
     grep -q '^ERR' "$_t" 2>/dev/null && bad "$l: the tap's register read raised an error"
-    awk '$1=="U" && $2 >= 2800 {n++} END {exit n ? 0 : 1}' "$_t" 2>/dev/null || bad "$l: no uploader write from 2800 — the leg did not reach the move"
+    awk '$1=="U" && $2 >= 2800 {n++} END {exit n ? 0 : 1}' "$_t" 2>/dev/null || { vs_ctl_nj "$l: the leg did not reach the move"; bad "$l: no uploader write from 2800 — the leg did not reach the move"; }   # #310 g7 NJ
 done
-grep -q '^OPATCH 02adb4:ef92 readback ef92ef96$' "$W/bad/u.tap" 2>/dev/null || bad "bad: the opcode-share write did not read back as ef92ef96 — the BAD leg is void"
+grep -q '^OPATCH 02adb4:ef92 readback ef92ef96$' "$W/bad/u.tap" 2>/dev/null || { vs_ctl_nj "bad: the opcode-share write did not read back (the BAD leg is void)"; bad "bad: the opcode-share write did not read back as ef92ef96 — the BAD leg is void"; }   # #310 g7 NJ
 [ "$fail" = 0 ] || { echo "FAIL: audit_column_flash_cause"; exit 1; }
 
 # P1's uploads per (destination row, source) with counts and first/last frame; a source inside the requester's

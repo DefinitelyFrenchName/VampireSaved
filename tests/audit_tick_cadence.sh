@@ -120,11 +120,12 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # ABSOLUTE, as in every emulator gate since 14z-132 (a relative ROMDIR resolves
 # against a work dir and silently finds no reference members).
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
+# controls.sh before the binary check: its vs_ctl_nj runs there (14z-223, rule-checker run 2026-11-07-1716)
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
-[ -x "$BIN" ] || { echo "FAIL: no reference MAME binary at $BIN (tools/setup_mame.sh with WIDE=0)"; exit 1; }
+[ -x "$BIN" ] || { vs_ctl_nj "no reference MAME binary at $BIN"; echo "FAIL: no reference MAME binary at $BIN (tools/setup_mame.sh with WIDE=0)"; exit 1; }   # #310 g7 NJ
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}"
-. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 VPOKE="1400:ff8782:03;1450:ff8782:03;1500:ff8782:03;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
 grep -v '^#' "$REPO/tests/replays/48_don_immortal_ko.rpl" \
@@ -166,7 +167,7 @@ cleg_run() {  # cleg_run <name> <set> <tap> <frames> <window> <pokes> [VAR=value
 }
 cleg() {  # cleg <name> <frames>: a section C leg's END check (cleg_run ran it)
     grep -q "^END $2 " "$W/$1.tap" 2>/dev/null \
-        || { echo "FAIL: section C leg $1 did not reach frame $2 (see its MAME output)"; tail -3 "$W/$1.out"; exit 1; }
+        || { vs_ctl_nj "section C leg $1 did not reach frame $2"; echo "FAIL: section C leg $1 did not reach frame $2 (see its MAME output)"; tail -3 "$W/$1.out"; exit 1; }   # #310 g7 NJ
 }
 RNG="$(seq_pokes 2400 2901 ff80d4:0000)"
 L8="$(seq_pokes 2000 2901 ff8116:08)"
@@ -199,10 +200,10 @@ for g in vsav2 vsavj; do
     for t in "p1:ff841c,8" "p2:ff881c,8" "frz:ff885c,2" "tasks:ff025c,512"; do
         n=${t%%:*}
         grep -q '^END 2900 ' "$W/${g}_$n.tap" 2>/dev/null \
-            || { echo "FAIL: leg $g/$n did not reach frame 2900 (see its MAME output)"; tail -3 "$W/${g}_$n.out"; exit 1; }
+            || { vs_ctl_nj "leg $g/$n did not reach frame 2900"; echo "FAIL: leg $g/$n did not reach frame 2900 (see its MAME output)"; tail -3 "$W/${g}_$n.out"; exit 1; }   # #310 g7 NJ
     done
     nd="$(ls "$W/dump_$g"/dump_*_ff0000.bin 2>/dev/null | wc -l | tr -d ' ')"
-    [ "$nd" = 201 ] || { echo "FAIL: leg $g/dumps wrote $nd of 201 work-RAM dumps (see its MAME output)"; tail -3 "$W/dump_$g/mame.out"; exit 1; }
+    [ "$nd" = 201 ] || { vs_ctl_nj "leg $g/dumps wrote $nd of 201 work-RAM dumps"; echo "FAIL: leg $g/dumps wrote $nd of 201 work-RAM dumps (see its MAME output)"; tail -3 "$W/dump_$g/mame.out"; exit 1; }   # #310 g7 NJ
 done
 
 . "$REPO/tests/lib/decrypt_cache.sh"

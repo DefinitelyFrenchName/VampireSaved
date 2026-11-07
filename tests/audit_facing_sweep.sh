@@ -112,12 +112,12 @@ done
 wait
 n=0
 for f in "$W"/w_*.txt; do
-    command grep -q '^END' "$f" 2>/dev/null && n=$((n + 1)) || bad "$(basename "$f"): no END line"
+    command grep -q '^END' "$f" 2>/dev/null && n=$((n + 1)) || { vs_ctl_nj "$(basename "$f"): no END line"; bad "$(basename "$f"): no END line"; }   # #310 g7 NJ
 done
 for f in "$W"/ours_*/mame.log; do
-    command grep -q 'load of vsavjw\.ini' "$f" || bad "$(dirname "$f" | xargs basename): the MAME log does not name the vsavjw set"
+    command grep -q 'load of vsavjw\.ini' "$f" || { vs_ctl_nj "$(dirname "$f" | xargs basename): the MAME log does not name the vsavjw set"; bad "$(dirname "$f" | xargs basename): the MAME log does not name the vsavjw set"; }   # #310 g7 NJ
 done
-[ "$n" = 64 ] || bad "$n of 64 taps ended"
+[ "$n" = 64 ] || { vs_ctl_nj "$n of 64 taps ended"; bad "$n of 64 taps ended"; }   # #310 g7 NJ
 [ "$fail" = 0 ] || { echo "FAIL: audit_facing_sweep"; exit 1; }
 ok "64 legs complete (32 geometries x native, build); the build legs ran the vsavjw set"
 

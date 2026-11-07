@@ -17,7 +17,7 @@
 # POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `x` column (ff8410, the rig's pin) was sampled and never compared — DROPPED.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/guard_reentry.tsv
 #   tests/lua/field_trace.lua tests/lua/snapshot_frames.lua tools/name_moves.py
-#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh tests/lib/controls.sh
 #
 # SHEET: legs vs2,vsavj,ours — moments: per guard-cancel event its +16 (where vsavj re-enters the block animation and vsav2 ticks), hit+20 of the 3640 event (inside the frozen pixel window), and per leg the first possible attack with back held to +21 — each on that leg's own field trace — not comparable: vsav2's counter differs from vsavj's by design (the engine difference this gate freezes); each game's stage palette (the pixel row's liveness)
 #
@@ -68,6 +68,7 @@ BUILD="${BUILD:-build/m3b_merged34}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/guard_reentry.tsv"
 CONTROL="${CONTROL:-}"
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_nj only (#310 g7): this gate parses CONTROL itself
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
@@ -116,7 +117,7 @@ for s in vsav2:vsav2:"$ROMDIR" vsavj:vsavj:"$ROMDIR" ours:vsavjw:"$BUILD/rompath
         "$REPO/tools/run_mame.sh" "$set_" -autoboot_script "$REPO/tests/lua/snapshot_frames.lua" > "$W/$leg.s/mame.log" 2>&1 ) </dev/null &
 done
 wait
-for leg in vsav2 vsavj ours; do _rc="$(cat "$W/$leg/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "$leg exited $_rc (an emulator that crashed is not evidence)"; done
+for leg in vsav2 vsavj ours; do _rc="$(cat "$W/$leg/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "$leg exited $_rc"; bad "$leg exited $_rc (an emulator that crashed is not evidence)"; }; done   # #310 g7 NJ
 [ "$fail" = 0 ] || { echo "FAIL: audit_guard_reentry"; exit 1; }
 reduce() {  # reduce <W> <events>: the frozen rows (+ the superset row)
     python3 - "$1" "$2" <<'PY'
@@ -211,7 +212,7 @@ for s in vsav2:vsav2:"$ROMDIR" vsavj:vsavj:"$ROMDIR" ours:vsavjw:"$BUILD/rompath
     done; done
 done
 wait
-python3 - "$W" >> "$W/got.tsv" 2> "$W/act.err" <<'PY' || bad "act: $(cat "$W/act.err")"
+python3 - "$W" >> "$W/got.tsv" 2> "$W/act.err" <<'PY' || { grep -qE 'trace incomplete|FileNotFoundError' "$W/act.err" && vs_ctl_nj "act: a leg wrote no complete trace"; bad "act: $(cat "$W/act.err")"; }   # #310 g7 NJ
 import sys
 W = sys.argv[1]
 def load(p):

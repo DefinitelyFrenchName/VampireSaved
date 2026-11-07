@@ -274,9 +274,10 @@ PY
     wait
     sed -n 1p "$W/${TENANT}_${PARTS%% *}.pokes.log" | sed 's/^/  pokes: /'
     for p in $PARTS; do for leg in native ours; do
-        [ -s "$W/${TENANT}_$p.$leg.ft" ] || bad "part $p $leg: no samples ($W/${TENANT}_$p.$leg/mame.log)"
+        [ -s "$W/${TENANT}_$p.$leg.ft" ] || { vs_ctl_nj "part $p $leg: no samples"; bad "part $p $leg: no samples ($W/${TENANT}_$p.$leg/mame.log)"; }   # #310 g7 NJ
     done; done
     [ "$fail" = "$fail0" ] || { echo "FAIL: audit_victim_parity ($TENANT: a leg did not run)"; exit 1; }
+    for p in $PARTS; do for leg in native ours; do [ -s "$W/${TENANT}_$p.$leg.ft" ] || { vs_ctl_nj "part $p $leg: no samples"; echo "FAIL: audit_victim_parity ($TENANT: part $p $leg wrote no samples — a check above was already red, so the leg check could not stop the run)"; exit 1; }; done; done   # #310 g7 NJ
     echo "== 3. identity and the attacker's chains, per leg"
     for p in $PARTS; do for leg in native ours; do
         if [ $leg = native ]; then img="$W/v2_da.bin"; lay=vsav2; else img="$BUILD/verify_data.bin"; lay=vsavj; fi

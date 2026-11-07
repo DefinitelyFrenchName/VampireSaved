@@ -1,0 +1,5 @@
+  FLAG FIGURE: 47
+  FLAG D-FIGURE: 17  [build/agent223/t310b3/comment_310.md]
+  FLAG D-ABSOLUTE: In six of the gates a leg that never ran ended the gate on its liveness check, and a mode counted that exit as its control firing.  [build/agent223/t310b3/comment_310.md]
+  FLAG D-ABSOLUTE: The table runs each mode with the binary dead from the start, so the run exercises only the first liveness exit each gate reaches; the other tagged exits are...  [build/agent223/t310b3/comment_310.md]
+packet_check: 4 flag(s): D-ABSOLUTE 2, D-FIGURE 1, FIGURE 1

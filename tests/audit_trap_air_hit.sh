@@ -99,7 +99,7 @@ for leg in native merged; do for p in 3508 3511; do
 done; done
 wait
 for leg in native merged; do for p in 3508 3511; do
-    [ -s "$W/$leg-$p/trace.ft" ] && [ -s "$W/$leg-$p/boxes.txt" ] || { bad "$leg $p: no trace ($(tail -1 "$W/$leg-$p.out"))"; continue; }
+    [ -s "$W/$leg-$p/trace.ft" ] && [ -s "$W/$leg-$p/boxes.txt" ] || { vs_ctl_nj "$leg $p: no trace"; bad "$leg $p: no trace ($(tail -1 "$W/$leg-$p.out"))"; continue; }   # #310 g7 NJ
     grep -q '^# fighters by hitbox base: P1 id 16, P2 id 7$' "$W/$leg-$p/boxes.txt" && ok "$leg $p: P1 Phobos (0x10) and P2 Felicia (0x07) by their hitbox bases" \
         || bad "$leg $p: the fighters are not Phobos / Felicia: $(grep '^# fighters' "$W/$leg-$p/boxes.txt")"
 done; done

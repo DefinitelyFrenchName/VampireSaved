@@ -1,5 +1,5 @@
 #!/bin/sh
-# test_dead_leg_unjudged.sh — A DEAD EMULATOR LEG IS NOT THE CONTROL FIRING (#310 group 7, 14z-221). Needs ROMDIR (the gates' own ROM checks), runs no emulator: ~1 min.
+# test_dead_leg_unjudged.sh — A DEAD EMULATOR LEG IS NOT THE CONTROL FIRING (#310 group 7, 14z-221). Needs ROMDIR (the gates' own ROM checks), runs no emulator: ~4-5 min (91 rows on the MacBook, 14z-223: 3:56, then 5:18 under load).
 #
 # WHAT: tests/lib/controls.sh `vs_ctl_nj <why>`, which a gate calls beside each liveness check (an emulator that exited
 #   non-zero, a trace with no END line, no samples, a reducer's VOID about a leg that never ran): under a CONTROL= mode it
@@ -31,7 +31,9 @@
 # WHY: #310 (the 14z-215 re-census, group 7: 104 gates PRESENT): a leg that never finished counted as the control firing.
 #   Ruled 2026-10-31 (maintainer): "5 and 6 now, 7 in batches (Recommended)", whose text read "Group 7 (104 gates) in
 #   later sessions, batched by family, each batch proven by MAME_BIN=/usr/bin/false reading UNJUDGED". Batch 1 (14z-221):
-#   the gates with one PRESENT mode whose dead-emulator run read HONOURED at HEAD d3e8810d.
+#   the gates with one PRESENT mode whose dead-emulator run read HONOURED at HEAD d3e8810d. Batch 2 (14z-221c): 18 rows
+#   over 12 gates. Batch 3 (14z-223): the seven MAME gates with two or more modes off the concurrent lists, 48 rows
+#   (tests/expected/dead_leg_unjudged.tsv's header names them).
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

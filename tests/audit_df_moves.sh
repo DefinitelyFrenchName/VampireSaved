@@ -22,7 +22,7 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_moves.tsv
 #   tests/expected/registry.tsv tests/lua/field_trace.lua tests/lua/read_tap.lua
 #   tests/lua/snapshot_frames.lua tests/lua/sprite_capture.lua tools/build_fingerprint.py
-#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh tests/lib/controls.sh
 #
 # SHEET: legs vs2,ours — moments: one per in-DF event row, at each leg's own first hit frame (the event frame + 4 when it has none) — not comparable: each game's stage and palette, P2's art (each game's own copy; [VSP-168]), and the two modes' own looks (Change on ours, the vs2 EX install on native); the form rows (Pyron's palettes, Donovan's sword) are sprite-dump measurements, not drawn
 #
@@ -99,6 +99,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 case "$CONTROL" in ""|hit-dropped|contact-emptied|mode-lost|idle-leg|form-moved|rng-dead|palette-blind|pin-in-window|pins-unpinned|sword-poke-planted) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -244,8 +245,8 @@ for part in $PARTS; do
     fi
 done
 wait
-for part in $PARTS; do for leg in native ours; do _rc="$(cat "$W/$part.$leg/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "$part $leg exited $_rc"; done; done
-UP="${UNPIN_PART:-huitzil_dfx2}"; _rc="$(cat "$W/$UP.native.unpinned/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "$UP native.unpinned exited $_rc"
+for part in $PARTS; do for leg in native ours; do _rc="$(cat "$W/$part.$leg/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "$part $leg exited $_rc"; bad "$part $leg exited $_rc"; }; done; done   # #310 g7 NJ
+UP="${UNPIN_PART:-huitzil_dfx2}"; _rc="$(cat "$W/$UP.native.unpinned/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "$UP native.unpinned exited $_rc"; bad "$UP native.unpinned exited $_rc"; }   # #310 g7 NJ
 [ "$fail" = 0 ] || { echo "FAIL: audit_df_moves"; exit 1; }
 if [ "$CONTROL" = pins-unpinned ]; then cp "$W/$UP.native.unpinned.ft" "$W/$UP.native.ft"; echo "MODE: control pins-unpinned — $UP's native leg replaced by the one that ran with vsav2's own level and RNG"; fi
 rows() {  # rows <W> <parts> [plant] -> the ev rows; a VOID on stderr exits 1; `plant` puts an HP pin inside the first compared window in memory (the pin-in-window control)
@@ -495,7 +496,7 @@ for part in pyron_dfx1 donovan_dfx1; do
 done
 wait
 for r in pyron_dfx1.native.0000 pyron_dfx1.ours.0000 donovan_dfx1.native.0000 donovan_dfx1.ours.0000 donovan_dfx1.native.1234 donovan_dfx1.ours.1234; do
-    _rc="$(cat "$W/$r/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "$r exited $_rc and wrote no OBJDUMPSUMMARY"
+    _rc="$(cat "$W/$r/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "$r exited $_rc and wrote no OBJDUMPSUMMARY"; bad "$r exited $_rc and wrote no OBJDUMPSUMMARY"; }   # #310 g7 NJ
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_df_moves (a sprite dump was VOID)"; exit 1; }
 # THE RNG IS READ in the sword's window (rule-checker run 2026-09-18-49 Q4: a pin that never reaches
@@ -513,7 +514,7 @@ for leg in native ours; do
       _st=$?; grep -q -E '^(FIELDSUMMARY|END )' "$W/rng.$leg.tap" 2>/dev/null && _st=0; echo $_st > "$W/rng.$leg/rc"; rm -rf "$W/rng.$leg/sb" ) </dev/null &
 done
 wait
-for leg in native ours; do _rc="$(cat "$W/rng.$leg/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "rng tap $leg exited $_rc and wrote no END"; done
+for leg in native ours; do _rc="$(cat "$W/rng.$leg/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || { vs_ctl_nj "rng tap $leg exited $_rc and wrote no END"; bad "rng tap $leg exited $_rc and wrote no END"; }; done   # #310 g7 NJ
 [ "$fail" = 0 ] || { echo "FAIL: audit_df_moves (an RNG tap was VOID)"; exit 1; }
 # ONE reducer: the form rows. `blind` compares our palette page with NATIVE's own (what a read that
 # did not reach our palette RAM would compare) — the palette-blind control's perturbation.

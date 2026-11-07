@@ -183,7 +183,7 @@ for c in $CASES; do
         "$W/new_$k/b.log" "$W/sbn_$sk" >/dev/null 2>&1 &
     wait
     if [ ! -f "$W/van_$k/a.log" ] || [ ! -f "$W/new_$k/b.log" ]; then
-        echo "  FAIL: a leg did not complete"; fail=1; continue
+        vs_ctl_nj "$rpl f$frame: a leg did not complete"; echo "  FAIL: a leg did not complete"; fail=1; continue   # #310 g7 NJ
     fi
     # the vanilla leg IS the frozen run: its checksum at the case frame equals the basis log's (same mask) — #293
     if [ "$MASK" = "$BASIS_MASK" ]; then

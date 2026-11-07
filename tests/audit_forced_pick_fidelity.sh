@@ -17,7 +17,7 @@
 #   expectation and fails, the short cursor path confirms another character and fails
 #   identity.
 # FOLLOWS: emu/mame-patches/ tests/audit_move_parity.sh tests/expected/forced_pick_fidelity.tsv
-#   tests/lua/replay.lua tests/replays/naming/ tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
+#   tests/lua/replay.lua tests/replays/naming/ tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/controls.sh
 #
 # SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
 #
@@ -96,6 +96,7 @@ case "$CONTROL" in
     ""|same-leg|wrong-cursor|retyped-prologue) ;;
     *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;;
 esac
+. "$REPO/tests/lib/controls.sh"   # #310 g7 NJ
 if [ "${FREEZE:-0}" != 1 ] && [ "${MEASURE:-0}" != 1 ]; then
     [ -f "$EXPECT" ] || { echo "FAIL: no frozen expectation at $EXPECT (FREEZE=1 to create it)"; exit 1; }
 fi
@@ -295,7 +296,7 @@ wait
 for row in $ROWS; do
     for leg in poked real self; do
         [ "$(ls "$W/${row}_$leg"/dump_*_ff8000.bin 2>/dev/null | wc -l)" -ge 30 ] \
-            || bad "${row}_$leg produced no dumps (see $W/${row}_$leg/mame.log)"
+            || { vs_ctl_nj "${row}_$leg produced no dumps"; bad "${row}_$leg produced no dumps (see $W/${row}_$leg/mame.log)"; }   # #310 g7 NJ
     done
 done
 [ "$fail" = 0 ] || { echo "FAIL: a leg did not run"; exit 1; }

@@ -66,7 +66,7 @@ for t in tap90 tap2p; do grep -q '^END ' "$W/$t.txt" 2>/dev/null || { echo "  FA
 for l in unpoked before after; do for f in 3460 3470 4200; do
     [ -f "$W/$l/dump_${f}_ff8400.bin" ] || { echo "  FAIL  $l: no dump at f$f (see $W/$l/mame.log) — VOID"; fail=1; }
 done; done
-[ "$fail" = 0 ] || { echo "FAIL: audit_ladder_pick_store (a leg did not complete)"; exit 1; }
+[ "$fail" = 0 ] || { vs_ctl_nj "a leg did not complete"; echo "FAIL: audit_ladder_pick_store (a leg did not complete)"; exit 1; }   # #310 g7 NJ
 echo "  ok    five legs complete"
 
 check() {  # check <store pc> <before leg> <after leg> <base rotation> — prints ok/FAIL lines, exits 1 on any FAIL

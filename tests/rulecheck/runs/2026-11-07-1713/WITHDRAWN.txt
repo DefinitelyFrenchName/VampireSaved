@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-223): the packet check flagged comment_310.md's '31 group-7 gates ... (121 census rows)', a figure no artifact carried, and 'In each gate a leg that never ran ended the gate on its liveness check', which audit_marionette_cost's crash contradicts; both fixed and the packet re-prepared.
