@@ -921,12 +921,15 @@ for line in open(reg_path):
 # A gate that runs tests/test_crash_sweep.sh --tier emulator (audit_crash_sweep_emu, #310, 14z-218) is emulator-tier
 # too: it reaches the emulator through that gate's emulator rows, so the pattern missed it and the emulator runner read
 # its row as a DEAD ROW — every strict emulator run NOT GREEN, first seen at the M25 freeze's parity run (14z-220).
+# A gate that runs tests/test_dead_leg_unjudged.sh on tests/expected/dead_leg_unjudged_linux.tsv (audit_dead_leg_linux,
+# #310, 14z-223) reaches the release emulators through the two Linux release gates' rows the same way.
 EMU = re.compile(r'run_(replay_)?(mame|fbneo)\.sh|run_replay_guarded\.sh'
                  r'|MAME_BIN|FBNEO_BIN|autoboot_script|emu/fbneo/fbneo'
                  r'|run_battery|run_sim_jtcps2\.sh'
                  r'|run_inp_probe\.sh|run_inp_guarded\.sh'
                  r'|desktop_session_play\.py|cleanhost_libs\.py|tests/ci_emulator\.tsv'
-                 r'|test_crash_sweep\.sh"? --tier emulator')
+                 r'|test_crash_sweep\.sh"? --tier emulator'
+                 r'|dead_leg_unjudged_linux\.tsv')
 SRC = re.compile(r'^\s*\.\s+"?\$(?:REPO|\{REPO\})"?/(tests/lib/[a-z0-9_]+\.sh)', re.M)
 def uncomment(path):
     try:

@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**513 of 515 gates described.**
+**514 of 516 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 65 | 65 | the suite runners and their own ground truth |
+| [runner](#runner) | 66 | 66 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 65 of 65 described.
+the suite runners and their own ground truth. 66 of 66 described.
 
 ### `audit_crash_sweep_emu.sh` — audit, emulator
 
@@ -39,6 +39,14 @@ the suite runners and their own ground truth. 65 of 65 described.
 **HOW:** runs tests/test_crash_sweep.sh with `--tier emulator`, passing CONTROL through, prints its output, and judges the three controls itself from it: each control's own `CONTROL FIRED:` line there is re-emitted as this gate's firing, anything else is this gate's CONTROL DEAD (so its verdict lines are its own code, not a copy). Exits with the inner status (1 if a control is dead).
 
 **EXPECTS:** the static gate's EXPECTS for the emulator rows; ROMDIR set (the target gates need the reference sets).
+
+### `audit_dead_leg_linux.sh` — audit, emulator
+
+**WHAT:** the five control modes of tests/audit_release_linux_cleanhost.sh (2) and tests/audit_release_linux_desktop.sh (3), run with their leg's instrument dead, read UNJUDGED (a dead leg is not the control firing), their copies with the `# #310 g7 NJ` lines neutered read their frozen pre-fix class, and their plain runs are red and silent — exactly tests/test_dead_leg_unjudged.sh's checks (its header is the specification), on the Linux table; and the runs left no release emulator or sink recorder running (tools/desktop_session_play.py stops them even when a step raises: before 14z-223 a dead xwd leaked two runs' emulators and recorders into the session and failed the next desktop run).
+
+**HOW:** runs tests/test_dead_leg_unjudged.sh with DLU_TABLE=tests/expected/dead_leg_unjudged_linux.tsv, passing CONTROL through, prints its output, and judges the two controls itself from it: each control's own `CONTROL FIRED:` line there is re-emitted as this gate's firing, anything else is this gate's CONTROL DEAD. Exits with the inner status (1 if a control is dead or a process was left running; such a process is named and killed). The rows run one at a time (their dead instruments are on PATH). Each target gate's plain run writes its kept output dir (build/cleanhost_release, build/desktop_release) with a dead instrument, so run this AFTER the two gates' own release runs, whose logs are the release's record, and ALONE: it claims the desktop session for its whole run (tests/lib/desktop_session.sh) and is REFUSED (exit 3) beside another desktop gate or a release emulator already running — a desktop run refused inside a row reads UNJUDGED, a row's frozen class (14z-223).
+
+**EXPECTS:** PASS with 5 rows; a Linux host with podman, a live GNOME session for this user, ROMDIR, and the release's linux-x86_64 binaries under `release/<name>/` (or ASSETS=<dir of zips>), as the two target gates need. Elsewhere it SKIPs and says so: at release it runs on PILOT, after the two gates it checks.
 
 ### `audit_pool_drop.sh` — audit, emulator
 
@@ -788,7 +796,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 **WHAT:** each prebuilt linux-x86_64 asset (FBNeo and MAME), taken as a player gets it (the asset cut by the real uploader, the shipped applier, `sh PLAY.command` in a live GNOME session), opens a window, reaches the select screen showing the release's own version mark, and plays SOUND: its own audio stream is linked to the session's sink, and that stream, recorded for 15 s at the select screen, carries signal in every 5 s window.
 
-**HOW:** tools/upload_release_assets.sh --dry-run cuts the assets (or `ASSETS=<dir>` of zips, e.g. downloaded from the release); apply_release.py builds the set from ROMDIR; tools/desktop_session_play.py records the null sink with pw-record (rec.wav, evidence), launches PLAY.command, sends keys through XTEST, captures the window with xwd, snapshots pw-dump at select and records the emulator's OWN stream node (app.wav); tools/desktop_mark_check.py judges the select capture at font-pixel resolution against the manifests' version font; tools/desktop_audio_check.py reads the links and the WAV levels. About 6 min of desktop time (five runs of ~60-75 s). Linux with a live session ONLY: on any other host it SKIPs and says so; at release it runs on PILOT (see HOW IT REACHES A RELEASE).
+**HOW:** tools/upload_release_assets.sh --dry-run cuts the assets (or `ASSETS=<dir>` of zips, e.g. downloaded from the release); apply_release.py builds the set from ROMDIR; tools/desktop_session_play.py records the null sink with pw-record (rec.wav, evidence), launches PLAY.command, sends keys through XTEST, captures the window with xwd, snapshots pw-dump at select and records the emulator's OWN stream node (app.wav); tools/desktop_mark_check.py judges the select capture at font-pixel resolution against the manifests' version font; tools/desktop_audio_check.py reads the links and the WAV levels. About 6 min of desktop time (five runs of ~60-75 s). Linux with a live session ONLY: on any other host it SKIPs and says so; at release it runs on PILOT (see HOW IT REACHES A RELEASE). One harness at a time on the session: it claims it (tests/lib/desktop_session.sh) and is REFUSED (exit 3) beside another desktop gate or a release emulator already running; under audit_dead_leg_linux it claims nothing (14z-223).
 
 **EXPECTS:** per emulator, mark mismatches 0 of 147 font cells, at least one active link from the emulator's node to auto_null and from auto_null to pw-record, and every 5 s window of the emulator's own stream above -45 dBFS RMS (the sink measured 14z-194 at -27 to -36 dBFS after select); each control fails.
 

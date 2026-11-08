@@ -8148,3 +8148,43 @@ never reached. Found only because
 #310 group 7 made the dead leg read UNJUDGED. **A guard that refuses a state on purpose must be grepped against every
 control that creates that state on purpose (here: every mode that shares a sandbox). And a control's FIRED line must name
 the evidence it fired on, never a run-wide red that anything else can raise.**
+
+## A DRIVER THAT CRASHED PAST ITS OWN STOP LEFT TWO RUNS' EMULATORS PLAYING INTO THE DESKTOP, AND THE NEXT RUN JUDGED THEIR SOUND (paid: 14z-223, #310 group 7, PILOT)
+
+`tools/desktop_session_play.py` stopped the emulator's process group and the sink recorder in code that ran after its step
+loop. When a dead `xwd` left no `.xwd` file, the `cap` step's `os.remove` raised, and the stop never ran. The two baseline
+runs left two emulators and two recorders playing into the session's null sink. The next plain run of
+`tests/audit_release_linux_desktop.sh` then failed its signal check on a silent FBNeo stream: `apprec` recorded the first
+`fbneo` node it found, which was a leftover. The in-gate `unlinked-recorder` control read DEAD on the leftovers' links. A
+leftover with sound could just as well have passed a silent emulator. Fixed in the driver: the stop sits in a `finally`
+and kills the group even after its leader exits; the driver refuses to start beside another emulator's stream (`stray`,
+exit 3); `apprec` records only a node owned by its own process group; a missing capture is logged, not raised. The proof
+on PILOT: the old driver left 4 processes, the new one refused beside them, then left 0. `tests/audit_dead_leg_linux.sh`
+now names and kills any release emulator or sink recorder its runs leave. **A harness that starts processes in a shared
+session must stop them on every path out, and must refuse to judge while anything it did not start plays into the thing
+it measures.**
+
+## A WRITE TRACE SEES FILES, NOT A SHARED SESSION — a gate whose controls share a desktop was listed to run them side by side (paid: 14z-223, #310 group 7)
+
+`tests/controls_concurrent_emu.txt` listed `audit_release_linux_desktop` on a PILOT write trace (SAFE at pilot:a10866d0:
+no file two of its modes write). But all three modes play into the one desktop session: the null sink, the PipeWire
+graph the link check reads, and the X display, whose keyboard focus takes the XTEST keys. In a pooled release run
+(`--jobs N`) the runner would have run them side by side, and a mode's signal and link checks could have read a sibling's
+emulator. The M26 release escaped only because the gate ran alone (`--only`, one slot). It is now off the list, never to
+be listed. Its siblings were the next trap: the new dead-leg gate runs the desktop gate's modes inside it, and a desktop
+run refused beside a sibling reads UNJUDGED, a dead-leg row's frozen class; both gates now claim the session
+(`tests/lib/desktop_session.sh`), found by rule-checker run 2026-11-08-1727. **A write trace certifies file isolation only. Before listing a gate, ask what else its controls share — a
+display, a sound server, a device, a port — that no trace of `open` and `rename` calls can see.**
+
+## A LAUNCHER THAT IGNORES SIGPIPE MADE EVERY CONTROL OF A GATE READ UNJUDGED (paid: 14z-223, #310 group 7, PILOT)
+
+The PILOT pass was started as `setsid -f gnome-session-inhibit --inhibit idle timeout … bash script.sh`, to keep the
+desktop session awake. `gnome-session-inhibit` (GLib/GDBus) leaves SIGPIPE ignored, and every child inherits it
+(`/proc/self/status` SigIgn `0x1000`); a POSIX shell cannot un-ignore a signal ignored at its entry. In
+`tests/test_emulator_runner.sh`'s write trace, each perturbed runner copy's `printf` into a pipe its reader had closed then
+failed with EPIPE instead of dying quietly, dash printed `printf: printf: I/O error`, and `tests/lib/controls.sh` read the
+copies as unable to run: all 22 modes UNJUDGED, the gate HOLLOW, while each mode had in fact reached the gate's own FAIL.
+Re-run through `env --default-signal=PIPE` (and a script that refuses if SIGPIPE is still ignored). The same pass's gate
+runs and the M26 release's desktop runs, also under the inhibitor, carry no such line. **Start a remote run with the
+signals at their defaults: put `env --default-signal=PIPE` after any wrapper that is not a plain exec, and check SigIgn
+when a shell prints an I/O error on a pipe.**

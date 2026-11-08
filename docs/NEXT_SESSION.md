@@ -19,7 +19,7 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
-idle`). Idle at the 14z-222 close, its checkout `~/vampire-saved` detached at `bb10ce97` (the freeze commit) with a LOCAL tag
+idle env --default-signal=PIPE`: the inhibitor alone leaves SIGPIPE ignored for every child, gotchas.md, 14z-223). Idle at the 14z-222 close, its checkout `~/vampire-saved` detached at `bb10ce97` (the freeze commit) with a LOCAL tag
 `freeze/merged-m26` (`564775cf`, never pushed, not origin's tag object): delete that tag before PILOT fetches tags, then move
 the checkout to the new `main`. **ERIS** (WSL2, 24 threads,
 47 GB) runs the release shape; idle at the 14z-222 close, its checkout `~/vampire-saved` detached at `bb10ce97`: move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare

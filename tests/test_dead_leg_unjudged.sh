@@ -47,7 +47,9 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d)" || { echo "FAIL: test_dead_leg_unjudged — mktemp -d failed (W)"; exit 2; }; trap '[ -n "${KEEP_W:-}" ] || rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
-T="$REPO/tests/expected/dead_leg_unjudged.tsv"
+# DLU_TABLE: another table of the same form (tests/audit_dead_leg_linux.sh passes the Linux-only release gates' rows,
+# tests/expected/dead_leg_unjudged_linux.tsv, run on PILOT at release; ruled 14z-223)
+T="${DLU_TABLE:-$REPO/tests/expected/dead_leg_unjudged.tsv}"
 [ -f "$T" ] || { echo "FAIL: test_dead_leg_unjudged — no table $T"; exit 1; }
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: test_dead_leg_unjudged — ROMDIR unset, the row gates check their ROMs first"; exit 2; }
 JOBS="${JOBS:-6}"

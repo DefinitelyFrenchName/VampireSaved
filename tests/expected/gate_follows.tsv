@@ -19,6 +19,7 @@ declares	audit_continue_ladder
 declares	audit_continue_switch
 declares	audit_crash_sweep_emu
 declares	audit_crouch_flag
+declares	audit_dead_leg_linux
 declares	audit_dead_span_exec
 declares	audit_defense_row_reads
 declares	audit_defense_row_residue

@@ -376,6 +376,16 @@ dead_lists "$out3d" g_harness && fail "a gate that runs the crash sweep's emulat
 out3e="$(run --log "$T/l3e" || true)"
 dead_lists "$out3e" g_harness && ok "the same stub on the sweep's static tier is a DEAD ROW (the case discriminates)" \
     || fail "the static-tier stub was not reported DEAD: the crash-sweep case above proves nothing"
+# A gate that runs the dead-leg gate on the Linux release gates' table (audit_dead_leg_linux, #310, 14z-223): emulator-tier;
+# the same call on the static table is a DEAD ROW.
+{ echo "#!/bin/sh"; echo 'DLU_TABLE="$REPO/tests/expected/dead_leg_unjudged_linux.tsv" /bin/sh "$REPO/tests/test_dead_leg_unjudged.sh" > /dev/null'; echo "exit 0"; } > "$FR/tests/g_harness.sh"
+out3f="$(run --log "$T/l3f" || true)"
+dead_lists "$out3f" g_harness && fail "a gate that runs the dead-leg gate on the Linux table was reported as a DEAD ROW" \
+    || ok "a gate that runs the dead-leg gate on the Linux table is emulator-tier, not a DEAD ROW"
+{ echo "#!/bin/sh"; echo 'DLU_TABLE="$REPO/tests/expected/dead_leg_unjudged.tsv" /bin/sh "$REPO/tests/test_dead_leg_unjudged.sh" > /dev/null'; echo "exit 0"; } > "$FR/tests/g_harness.sh"
+out3g="$(run --log "$T/l3g" || true)"
+dead_lists "$out3g" g_harness && ok "the same stub on the static table is a DEAD ROW (the case discriminates)" \
+    || fail "the static-table stub was not reported DEAD: the Linux-table case above proves nothing"
 rm -f "$FR/tests/g_harness.sh"
 
 echo "4. --strict makes SKIP and an unregistered gate fatal"

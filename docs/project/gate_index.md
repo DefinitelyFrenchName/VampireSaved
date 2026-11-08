@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**515 scripts** — 155 ci_portable, 98 ci_static, 262 emulator-tier (run by name).
+**516 scripts** — 155 ci_portable, 98 ci_static, 263 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 65 | the suite runners and their own ground truth |
+| [runner](#runner) | 66 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -38,6 +38,7 @@ the suite runners and their own ground truth.
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
 | `tests/audit_crash_sweep_emu.sh` | audit | emulator | MAME | THE EMULATOR ROWS OF THE CRASH SWEEP (#310, 14z-218): tests/test_crash_sweep.sh --tier emulator. | 14z-218 |
+| `tests/audit_dead_leg_linux.sh` | audit | emulator | FBNeo, a build dir | THE LINUX-ONLY RELEASE GATES' DEAD-LEG ROWS (#310 group 7, 14z-223): tests/test_dead_leg_unjudged.sh on tests/expected/dead_leg_unjudged_linux.tsv, at release, on PILOT. | 14z-223 |
 | `tests/audit_pool_drop.sh` | audit | emulator | a build dir, ~100 s | EVERY GATE THAT POOLS ITS EMULATOR RUNS STILL FAILS WHEN THE POOL LOSES ONE (#334, 14z-212). | 14z-212 |
 | `tests/run_all_emulator.sh` | run | emulator | Verilator, MAME, FBNeo, a build dir | THE EMULATOR-TIER GATE CHAIN. One command, every gate that needs MAME, FBNeo or the Verilator simulator. (14z-128.) | 14z-128 |
 | `tests/run_all_static.sh` | run | emulator | FBNeo, a build dir | THE PRE-COMMIT GATE CHAIN. One command, every gate that does not need an emulator. (14z-94, GitHub #30.) | 14z-94 |

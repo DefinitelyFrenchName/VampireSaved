@@ -84,12 +84,12 @@ else
     # the assets cut into this run's own dir, the uploader's git taking no index lock (#321, 14z-210: two runs side by
     # side shared build/scratch/release_assets/<set> and .git/index.lock — fork P's PILOT write trace)
     GIT_OPTIONAL_LOCKS=0 RELEASE_DRY_OUT="$W/assets" tools/upload_release_assets.sh "freeze/$NAME" --dry-run > "$OUT/cut.log" 2>&1 || {
-        echo "FAIL: the uploader refused its own dry run:"; sed 's/^/      /' "$OUT/cut.log"; exit 1; }
+        vs_ctl_nj "the uploader's dry run failed, so no asset was cut"; echo "FAIL: the uploader refused its own dry run:"; sed 's/^/      /' "$OUT/cut.log"; exit 1; }   # #310 g7 NJ
     AD="$W/assets"
 fi
 AD="$(cd "$AD" && pwd)"
 for e in fbneo mame; do
-    [ -f "$AD/$NAME-$e-linux-x86_64.zip" ] || { echo "FAIL: no $NAME-$e-linux-x86_64.zip in $AD"; exit 1; }
+    [ -f "$AD/$NAME-$e-linux-x86_64.zip" ] || { vs_ctl_nj "no $NAME-$e-linux-x86_64.zip to run"; echo "FAIL: no $NAME-$e-linux-x86_64.zip in $AD"; exit 1; }   # #310 g7 NJ
 done
 echo "== the release under test: $NAME (assets from $AD)"
 
@@ -146,11 +146,16 @@ judge() {
 
 DROP=""; vs_ctl_is list-minus-one && DROP="--drop libGL.so.1"
 P="$PKGS"; vs_ctl_is uninstalled-host-lib && P="$(echo $PKGS | tr ' ' '\n' | grep -vx libasound2t64 | tr '\n' ' ')"
-CRASH=0
+CRASH=0; CDEAD=""; EV=""
 for e in fbneo mame; do
     echo "== $e: a stock $IMAGE, the list's packages only"
     crun "$e" real "$P"
     judge "$e" real $DROP
+    # a container that never ran (no C0 line: podman or the image failed) is a dead leg, not the mode's finding (#310 g7)
+    grep -q '^C0 packages ' "$OUT/$e.real/summary.txt" || { CDEAD="$CDEAD $e"; vs_ctl_nj "$e: the container did not run (no C0 line), so nothing was judged on it"; }   # #310 g7 NJ
+    # each mode's OWN evidence on this run: the C0 line naming libasound.so.2 missing; C1 failing with no tool crash
+    if vs_ctl_is uninstalled-host-lib && grep -q '^C0 .*missing:.* libasound\.so\.2\( \|$\)' "$OUT/$e.real/summary.txt"; then EV="$EV $e"; fi
+    if vs_ctl_is list-minus-one && [ "$C1_OK" = 0 ] && [ "$CRASH" = 0 ]; then EV="$EV $e"; fi
     [ "$C0_OK" = 1 ] && ok "$e: C0 every listed soname is present in the container" || bad "$e: C0 a listed soname is missing (see above)"
     [ "$APPLY_OK" = 1 ] && ok "$e: the shipped applier built the set" || bad "$e: the shipped applier failed"
     [ "$LDD_OK" = 1 ] && ok "$e: the binary and every bundled library resolve (ldd: 0 not found)" || bad "$e: ldd reports a library not found"
@@ -161,7 +166,11 @@ done
 
 if [ -n "${VS_CTL:-}" ]; then
     [ "$fail" = 1 ] && [ "$CRASH" = 1 ] && { echo "NOT JUDGED: $VS_CTL — tools/cleanhost_libs.py crashed on the perturbed run (above), so C1/C2 judged nothing"; echo "FAIL: audit_release_linux_cleanhost (control mode)"; exit 1; }
-    [ "$fail" = 1 ] && { vs_ctl_fired "$VS_CTL" "the perturbed run failed (mode)"; echo "FAIL: audit_release_linux_cleanhost (control mode)"; exit 1; }
+    # the mode fires on its own evidence on BOTH runs, never on any red of the run (#310 group 7, 14z-223): before, a dead
+    # podman failed every check and the mode read that as its firing
+    if [ "$EV" = " fbneo mame" ]; then vs_ctl_fired "$VS_CTL" "the perturbed run failed on its own evidence on both emulators (mode: $([ "$VS_CTL" = list-minus-one ] && echo 'C1 with libGL.so.1 dropped' || echo 'C0 names libasound.so.2 missing'))"; echo "FAIL: audit_release_linux_cleanhost (control mode)"; exit 1; fi
+    if [ -n "$CDEAD" ]; then vs_ctl_nj "the container did not run for:$CDEAD, so the perturbation was judged on${EV:- no run}"; echo "FAIL: audit_release_linux_cleanhost (control mode)"; exit 1; fi   # #310 g7 NJ
+    [ "$fail" = 1 ] && { echo "CONTROL DEAD: $VS_CTL — the run failed, but its own evidence was found only on:${EV:- no run}"; echo "FAIL: audit_release_linux_cleanhost (control mode)"; exit 1; }
     echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the gate fail: a dead mode, not a verdict"; exit 3
 fi
 

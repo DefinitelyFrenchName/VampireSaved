@@ -128,6 +128,63 @@ re-census, then #310's closure (or a batch 6 first).
   and #310 commented on rule-checker run 2026-11-08-1724 OK after -1721 to -1723 (the gaps they found were evidence: blobs
   unrecorded, the sdram mode's output, where a leg died, roundtrip's other modes).
 
+### (7) #310 GROUP 7 — THE LINUX GATE (5 ROWS ON PILOT AT RELEASE); A DRIVER THAT LEAKED INTO THE DESKTOP
+- **`tests/audit_dead_leg_linux.sh`**, as ruled in (5): `tests/test_dead_leg_unjudged.sh` on
+  `tests/expected/dead_leg_unjudged_linux.tsv` (cleanhost's 2 modes on a dead `PATH:podman`, desktop's muted-stream and
+  unlinked-recorder on a dead `PATH:pw-record`, wrong-mark on a dead `PATH:xwd`), release cadence, `tests/ci_emulator.tsv`;
+  SKIPs off Linux, without podman or without a live GNOME session, and says so. The two target gates call `vs_ctl_nj` at their
+  liveness exits; cleanhost's modes fire only on their own evidence (C0 naming libasound.so.2 missing, C1 failing with
+  libGL.so.1 dropped). On PILOT at scratch `3ce6645c`: plain PASS in 2,024 s (5 rows UNJUDGED dead, their neutered copies at
+  their frozen classes, plain runs red and silent), `nj-stripped` and `plain-loud` HONOURED (2,025 s and 1,613 s), nothing
+  left running.
+- **The driver leaked (found by this work):** `tools/desktop_session_play.py` stopped the emulator and the sink recorder
+  after its step loop; a dead `xwd` made the `cap` step raise, so the two baseline runs left two emulators and two recorders
+  playing into the session, and the next plain desktop run FAILed on a leftover's silent stream. Fixed: the stop is in a
+  `finally` (group TERM, then KILL even after the leader exits); the driver refuses to start beside another emulator's
+  stream (`stray`, exit 3); `apprec` records only its own process group's node; a missing capture is logged. Shown on
+  PILOT: D1 (the old driver, xwd dead) left 4 processes and read DIED; D2 (the new driver beside them) refused, 5 "already
+  on the session" lines; D3 (the new driver, xwd dead) read UNJUDGED with both own-stream checks ok and left 0. The new gate
+  also names and kills any release emulator or recorder its runs leave (shown on PILOT with a stub inner gate leaving a
+  process named as a release FBNeo: named, killed, FAIL; with nothing left: PASS; not a frozen control). The desktop gate's plain run and its 3 modes then
+  PASS/HONOURED under the runner (783 s, one after another).
+- **One harness at a time on the desktop session (rule-checker run -1727):** nothing in the runner keeps two gates apart
+  in a pooled run, and a desktop run refused inside a dead-leg row (the driver's `stray`, exit 3) reads UNJUDGED, that
+  row's frozen class: a false green. `tests/lib/desktop_session.sh`: the desktop gate and the dead-leg gate claim the
+  session (an owner file) and are REFUSED (exit 3) beside a live owner or a release emulator already running; the driver
+  refuses unless it runs under the owner (`owned`, exit 3); nested runs claim nothing. Shown on PILOT at scratch
+  `d29fa100`: with a foreign owner both gates and the driver refuse; with a leftover both gates refuse and leave it
+  alone; a stale owner is ignored. Then the desktop gate PASS with 3 modes HONOURED (794 s) and the dead-leg gate PASS
+  (2,027 s) with both modes HONOURED (5,687 s), nothing left running, the owner file gone after each.
+- **The desktop gate off the emulator concurrent list, never to be listed:** its modes share the desktop session (the null
+  sink, the PipeWire graph, the X display and its focus), which a write trace cannot see; its `pilot:a10866d0` SAFE said
+  nothing about them. M26's release ran it alone (`--only`), so no release was judged side by side.
+- **Back on the static concurrent list:** `test_release_roundtrip` (10 controls, SAFE, 10 HONOURED) and
+  `test_emulator_runner` (new cases 3f and 3g) re-traced on PILOT at `3ce6645c`. The runner's first trace read all 22
+  modes UNJUDGED (HOLLOW): the pass ran under `gnome-session-inhibit`, which leaves SIGPIPE ignored for every child, so each
+  runner copy's write into a closed pipe printed `printf: I/O error` and the error scan read the copies as unable to run;
+  each mode had reached the gate's own FAIL. Both gates re-traced through `env --default-signal=PIPE` (roundtrip's first trace,
+  in the same phase, had read SAFE; rule-checker run -1725 asked for it to be re-run too). The pass's gate runs and M26's
+  desktop runs (also under the inhibitor) carry no such line.
+- PILOT crashed or powered down (the maintainer: "For some reason PILOT has either crashed or powered down. It's
+  now back up"); it booted at 05:22 CET with no shutdown record, after batch 5 lost it (6); both passes of this work ran after that
+  (from 05:26 and 05:42). Pass 1 was stopped by hand in its dead-leg run, its desktop run having failed on the leaked
+  processes; pass 2 ran whole.
+- **Checked:** rule-checker run 2026-11-08-1730 OK after -1725 to -1729 (each found a real gap: roundtrip's trace with
+  SIGPIPE ignored, the leftover check never fired, pass 1's stop, the dead-leg gate beside the desktop gate, the driver
+  blob the leak evidence ran, where each PATH row dies — measured on PILOT: each stub called, each NOT JUDGED naming its leg). Three gotchas in `docs/project/gotchas.md`. Evidence:
+  `build/agent223/t310lx/` (local; PILOT `~/t310lx`, `~/t310lx2`).
+
+### (8) #310 — THE RE-CENSUS FOUND AN UNTAKEN LIST; A POST-MORTEM BEFORE ANY BATCH 6
+The group-7 re-census at the staged tree (`build/agent223/recensus/`, local): 1,191 declared control modes in 312 gates;
+214 are rows of the two dead-leg tables; 124 modes in 32 gates the 14z-215 census marked PRESENT or CANNOT TELL have none:
+118 from its "new instances" list, which batches 1-5 never drew from, and 6 that batch 4 judged need no row. 439 modes
+were never censused. A dead-emulator baseline of
+the 124 (`build/agent223/b6/`, local) shows the defect live (`audit_anakaris_rows`' modes HONOURED in 2 s), and that part
+of them need a dead-leg mechanism of their own (`test_run_on_snapshot`'s leg dies on a probe timeout, not an emulator).
+The maintainer: **"I can't shake the feeling that while there is proper root causes, we are making things very
+complicated incrementally. … we'll need to post mortem that"**, then **"Post-mortem first (Recommended)"**
+(`DECISIONS_HISTORY.md`, 14z-223): the Linux gate lands; batch 6 waits for a post-mortem and a greenfield proposal.
+
 ## Session 14z-222 — **M26 FROZEN at `bb10ce97` (#357 Donovan's guard orbs and #363 Phobos's Plasma Beam freezing its victim; tags `freeze/donovan-m30`, `huitzil-m37`, `pyron-m31`, `merged-m26`) and RELEASED: `freeze/merged-m26` published on GitHub with merged-m24's zips pruned, after every release gate passed on the Mac, ERIS and PILOT; #345, #346, #356, #357, #358 and #363 closed done on rule-checker run -1708 after -1697 to -1707; #365 and #366 filed.** Opus 5.5 at effort High, transcript `356b9b97` (compacted twice).
 
 ### opened with

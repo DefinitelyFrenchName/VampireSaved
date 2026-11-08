@@ -1,0 +1,23 @@
+# tests/expected/dead_leg_unjudged_linux.tsv — #310 group 7 (14z-223): the dead-leg rows of the two Linux-only release
+# gates, in tests/expected/dead_leg_unjudged.tsv's form (its header is the specification), read by
+# tests/test_dead_leg_unjudged.sh through tests/audit_dead_leg_linux.sh, which runs at release on PILOT (podman and a live
+# GNOME session; ruled 14z-223: "A. A small release-cadence emulator gate that judges the 5 rows on PILOT at release"). On
+# any other host both gates SKIP before any instrument, so these rows cannot sit in the static gate's table.
+# audit_release_linux_cleanhost: a dead podman (PATH:podman) — no container runs, every check fails, and its mode once
+# read that as its firing; it now fires only on its own evidence on both emulators (C0 naming libasound.so.2 missing; C1
+# failing with libGL.so.1 dropped) and reads NOT JUDGED when a container never ran (no C0 line).
+# audit_release_linux_desktop: muted-stream and unlinked-recorder on a dead pw-record (the session driver exits 3 when its
+# sink recorder dies, so the player's run breaks); wrong-mark on a dead xwd (the driver logs the capture missing and the run
+# completes, so the mark check has nothing to judge; before 14z-223's tools/desktop_session_play.py fix the missing .xwd
+# crashed the driver past its stop, read DIED, and leaked the run's emulator and recorder into the session). Each mode now
+# fires only on its own check failing on both emulators' live runs.
+# The stripped classes are the neutered copies' measured classes (batch 2's convention). Baseline: PILOT, 14z-223:
+# the unfixed gates at 9b83394d (no NJ lines yet) read cleanhost's two and desktop's muted-stream and unlinked-recorder
+# HONOURED, and wrong-mark DIED (the driver crash above); with the fixed driver wrong-mark's neutered copy reads HONOURED;
+# all five neutered copies read these classes in this gate's run at scratch 3ce6645c (in-gate section 3, nj-stripped: PASS).
+# gate	mode	class	stripped class (the gate with its NJ lines neutered)	dead instrument
+audit_release_linux_cleanhost	uninstalled-host-lib	UNJUDGED	HONOURED	PATH:podman
+audit_release_linux_cleanhost	list-minus-one	UNJUDGED	HONOURED	PATH:podman
+audit_release_linux_desktop	muted-stream	UNJUDGED	HONOURED	PATH:pw-record
+audit_release_linux_desktop	unlinked-recorder	UNJUDGED	HONOURED	PATH:pw-record
+audit_release_linux_desktop	wrong-mark	UNJUDGED	HONOURED	PATH:xwd

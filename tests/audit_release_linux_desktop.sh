@@ -16,13 +16,15 @@
 #   manifests' version font; tools/desktop_audio_check.py reads the links and the WAV levels.
 #   About 6 min of desktop time (five runs of ~60-75 s). Linux with a live session ONLY: on any
 #   other host it SKIPs and says so; at release it runs on PILOT (see HOW IT REACHES A RELEASE).
+#   One harness at a time on the session: it claims it (tests/lib/desktop_session.sh) and is REFUSED (exit 3) beside
+#   another desktop gate or a release emulator already running; under audit_dead_leg_linux it claims nothing (14z-223).
 # EXPECTS: per emulator, mark mismatches 0 of 147 font cells, at least one active link from the
 #   emulator's node to auto_null and from auto_null to pw-record, and every 5 s window of the
 #   emulator's own stream above -45 dBFS RMS (the sink measured 14z-194 at -27 to -36 dBFS after
 #   select); each control fails.
 # FOLLOWS: tools/upload_release_assets.sh tools/desktop_session_play.py tools/desktop_audio_check.py
 #   tools/desktop_mark_check.py build/manifest/version_font.json build/manifest/donovan.toml
-#   build/manifest/huitzil.toml build/manifest/pyron.toml
+#   build/manifest/huitzil.toml build/manifest/pyron.toml tests/lib/desktop_session.sh
 #   build/manifest/ tests/lib/controls.sh emu/fbneo/ emu/fbneo-patches/ tools/setup_fbneo.sh
 #   emu/mame-patches/ tools/setup_mame.sh tools/build_release_emulators.sh
 #
@@ -83,7 +85,11 @@ python3 -c 'import PIL' 2>/dev/null || { echo "SKIP: python3 has no PIL on this 
 ls "/run/user/$(id -u)"/.mutter-Xwaylandauth.* >/dev/null 2>&1 || { echo "SKIP: no live GNOME session for this user (/run/user/$(id -u)/.mutter-Xwaylandauth.*)"; exit 0; }
 [ -n "${ROMDIR:-}" ] && [ -d "$ROMDIR" ] || { echo "FAIL: set ROMDIR to the reference dumps"; exit 1; }
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+. "$REPO/tests/lib/desktop_session.sh"
+W="$(mktemp -d)"; trap 'vs_desktop_release; rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+# one harness at a time on the desktop session (#310 group 7, 14z-223): REFUSED (exit 3) beside another desktop gate or a
+# leftover release emulator; under audit_dead_leg_linux (its owner) it claims and checks nothing
+vs_desktop_claim audit_release_linux_desktop
 # a control mode writes privately, its mesa cache too (#321, 14z-210: modes side by side wiped and wrote one OUT and
 # one ~/.cache/mesa_shader_cache); the plain run keeps build/desktop_release, its registered output
 OUT="$REPO/build/desktop_release"; [ -n "${CONTROL:-}" ] && { OUT="$W/out"; export XDG_CACHE_HOME="$W/xdg_cache"; }
@@ -113,12 +119,12 @@ else
     # the assets cut into this run's own dir, the uploader's git taking no index lock (#321, 14z-210: two runs side by
     # side shared build/scratch/release_assets/<set> and .git/index.lock — fork P's PILOT write trace)
     GIT_OPTIONAL_LOCKS=0 RELEASE_DRY_OUT="$W/assets" tools/upload_release_assets.sh "freeze/$NAME" --dry-run > "$OUT/cut.log" 2>&1 || {
-        echo "FAIL: the uploader refused its own dry run:"; sed 's/^/      /' "$OUT/cut.log"; exit 1; }
+        vs_ctl_nj "the uploader's dry run failed, so no asset was cut"; echo "FAIL: the uploader refused its own dry run:"; sed 's/^/      /' "$OUT/cut.log"; exit 1; }   # #310 g7 NJ
     AD="$W/assets"
 fi
 AD="$(cd "$AD" && pwd)"
 for e in fbneo mame; do
-    [ -f "$AD/$NAME-$e-linux-x86_64.zip" ] || { echo "FAIL: no $NAME-$e-linux-x86_64.zip in $AD"; exit 1; }
+    [ -f "$AD/$NAME-$e-linux-x86_64.zip" ] || { vs_ctl_nj "no $NAME-$e-linux-x86_64.zip to run"; echo "FAIL: no $NAME-$e-linux-x86_64.zip in $AD"; exit 1; }   # #310 g7 NJ
 done
 ok "assets: $NAME-fbneo-linux-x86_64.zip, $NAME-mame-linux-x86_64.zip (from $AD)"
 
@@ -163,7 +169,7 @@ play() {  # play <emu> <run label> [driver options...] -> prints the run dir; re
 judge() {
     e="$1"; d="$2"; mk="$3"; b="$(eval echo "\$BIN_$e")"
     M_OK=0; L_OK=0; S_OK=0
-    m="$(python3 tools/desktop_mark_check.py "$d/select.png" "$mk" 2>&1 | tail -1)" || true; echo "      $m"
+    m="$(python3 tools/desktop_mark_check.py "$d/select.png" "$mk" 2>&1 | tail -1)" || true; echo "      $m"; M_LINE="$m"
     case "$m" in "MARK "*" mismatches 0 of "*) M_OK=1 ;; esac
     l="$(python3 tools/desktop_audio_check.py links "$d/pwdump_select.json" "$b" 2>&1 | tail -1)" || true; echo "      $l"
     a2s="$(echo "$l" | sed -n 's/^LINKS .*app_to_sink_active=\([0-9]*\).*/\1/p')"
@@ -180,18 +186,44 @@ judge() {
 }
 
 # ---- the real runs (in a CONTROL= mode, the perturbation applied to them) ----------------------
+RDEAD=""; EV=""
 for e in fbneo mame; do
     echo "== $e: the player's run"
     opts=""
     vs_ctl_is muted-stream && opts="$(mute_args "$e")"
     vs_ctl_is unlinked-recorder && opts="$UNLINK"
-    d="$(play "$e" real $opts)" || { bad "$e: the run did not complete (see above)"; continue; }
+    d="$(play "$e" real $opts)" || { RDEAD="$RDEAD $e(the run broke)"; vs_ctl_nj "$e: the player's run did not complete"; bad "$e: the run did not complete (see above)"; continue; }   # #310 g7 NJ
     mk="$MARK"; vs_ctl_is wrong-mark && mk="$(wrong_mark "$MARK")"
-    judge "$e" "$d" "$mk"
+    M_LINE=""; judge "$e" "$d" "$mk"
+    # under a mode, the leg is LIVE only when the run gave the mode's check something to read (#310 group 7, 14z-223):
+    # muted-stream and unlinked-recorder need the select screen reached (the true mark read) and the sink recording made;
+    # wrong-mark needs a capture the mark check gave a verdict on. A leg without it is dead, never the mode's finding.
+    if vs_ctl_is muted-stream || vs_ctl_is unlinked-recorder; then
+        if [ "$M_OK" = 1 ] && [ -s "$d/rec.wav" ]; then
+            if vs_ctl_is muted-stream && [ "$S_OK" = 0 ]; then EV="$EV $e"; fi
+            if vs_ctl_is unlinked-recorder && [ "$L_OK" = 0 ] && [ -s "$d/pwdump_select.json" ]; then EV="$EV $e"; fi
+        else RDEAD="$RDEAD $e(M_OK=$M_OK rec.wav $([ -s "$d/rec.wav" ] && echo made || echo missing))"; vs_ctl_nj "$e: the run never showed the select screen's mark, or made no sink recording"; fi   # #310 g7 NJ
+    fi
+    if vs_ctl_is wrong-mark; then
+        case "$M_LINE" in
+            "MARK "*" mismatches 0 of "*) ;;
+            "MARK "*" mismatches "[0-9]*) EV="$EV $e" ;;
+            *) RDEAD="$RDEAD $e(no mark verdict)"; vs_ctl_nj "$e: the select capture gave the mark check nothing to judge" ;;   # #310 g7 NJ
+        esac
+    fi
     [ "$M_OK" = 1 ] && ok "$e: the select screen carries the mark $mk (0 mismatches)" || bad "$e: the select screen does not carry the mark $mk"
     [ "$L_OK" = 1 ] && ok "$e: its audio stream is linked to the sink, and the recorder to the sink's monitor" || bad "$e: no active link emulator -> sink -> recorder"
     [ "$S_OK" = 1 ] && ok "$e: its own stream carries signal above -45 dBFS in every 5 s window at the select screen" || bad "$e: its own stream is silent or absent at the select screen"
 done
+
+# ---- a mode's readout: it fires on its OWN evidence on both emulators' runs, never on any red of the run (#310 group 7,
+# 14z-223: before, a run that broke failed every check and the mode read that as its firing)
+if [ -n "${VS_CTL:-}" ]; then
+    if [ "$EV" = " fbneo mame" ]; then vs_ctl_fired "$VS_CTL" "its check failed on both emulators' live runs (mode)"
+    elif [ -n "$RDEAD" ]; then vs_ctl_nj "a leg was dead:$RDEAD, so the perturbation was judged on${EV:- no run}"   # #310 g7 NJ
+    else echo "CONTROL DEAD: $VS_CTL — both runs were live, but its check failed only on:${EV:- no run}"; fi
+    echo "FAIL: audit_release_linux_desktop (control mode)"; exit 1
+fi
 
 # ---- the controls, in-gate (skipped in a CONTROL= mode: the mode IS the control) ---------------
 if [ -z "${VS_CTL:-}" ]; then
