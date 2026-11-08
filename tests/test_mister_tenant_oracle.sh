@@ -130,7 +130,7 @@ mkdir -p "$W/mame"
 DUMPS="$(python3 -c "print(';'.join(f'{f}:ff0000-ffffff' for f in range($MAME_LO,$MAME_HI+1)))")" \
     MAME_BIN="$MAME_BIN" MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
     "$REPO/tools/run_replay_mame.sh" vsavjw "$RPL" "$W/mame/out.log" "$W/mbox" \
-    || { echo "FAIL: MAME leg did not complete"; exit 1; }
+    || { vs_ctl_nj "the MAME leg did not complete"; echo "FAIL: MAME leg did not complete"; exit 1; }   # #310 g7 NJ
 python3 "$REPO/tools/check_wram_dumps.py" "$W/mame" --first "$MAME_LO" --last "$MAME_HI" \
     && ok "MAME dump set COMPLETE" || bad "MAME dump set INCOMPLETE — any anchor would be an artefact"
 AM="$(cf "$W/mame" --list-anchors --fields "$FIELDS" 2>/dev/null | head -1)"
@@ -139,7 +139,7 @@ AM="$(cf "$W/mame" --list-anchors --fields "$FIELDS" 2>/dev/null | head -1)"
 echo "== sim leg (cps2w under Verilator, the WIDE romset; ~65 min) =="
 "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/sim" --core cps2w --wide "$BUILD" \
     --frame-output off --frames "$SIM_FRAMES" --wram "$SIM_LO" "$SIM_HI" \
-    || { echo "FAIL: sim leg did not complete"; exit 1; }
+    || { vs_ctl_nj "the sim leg did not complete"; echo "FAIL: sim leg did not complete"; exit 1; }   # #310 g7 NJ
 grep -aq "frame output DISABLED (JTFRAME_SIM_NOVIDEO)" "$W/sim/jtsim.log" \
     && ok "sim leg ran with HOST FRAME OUTPUT DISABLED (the frozen configuration)" \
     || bad "sim leg did NOT report JTFRAME_SIM_NOVIDEO — not the frozen configuration"

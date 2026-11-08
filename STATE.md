@@ -94,6 +94,40 @@ available to be put to good use"**.
   `test_plants_not_applied`, ERIS six), rows re-pointed. Gotcha
   appended in `docs/project/gotchas.md`.
 
+### (5) #310 — WHAT IS LEFT, RULED BY THE MAINTAINER
+Asked where the two Linux-only gates' dead-leg rows should run (`audit_release_linux_cleanhost`, 2 modes;
+`audit_release_linux_desktop`, 3 modes; both SKIP off Linux before any instrument), with options A (a release-cadence
+emulator gate judging them on PILOT at release, as `audit_crash_sweep_emu` carries the crash sweep's Linux row), B (a host
+column the Mac's static tier skips), C (the static gate over SSH to PILOT) and D (a faked host), the maintainer: **"A. A
+small release-cadence emulator gate that judges the 5 rows on PILOT at release (my recommendation). … -> agreed."** On #368:
+**"do it when you can"**. On re-censusing group 7 at HEAD (the 14z-215 census predates later modes): **"do it before
+closing #310 then, so after all the other #310 tasks"**. The order: batch 5, the release-cadence Linux gate, #368, the
+re-census, then #310's closure (or a batch 6 first).
+
+### (6) #310 GROUP 7 BATCH 5 — THE SIX HELD OUT, 6 ROWS; #368 DONE
+- **The dead-leg gate kills any instrument:** a row's dead instrument is any `<NAME>_BIN`, or `PATH:<tool>` (a stub first on
+  `PATH` that exits 1); `PATH:` rows run one at a time (the MiSTer legs share one scratch clone). Wall 25:03 on 209 rows (re-run on the staged tree, every row gate's blob recorded
+  against the index before and after).
+- **The six:** `test_mister_obj_oracle`, `test_mister_prg_window`, `test_mister_tenant_oracle` (dead `PATH:verilator`, read
+  HONOURED); `test_mister_sdram_census` (read LIES: its readout printed `CONTROL DEAD` on a leg A that never ran, and its
+  C-vs-D cross-check read two missing legs as "differ"); `audit_stock_emulator_stall` (DIED on a Traceback; now checks each
+  leg's END line); `test_release_roundtrip`'s `encoder-check-removed` (dead `PATH:python3`: a copy that crashed before the
+  check "did not refuse"; the planted copy now prints a line where the check was). All six UNJUDGED after the fix, neutered
+  copies HONOURED; `tests/test_dead_leg_unjudged.sh` PASS. Live plain PASS: on the Mac the stall, roundtrip and sdram (their
+  changed modes HONOURED), on PILOT obj_oracle and tenant_oracle (read back over SSH, not fetched: PILOT went unreachable), and prg_window on
+  the Mac in 3,358 s after PILOT dropped mid-run.
+- **#368 done:** the `shared-sandbox` control was written in 14z-205; #296's guard (14z-206) refuses an undeclared sandbox
+  reuse, so from then on the mode's f5868 legs never ran and the mode "fired" on the run's general red. The mode now declares
+  the reuse (`MAME_SANDBOX_REUSE=1`), fires only on the frozen-basis check naming the case, and reads NOT JUDGED on a dead
+  leg. On ERIS at scratch `7150f4c3`: plain PASS, `shared-sandbox` fired on 105 f5868 (HONOURED), `wrong-window` HONOURED,
+  the write-trace SAFE; the gate is back on `tests/controls_concurrent_emu.txt`. Gotcha in `docs/project/gotchas.md`.
+- **Off the static concurrent list:** `test_release_roundtrip` (its script changed; PILOT, the only host with xdelta3 and
+  strace, was unreachable), by an OFF line in `tests/controls_concurrent.txt`; it goes back after a trace on PILOT.
+- **Checked:** where each of the six legs dies with only its named instrument dead (each reached it; the mode's NOT JUDGED
+  line names that leg), and roundtrip's plain run plus all 10 modes at the new blob (PASS, all HONOURED); #368 closed done
+  and #310 commented on rule-checker run 2026-11-08-1724 OK after -1721 to -1723 (the gaps they found were evidence: blobs
+  unrecorded, the sdram mode's output, where a leg died, roundtrip's other modes).
+
 ## Session 14z-222 — **M26 FROZEN at `bb10ce97` (#357 Donovan's guard orbs and #363 Phobos's Plasma Beam freezing its victim; tags `freeze/donovan-m30`, `huitzil-m37`, `pyron-m31`, `merged-m26`) and RELEASED: `freeze/merged-m26` published on GitHub with merged-m24's zips pruned, after every release gate passed on the Mac, ERIS and PILOT; #345, #346, #356, #357, #358 and #363 closed done on rule-checker run -1708 after -1697 to -1707; #365 and #366 filed.** Opus 5.5 at effort High, transcript `356b9b97` (compacted twice).
 
 ### opened with

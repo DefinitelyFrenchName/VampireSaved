@@ -11,13 +11,12 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**368 tickets** — status: open 7 · parked 4 · done 324 · declined 15 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 246 · cosmetic 23 · evolution 99 · **backfill debt: 0 rows**.
+**368 tickets** — status: open 6 · parked 4 · done 325 · declined 15 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 246 · cosmetic 23 · evolution 99 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
-| [#368](https://github.com/DefinitelyFrenchName/VampireSaved/issues/368) | bug | open | audit_flicker_attribution's shared-sandbox control fires on a dead leg (replay 105 f5868), never on the frozen-basis check it names | `tests/audit_flicker_attribution.sh` | none | none | none | 14z-223 |
 | [#364](https://github.com/DefinitelyFrenchName/VampireSaved/issues/364) | bug | open | under dash (PILOT's /bin/sh) an EXIT-only cleanup trap does not run when a gate is TERM'd, so its work directory is left behind (~277 scripts) | `tests/test_signal_traps.sh` | none | `docs/platform/gotchas.md § And under dash an EXIT-only trap does not run on TERM at all` | none | 14z-221c |
 | [#360](https://github.com/DefinitelyFrenchName/VampireSaved/issues/360) | cosmetic | open | in Dark Force two of Donovan's four dash speed lines alternate one frame out of phase with native vs2 (found by #356's fix; 28 of 49 records on donovan_6, each equal to native's at the adjacent frame) | `tests/audit_don_speed_lines.sh` | none | `docs/game/engine_internals.md § The speed-line effect (class 0x0F)` | none | 14z-219 |
 | [#352](https://github.com/DefinitelyFrenchName/VampireSaved/issues/352) | evolution | open | audit_release_linux_desktop reports a paused FBNeo window as missing mark and silence instead of NOT JUDGED: paused | `tests/audit_release_linux_desktop.sh` | none | none | none | 14z-217 |
@@ -33,6 +32,7 @@ backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py pag
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#368](https://github.com/DefinitelyFrenchName/VampireSaved/issues/368) | bug | done | audit_flicker_attribution's shared-sandbox control fires on a dead leg (replay 105 f5868), never on the frozen-basis check it names | `tests/audit_flicker_attribution.sh` | none | `tests/audit_flicker_attribution.sh § the mode fires on the frozen-basis check ITSELF failing a vanilla leg` · `tests/audit_flicker_attribution.sh § under the mode the sandbox is shared ON PURPOSE, so the reuse is declared` | `docs/project/gotchas.md § A GUARD ADDED LATER KILLED A CONTROL WRITTEN EARLIER, AND THE CONTROL KEPT "FIRING" ON THE REFUSAL` | 14z-223 |
 | [#367](https://github.com/DefinitelyFrenchName/VampireSaved/issues/367) | bug | done | classify.sh reads a set -e gate that dies on a tool error (awk: can't open file, exit 2) as HONOURED, not DIED | `tests/audit_marionette_cost.sh` · `tests/lib/classify.sh` | none | `docs/project/must_fire_contract.md § a gate that printed its FAIL and then ran a diagnostic that failed exited by its own hand` · `tests/lib/classify.sh § A GATE THAT DIED ON A TOOL'S ERROR` | `docs/project/gotchas.md § A CLASSIFIER RULE PROVEN ON ONE KIND OF LOG MISREADS THE OTHER KIND` | 14z-223 |
 | [#366](https://github.com/DefinitelyFrenchName/VampireSaved/issues/366) | bug | done | two gate headers state facts their frozen data no longer holds: test_dead_span_reach (one span, 5 judged pairs; two spans, 10 since M26) and audit_pass_overrun (ours donovan_2 since M24; none since M25) | `tests/test_dead_span_reach.sh` · `tests/audit_pass_overrun.sh` | none | `docs/project/gotchas.md § A CONTROL PLANTED ON THE FIRST ROW ONLY CANNOT SHOW IT IS BLIND ON THE NEXT` · `tests/test_dead_span_reach.sh § every control on EVERY span` | `docs/project/gotchas.md § A CONTROL PLANTED ON THE FIRST ROW ONLY CANNOT SHOW IT IS BLIND ON THE NEXT` | 14z-222,14z-223 |
 | [#365](https://github.com/DefinitelyFrenchName/VampireSaved/issues/365) | bug | done | test_sheet_census FAILs: audit_crash_sweep_emu has no # SHEET: line (an ondemand gate, so no tier ran it) | `tests/test_sheet_census.sh` | none | `tests/audit_crash_sweep_emu.sh § # SHEET: none` | none | 14z-222,14z-223 |

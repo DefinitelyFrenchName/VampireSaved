@@ -8136,3 +8136,15 @@ then a diagnostic `grep` of the dead leg's missing log, and exits 1; that read D
 the NOT JUDGED line, read DIED too. Fixed by reading the rule after NOT-JUDGED and sparing a gate whose own FAIL line comes
 just before the trailing tool errors. **Prove a classifier rule on every population of logs it will judge: live and dead
 runs, plain and mode, the gates and their neutered copies. Not only on the corpus you happen to have kept.**
+
+## A GUARD ADDED LATER KILLED A CONTROL WRITTEN EARLIER, AND THE CONTROL KEPT "FIRING" ON THE REFUSAL (paid: 14z-223, #368)
+
+`tests/audit_flicker_attribution.sh`'s `shared-sandbox` mode (14z-205, #293) shares one MAME sandbox between replay 105's
+two cases, so the second should boot on the first's nvram and fail the frozen-basis check. Three days later #296 made
+`tools/run_mame.sh` refuse any reused sandbox unless the caller sets `MAME_SANDBOX_REUSE=1`, and the mode never set it. From
+then on, the second case's legs were refused at start-up and wrote no log. The mode closed on the run's general `fail`
+flag, so it printed `CONTROL FIRED` in every release tier kept since (14z-208, 14z-216, 14z-222), on a check it
+never reached. Found only because
+#310 group 7 made the dead leg read UNJUDGED. **A guard that refuses a state on purpose must be grepped against every
+control that creates that state on purpose (here: every mode that shares a sandbox). And a control's FIRED line must name
+the evidence it fired on, never a run-wide red that anything else can raise.**

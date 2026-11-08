@@ -136,13 +136,13 @@ leg() {
     # shellcheck disable=SC2086
     "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/$_n" --core "$_core" $_w \
         --frame-output off --post-frames 2 --keep-banks \
-        || { bad "leg $_n did not complete"; return 1; }
+        || { vs_ctl_nj "leg $_n did not complete"; bad "leg $_n did not complete"; return 1; }   # #310 g7 NJ
 }
 
 census() {   # census <verdict pass|fail> <leg> <map> [extra args...]
     _want="$1"; _n="$2"; _map="$3"; shift 3
     if [ ! -s "$W/$_n/rom_path.txt" ] || [ ! -s "$W/$_n/sdram/sdram_bank0.bin" ]; then
-        bad "census $_n: that leg produced no image, so nothing was compared"
+        vs_ctl_nj "census $_n: leg $_n produced no image"; bad "census $_n: that leg produced no image, so nothing was compared"   # #310 g7 NJ
         return
     fi
     if python3 "$REPO/tools/mister_sdram_census.py" "$W/$_n/sdram" \
@@ -185,6 +185,12 @@ census pass D stock
 
 echo
 echo "== cross-check: the re-pack is confined to bank 0 (C vs D) =="
+# BOTH SIDES MUST EXIST FIRST, as for A vs B below: `cmp -s` on a MISSING file reports "differ", so two dead legs printed
+# "control fired: bank 0 DOES differ" (#310 group 7 batch 5, 14z-223)
+_cd=1; for _l in C D; do for b in 0 1 2 3; do [ -s "$W/$_l/sdram/sdram_bank$b.bin" ] || _cd=0; done; done
+if [ "$_cd" = 0 ]; then
+    vs_ctl_nj "leg C or D produced no bank images"; bad "leg C or D produced no bank images — the C-vs-D cross-check cannot run"   # #310 g7 NJ
+else
 same=0; diff=0
 for b in 1 2 3; do
     if cmp -s "$W/C/sdram/sdram_bank$b.bin" "$W/D/sdram/sdram_bank$b.bin"
@@ -195,13 +201,14 @@ done
 if cmp -s "$W/C/sdram/sdram_bank0.bin" "$W/D/sdram/sdram_bank0.bin"
 then bad "CONTROL DID NOT FIRE: bank 0 is identical too, so the comparison above is vacuous"
 else ok "control fired: bank 0 DOES differ (the Z80 region moved 0x700000 -> 0x658000)"; fi
+fi
 
 echo "== cross-check: the group-C redirect is doing work (A vs B) =="
 # BOTH SIDES MUST EXIST FIRST. `cmp -s` on a MISSING file reports "differ",
 # so a leg that never ran would make this comparison pass vacuously — which
 # is exactly what this gate's first run did, with leg B absent (14z-107 (9)).
 if [ ! -s "$W/B/sdram/sdram_bank2.bin" ] || [ ! -s "$W/B/sdram/sdram_bank3.bin" ]; then
-    bad "leg B produced no bank images — the A-vs-B cross-check cannot run"
+    vs_ctl_nj "leg B produced no bank images"; bad "leg B produced no bank images — the A-vs-B cross-check cannot run"   # #310 g7 NJ
 else
     n=0
     for b in 2 3; do cmp -s "$W/A/sdram/sdram_bank$b.bin" "$W/B/sdram/sdram_bank$b.bin" || n=$((n + 1)); done
@@ -224,7 +231,12 @@ census pass A wide --perturb z80 --perturb-kib 1
 census pass A wide --perturb pcm_lo --perturb-kib 1
 
 # the declared control's FIRED/DEAD: the census tool rejects a 1 KiB-perturbed map
-if [ -f "$W/A/rom_path.txt" ] && python3 "$REPO/tools/mister_sdram_census.py" "$W/A/sdram" \
+# a leg A that never ran is not this control dead: under a mode it is NOT JUDGED (#310 group 7 batch 5, 14z-223; the
+# classifier reads a control's own CONTROL DEAD line before a NOT JUDGED one)
+if [ ! -s "$W/A/rom_path.txt" ] || [ ! -s "$W/A/sdram/sdram_bank0.bin" ]; then
+    if [ -n "$MODE" ]; then vs_ctl_nj "leg A produced no image, so the control's readout read nothing"   # #310 g7 NJ
+    else echo "CONTROL DEAD: perturbed-map — leg A did not run, so the census read nothing"; fi; fail=1
+elif python3 "$REPO/tools/mister_sdram_census.py" "$W/A/sdram" \
         --rom "$(cat "$W/A/rom_path.txt")" --map wide --perturb z80 --perturb-kib 1 >/dev/null 2>&1; then
     vs_ctl_fired perturbed-map "the census rejects a 1 KiB-perturbed map (its own control fired); the mode censuses leg A against the STOCK map and the gate FAILs"
 else

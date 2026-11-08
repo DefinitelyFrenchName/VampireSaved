@@ -153,9 +153,9 @@ if [ -z "$POSLOG" ] || [ -z "$NEGLOG" ]; then
         run_leg pos && _r1=0 || _r1=$?
         run_leg neg && _r2=0 || _r2=$?
     fi
-    [ "$_r1" = 0 ] || { echo "FAIL: the positive leg did not complete"; exit 1; }
-    [ "$_r2" = 0 ] || { echo "FAIL: the control leg did not complete"; exit 1; }
-    [ -s "$POSLOG/rom_path" ] && [ -s "$NEGLOG/rom_path" ] || { echo "FAIL: a leg recorded no rom_path"; exit 1; }
+    [ "$_r1" = 0 ] || { vs_ctl_nj "the positive leg did not complete"; echo "FAIL: the positive leg did not complete"; exit 1; }   # #310 g7 NJ
+    [ "$_r2" = 0 ] || { vs_ctl_nj "the control leg did not complete"; echo "FAIL: the control leg did not complete"; exit 1; }   # #310 g7 NJ
+    [ -s "$POSLOG/rom_path" ] && [ -s "$NEGLOG/rom_path" ] || { vs_ctl_nj "a leg recorded no rom_path"; echo "FAIL: a leg recorded no rom_path"; exit 1; }   # #310 g7 NJ
     echo "  control image: $(cat "$NEGLOG/rom_path") (a COPY with header byte 41 0xFE -> 0xFF; the .rom untouched)"
     cp "$(cat "$POSLOG/rom_path")" "$POSLOG/rom_used.bin"
     cp "$(cat "$NEGLOG/rom_path")" "$NEGLOG/rom_used.bin"

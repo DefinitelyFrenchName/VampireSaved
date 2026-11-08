@@ -98,7 +98,11 @@ fail=0
 echo "== 0. the packager refuses an xdelta3 older than the one measured clean (#279) =="
 # a fake xdelta3 that reports apt's 3.0.11 (PILOT), first on PATH: the packager must stop before any work, naming #279
 mkdir -p "$W/oldx"; printf '#!/bin/sh\necho "Xdelta version 3.0.11, Copyright (C) Joshua MacDonald"\nexit 0\n' > "$W/oldx/xdelta3"; chmod +x "$W/oldx/xdelta3"
-sed 's/^    if xv is None or xv < XDELTA_MIN:$/    if False:/' tools/package_release.py > "$W/pkg_nocheck.py"
+# the plant prints one line where the check was, so the copy's log shows it got PAST the check: a copy that stopped
+# before it (a dead python3, a crash in the argument checks) did not refuse either, and is not this control firing
+# (#310 group 7 batch 5, 14z-223)
+sed 's/^    if xv is None or xv < XDELTA_MIN:$/    if print("PLANT: past the encoder check (tests\/test_release_roundtrip.sh)", flush=True) or False:/' tools/package_release.py > "$W/pkg_nocheck.py"
+past_check() { grep -q '^PLANT: past the encoder check' "$1.log" 2>/dev/null; }   # past_check <out>: the copy ran past it
 # #310 group 6 (14z-215): under the mode, a copy the sed did not change is a plant that did not apply — REFUSED (exit 3, UNJUDGED)
 vs_ctl_is encoder-check-removed && cmp -s tools/package_release.py "$W/pkg_nocheck.py" \
     && { echo "REFUSED: encoder-check-removed — the encoder check is not where this control expects it: the mode judged nothing"; exit 3; }
@@ -116,12 +120,17 @@ else
 fi
 # #310 group 6 (14z-215): the mode exits 1 only on ITS finding (the copy did not refuse 3.0.11); a copy that still refused is this control dead
 if vs_ctl_is encoder-check-removed; then
-    [ "${_noref:-}" = 1 ] && { echo "FAIL: release package (control mode: the encoder check removed)"; exit 1; }
+    if [ "${_noref:-}" = 1 ]; then
+        past_check "$W/rel_oldx" || { vs_ctl_nj "the packager copy stopped before its encoder check, so its not refusing judged nothing"; echo "FAIL: release package (control mode: the copy never reached the check)"; exit 1; }   # #310 g7 NJ
+        echo "FAIL: release package (control mode: the encoder check removed)"; exit 1
+    fi
     vs_ctl_left_green encoder-check-removed "FAIL: release package — control mode encoder-check-removed: the packager without its check still refused 3.0.11"
 fi
 # must-fire control: the packager without its check does not refuse the old encoder
 if refuses_old "$W/pkg_nocheck.py" "$W/rel_nocheck"; then
     vs_ctl_dead encoder-check-removed "the packager without its version check still refused 3.0.11"; fail=1
+elif ! past_check "$W/rel_nocheck"; then
+    vs_ctl_dead encoder-check-removed "the packager copy stopped before its encoder check: $(tail -1 "$W/rel_nocheck.log" | cut -c1-80)"; fail=1
 else
     vs_ctl_fired encoder-check-removed "without the check the packager runs on xdelta3 3.0.11: $(tail -1 "$W/rel_nocheck.log" | cut -c1-80)"
 fi

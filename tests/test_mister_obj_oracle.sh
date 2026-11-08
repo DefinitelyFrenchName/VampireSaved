@@ -123,19 +123,19 @@ if [ -z "$SIMDIR" ] || [ -z "$MAMELOG" ]; then
     MAME_SANDBOX="$W/box" MAME_BIN="$MAME_BIN" \
     MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
         "$REPO/tools/run_mame.sh" vsavjw -autoboot_script "$REPO/tests/lua/obj_records_dump.lua" \
-        > "$W/mame.log" 2>&1 || { echo "FAIL: MAME leg"; exit 1; }
+        > "$W/mame.log" 2>&1 || { vs_ctl_nj "the MAME leg did not complete"; echo "FAIL: MAME leg"; exit 1; }   # #310 g7 NJ
     MAMELOG="$W/mame_obj.txt"
 
     echo "== sim leg (cps2w, WIDE romset, ORAM out of SDRAM bank 0; ~65 min) =="
     "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/sim" --core cps2w --wide "$BUILD" \
         --frame-output off --frames 3800 \
         --region 0 0x640000 0x8000 0x700000 --wram $((EXP_AS-6)) $((EXP_AS+14)) \
-        || { echo "FAIL: sim leg"; exit 1; }
+        || { vs_ctl_nj "the sim leg did not complete"; echo "FAIL: sim leg"; exit 1; }   # #310 g7 NJ
     SIMDIR="$W/sim/wram"
 fi
 
 DUMP="$SIMDIR/dump_${EXP_AS}_700000.bin"
-[ -s "$DUMP" ] || { echo "FAIL: no core ORAM dump at $DUMP"; exit 1; }
+[ -s "$DUMP" ] || { vs_ctl_nj "the sim leg wrote no core ORAM dump"; echo "FAIL: no core ORAM dump at $DUMP"; exit 1; }   # #310 g7 NJ
 python3 "$REPO/tools/check_wram_dumps.py" "$SIMDIR" \
         --first $((EXP_AS-6)) --last $((EXP_AS+14)) >/dev/null 2>&1 \
     && ok "0a core dump set COMPLETE over the anchor window" \

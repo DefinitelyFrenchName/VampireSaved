@@ -70,6 +70,14 @@ fi
 vs_pool_run leg ctl vsavjw "$REPO/$MERGED/rompath;$ROMDIR" "$WIDE"
 vs_pool_wait
 
+# every read below needs all three legs: a leg with no END line never finished, and the reader would crash on it or read
+# its silence as the stall (#310 group 7 batch 5, 14z-223: a dead MAME_BIN raised a Traceback here); its crash line, if
+# any, is still shown
+for l in wide stock ctl; do
+    grep -aq '^END ' "$W/$l.log" 2>/dev/null && continue
+    grep -aE '^(CRASH|PCWEEDS|SOFTRESET|END-CRASH)' "$W/$l.log" 2>/dev/null | head -1 | sed "s/^/  $l leg: /"
+    vs_ctl_nj "the $l leg did not complete (no END line)"; echo "FAIL: $l leg has no END line — the reads below need all three legs"; exit 1   # #310 g7 NJ
+done
 fail=0
 python3 - "$W/wide.log" "$W/stock.log" "$W/ctl.log" "$FROZEN_DIVERGE" <<'PY' || fail=1
 import sys

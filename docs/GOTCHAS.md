@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-615 entries (49 game / 154 platform / 412 project), counted from the buckets at generation.
+616 entries (49 game / 154 platform / 413 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
@@ -231,7 +231,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - AN EXCEPTION RAISED IN `sitecustomize.py` DOES NOT CRASH PYTHON — `site.py` catches it, prints "Error in sitecustomize", and the program runs (paid: 14z-218, the Mac; `tests/lib/crash_sweep.sh`)
 - AN APOSTROPHE INSIDE `${VAR:?message}` OPENS A QUOTE — the whole script fails to parse, at a line far below (paid: 14z-221, #310)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 412 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 413 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -645,3 +645,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A NEGATIVE CONTROL THAT NAMES AN UNPORTED SITE ROTS THE DAY A PORT TAKES THAT SITE (paid: 14z-222, the M26 freeze)
 - A CONTROL PLANTED ON THE FIRST ROW ONLY CANNOT SHOW IT IS BLIND ON THE NEXT (paid: 14z-223, #366)
 - A CLASSIFIER RULE PROVEN ON ONE KIND OF LOG MISREADS THE OTHER KIND (paid: 14z-223, #367)
+- A GUARD ADDED LATER KILLED A CONTROL WRITTEN EARLIER, AND THE CONTROL KEPT "FIRING" ON THE REFUSAL (paid: 14z-223, #368)

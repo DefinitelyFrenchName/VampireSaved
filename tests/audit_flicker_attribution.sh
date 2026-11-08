@@ -157,7 +157,7 @@ BASIS=tests/expected/vsavj/masked-v2
 # only a case-insensitive filesystem resolves: the gate passed on the Mac and failed on every Linux run (PILOT, ERIS).
 [ -f "$BASIS/MASK" ] || { echo "FAIL: no $BASIS/MASK (the vanilla basis's tracked mask)"; exit 1; }
 BASIS_MASK="$(cat "$BASIS/MASK")"
-lastnew=""; lastrpl=""; lastframe=""
+lastnew=""; lastrpl=""; lastframe=""; basis_fail=""   # basis_fail: the case whose vanilla leg failed the frozen-basis check
 # fresh_ok <log> <replay> <frame>: the log's checksum at <frame> equals the frozen basis log's (the one copy of the test)
 fresh_ok() {
     _a="$(awk -v f="$3" '$1 == f {print $2}' "$1")"; _b="$(awk -v f="$3" '$1 == f {print $2}' "$BASIS/logs/$2.log")"
@@ -172,23 +172,25 @@ for c in $CASES; do
     if vs_ctl_is wrong-window; then want=qsound-handshake-latch; fi
     echo "== $rpl frame $frame — expect the unmasked diff in $want =="
     k="$rpl.$frame"                                  # one log dir and one FRESH sandbox per case (#293)
-    if vs_ctl_is shared-sandbox; then sk="$rpl"; else sk="$k"; fi
+    # under the mode the sandbox is shared ON PURPOSE, so the reuse is declared: since #296 (14z-206) tools/run_mame.sh
+    # refuses an undeclared one, and that refusal (no log, "a leg did not complete") was all this mode ever read (#368)
+    if vs_ctl_is shared-sandbox; then sk="$rpl"; reuse=1; else sk="$k"; reuse=""; fi
     mkdir -p "$W/van_$k" "$W/new_$k"
-    DUMPS="$frame:ff0000-ffffff" MASK_RANGES="$MASK" MAME_ROMPATH="$ROMDIR" \
+    MAME_SANDBOX_REUSE="$reuse" DUMPS="$frame:ff0000-ffffff" MASK_RANGES="$MASK" MAME_ROMPATH="$ROMDIR" \
         tools/run_replay_mame.sh vsavj "tests/replays/$rpl.rpl" \
         "$W/van_$k/a.log" "$W/sbv_$sk" >/dev/null 2>&1 &
-    DUMPS="$frame:ff0000-ffffff" MASK_RANGES="$MASK" \
+    MAME_SANDBOX_REUSE="$reuse" DUMPS="$frame:ff0000-ffffff" MASK_RANGES="$MASK" \
     MAME_ROMPATH="$PWD/$BUILD/rompath;$ROMDIR" \
         tools/run_replay_mame.sh vsavjw "tests/replays/$rpl.rpl" \
         "$W/new_$k/b.log" "$W/sbn_$sk" >/dev/null 2>&1 &
     wait
     if [ ! -f "$W/van_$k/a.log" ] || [ ! -f "$W/new_$k/b.log" ]; then
-        vs_ctl_nj "$rpl f$frame: a leg did not complete"; echo "  FAIL: a leg did not complete"; fail=1; continue   # #310 g7 NJ
+        legdead="$rpl f$frame"; vs_ctl_nj "$rpl f$frame: a leg did not complete"; echo "  FAIL: a leg did not complete"; fail=1; continue   # #310 g7 NJ
     fi
     # the vanilla leg IS the frozen run: its checksum at the case frame equals the basis log's (same mask) — #293
     if [ "$MASK" = "$BASIS_MASK" ]; then
         if fresh_ok "$W/van_$k/a.log" "$rpl" "$frame"; then echo "  ok: the vanilla leg equals the frozen basis at f$frame (a fresh boot)"
-        else echo "  FAIL: the vanilla leg is NOT the frozen run at f$frame ($(awk -v f="$frame" '$1 == f {print $2}' "$W/van_$k/a.log") against the basis's $(awk -v f="$frame" '$1 == f {print $2}' "$BASIS/logs/$rpl.log")) — a carried sandbox, or the rig moved"; fail=1; continue; fi
+        else basis_fail="$rpl f$frame"; echo "  FAIL: the vanilla leg is NOT the frozen run at f$frame ($(awk -v f="$frame" '$1 == f {print $2}' "$W/van_$k/a.log") against the basis's $(awk -v f="$frame" '$1 == f {print $2}' "$BASIS/logs/$rpl.log")) — a carried sandbox, or the rig moved"; fail=1; continue; fi
         lastnew="$W/new_$k/b.log"; lastrpl="$rpl"; lastframe="$frame"
     else
         echo "  NOTE: the build's mask is not the basis mask, so the vanilla leg is not checked against the basis"
@@ -254,9 +256,12 @@ if ! vs_ctl_is shared-sandbox && [ -n "$lastnew" ]; then
     if fresh_ok "$lastnew" "$lastrpl" "$lastframe"; then vs_ctl_dead shared-sandbox "the frozen-basis check accepted the merged leg's log at $lastrpl f$lastframe" || fail=1
     else vs_ctl_fired shared-sandbox "the frozen-basis check refuses a run that is not the frozen vanilla one ($lastrpl f$lastframe, the merged leg)"; fi
 fi
+# the mode fires on the frozen-basis check ITSELF failing a vanilla leg, never on any other red of the run (#368: it once
+# fired on a leg the reuse refusal stopped, a check it never reached)
 if vs_ctl_is shared-sandbox; then
-    if [ "$fail" = 1 ]; then vs_ctl_fired shared-sandbox "with the cases sharing a sandbox per replay, a vanilla leg failed the frozen-basis check"
-    else vs_ctl_dead shared-sandbox "the shared sandboxes passed — the frozen-basis check cannot see carried nvram" || fail=1; fi
+    if [ -n "$basis_fail" ]; then vs_ctl_fired shared-sandbox "with the cases sharing a sandbox per replay, the vanilla leg of $basis_fail failed the frozen-basis check"
+    elif [ -n "${legdead:-}" ]; then vs_ctl_nj "a leg did not complete ($legdead), so the frozen-basis check did not run on every case"; fail=1   # #310 g7 NJ
+    else vs_ctl_dead shared-sandbox "no vanilla leg failed the frozen-basis check with the sandboxes shared — it cannot see carried nvram, or no case reached it" || fail=1; fi
 fi
 if vs_ctl_is wrong-window; then
     if [ "$fail" = 1 ]; then vs_ctl_fired wrong-window "every case expecting qsound-handshake-latch read nothing in it"

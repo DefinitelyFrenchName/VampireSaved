@@ -1,0 +1,30 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: close #368 done (audit_flicker_attribution's shared-sandbox control) and freeze #310 group 7 batch 5 (6 dead-leg rows over 6 gates; test_release_roundtrip off the static concurrent list until a PILOT trace) (14z-223)
+Claim (the working agent's sentence): #368 can be closed done with closing_368.md, and #310 group 7 batch 5 can be frozen as 6 new rows of tests/expected/dead_leg_unjudged.tsv (table5.diff.txt) and reported on #310 with comment_310_b5.md. Batch 5: tests/test_dead_leg_unjudged.sh now takes a row's dead instrument as any <NAME>_BIN or PATH:<tool> (a stub first on PATH that exits 1), PATH rows run serially (batch5.diff.txt); on PILOT at f329dc8d, before the fix, the six read obj_oracle, prg_window, tenant_oracle and roundtrip HONOURED, sdram_census LIES (its CONTROL DEAD line) and the stall DIED (a Traceback) (base/t310b5_base/classes.tsv; roundtrip's baseline was run with PATH:xdelta3); after the fix (batch5.diff.txt: vs_ctl_nj at each leg exit, sdram's readout and C/D guard, the stall's END-line check, roundtrip's planted marker and past_check) all six read UNJUDGED with every leg dead and with only the named instrument dead, and their neutered copies HONOURED (dlu6.log); the full gate PASSes on 209 rows, nj-stripped FIRED on 209 and plain-loud on 206 of 209 (dead_leg_gate.log; the script differs from the run's copy in comment lines only, evidence_b5.txt §2); live, the Mac ran the stall, roundtrip and sdram_census, each plain PASS with its changed mode HONOURED (mac_live/classes.tsv), on PILOT obj_oracle and tenant_oracle each plain PASS (pilot_live/readback.txt: read back over SSH, not fetched, PILOT unreachable since), and prg_window plain PASS on the Mac in 3,358 s at the same blob 6267435c (mac_prg/classes.tsv, mac_prg/prep); the six gates' blobs equal scratch 59bb621e's and the working tree's (evidence_b5.txt §1); test_release_roundtrip (static concurrent list, its script changed) is taken off tests/controls_concurrent.txt with an OFF line naming the changed blob 7598eee8 and PILOT's outage (ERIS has no xdelta3), so its 10 controls run serially until a PILOT trace re-lists it; tests/test_controls_concurrent.sh PASS (controls_concurrent.log). #368: tests/audit_flicker_attribution.sh's shared-sandbox mode now runs both legs with MAME_SANDBOX_REUSE=1 (empty in a plain run), fires only when the frozen-basis check fails a vanilla leg and names that case, reads NOT JUDGED when a leg died, and CONTROL DEAD otherwise (t368.diff.txt); on ERIS at scratch 7150f4c3 (its blob d6fdf7ab equals the working tree's) the plain run PASSes, shared-sandbox fires on 105_legacy_2pwin_auto f5868 (66079e5f9a1d6305 against 218b2a28f0883435) and reads HONOURED, wrong-window HONOURED (t368_live2/t368_live/), the write-trace 2 HONOURED SAFE (t368_meta/), so the gate's row goes back on tests/controls_concurrent_emu.txt; with a dead emulator both of its rows still read UNJUDGED and their neutered copies HONOURED (dlu_fl.log); the other deliberate users of MAME_SANDBOX_REUSE are listed in evidence_b5.txt §3. The maintainer's word on #368 is "do it when you can" (state_14z223.txt). NOT TESTED: the live control modes of obj_oracle, prg_window and tenant_oracle were not re-run (their diff touches only exits a passing run does not reach); roundtrip's pre-fix class under a dead python3 was not measured (its baseline used PATH:xdelta3, which the gate's own fake encoder shadows; the stripped class recorded is the neutered copy's, HONOURED); the dead check kills the instrument from the start, so only the first liveness exit each gate reaches runs dead and the other tagged exits are read in the diff; the MiSTer rows need the host's emu/jtcores checkout and WIDE build (obj and tenant also the WIDE MAME); on a host without them (ERIS has no jtcores) a gate whose REFUSED check names the missing piece reads REFUSED, so the dead-leg gate would FAIL there (not run; its tier runs on the Mac); the dead-leg gate's wall time grew from about 4 min to 25:09; audit_release_linux_cleanhost and audit_release_linux_desktop have no rows (ruled to a release-cadence gate of their own on PILOT, not yet written); #368's fix was run on ERIS only, and the two other gates that set MAME_SANDBOX_REUSE were not re-run; test_release_roundtrip's controls were not write-traced at the new blob (taken off the list instead); prg_window's live run was on the Mac, not PILOT.
+Artifacts (read every one, in full):
+  - build/agent223/t310b5/claim.txt
+  - build/agent223/t368/closing_368.md
+  - build/agent223/t310b5/comment_310_b5.md
+  - build/agent223/t310b5/batch5.diff.txt
+  - build/agent223/t310b5/table5.diff.txt
+  - build/agent223/t368/t368.diff.txt
+  - build/agent223/t310b5/docs5.diff.txt
+  - build/agent223/t310b5/evidence_b5.txt
+  - build/agent223/t310b5/base/t310b5_base/classes.tsv
+  - build/agent223/t310b5/dlu6.log
+  - build/agent223/t310b5/dead_leg_gate.log
+  - build/agent223/t310b5/mac_live/classes.tsv
+  - build/agent223/t310b5/mac_prg/classes.tsv
+  - build/agent223/t310b5/mac_prg/prep
+  - build/agent223/t310b5/pilot_live/readback.txt
+  - build/agent223/t368/t368_live2/t368_live/classes.tsv
+  - build/agent223/t368/t368_live2/t368_live/prep
+  - build/agent223/t368/t368_live2/t368_live/audit_flicker_attribution.shared-sandbox.out
+  - build/agent223/t368/t368_live2/t368_live/meta/score.txt
+  - build/agent223/t368/t368_live2/t368_live/meta/classes.tsv
+  - build/agent223/t368/dlu_fl.log
+  - build/agent223/t310b5/controls_concurrent.log
+  - build/agent223/t310b5/state_14z223.txt
+  - tests/expected/dead_leg_unjudged.tsv

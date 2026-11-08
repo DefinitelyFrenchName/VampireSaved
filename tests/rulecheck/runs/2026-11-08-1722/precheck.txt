@@ -1,0 +1,13 @@
+  FLAG D-ABSOLUTE: In every kept release tier, that leg never ran.  [build/agent223/t368/closing_368.md]
+  FLAG D-ABSOLUTE: The mode never set it.  [build/agent223/t368/closing_368.md]
+  FLAG D-ABSOLUTE: In a plain run the variable is empty, so every case still gets a fresh sandbox.  [build/agent223/t368/closing_368.md]
+  FLAG D-ABSOLUTE: - **The mode fires only on the frozen-basis check itself:** it fires when that check fails a vanilla leg, and the line names the case.  [build/agent223/t368/closing_368.md]
+  FLAG D-ABSOLUTE: **The six, and what each needed:**  [build/agent223/t310b5/comment_310_b5.md]
+  FLAG D-ABSOLUTE: It now checks each leg's END line first.  [build/agent223/t310b5/comment_310_b5.md]
+  FLAG D-ABSOLUTE: - **After the fix:** all six read UNJUDGED with every leg dead and with only the named instrument dead.  [build/agent223/t310b5/comment_310_b5.md]
+  FLAG D-ABSOLUTE: Every neutered copy reads HONOURED.  [build/agent223/t310b5/comment_310_b5.md]
+  FLAG D-ABSOLUTE: The run was on the staged tree, and every row gate's script was recorded against the commit's copy before and after.  [build/agent223/t310b5/comment_310_b5.md]
+  FLAG D-ABSOLUTE: Their diff only touches exits a passing run never reaches.  [build/agent223/t310b5/comment_310_b5.md]
+  FLAG D-ABSOLUTE: ERIS has no jtcores: there, a gate whose REFUSED check names the missing piece would read REFUSED, and the dead-leg gate would go red, never falsely green (n...  [build/agent223/t310b5/comment_310_b5.md]
+  FLAG D-ABSOLUTE: - **A re-census of group 7 at HEAD**, which closes this ticket if it finds nothing new.  [build/agent223/t310b5/comment_310_b5.md]
+packet_check: 12 flag(s): D-ABSOLUTE 12

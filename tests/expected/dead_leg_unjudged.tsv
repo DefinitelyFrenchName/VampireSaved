@@ -31,6 +31,19 @@
 # a host-text guard, or the release binaries the gate runs itself), so it reads HONOURED dead, correctly; and
 # audit_latch_reads tap-window-moved, already UNJUDGED before the batch (its own NOT JUDGED line).
 # audit_release_linux_desktop (PILOT's desktop only) is left with the podman gate.
+# Batch 5 (14z-223): the six held out of batch 1 (build/agent221/t310g7/rc/excluded.txt, local), one row each: the four
+# MiSTer gates (test_mister_obj_oracle, test_mister_prg_window, test_mister_sdram_census, test_mister_tenant_oracle), whose
+# sim legs find verilator on PATH, so their dead instrument is PATH:verilator (tests/test_dead_leg_unjudged.sh puts a stub
+# that exits 1 first on PATH and runs these rows one at a time: the sim legs share one scratch clone);
+# audit_stock_emulator_stall, whose mode runs only the WIDE MAME_BIN (with only MAME_REF_BIN dead its live mode honestly
+# read HONOURED), which DIED on a Traceback over the dead legs' logs and now checks each leg's END line first; and
+# test_release_roundtrip encoder-check-removed, whose instrument is the packager: its planted copy now prints a line where
+# the check was, and a copy that never got past it (PATH:python3 dead) is NOT JUDGED. Baseline at f329dc8d on PILOT
+# (build/agent223/t310b5/, local): obj_oracle, prg_window, tenant_oracle and roundtrip HONOURED, sdram_census LIES (its
+# readout printed CONTROL DEAD on a leg A that never ran; under a mode it is now NOT JUDGED), the stall DIED. The stripped
+# classes are the neutered copies' measured classes (batch 2's convention). audit_release_linux_cleanhost (PATH:podman,
+# Linux only) and audit_release_linux_desktop (PILOT's desktop only) are not rows yet: on any other host they SKIP before
+# any instrument, so their rows need a host condition this table does not have.
 # gate	mode	class	stripped class (the gate with its NJ lines neutered)	dead instrument
 audit_air_dash_height	native-dash-planted	UNJUDGED	HONOURED	MAME_BIN
 audit_air_gc_legacy	air-commit-planted	UNJUDGED	HONOURED	MAME_BIN
@@ -235,3 +248,9 @@ test_shadow_tenant	four-presses-morph	UNJUDGED	HONOURED	MAME_BIN
 test_vanilla_aerial_join	swapped-directions	UNJUDGED	HONOURED	MAME_BIN
 test_vanilla_command_join	swapped-commands	UNJUDGED	HONOURED	MAME_BIN
 test_vanilla_command_join	three-hits	UNJUDGED	HONOURED	MAME_BIN
+audit_stock_emulator_stall	wide-binary-no-stall	UNJUDGED	HONOURED	MAME_BIN
+test_mister_obj_oracle	perturbed-promoted-entry	UNJUDGED	HONOURED	PATH:verilator
+test_mister_prg_window	frozen-pair-moved	UNJUDGED	HONOURED	PATH:verilator
+test_mister_sdram_census	perturbed-map	UNJUDGED	HONOURED	PATH:verilator
+test_mister_tenant_oracle	perturbed-field	UNJUDGED	HONOURED	PATH:verilator
+test_release_roundtrip	encoder-check-removed	UNJUDGED	HONOURED	PATH:python3
