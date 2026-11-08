@@ -8188,3 +8188,19 @@ Re-run through `env --default-signal=PIPE` (and a script that refuses if SIGPIPE
 runs and the M26 release's desktop runs, also under the inhibitor, carry no such line. **Start a remote run with the
 signals at their defaults: put `env --default-signal=PIPE` after any wrapper that is not a plain exec, and check SigIgn
 when a shell prints an I/O error on a pipe.**
+
+## A FIX THAT LISTS THE WRONG ANSWERS NEVER FINISHES — #310 spent nine sessions teaching the classifier each bad red instead of defining a good one (paid: 14z-206 to 14z-223, #310)
+
+#310 found that a control mode reads HONOURED whenever its run exits red, and a red can come from anything. Its body
+named the direct fix, "require the control's own `CONTROL FIRED: <name>` line", and set it aside because 193 of 413
+controls did not print one. Every step after that taught the system one more wrong red: `NOT JUDGED` lines, classifier
+rules (crash, library abort, dead-beside-crash, environment error, tool error, REFUSED, SKIP), censuses of tracebacks and
+unapplied plants, a crash-injection sweep, and for dead legs 304 `# #310 g7 NJ` tags in 108 files, 214 table rows,
+stripped and loud copies and per-host instruments. That came to 12 commits over 9 days. The 14z-223 re-census then found
+124 modes still unlisted (118 from a census list no batch had drawn from) and 439 never censused, and some dead legs that
+are not an emulator at all. Meanwhile 117 of 297 honoured emulator modes, and 418 of 694 static ones (84 gates), still print
+no firing line of their own: the definition of a good red never moved. Every step was locally correct and passed every
+gate and every rule-checker, and nothing in the method asked whether the series was converging. Ruled replacements: #369
+(honoured only on positive evidence from the mode's own check) and #370 (gates declare what they share, instead of
+write-traced allow-lists). **When a fix keeps arriving as one more case, stop at the batch boundary and ask what the
+right answer looks like; a rule that defines the good outcome beats any list of the bad ones.**

@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-222 CLOSE, 2026-11-07)
+# NEXT SESSION — orientation (rewritten at the 14z-223 CLOSE, 2026-11-08)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -13,27 +13,30 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 - Every quoted figure comes from a `measurer` / `reader` spec (`docs/project/worker_spec.md`, the spec text IN the prompt, no model). The Bash tool's shell is zsh: write a revision and a path as `"${c}:path"`, never `$c:path` (zsh reads `:t` as a modifier; it cost 14z-207 a wrong hash table). An adapting worker that is not `measurer`/`reader` is called `general-purpose` with `model: opus` (the call gate refuses it without a model).
 - **The rule-checker runs ONLY BEFORE AN ACTION** (a freeze, a build, an expectation, a recommendation, a ticket closure; `docs/project/rule_checker.md`), **as soon as that action's work is done, never held for the close** (ruled 2026-10-16). The pinned `rule-checker`, the prompt files pasted VERBATIM, then `record --session <the CURRENT transcript's prefix>` and `resolve` on ONE line answering every violated question by its label. Prepare the next run only after the last one is resolved; a reader whose answer runs over six lines is asked to restate it in six (14z-207, run `2026-10-24-1240`).
 - **THE GREEN GUARD (#290):** a commit needs a strict GREEN whole-tier row for the staged tree; tier the STAGED tree on a snapshot (`tests/run_on_snapshot.sh --commit "$(git commit-tree "$(git write-tree)" -p HEAD -m …)"`), then commit. Base a `--confirm` on a recent run of record.
-- **WHEN TO COMMIT (ruled 2026-10-17):** only at a ticket closure, a freeze or release, work handed to PILOT or ERIS, or the close. Before EVERY tier, regenerate the generated files and run the bookkeeping gates the change touches IN A CLEAN CHECKOUT of the staged tree (`git worktree add --detach` of a commit-tree object): the main tree holds #229's untracked gates, which break the generators.
+- **WHEN TO COMMIT (ruled 2026-10-17):** only at a ticket closure, a freeze or release, work handed to PILOT or ERIS, or the close. Before EVERY tier, regenerate the generated files and run the bookkeeping gates the change touches — THE WHOLE LIST in `docs/project/working_methods.md` ("Before every tier"), not a remembered subset: 14z-223's tier went red on three of them (`test_must_fire_census`, `test_gate_descriptions`, `test_expectation_provenance` for a new gate and table) — IN A CLEAN CHECKOUT of the staged tree (`git worktree add --detach` of a commit-tree object): the main tree holds #229's untracked gates, which break the generators.
 - **Never edit a script while it runs** ([MJC-54]); the emulator runner reports a tracked file changed during its run.
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
-idle env --default-signal=PIPE`: the inhibitor alone leaves SIGPIPE ignored for every child, gotchas.md, 14z-223). Idle at the 14z-222 close, its checkout `~/vampire-saved` detached at `bb10ce97` (the freeze commit) with a LOCAL tag
-`freeze/merged-m26` (`564775cf`, never pushed, not origin's tag object): delete that tag before PILOT fetches tags, then move
-the checkout to the new `main`. **ERIS** (WSL2, 24 threads,
-47 GB) runs the release shape; idle at the 14z-222 close, its checkout `~/vampire-saved` detached at `bb10ce97`: move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
+idle env --default-signal=PIPE`: the inhibitor alone leaves SIGPIPE ignored for every child, gotchas.md, 14z-223). It crashed
+once on 2026-11-08 (no shutdown record; the maintainer brought it back). Idle at the 14z-223 close, its checkout
+`~/vampire-saved` detached at the scratch `d29fa100` (never pushed): move it to `main` first. **ERIS** (WSL2, 24 threads,
+47 GB) runs the release shape; idle at the 14z-223 close, its checkout `~/vampire-saved` detached at the scratch `7150f4c3`
+(never pushed): move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
 commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS)
 or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shell splits it at a pipe and mangles quotes), and
 a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-222's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-223's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
   control as a pool job of its own; a listed gate whose script changed must be re-traced on PILOT before it stays listed
-  (`tests/test_controls_concurrent.sh`), and the static list `tests/controls_concurrent.txt` the same.
+  (`tests/test_controls_concurrent.sh`), and the static list `tests/controls_concurrent.txt` the same. Both lists are to be
+  replaced by declared shares (#370). The two Linux desktop gates claim the desktop session (`tests/lib/desktop_session.sh`)
+  and run alone; `audit_dead_leg_linux` runs AFTER the two Linux release gates at release.
 - **`--order <an earlier run>/results.tsv`** starts a pooled lane longest first.
 - **Temp files on disk:** unless the caller set `TMPDIR`, a run's gates write under `build/tmp/emu_<stamp>.<pid>/`
   (removed at the end); the run refuses to start with under 10 GB free there (`VS_TMP_MIN_GB`).
@@ -60,24 +63,22 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **#366 and #365 — two small test-integrity fixes found at the M26 release** (STATE 14z-222 (4)). #366: correct
-   `tests/test_dead_span_reach.sh`'s header (two spans and 10 judged pairs since M26, #363's span among them) and
-   `tests/audit_pass_overrun.sh`'s EXPECTS line (ours `none` on all three parts since M25), and decide whether the reach
-   gate plants a control on every span, not only the first. #365: give `tests/audit_crash_sweep_emu.sh` its `# SHEET:` line,
-   then run `tests/test_sheet_census.sh` (ondemand: no tier runs it). Both gates may be on the concurrent-controls lists:
-   an edit means a PILOT re-trace or a delisting.
-2. **`test_release_binaries` is OFF the emulator concurrent-controls list** (`tests/controls_concurrent_emu.txt`, its
-   `# NOT listed (14z-222 …)` note): its header was corrected after the PILOT trace. Re-trace it on PILOT and list it again.
-3. **#310 — GROUP 7, BATCH 3** (batches 1 and 2 landed, 43 rows: `tests/test_dead_leg_unjudged.sh`, STATE_HISTORY 14z-221c
-   (5)). Left: the six held out (four MiSTer gates needing verilator, `test_release_roundtrip`, `audit_stock_emulator_stall`
-   on `MAME_REF_BIN`), podman's, the 14 two-mode gates on the concurrent list, and every gate with three or more modes
-   (`build/agent215/t310/census57/group7.tsv`, local). A row's dead instrument goes in the table's fifth column; the gate
-   then runs its mode with only that instrument dead.
-4. **#364 — under dash an EXIT-only cleanup trap does not run on TERM** (`docs/platform/gotchas.md`). About 277 scripts
-   leave their work directory behind when TERM'd on PILOT. The fix is #359's pattern beside each EXIT-only trap; then
-   `tests/test_signal_traps.sh` refuses the form.
-5. **Ask the maintainer for the order of the rest.** Open tickets: bugs/test-integrity #310, #364, #365, #366; evolution
-   #348, #352; cosmetic #344, #360. Parked: #123, #124, #125, #128.
+1. **#369 — a control mode is honoured only on positive evidence from its own check** (ruled 14z-223: the #310
+   post-mortem's first recommendation; STATE 14z-223 (9), `DECISIONS_HISTORY.md`). Design first and show it before
+   migrating: the one classifier rule, the static lint (a `CONTROL FIRED` print sits in the failure branch of the check it
+   names), a control on the classifier, then the migration — 117 of 297 emulator modes (kept logs, an upper bound) and 418
+   of 694 static modes (84 gates) print no firing line of their own (the table: `build/agent223/postmortem/static_fired/`,
+   local). When #369 lands, **#310 closes** (ruled). #310's batch 6 is dropped.
+2. **#370 — gates declare what they share; the runners schedule by it** (the post-mortem's second recommendation),
+   replacing the two concurrent-control allow-lists and the desktop-session lock.
+3. **#364 — under dash an EXIT-only cleanup trap does not run on TERM** (`docs/platform/gotchas.md`): about 277 scripts;
+   #359's pattern beside each EXIT-only trap, then `tests/test_signal_traps.sh` refuses the form.
+4. **Ask the maintainer for the order of the rest.** Open tickets: bug #310 (closes with #369), #364; evolution #369,
+   #370, #348, #352; cosmetic #344, #360. Parked: #123, #124, #125, #128.
+
+**THE STANDING LESSON OF 14z-223** (feedback memory `step-back-before-patch-series`, gotcha "A FIX THAT LISTS THE WRONG
+ANSWERS NEVER FINISHES"): at every batch boundary of a multi-batch ticket, if the next batch repeats a patch family,
+write the one-paragraph alternative design and ask before starting it.
 
 ## PARKED (not open work)
 
@@ -86,25 +87,19 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A release-cadence static tier runs every control** (601 at M26): run it `--jobs 8` (50 min) with a cap well over two
-  hours; serial, it was stopped at a 2 h cap after 97 gates. `--confirm` is refused at release cadence (#269), so a red is
-  fixed and the whole tier re-run.
-- **Run the release's static tier after every emulator release record is in.** `test_emulator_staleness` reads each gate's
-  NEWEST row by `results.tsv` mtime: ERIS's host-bound SKIP rows, finished later than the Mac's and PILOT's PASS runs of the
-  same gates, were the newest, so those host gates were re-run after ERIS.
-- **The uploader creates the release with `--verify-tag`**: the freeze tag must be on `origin` first. Push the jtcores fork's
-  pinned commit before the tag, so the published tag never names a missing submodule commit.
-- **The build each host's release runs judged** is recorded as `build MERGED <fingerprint>` in each run's
-  `identity.tsv`/`identity_end.tsv`. The fingerprint covers the zip container, so it differs between hosts whose 25 members
-  are equal (`build/agent222/m26/release/close/build_identity.txt`).
-- **A closing comment's coverage limits come from the gate's WHOLE header**, in every form: "Not covered", "NOT COVERED",
-  "WHAT IT DOES NOT COVER", "Stated, not tested", "MEASURED, not asserted", "Not compared", "deliberately absent". Twelve
-  rule-checker runs at this release each found one form or one gate missed.
+- **A wrapper can leave SIGPIPE ignored for every child** (`gnome-session-inhibit`): dash then prints `printf: I/O
+  error` on a closed pipe and `tests/lib/controls.sh` reads the copy as unable to run. Put `env --default-signal=PIPE`
+  after any wrapper that is not a plain exec; check `SigIgn` in `/proc/self/status`.
+- **A write trace sees files, never a shared session** (display, sink, focus): it cannot clear a gate whose controls
+  share one (`docs/project/gotchas.md`, 14z-223).
+- **A dead instrument on `PATH` does not show where a leg died**: `test_dead_leg_unjudged.sh`'s only-the-instrument check
+  varies only `MAME_BIN`. A stub that logs its calls, and the leg named by the NOT JUDGED line, do (14z-223's where-died runs).
+- **The rule-checker found a real gap in each of six rounds on one commit** (runs -1725 to -1730): assemble the evidence
+  for what each claim rests on, including which blob each run executed, before preparing.
 
-## WHAT CLOSED THIS SITTING (14z-222)
+## WHAT CLOSED THIS SITTING (14z-223)
 
-- **M26 frozen** at `bb10ce97` (#357, #363) and **released** on `freeze/merged-m26` (merged-m24's zips pruned; M25 never
-  published, its changes ship here).
-- **Closed done:** #345, #346, #356, #357, #358, #363 (rule-checker run `2026-11-07-1708` after -1697 to -1707; the
-  maintainer's Cecil reading posted on #358).
-- **Filed:** #365, #366.
+- **Closed done:** #365, #366 (run -1712), #367 (run -1720), #368 (run -1724).
+- **#310:** group 7 batches 3-5 (166 dead-leg rows) and the Linux gate's 5 rows (`8973b301`, run -1730); the post-mortem
+  posted on it; it closes with #369.
+- **Filed:** #367, #368, #369, #370.

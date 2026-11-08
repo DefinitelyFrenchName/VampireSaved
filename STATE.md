@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-223 — **#365 and #366 closed done (rule-checker run -1712 after -1710; -1709 and -1711 withdrawn unspawned): the reach gate's fall-through control was blind on #363's span, fixed, and every control now plants on every span; `test_release_binaries` re-traced on PILOT and listed again.** Opus 5.5, transcript `aef5e221`.
+## Session 14z-223 — **#365, #366, #367 and #368 closed done; #310 group 7 batches 3-5 (166 dead-leg rows) and the Linux-only gates' 5 rows on a new release-cadence gate on PILOT, with the desktop driver's leak fixed and one harness at a time on the desktop session; the group-7 re-census found an untaken census list, and the maintainer, after a post-mortem of #310's patch-by-patch route, ruled its replacement: #369 (honoured only on positive evidence) and #370 (declared shares) filed, batch 6 dropped, #310 to close with #369.** Opus 5.5, transcript `aef5e221` (compacted).
 
 ### opened with
 The maintainer: **"read handoff.md, state.md and docs/next_session.md"**, then **"I agree with the order for items 1,2,3 then
@@ -72,7 +72,7 @@ its 14z-222 header correction) 4 HONOURED SAFE and listed again. PILOT's local p
   (`audit_marionette_cost`'s pre-fix exit 2 after `awk: can't open file`; batch 3 fixed that gate's path).
 - Rule-checker run -1718 OK after -1714 to -1717 (-1713 withdrawn unspawned); the progress comment posted on #310.
   Left of group 7 (the 14z-215 census, which predates later modes): 31 concurrent-list gates (121 rows), podman's 2 rows,
-  the six held out.
+  the six held out. *[Continued: (4), (6).]*
 
 ### (4) #367 — THE CLASSIFIER'S TOOL-ERROR RULE; #310 GROUP 7 BATCH 4 — 112 ROWS OVER 29 GATES; #368 FILED
 The maintainer: **"continue with both #367 and the next batches of #310 unless there's a blocker. PILOT and ERIS are
@@ -92,7 +92,7 @@ available to be put to good use"**.
   `audit_latch_reads` lacked the file, so its `latch-fix-reverted` control went DEAD. Both gates PASS after the fix; the
   twelve changed scripts re-traced at scratch `f329dc8d`, all SAFE and every control HONOURED (PILOT five plus
   `test_plants_not_applied`, ERIS six), rows re-pointed. Gotcha
-  appended in `docs/project/gotchas.md`.
+  appended in `docs/project/gotchas.md`. *[#368 resolved: (6).]*
 
 ### (5) #310 — WHAT IS LEFT, RULED BY THE MAINTAINER
 Asked where the two Linux-only gates' dead-leg rows should run (`audit_release_linux_cleanhost`, 2 modes;
@@ -102,7 +102,7 @@ column the Mac's static tier skips), C (the static gate over SSH to PILOT) and D
 small release-cadence emulator gate that judges the 5 rows on PILOT at release (my recommendation). … -> agreed."** On #368:
 **"do it when you can"**. On re-censusing group 7 at HEAD (the 14z-215 census predates later modes): **"do it before
 closing #310 then, so after all the other #310 tasks"**. The order: batch 5, the release-cadence Linux gate, #368, the
-re-census, then #310's closure (or a batch 6 first).
+re-census, then #310's closure (or a batch 6 first). *[Continued: (6)-(9).]*
 
 ### (6) #310 GROUP 7 BATCH 5 — THE SIX HELD OUT, 6 ROWS; #368 DONE
 - **The dead-leg gate kills any instrument:** a row's dead instrument is any `<NAME>_BIN`, or `PATH:<tool>` (a stub first on
@@ -126,7 +126,7 @@ re-census, then #310's closure (or a batch 6 first).
 - **Checked:** where each of the six legs dies with only its named instrument dead (each reached it; the mode's NOT JUDGED
   line names that leg), and roundtrip's plain run plus all 10 modes at the new blob (PASS, all HONOURED); #368 closed done
   and #310 commented on rule-checker run 2026-11-08-1724 OK after -1721 to -1723 (the gaps they found were evidence: blobs
-  unrecorded, the sdram mode's output, where a leg died, roundtrip's other modes).
+  unrecorded, the sdram mode's output, where a leg died, roundtrip's other modes). *[Roundtrip re-listed: (7).]*
 
 ### (7) #310 GROUP 7 — THE LINUX GATE (5 ROWS ON PILOT AT RELEASE); A DRIVER THAT LEAKED INTO THE DESKTOP
 - **`tests/audit_dead_leg_linux.sh`**, as ruled in (5): `tests/test_dead_leg_unjudged.sh` on
@@ -178,99 +178,29 @@ re-census, then #310's closure (or a batch 6 first).
 The group-7 re-census at the staged tree (`build/agent223/recensus/`, local): 1,191 declared control modes in 312 gates;
 214 are rows of the two dead-leg tables; 124 modes in 32 gates the 14z-215 census marked PRESENT or CANNOT TELL have none:
 118 from its "new instances" list, which batches 1-5 never drew from, and 6 that batch 4 judged need no row. 439 modes
-were never censused. A dead-emulator baseline of
-the 124 (`build/agent223/b6/`, local) shows the defect live (`audit_anakaris_rows`' modes HONOURED in 2 s), and that part
-of them need a dead-leg mechanism of their own (`test_run_on_snapshot`'s leg dies on a probe timeout, not an emulator).
+were never censused. Their dead-emulator baseline (`build/agent223/b6/`, local): 95 HONOURED, 23 DIED, 6 UNJUDGED.
 The maintainer: **"I can't shake the feeling that while there is proper root causes, we are making things very
 complicated incrementally. … we'll need to post mortem that"**, then **"Post-mortem first (Recommended)"**
-(`DECISIONS_HISTORY.md`, 14z-223): the Linux gate lands; batch 6 waits for a post-mortem and a greenfield proposal.
+(`DECISIONS_HISTORY.md`, 14z-223): the Linux gate lands; batch 6 waits for a post-mortem and a greenfield proposal. *[Resolved: (9).]*
 
-## Session 14z-222 — **M26 FROZEN at `bb10ce97` (#357 Donovan's guard orbs and #363 Phobos's Plasma Beam freezing its victim; tags `freeze/donovan-m30`, `huitzil-m37`, `pyron-m31`, `merged-m26`) and RELEASED: `freeze/merged-m26` published on GitHub with merged-m24's zips pruned, after every release gate passed on the Mac, ERIS and PILOT; #345, #346, #356, #357, #358 and #363 closed done on rule-checker run -1708 after -1697 to -1707; #365 and #366 filed.** Opus 5.5 at effort High, transcript `356b9b97` (compacted twice).
+### (9) THE POST-MORTEM RULED: #369 AND #370 FILED; #310 CLOSES WITH #369
+The post-mortem (posted on #310; the lesson in `docs/project/gotchas.md`, "A FIX THAT LISTS THE WRONG ANSWERS NEVER
+FINISHES") found #310 enumerative from day one and made three recommendations. The maintainer: **"I agree with all 3
+recommendations"** (`DECISIONS_HISTORY.md`, 14z-223). Filed: **#369** (a control mode is honoured only on positive
+evidence from its own check; batch 6 dropped) and **#370** (gates declare what they share; the runners schedule by it,
+replacing the write-traced allow-lists and the desktop-session lock). #310 stays open until #369 lands, then closes.
+#369's migration size is in its body and `DECISIONS_HISTORY.md` (static run: `build/agent223/postmortem/static_fired/`).
 
-### opened with
-The maintainer: **"read handoff.md, state.md and docs/next_session.md"**, then **"yes, all efforts focused on freeze and
-release"** (`DECISIONS_HISTORY.md` "Ruled 2026-11-06 … freeze M26, then release it"). Asked to unlock PILOT's desktop
-session for the Linux desktop gate: **"I'll unlock it now (Recommended)"**. Mid-session the maintainer: **"FYI ERIS and
-PILOT were unreacheable for some time but you're back on the same network"**. Working evidence: `build/agent222/m26/`
-(local; the freeze packet `rc/freeze/`, the release `release/`, the closures `release/close/`).
-
-### (1) THE M26 FREEZE — `bb10ce97`
-- **The freeze** (the freeze commit's message is the full account): `build/manifest/staged/357_363.patch` applied and
-  removed; the mark M26; Donovan re-extracted (two new regions, every old region file byte-identical); the six builds on the
-  Mac and on ERIS from the same tree, program, set keys and member CRCs equal; registry rows `donovan-m30`, `huitzil-m37`,
-  `pyron-m31`, `merged-m26`; the four expectation sets frozen on both hosts and equal; the frozen byte diff reviewed
-  (UNEXPLAINED 0); the MiSTer tail (fork commit `e11729fe`, patch 0042, `tools/setup_jtcores.sh` pin); `release/merged-m26`
-  packaged.
-- **The re-point sweep and the relocation re-freezes** (+0x270 behind Donovan's two new wide_ext regions, +0x2A0 behind
-  Huitzil's handler), every changed expectation attributed line by line: rule-checker runs -1680 to -1689, -1689 OK.
-- **The freeze check:** runs -1690 to -1696. They found four lines the sweep had re-pointed inside past records: two
-  scripts and one line restored to HEAD, one header corrected. Two tools came out of it: a paragraph-context audit of every
-  sweep-changed line (`build/agent222/m26/sweep_context_audit.py`, three plants) and a content rule for every named path
-  (`named_checks.py`, two plants). `test_release_binaries`' header correction took it off the emulator concurrent-controls
-  list until it is re-traced. Run -1694 read OK but named the rows comma-joined, which the freeze binding refused; -1696 OK.
-- **The static freeze tier** on scratch snapshot S5 `4f260c72`: PASS 239, FAIL 2. `test_rule_checker` was fixed.
-  `test_emulator_staleness` named three stale rows, re-run on S5, all PASS (`test_release_binaries` 215 s,
-  `test_mister_sdram_census` 2,792 s, `test_mister_gfxc_fetch` 7,687 s). The confirm tier on S6 `c683e327` (the staged
-  tree): `--strict --confirm`, PASS 173, FAIL 0, GREEN. Committed `bb10ce97`; the green guard read that row. The four
-  provisional tags (scratch S1) re-cut on it.
-
-### (2) THE M26 RELEASE, ON THE FREEZE COMMIT `bb10ce97`
-- **ERIS's release emulator tier** (`--scope all --strict --controls --jobs 6 --skip test_mame_parity`, no reuse): 3 h 40
-  min, PASS 458, SKIP 4, FAIL 0, 260 control rows. The four SKIPs are host-bound (`test_release_binaries`,
-  `test_readme_recording`, `audit_release_linux_desktop`, `audit_release_linux_cleanhost`). Copied to the Mac as
-  `build/emu_rel222_eris` (tarball sha256 equal on both ends).
-- **The Mac:** `test_mame_parity`, `test_release_binaries` and `test_readme_recording` with controls, GREEN; the MiSTer lane
-  at `--jobs 4`, PASS 12 of 12, 4 controls, 3 h 28 min. **PILOT:** the desktop (under `gnome-session-inhibit`), cleanhost,
-  Linux-binaries and README-recording gates with controls, all GREEN. **ERIS under MSYS2:** `test_release_launcher_bat`'s
-  Windows half PASS, 8 controls fired, `first-found` FAILs as a mode.
-- **The static release tier** (`--cadence release --jobs 8`, every control executed). The first run was serial and stopped
-  at my 2 h cap after 97 gates; `--jobs 8` then took 50 min. Run 2: PASS 238, FAIL 2. `test_emulator_staleness` was red
-  because the release records were not yet in, and `test_build_dirs` was red on a stray `build/build/` from my own
-  wrong-directory unpack (removed). `--confirm` is refused at release cadence (#269). A third run went red again because
-  ERIS's four SKIP rows were the newest by `results.tsv` mtime, so the four host gates were re-run after ERIS on PILOT and the
-  Mac (`build/emu_rel222b_*`). The run of record (`build/agent222/m26/release/static3/`): PASS 240, SKIP 1, FAIL 0, 601
-  controls executed and honoured. The SKIP is the launcher's Windows half.
-- **Published** on the maintainer's **"Accept and publish (Recommended)"** (`DECISIONS_HISTORY.md` "Ruled 2026-11-07
-  (14z-222)"). The jtcores fork commit `e11729fe` and the four freeze tags were pushed first (the uploader verifies the tag
-  on the remote); `main` was not pushed. `tools/upload_release_assets.sh freeze/merged-m26 --prune` created the release,
-  uploaded and re-verified 9 assets, and pruned merged-m24's 9 zips. The 12 `BINARY.txt` asset lines it moved to merged-m26
-  ride this close.
-- **The published zips are the commit's release:** downloaded back, 308 files: 241 tracked files equal, 61 binaries equal
-  to their `BINARY.txt` rows, 6 `BINARY.txt` differing only by the asset line. All 9 packages applied to the dumps build
-  merged-m26 `de548a9e`, one set, whose 25 members equal `build/m3b_merged34`. The build each host's runs judged is that set
-  (their recorded merged-build fingerprints, the members equal on the three hosts). Three must-fail controls fired
-  (`build/agent222/m26/release/close/`).
-
-### (3) THE RELEASE'S CLOSURES: #345, #346, #356, #357, #358, #363
-Rule-checker runs -1697 to -1708. Every VIOLATED round found a real gap in the closing comments, fixed in them:
-- **Coverage limits:** gate limits left out, then the headers' "Stated, not tested" and "MEASURED, not asserted" forms.
-- **Evidence:** the build each host judged; each gate's rows in the run; the static tier's commit.
-- **#363's span:** a re-run of `test_dead_span_reach` at HEAD shows #363's span REACHED ONLY by row 0x4F on merged and
-  Phobos solo and DEAD on the other three tracks; its controls plant only on #294's span.
-- **Attributions:** two closings said the maintainer read capture sheets when the record quoted no reading of them.
-- **Scope:** the speed-line gate's VOID groups; the RNG pinned to 0000 on every ours-vs-native gate.
-
--1708 OK; the six closed with their comments. For #358 the maintainer chose **"Close on the 221c sheets"**. Shown the
-three 14z-221c sheets again, they concluded Cecil is present and behaves alike on both games, and the remaining offset
-is not an issue (quoted in `DECISIONS_HISTORY.md`; posted on #358).
-
-### (4) TICKETS FILED
-#365 (`test_sheet_census` FAILs: `audit_crash_sweep_emu` has no `# SHEET:` line; an ondemand gate, so no tier ran it) and
-#366 (two stale gate headers: `test_dead_span_reach` still says one span and 5 judged pairs, now two and 10;
-`audit_pass_overrun` still says "ours donovan_2 since M24", its frozen rows read none since M25).
-
-### CLOSE (14z-222, 2026-11-07)
-Riding this close: (1)-(4) above; the 14z-221c group rolled to `STATE_HISTORY.md` with its ledger line (144 lines), its
-#357 and #363 sections pointing here; the 14z-221c opener moved VERBATIM to `docs/NEXT_SESSION_HISTORY.md` (122 lines,
-quoted) and the new opener; `DECISIONS_HISTORY.md` "Ruled 2026-11-07 (14z-222)" (the release, #358 and the maintainer's
-Cecil reading); the six closed tickets' rows (`done`, their four answers) and the rows of #365 and #366,
-`docs/project/tickets_github.tsv` refreshed; the 12 `BINARY.txt` asset lines the uploader moved to merged-m26; rule-checker
-runs -1697 to -1708 (the freeze's own runs -1680 to -1696 rode the freeze commit); the regenerated indexes. Tickets closed
-this sitting on GitHub before this commit: #345, #346, #356, #357, #358, #363, each with its closing comment (and the
-maintainer's Cecil reading on #358); filed: #365, #366. Steps: sections (this group); next-session; rollover; indexes (by
-the driver); dashboard (14z-163..14z-222, 3,680 figures, 0 unclassed; five assets uploaded, `datasets` re-pointed:
-actions v13, costly v33, figures v33, rc_runs v33, tiers v34). The tier's results: `build/agent222/close/tier_results.tsv`,
-the next close's `--prev`.
+### CLOSE (14z-223, 2026-11-08)
+Riding this close: (9) above (the post-mortem's ruling, #369 and #370 filed, their rows and #310's decided and wrong
+links, the gotcha "A FIX THAT LISTS THE WRONG ANSWERS NEVER FINISHES", `DECISIONS_HISTORY.md`'s two 14z-223 rulings' second),
+and STATE's row (8) trimmed under the byte cap. Commits this sitting before the close: `c5fe01b4` (#365, #366), `d9014d34`
+(#367; batches 3-4), `9b83394d` (#368; batch 5), `8973b301` (the Linux gate). Tickets closed on GitHub this sitting:
+#365, #366, #367, #368; filed: #367, #368, #369, #370. Steps: sections (this group; pointers on (3)-(6) and (8)); next-session (the 14z-222 opener, 110 lines, quoted, to
+`docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-222 group, 86 lines, to `STATE_HISTORY.md` with its ledger line);
+indexes (by the driver); dashboard (14z-163..14z-223, 3,734 figures, 0 unclassed; five assets uploaded, `datasets`
+re-pointed: actions v14, costly v34, figures v34, rc_runs v34, tiers v35). The tier's results:
+`build/agent223/close/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
