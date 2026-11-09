@@ -38,169 +38,54 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-223 — **#365, #366, #367 and #368 closed done; #310 group 7 batches 3-5 (166 dead-leg rows) and the Linux-only gates' 5 rows on a new release-cadence gate on PILOT, with the desktop driver's leak fixed and one harness at a time on the desktop session; the group-7 re-census found an untaken census list, and the maintainer, after a post-mortem of #310's patch-by-patch route, ruled its replacement: #369 (honoured only on positive evidence) and #370 (declared shares) filed, batch 6 dropped, #310 to close with #369.** Opus 5.5, transcript `aef5e221` (compacted).
+## Session 14z-224 — **#369 pieces 1-3 landed (a control mode is honoured only on a `CONTROL CAUGHT:` line from its own check; 310 gates on a shrink-only debt list; a lint with a stated limit); #369's and #370's designs ruled; the ledger page's "OK in the end" tile explained and split by era, pushed to gh-pages on the maintainer's word.** Opus 5.5, transcript `77feeeca` (compacted twice).
 
 ### opened with
-The maintainer: **"read handoff.md, state.md and docs/next_session.md"**, then **"I agree with the order for items 1,2,3 then
-let's focus on bugs and test integrity"**. Working evidence: `build/agent223/` (local; #365/#366 in `t366/`).
+The maintainer: **"read handoff.md, state.md and docs/next_session.md"**, then **"yes, let's focus on 369 right now"**.
+Working evidence: `build/agent224/` (local; #369 in `t369/`, its rule-checker evidence in `t369/rc/`, #370 in `t370/`).
 
-### (1) #366 AND #365 — TWO STALE HEADERS, A MISSING SHEET LINE, AND A BLIND CONTROL
-- **#366:** `tests/test_dead_span_reach.sh`'s header now states both frozen spans and judged-pairs 10;
-  `tests/audit_pass_overrun.sh`'s says ours has no overrun since M25, as `tests/expected/pass_overrun.tsv` holds (the claim
-  grepped out of `tests/ci_emulator.tsv`, `docs/game/engine_internals.md`, `docs/project/sheet_notes.md`).
-- **The issue's open question, controls on every span: yes, measured.** Run by hand on #363's span, 21 of the 22 plants
-  fired; fall-through did not, because it nopped the 4 bytes before the span and #363's fence is a 6-byte `jmp.l` at
-  `PRG:0x029CB4`. `tools/audit_dead_span.py --plant fallthrough` now overwrites every reached instruction ending at the span
-  start, whole; the gate plants every control on every span (modes on the first). PASS, 22 of 22 FIRED on both spans; wall
-  18:42, against 10:31. Gotcha in `docs/project/gotchas.md`.
-- **#365:** `tests/audit_crash_sweep_emu.sh` declares `# SHEET: none — …`; `tests/test_sheet_census.sh` PASS, 0 on the
-  debt list.
+### (1) #369 PIECES 1-3 — THE RULE, THE HELPER, THE LINT AND THE DEBT LIST (`23ccb65c`)
+The design (`build/agent224/t369/design.md`, rule-checker run 2026-11-08-1736 OK after -1731 to -1735) was ruled
+**"A1, B1, c1"** (`DECISIONS_HISTORY.md`, 14z-224). Built: `tests/lib/classify.sh`'s fall-through reads HONOURED only on
+`CONTROL CAUGHT: <mode> — `, printed by the new `vs_ctl_caught <file> <ERE>` (`tests/lib/controls.sh`), else UNJUDGED;
+a gate on `tests/expected/ctl_caught_debt.tsv` (310 rows) keeps the old fall-through. `tools/ctl_caught_lint.py`, gated by
+`tests/test_ctl_caught_lint.sh` (18 must-fire controls, two near misses): the literal only in the helper, the classifier
+and the lint; no catch-all ERE; no `vs_ctl_fired "$VS_CTL"` off the list; every mode-declaring gate calls the helper or
+is listed; a multi-mode ERE holds `$`; the list only shrinks (its rows must be on its first version, blob `9cf7c951`, and
+on every committed version). The six gates that write synthetic CAUGHT logs are read by a statement scanner with a
+stated limit, ruled **"Land with a stated limit (Recommended)"** after runs -1743 to -1745 each found a way past the
+check; the further limits the session named are an open decision ("Decisions pending"). Evidence: on PILOT at
+`17f4f67f` the 3 migrated gates' 16 modes HONOURED on CAUGHT and the 5 listed consumer gates' 61 modes HONOURED by the
+fall-through, all 8 re-traced SAFE; the lint gate's 18 modes HONOURED at `cfcdc2e3` (SAFE); the rows re-pinned on
+`tests/controls_concurrent.txt`. The discovery tier (`build/agent224/tier1/`) ran 575 controls, all HONOURED, and six
+reds, each fixed (`build/agent224/t369/rc/bookkeeping.txt`); the strict confirm tier on the staged tree `96e3da38` read
+GREEN, PASS 166 (`build/agent224/tier2/`). Rule-checker run 2026-11-09-1750 OK after -1743 to -1749.
+Next: migrate the 310 listed gates (each to `vs_ctl_caught`, its row removed); piece 5 (the crash-sweep and dead-leg
+classes) is not designed. #310 stays open until the list is empty.
 
-### (2) THE CONCURRENT-CONTROLS ROWS — PILOT at scratch `3d90dfaa`
-`test_dead_span_reach` (static list, its script changed) 22 HONOURED SAFE; `test_release_binaries` (emulator list, off since
-its 14z-222 header correction) 4 HONOURED SAFE and listed again. PILOT's local provisional tag `freeze/merged-m26`
-(`564775cf`) deleted and origin's tags fetched; PILOT is left detached at `3d90dfaa`.
+### (2) #370 — THE DESIGN, RULED A1, B1, C1
+Drafted on **"draft the #370 design"** (`build/agent224/t370/design.md`, rule-checker run 2026-11-08-1742 OK after -1738
+to -1741) and ruled A1, B1 and C1, each the recommended option (`DECISIONS_HISTORY.md`, 14z-224). Nothing is built; it
+follows #369's pieces 1-3, now committed.
 
-### (3) #310 GROUP 7 BATCH 3 — 48 ROWS OVER 7 GATES; #367 FILED
-- The seven group-7 MAME gates with two or more modes off the concurrent lists (`audit_ladder_pick_store`,
-  `audit_marionette_cost`, the three `audit_mizuumi_*`, `audit_tick_cadence`, `test_proof_sheets`): all 48 modes read
-  HONOURED on a dead emulator at `c5fe01b4`; each liveness exit now calls `vs_ctl_nj` (`# #310 g7 NJ`), and all 48 read
-  UNJUDGED; live, all seven PASS plainly and all 48 modes read HONOURED. `tests/expected/dead_leg_unjudged.tsv` 91 rows,
-  `tests/test_dead_leg_unjudged.sh` PASS. One defect of my own, found by a reader and fixed: `audit_tick_cadence`'s tagged
-  binary check ran before `controls.sh` was sourced (moved; run dead with a missing binary, UNJUDGED).
-- **#367 filed:** `tests/lib/classify.sh` reads a `set -e` gate that dies on a tool error as HONOURED
-  (`audit_marionette_cost`'s pre-fix exit 2 after `awk: can't open file`; batch 3 fixed that gate's path).
-- Rule-checker run -1718 OK after -1714 to -1717 (-1713 withdrawn unspawned); the progress comment posted on #310.
-  Left of group 7 (the 14z-215 census, which predates later modes): 31 concurrent-list gates (121 rows), podman's 2 rows,
-  the six held out. *[Continued: (4), (6).]*
+### (3) THE LEDGER PAGE — "59% OK IN THE END" EXPLAINED; THE TILE SPLIT BY ERA
+The maintainer asked why the page read an estimated 59% OK in the end when every action seemed to end checked. The
+answer: until 14z-182 a VIOLATED run was answered with its resolution and the action went on, never re-checked, and
+those actions end on a VIOLATED run. On **"Actually both would help"**, `tools/ledger_page.py` gained a "resolved, not
+re-run" tile and a by-era table (to 14z-182; 14z-183 to 14z-211; 14z-212 on, grouped exactly), with `last` added to
+`tools/session_metrics.py`'s action rows (committed in `23ccb65c`). On **"push the ledger page now. my own website copy I
+handle on my own …"** it was pushed to `gh-pages` as `87372240` (`build/agent224/ledger_push/`); the close republishes it.
 
-### (4) #367 — THE CLASSIFIER'S TOOL-ERROR RULE; #310 GROUP 7 BATCH 4 — 112 ROWS OVER 29 GATES; #368 FILED
-The maintainer: **"continue with both #367 and the next batches of #310 unless there's a blocker. PILOT and ERIS are
-available to be put to good use"**.
-- **#367:** `tests/lib/classify.sh` reads DIED a mode whose log ends on a tool's error lines with no gate FAIL just before
-  them and no `NOT JUDGED:` line; `tests/test_emulator_runner.sh` section 14o and its `tool-honoured` control; the replay
-  over 1,382 kept honoured mode logs changes no verdict. Its first form misread two dead-run shapes (`test_hui_air`), found
-  by the dead-leg gate and fixed (gotcha in `docs/project/gotchas.md`). `test_emulator_runner` re-traced SAFE on PILOT.
-- **Batch 4:** the 30 group-7 gates on the emulator concurrent list; two workers tagged disjoint halves, one combined dead
-  run checked them (113 UNJUDGED, 8 correctly HONOURED: evidence a dead MAME_BIN does not remove). 112 rows, the table at
-  203, `tests/test_dead_leg_unjudged.sh` PASS. Live on ERIS (28 gates) and the Mac (`test_readme_recording`): every plain run
-  PASSes, every mode HONOURED but one. Concurrent controls re-traced at scratch `1ecdcc22`: PILOT 15 SAFE, ERIS 13 SAFE.
-- **#368 filed:** `audit_flicker_attribution`'s `shared-sandbox` control has fired on a dead leg in every kept release tier,
-  never on the frozen-basis check it names; now UNJUDGED live, the gate HOLLOW and off the emulator concurrent list.
-- **Two reds on the confirm tier, both mine, fixed:** the eleven gates that gained the `controls.sh` source line did not
-  declare it in `# FOLLOWS:` (`test_gate_follows`), and `tests/test_plants_not_applied.sh`'s hand-built copy of
-  `audit_latch_reads` lacked the file, so its `latch-fix-reverted` control went DEAD. Both gates PASS after the fix; the
-  twelve changed scripts re-traced at scratch `f329dc8d`, all SAFE and every control HONOURED (PILOT five plus
-  `test_plants_not_applied`, ERIS six), rows re-pointed. Gotcha
-  appended in `docs/project/gotchas.md`. *[#368 resolved: (6).]*
-
-### (5) #310 — WHAT IS LEFT, RULED BY THE MAINTAINER
-Asked where the two Linux-only gates' dead-leg rows should run (`audit_release_linux_cleanhost`, 2 modes;
-`audit_release_linux_desktop`, 3 modes; both SKIP off Linux before any instrument), with options A (a release-cadence
-emulator gate judging them on PILOT at release, as `audit_crash_sweep_emu` carries the crash sweep's Linux row), B (a host
-column the Mac's static tier skips), C (the static gate over SSH to PILOT) and D (a faked host), the maintainer: **"A. A
-small release-cadence emulator gate that judges the 5 rows on PILOT at release (my recommendation). … -> agreed."** On #368:
-**"do it when you can"**. On re-censusing group 7 at HEAD (the 14z-215 census predates later modes): **"do it before
-closing #310 then, so after all the other #310 tasks"**. The order: batch 5, the release-cadence Linux gate, #368, the
-re-census, then #310's closure (or a batch 6 first). *[Continued: (6)-(9).]*
-
-### (6) #310 GROUP 7 BATCH 5 — THE SIX HELD OUT, 6 ROWS; #368 DONE
-- **The dead-leg gate kills any instrument:** a row's dead instrument is any `<NAME>_BIN`, or `PATH:<tool>` (a stub first on
-  `PATH` that exits 1); `PATH:` rows run one at a time (the MiSTer legs share one scratch clone). Wall 25:03 on 209 rows (re-run on the staged tree, every row gate's blob recorded
-  against the index before and after).
-- **The six:** `test_mister_obj_oracle`, `test_mister_prg_window`, `test_mister_tenant_oracle` (dead `PATH:verilator`, read
-  HONOURED); `test_mister_sdram_census` (read LIES: its readout printed `CONTROL DEAD` on a leg A that never ran, and its
-  C-vs-D cross-check read two missing legs as "differ"); `audit_stock_emulator_stall` (DIED on a Traceback; now checks each
-  leg's END line); `test_release_roundtrip`'s `encoder-check-removed` (dead `PATH:python3`: a copy that crashed before the
-  check "did not refuse"; the planted copy now prints a line where the check was). All six UNJUDGED after the fix, neutered
-  copies HONOURED; `tests/test_dead_leg_unjudged.sh` PASS. Live plain PASS: on the Mac the stall, roundtrip and sdram (their
-  changed modes HONOURED), on PILOT obj_oracle and tenant_oracle (read back over SSH, not fetched: PILOT went unreachable), and prg_window on
-  the Mac in 3,358 s after PILOT dropped mid-run.
-- **#368 done:** the `shared-sandbox` control was written in 14z-205; #296's guard (14z-206) refuses an undeclared sandbox
-  reuse, so from then on the mode's f5868 legs never ran and the mode "fired" on the run's general red. The mode now declares
-  the reuse (`MAME_SANDBOX_REUSE=1`), fires only on the frozen-basis check naming the case, and reads NOT JUDGED on a dead
-  leg. On ERIS at scratch `7150f4c3`: plain PASS, `shared-sandbox` fired on 105 f5868 (HONOURED), `wrong-window` HONOURED,
-  the write-trace SAFE; the gate is back on `tests/controls_concurrent_emu.txt`. Gotcha in `docs/project/gotchas.md`.
-- **Off the static concurrent list:** `test_release_roundtrip` (its script changed; PILOT, the only host with xdelta3 and
-  strace, was unreachable), by an OFF line in `tests/controls_concurrent.txt`; it goes back after a trace on PILOT.
-- **Checked:** where each of the six legs dies with only its named instrument dead (each reached it; the mode's NOT JUDGED
-  line names that leg), and roundtrip's plain run plus all 10 modes at the new blob (PASS, all HONOURED); #368 closed done
-  and #310 commented on rule-checker run 2026-11-08-1724 OK after -1721 to -1723 (the gaps they found were evidence: blobs
-  unrecorded, the sdram mode's output, where a leg died, roundtrip's other modes). *[Roundtrip re-listed: (7).]*
-
-### (7) #310 GROUP 7 — THE LINUX GATE (5 ROWS ON PILOT AT RELEASE); A DRIVER THAT LEAKED INTO THE DESKTOP
-- **`tests/audit_dead_leg_linux.sh`**, as ruled in (5): `tests/test_dead_leg_unjudged.sh` on
-  `tests/expected/dead_leg_unjudged_linux.tsv` (cleanhost's 2 modes on a dead `PATH:podman`, desktop's muted-stream and
-  unlinked-recorder on a dead `PATH:pw-record`, wrong-mark on a dead `PATH:xwd`), release cadence, `tests/ci_emulator.tsv`;
-  SKIPs off Linux, without podman or without a live GNOME session, and says so. The two target gates call `vs_ctl_nj` at their
-  liveness exits; cleanhost's modes fire only on their own evidence (C0 naming libasound.so.2 missing, C1 failing with
-  libGL.so.1 dropped). On PILOT at scratch `3ce6645c`: plain PASS in 2,024 s (5 rows UNJUDGED dead, their neutered copies at
-  their frozen classes, plain runs red and silent), `nj-stripped` and `plain-loud` HONOURED (2,025 s and 1,613 s), nothing
-  left running.
-- **The driver leaked (found by this work):** `tools/desktop_session_play.py` stopped the emulator and the sink recorder
-  after its step loop; a dead `xwd` made the `cap` step raise, so the two baseline runs left two emulators and two recorders
-  playing into the session, and the next plain desktop run FAILed on a leftover's silent stream. Fixed: the stop is in a
-  `finally` (group TERM, then KILL even after the leader exits); the driver refuses to start beside another emulator's
-  stream (`stray`, exit 3); `apprec` records only its own process group's node; a missing capture is logged. Shown on
-  PILOT: D1 (the old driver, xwd dead) left 4 processes and read DIED; D2 (the new driver beside them) refused, 5 "already
-  on the session" lines; D3 (the new driver, xwd dead) read UNJUDGED with both own-stream checks ok and left 0. The new gate
-  also names and kills any release emulator or recorder its runs leave (shown on PILOT with a stub inner gate leaving a
-  process named as a release FBNeo: named, killed, FAIL; with nothing left: PASS; not a frozen control). The desktop gate's plain run and its 3 modes then
-  PASS/HONOURED under the runner (783 s, one after another).
-- **One harness at a time on the desktop session (rule-checker run -1727):** nothing in the runner keeps two gates apart
-  in a pooled run, and a desktop run refused inside a dead-leg row (the driver's `stray`, exit 3) reads UNJUDGED, that
-  row's frozen class: a false green. `tests/lib/desktop_session.sh`: the desktop gate and the dead-leg gate claim the
-  session (an owner file) and are REFUSED (exit 3) beside a live owner or a release emulator already running; the driver
-  refuses unless it runs under the owner (`owned`, exit 3); nested runs claim nothing. Shown on PILOT at scratch
-  `d29fa100`: with a foreign owner both gates and the driver refuse; with a leftover both gates refuse and leave it
-  alone; a stale owner is ignored. Then the desktop gate PASS with 3 modes HONOURED (794 s) and the dead-leg gate PASS
-  (2,027 s) with both modes HONOURED (5,687 s), nothing left running, the owner file gone after each.
-- **The desktop gate off the emulator concurrent list, never to be listed:** its modes share the desktop session (the null
-  sink, the PipeWire graph, the X display and its focus), which a write trace cannot see; its `pilot:a10866d0` SAFE said
-  nothing about them. M26's release ran it alone (`--only`), so no release was judged side by side.
-- **Back on the static concurrent list:** `test_release_roundtrip` (10 controls, SAFE, 10 HONOURED) and
-  `test_emulator_runner` (new cases 3f and 3g) re-traced on PILOT at `3ce6645c`. The runner's first trace read all 22
-  modes UNJUDGED (HOLLOW): the pass ran under `gnome-session-inhibit`, which leaves SIGPIPE ignored for every child, so each
-  runner copy's write into a closed pipe printed `printf: I/O error` and the error scan read the copies as unable to run;
-  each mode had reached the gate's own FAIL. Both gates re-traced through `env --default-signal=PIPE` (roundtrip's first trace,
-  in the same phase, had read SAFE; rule-checker run -1725 asked for it to be re-run too). The pass's gate runs and M26's
-  desktop runs (also under the inhibitor) carry no such line.
-- PILOT crashed or powered down (the maintainer: "For some reason PILOT has either crashed or powered down. It's
-  now back up"); it booted at 05:22 CET with no shutdown record, after batch 5 lost it (6); both passes of this work ran after that
-  (from 05:26 and 05:42). Pass 1 was stopped by hand in its dead-leg run, its desktop run having failed on the leaked
-  processes; pass 2 ran whole.
-- **Checked:** rule-checker run 2026-11-08-1730 OK after -1725 to -1729 (each found a real gap: roundtrip's trace with
-  SIGPIPE ignored, the leftover check never fired, pass 1's stop, the dead-leg gate beside the desktop gate, the driver
-  blob the leak evidence ran, where each PATH row dies — measured on PILOT: each stub called, each NOT JUDGED naming its leg). Three gotchas in `docs/project/gotchas.md`. Evidence:
-  `build/agent223/t310lx/` (local; PILOT `~/t310lx`, `~/t310lx2`).
-
-### (8) #310 — THE RE-CENSUS FOUND AN UNTAKEN LIST; A POST-MORTEM BEFORE ANY BATCH 6
-The group-7 re-census at the staged tree (`build/agent223/recensus/`, local): 1,191 declared control modes in 312 gates;
-214 are rows of the two dead-leg tables; 124 modes in 32 gates the 14z-215 census marked PRESENT or CANNOT TELL have none:
-118 from its "new instances" list, which batches 1-5 never drew from, and 6 that batch 4 judged need no row. 439 modes
-were never censused. Their dead-emulator baseline (`build/agent223/b6/`, local): 95 HONOURED, 23 DIED, 6 UNJUDGED.
-The maintainer: **"I can't shake the feeling that while there is proper root causes, we are making things very
-complicated incrementally. … we'll need to post mortem that"**, then **"Post-mortem first (Recommended)"**
-(`DECISIONS_HISTORY.md`, 14z-223): the Linux gate lands; batch 6 waits for a post-mortem and a greenfield proposal. *[Resolved: (9).]*
-
-### (9) THE POST-MORTEM RULED: #369 AND #370 FILED; #310 CLOSES WITH #369
-The post-mortem (posted on #310; the lesson in `docs/project/gotchas.md`, "A FIX THAT LISTS THE WRONG ANSWERS NEVER
-FINISHES") found #310 enumerative from day one and made three recommendations. The maintainer: **"I agree with all 3
-recommendations"** (`DECISIONS_HISTORY.md`, 14z-223). Filed: **#369** (a control mode is honoured only on positive
-evidence from its own check; batch 6 dropped) and **#370** (gates declare what they share; the runners schedule by it,
-replacing the write-traced allow-lists and the desktop-session lock). #310 stays open until #369 lands, then closes.
-#369's migration size is in its body and `DECISIONS_HISTORY.md` (static run: `build/agent223/postmortem/static_fired/`).
-
-### CLOSE (14z-223, 2026-11-08)
-Riding this close: (9) above (the post-mortem's ruling, #369 and #370 filed, their rows and #310's decided and wrong
-links, the gotcha "A FIX THAT LISTS THE WRONG ANSWERS NEVER FINISHES", `DECISIONS_HISTORY.md`'s two 14z-223 rulings' second),
-and STATE's row (8) trimmed under the byte cap. Commits this sitting before the close: `c5fe01b4` (#365, #366), `d9014d34`
-(#367; batches 3-4), `9b83394d` (#368; batch 5), `8973b301` (the Linux gate). Tickets closed on GitHub this sitting:
-#365, #366, #367, #368; filed: #367, #368, #369, #370. Steps: sections (this group; pointers on (3)-(6) and (8)); next-session (the 14z-222 opener, 110 lines, quoted, to
-`docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-222 group, 86 lines, to `STATE_HISTORY.md` with its ledger line);
-indexes (by the driver); dashboard (14z-163..14z-223, 3,734 figures, 0 unclassed; five assets uploaded, `datasets`
-re-pointed: actions v14, costly v34, figures v34, rc_runs v34, tiers v35). The tier's results:
-`build/agent223/close/tier_results.tsv`, the next close's `--prev`.
+### CLOSE (14z-224, 2026-11-09)
+Riding this close: the records of (1)-(3) (`DECISIONS_HISTORY.md`'s three 14z-224 rulings, the open decision on #369's
+lint limits, two standing-ruling lines, the gotcha "A TEXT LINT OF SHELL SOURCE CANNOT BE MADE AIRTIGHT", the rows of
+#310, #369 and #370). Commits this sitting before the close: `23ccb65c` (#369 pieces 1-3, the ledger tiles). Pushed
+mid-sitting on the maintainer's word: the ledger page, `gh-pages` `87372240`. Tickets closed: none; filed: none.
+Steps: sections (this group); next-session (the 14z-223 opener, 105 lines, quoted, to `docs/NEXT_SESSION_HISTORY.md`);
+rollover (the 14z-223 group, 164 lines, to `STATE_HISTORY.md` with its ledger line); indexes (by the driver); dashboard
+(14z-163..14z-224, 3,787 figures, 0 unclassed; five assets uploaded, `datasets` re-pointed: actions v15, costly v35,
+figures v35, rc_runs v35, tiers v36). The tier's results: `build/agent224/close/tier_results.tsv`, the next close's
+`--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
@@ -208,6 +93,8 @@ re-pointed: actions v14, costly v34, figures v34, rc_runs v34, tiers v35). The t
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **#369 lands with a shrink-only debt list and a lint with a stated limit (2026-11-08/09, 14z-224):** a mode is HONOURED only on its own `CONTROL CAUGHT:` line unless its gate is on `tests/expected/ctl_caught_debt.tsv`, which only shrinks — `DECISIONS_HISTORY.md` "Ruled 2026-11-08 (14z-224) — #369's design …" and "Ruled 2026-11-09 (14z-224) — #369's lint …".
+- **#370 is built as A1, B1, C1 (2026-11-08, 14z-224):** today's sharing written down, every gate carries a `# SHARES:` line, a host-wide per-token lock — `DECISIONS_HISTORY.md` "Ruled 2026-11-08 (14z-224) — #370's design …".
 - **#356 is built as Option 1 (a tenant-only copy of the speed-line effect with vs2's 14-row tables), with the raw allocator, and frozen as M25 as built (frozen 14z-220, `91bde83b`); its one-frame Dark Force phase is accepted and is #360 (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356" and "Ruled 2026-11-03 (14z-219) — #356".
 - **#345's option A1b is built and its timing ACCEPTED: frozen in M25 with #356 (14z-220, `91bde83b`) — ours loses no logic frame in Blizzard Sword where native does; the moved expectations (pass_overrun, the stale lag exemption, donovan_2's parity and RNG-form rows) re-frozen at the freeze, each through its own rule-checker run; vsavj's table PRG:0x1F3FD2 is never touched; B stays held (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #345", "Ruled 2026-11-03 (14z-219) — #345: option A is built as A1b" and "… the built A1b's timing is accepted".
 - **#345's rows may turn DIFF under a non-zero RNG; the parity gates keep the 0000 pin (2026-11-01, 14z-216):** `tools/rng_forms.py` exempts rows `after:` a SLOWDOWN root, by name — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #345's rows under a non-zero RNG".
@@ -305,6 +192,17 @@ them would reduce the legacy footprint from 5 bytes to 2.
 
 Only undecided items live here; a ruling moves its entry to `DECISIONS_HISTORY.md` in the
 commit that records it (CLAUDE.md [VSP-17]).
+
+- **#369's lint: do the limits the session named, beyond the ruled one, stand?** (14z-224; the ruled limit:
+  `DECISIONS_HISTORY.md` "Ruled 2026-11-09 (14z-224) — #369's lint lands with a stated limit …".) The session named
+  more than was ruled: in the six ground-truth gates, the textual reader misses a mis-split one-line echo, a variable
+  redirect target, a later redirect overriding an earlier one, `eval`, aliases and functions; in every gate, CAUGHT text
+  assembled at run time, code outside `tests/` and `tools/`, and a printed data file holding the text pass; a
+  `vs_ctl_caught` call handed the wrong file is review (`tools/ctl_caught_lint.py`'s docstring, `docs/project/
+  must_fire_contract.md` § #369). Options: (a) accept them as stated limits; (b) close them first with an evidence file
+  (the helper also writes its CAUGHT record where the gate cannot write; the classifier reads that, not the log), a
+  change to the helper, the classifier and the 3 migrated gates. Recommendation: decide before the 310-gate migration,
+  since every migrated gate would use (b)'s form.
 
 ## THE DEADNESS REGISTER (opened 14z-71, maintainer's standing instruction)
 

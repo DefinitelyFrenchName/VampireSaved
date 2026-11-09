@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-620 entries (49 game / 154 platform / 417 project), counted from the buckets at generation.
+621 entries (49 game / 154 platform / 418 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
@@ -231,7 +231,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - AN EXCEPTION RAISED IN `sitecustomize.py` DOES NOT CRASH PYTHON — `site.py` catches it, prints "Error in sitecustomize", and the program runs (paid: 14z-218, the Mac; `tests/lib/crash_sweep.sh`)
 - AN APOSTROPHE INSIDE `${VAR:?message}` OPENS A QUOTE — the whole script fails to parse, at a line far below (paid: 14z-221, #310)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 417 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 418 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -650,3 +650,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A WRITE TRACE SEES FILES, NOT A SHARED SESSION — a gate whose controls share a desktop was listed to run them side by side (paid: 14z-223, #310 group 7)
 - A LAUNCHER THAT IGNORES SIGPIPE MADE EVERY CONTROL OF A GATE READ UNJUDGED (paid: 14z-223, #310 group 7, PILOT)
 - A FIX THAT LISTS THE WRONG ANSWERS NEVER FINISHES — #310 spent nine sessions teaching the classifier each bad red instead of defining a good one (paid: 14z-206 to 14z-223, #310)
+- A TEXT LINT OF SHELL SOURCE CANNOT BE MADE AIRTIGHT — eight rule-checker runs each found one more shape; state what it covers and stop (paid: 14z-224, #369, rule-checker runs 2026-11-09-1743 to -1749)

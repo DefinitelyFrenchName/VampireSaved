@@ -8204,3 +8204,15 @@ gate and every rule-checker, and nothing in the method asked whether the series 
 (honoured only on positive evidence from the mode's own check) and #370 (gates declare what they share, instead of
 write-traced allow-lists). **When a fix keeps arriving as one more case, stop at the batch boundary and ask what the
 right answer looks like; a rule that defines the good outcome beats any list of the bad ones.**
+
+## A TEXT LINT OF SHELL SOURCE CANNOT BE MADE AIRTIGHT — eight rule-checker runs each found one more shape; state what it covers and stop (paid: 14z-224, #369, rule-checker runs 2026-11-09-1743 to -1749)
+
+#369's lint (`tools/ctl_caught_lint.py`) must let six gates write `CONTROL CAUGHT:` text into synthetic logs while
+refusing any line that would print it to the gate's own output. Each fix of the textual reader met a new shape it could
+not see: a `>` inside the message, `>&2`, `printf '%s'`, `/dev/stderr`, `/bin/echo`, `VAR=x echo`, a `{ …; } >>` block,
+a heredoc, a scan that read only top-level `.sh` and `.py` files, then a variable redirect target, an overriding later
+redirect, `eval`, aliases and functions. A shell line's effect is decided at run time; a reader of its text can only
+approximate the parser, and every approximation has a next counter-example. The maintainer ruled "Land with a stated
+limit" after the third. **When a static check of a dynamic language keeps losing to one more shape, write down exactly
+what it covers, name the rest as review in the check, its gate and its contract, and put the alternative that does not
+read text (here, an evidence file the gate cannot write) to the maintainer.**
