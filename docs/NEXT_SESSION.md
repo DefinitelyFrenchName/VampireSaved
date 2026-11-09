@@ -68,20 +68,17 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **Ask the open decision first** (STATE "Decisions pending", 14z-224): do the lint limits the session named, beyond the
-   one the maintainer ruled, stand — or is the evidence-file form built before the migration? Its answer decides the form
-   every migrated gate takes.
-2. **#369 — migrate the 310 gates on `tests/expected/ctl_caught_debt.tsv`** (STATE 14z-224 (1); `DECISIONS_HISTORY.md`
+1. **#369 — migrate the 310 gates on `tests/expected/ctl_caught_debt.tsv`** (STATE 14z-224 (1); `DECISIONS_HISTORY.md`
    14z-224): each gate's modes to `vs_ctl_caught <its check's output> <the mode's finding>`, its row removed in the same
    commit; a migrated gate's modes must read HONOURED on CAUGHT (and every listed gate it changes re-traced, or its
    concurrent row taken off). Work in batches by family; at each batch boundary apply the standing lesson below. Piece 5
    (the crash-sweep `fx` classes and the dead-leg tables under the new rule) is NOT designed: design it and show it before
    the batches reach those gates. #369 closes, and **#310 with it** (ruled), when the list is empty and deleted.
-3. **#370 — build it as ruled: A1, B1, C1** (`DECISIONS_HISTORY.md` 14z-224; design `build/agent224/t370/design.md`,
+2. **#370 — build it as ruled: A1, B1, C1** (`DECISIONS_HISTORY.md` 14z-224; design `build/agent224/t370/design.md`,
    local, summarised in the ruling). The design's order: interleave with #369's migration — each migrated gate gets its
    `# SHARES:` line in the same edit — or land the field and scheduler first; say which at the opener.
-4. **#364 — under dash an EXIT-only cleanup trap does not run on TERM** (`docs/platform/gotchas.md`): about 277 scripts.
-5. **Ask the maintainer for the order of the rest.** Open tickets: bug #310 (closes with #369), #364; evolution #369,
+3. **#364 — under dash an EXIT-only cleanup trap does not run on TERM** (`docs/platform/gotchas.md`): about 277 scripts.
+4. **Ask the maintainer for the order of the rest.** Open tickets: bug #310 (closes with #369), #364; evolution #369,
    #370, #348, #352; cosmetic #344, #360. Parked: #123, #124, #125, #128.
 
 **THE STANDING LESSON OF 14z-223** (feedback memory `step-back-before-patch-series`, gotcha "A FIX THAT LISTS THE WRONG
@@ -96,8 +93,8 @@ write the one-paragraph alternative design and ask before starting it.
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
 - **A text lint of shell source cannot be made airtight** (gotcha, 14z-224): `tools/ctl_caught_lint.py` lost to one more
-  shape in each of runs -1743 to -1749; it now states what it covers. Do not patch it shape by shape again: answer the
-  open decision instead.
+  shape in each of runs -1743 to -1749; it now states what it covers. Do not patch it shape by shape again: the limits stand
+  as stated (ruled 14z-225, `DECISIONS_HISTORY.md`).
 - **zsh expands a word that starts with `=`** (`echo ======` looks up a command named `=====`); quote separators.
 - **The rule-checker found a real gap in seven rounds on one commit** (runs -1743 to -1749): for a lint, list the shapes it
   claims to see and the ones it does not BEFORE preparing, and plant a control for each claimed one.

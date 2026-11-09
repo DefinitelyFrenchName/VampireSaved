@@ -32,6 +32,7 @@
 # MUST-FIRE: perturbed-copy: debt-regrown — a copy of the debt list with a declaring gate added back must be named as a row that should be gone (section 1 fails), or the list does not only shrink
 #
 # Usage: tests/test_sheet_census.sh   # ci_portable, ROM-free, ~2 s
+# SHARES: none — its 7 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"

@@ -48,6 +48,7 @@
 #   14z-76; its value scales with the count — three independent tenant
 #   fingerprints are three independent oracles over one refactor. Needs only
 #   ROMDIR, no emulator. ~4 min. Run after EVERY M3b machinery commit
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

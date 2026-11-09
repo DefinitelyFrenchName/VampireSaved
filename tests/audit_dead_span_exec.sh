@@ -20,6 +20,7 @@
 # SHEET: none — measures pristine vsavj only; no leg of our build
 #
 # Usage: ROMDIR=... [JOBS=6] tests/audit_dead_span_exec.sh      on-demand (64 MAME debug runs, ~25 min on the MacBook)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"; if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi

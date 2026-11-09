@@ -70,6 +70,7 @@
 #   "passed" by deleting the thunk. CLOSES A COVERAGE GAP: test_wheel_bank5
 #   3b's two protocols are both single-player and could never see this.
 #   Default build/m3b_merged19
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

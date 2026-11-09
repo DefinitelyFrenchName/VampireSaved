@@ -40,6 +40,7 @@
 #   (review-triage, 14z-94) the merged playtest build stays distinguishable
 #   from its legacy-only instrument, which SHARES its program fingerprint by
 #   design.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

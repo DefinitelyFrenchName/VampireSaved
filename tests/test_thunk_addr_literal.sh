@@ -49,6 +49,7 @@
 #   sections incl. all three real manifests staying quiet, the addr_literal_ok
 #   escape hatch, and 2 verdict controls. Runs the GENERATOR ALONE against an
 #   extract dir; never edits a tracked file. No emulator, ~40s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 cd "$(dirname "$0")/.."
 

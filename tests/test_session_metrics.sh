@@ -46,6 +46,7 @@
 # MUST-FIRE: shadow-tool: void-only-dropped — a copy of tools/session_metrics.py that never writes the actions-of-VOID-runs-only figure must drop 14z-10's (its lone freeze, whose plant died), and the comparison must FAIL (mode: the gate reads that copy)
 #
 # Usage: tests/test_session_metrics.sh      # ci_portable, ~2 s
+# SHARES: none — its 13 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -70,6 +70,7 @@
 #   control, 3 pick- replay liveness. WINDOW CHOICE IS LOAD-BEARING (header):
 #   merged bank 4 is a UNION — a window holding another tenant's exclusive
 #   codes fails BY DESIGN. ~25 min
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

@@ -82,6 +82,7 @@
 #   controls. Default: own-class on build/don_m10 (14z-103; the b+c fix ships
 #   in every current build); VOICE_BORROW_EXPECT=lottery vs build/don_m4 = the
 #   ground-truth- failing pre-fix pair
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 BUILD="${1:-build/don_m30}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b

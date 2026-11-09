@@ -57,6 +57,7 @@
 #
 # Usage: ROMDIR=... tests/test_vanilla_aerial_join.sh   # emulator tier (MAME, ~10 min, legs in parallel)
 #        CHARS="BU VI" to measure a subset; FREEZE=1 to re-freeze; KEEP=dir keeps the traces.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

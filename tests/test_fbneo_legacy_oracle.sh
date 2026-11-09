@@ -109,6 +109,7 @@
 #   "execution POSITION, not state"). Reported as `open:` — MEASURED
 #   DEVIATIONS AWAITING A RULING, bounded to two named windows; anything
 #   outside FAILS. FBNEO_ORACLE_EXPECT=exact is the post-ruling target. ~5 min
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

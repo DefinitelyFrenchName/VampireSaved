@@ -75,6 +75,7 @@
 #   FAIL on four fabricated defects: a leaking control, a zero positive, an
 #   out-of-range address, and a dead liveness probe. Fetched is NOT heard — no
 #   audio has been rendered or compared
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }

@@ -12,8 +12,8 @@ from the gate's main check output (tests/lib/classify.sh). This lint holds what 
       /dev/stderr, /dev/fd/N and /dev/tty are not files: they reach the mode's log), nor on a line that begins with it
       (direct_prints). THE STATED LIMIT (maintainer, 2026-11-09: "Land with a stated limit (Recommended)"): in those six
       files the lint covers echo or printf written on one line; any other printer (awk, cat of a file, tee) and a line
-      assembled at run time are review, not lint. BEYOND THE RULING, stated by the session and not ruled by the
-      maintainer: THE READER IS TEXTUAL — it reads each statement as written, never as the shell evaluates it — so a
+      assembled at run time are review, not lint. BEYOND THAT RULING, stated by the session and
+      accepted by the maintainer 2026-11-09 (14z-225: "(a) Accept them as stated limits."): THE READER IS TEXTUAL — it reads each statement as written, never as the shell evaluates it — so a
       one-line echo or printf it mis-splits (a `>` in a trailing comment read as a redirect), a redirect target held in a
       variable (`>> "$OUT"`, read as a file), a later redirect that overrides an earlier one (`>/dev/null 1>&2`, the first
       one read), eval, aliases and functions pass it (rule-checker runs 2026-11-09-1748 and -1749);

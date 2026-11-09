@@ -76,6 +76,7 @@
 #
 # Usage: ROMDIR=... [JOBS=N] [OUT=<dir>] [TR_FAMILY=ground|air|command] [TR_HEIGHT=-3|3|6] [TR_VICTIM=<hex>] [TR_FULL=<lines>]
 #        [FREEZE=1 TR_FAMILY=<f> TR_TICKS=<ticks.tsv>] tests/audit_throw_recovery.sh
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"

@@ -287,6 +287,7 @@ declares	test_select_arrays
 declares	test_session_close
 declares	test_session_metrics
 declares	test_shadow_tenant
+declares	test_shares
 declares	test_sheet_census
 declares	test_shell_portability
 declares	test_shim_charid

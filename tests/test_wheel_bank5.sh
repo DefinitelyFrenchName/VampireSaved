@@ -61,6 +61,7 @@
 #   the select-wheel bank-5 move (14z-63): site + re-derived tile inventory +
 #   group C member identity straight from the zips + negative controls + the
 #   engine's own bank-5 walk. Self-builds at 0x13 unless given a build
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:69321107) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

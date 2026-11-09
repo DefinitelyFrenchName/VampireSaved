@@ -43,6 +43,7 @@
 # before commit (rule-checker run 2026-10-11-807 Q1): this note first said the stage-4 build "loses both pods by f6000",
 # read off this gate's own verdict, which could not tell a reset from a dead pod until f6000's state check.
 # A stage-4 build can still be passed by hand.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

@@ -40,6 +40,7 @@
 # MUST-FIRE: known-bad: program-fallback-reaches-wholeset — a whole-set-only registry row must be UNREACHABLE by the program-key fallback (the merged1-vs-shipped hazard); the mode demands the forbidden resolution (rc 0) where the design refuses it (rc 2), so the run must FAIL
 #
 # Usage: ROMDIR=... tests/test_suite_dispatch.sh
+# SHARES: self
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

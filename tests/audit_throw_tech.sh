@@ -40,6 +40,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34]
 #        tests/audit_throw_tech.sh          (~8 legs x ~1 min)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

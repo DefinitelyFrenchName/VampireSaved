@@ -42,6 +42,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [KEEP=<dir>] [JOBS=10] tests/audit_extra_pass.sh
 #   emulator tier, MAME; ~3 min at JOBS=10 (twenty legs)
+# SHARES: self
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

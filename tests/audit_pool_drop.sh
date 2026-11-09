@@ -27,6 +27,7 @@
 #
 # ON-DEMAND: every pooled gate twice (~2 x 4,200 s on ERIS, 14z-212). POOL_DROP_GATES="<gate> ..." limits the set.
 # Usage: ROMDIR=... [POOL_DROP_GATES="..."] [OUT=<dir>] tests/audit_pool_drop.sh
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

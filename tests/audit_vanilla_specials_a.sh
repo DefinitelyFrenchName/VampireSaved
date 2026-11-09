@@ -67,6 +67,7 @@
 #
 # Usage: ROMDIR=... [JOBS=2] [KEEP=dir] [SHEET=<workbook.xlsx>] tests/audit_vanilla_specials_a.sh [--freeze-clock]
 #        FREEZE=1 re-freezes the identity table and the verdicts; --freeze-clock re-freezes the game clocks.
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

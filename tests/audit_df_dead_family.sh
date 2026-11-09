@@ -52,6 +52,7 @@
 # Four -debug runs of ~7,000 frames; ~3 min in parallel.
 #
 # Usage: ROMDIR=... tests/audit_df_dead_family.sh [--freeze-clock]
+# SHARES: self
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

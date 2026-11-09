@@ -68,6 +68,7 @@
 #   structural shape: a plain summon = ONE contact wave, an ES summon = TWO
 #   (going away and coming back), the plant never connects. Run after any
 #   change to the rig or Donovan's stance/summon chains
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 : "${ROMDIR:?set ROMDIR}"

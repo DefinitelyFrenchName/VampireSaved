@@ -49,6 +49,7 @@
 #   vanilla-prefixed, the copy's own pc-relative dispatch resolving to its own
 #   table, and every caller a 4-byte OPERAND write at caller+2 with 4EB9
 #   untouched. 2 verdict controls. ROM-free, seconds
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 # DEFAULT RE-POINTED 14z-92: was build/don_m5, which PREDATES the 14z-91

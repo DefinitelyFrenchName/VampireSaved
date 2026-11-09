@@ -33,6 +33,7 @@
 # rows IN-TABLE and all nineteen were false positives (key `R` matches any row
 # containing an `r`). A value counts as documented only when the manifest
 # SAYS which table documents it and that table really carries the value.
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

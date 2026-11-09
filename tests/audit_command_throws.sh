@@ -65,6 +65,7 @@
 # caused — never the scripted input ([VSE-47]): the inputs themselves were taken from vsavj's command handlers.
 #
 # Usage: ROMDIR=... [JOBS=2] [OUT=<dir>] [SHEET=<workbook.xlsx>] [FREEZE=1] tests/audit_command_throws.sh [--freeze-clock]
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"

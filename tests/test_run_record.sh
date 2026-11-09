@@ -23,6 +23,7 @@
 # MUST-FIRE: perturbed-copy: secret-leak — a copy without the secret-name filter must record the planted token variable, and the selftest must FAIL (mode: that copy's selftest)
 #
 # Usage: tests/test_run_record.sh      # ci_portable, ~5 s
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

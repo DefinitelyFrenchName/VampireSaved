@@ -36,6 +36,7 @@
 #   palette locks: accent steadiness, VICTOR byte guard + cycle, fixture-
 #   override rows, shock-window vanilla lock (palette ROM->RAM is RAM-gate-
 #   blind — these are the only locks)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

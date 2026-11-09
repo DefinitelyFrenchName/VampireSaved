@@ -37,6 +37,7 @@
 #   Huitzil EX-move gate (14z-66): FOUR sections (ES, FG-connect, FG-full-seq,
 #   FG+aftermath chaos) — each fires with the stock decrementing (anti-
 #   coverage-loss). Self-builds stage 4 unless given a build
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

@@ -6,7 +6,7 @@
 #   locale, and a UTF-8 locale on Linux (en_US.UTF-8) collates `_`, `.` and `:` away, so the same gate compared a
 #   different order against its byte-ordered frozen list (#278: test_escape_triage and test_jtcores_twin, red on PILOT
 #   only, 14z-200). The census of 14z-208b found 134 such lines in 61 shell files; pinning here covers all of them, and
-#   every future one, without touching a gate (a changed gate leaves tests/controls_concurrent.txt until a re-trace).
+#   every future one, without touching a gate (a changed gate left tests/controls_concurrent.txt until a re-trace, before #370).
 # WHAT: only collation changes. A caller's LC_ALL (which overrides every category) is moved onto LANG and each
 #   category variable, so character handling, messages and numbers stay as the caller had them; then LC_COLLATE=C.
 #   macOS's en_US.UTF-8 collates too (case and punctuation: `a A a_c a-c a:c a.c` where C gives `A a a-c a.c a:c a_c`);

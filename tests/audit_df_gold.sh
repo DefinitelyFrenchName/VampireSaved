@@ -38,6 +38,7 @@
 #   class). Compare on 0x0FFF color bits — the uploader ORs the alpha nibble
 #   (v1 compared raw bytes and called a WORKING upload dead). DF-controlled
 #   rig. ~10 min
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

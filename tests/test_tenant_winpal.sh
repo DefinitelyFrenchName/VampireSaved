@@ -51,6 +51,7 @@
 #   variant-id win-screen palette (14z-63): the sparse block + TT thunk at
 #   0x5F1B6; BOTH thunk paths measured on real 2P victories (replays 61/62).
 #   Self-builds at 0x13 unless
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

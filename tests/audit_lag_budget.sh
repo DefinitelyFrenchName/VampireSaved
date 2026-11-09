@@ -43,6 +43,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [REF=build/m3b_merged26] [JOBS=6] [PARTS="donovan_1 pyron_2"] tests/audit_lag_budget.sh
 #   emulator tier, MAME; 84 field-trace runs — measured 14z-170 on this MacBook at JOBS=6: see ci_emulator.tsv
+# SHARES: self
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

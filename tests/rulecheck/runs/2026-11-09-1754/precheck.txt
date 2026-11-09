@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: - The census looks for the claim call TEXTUALLY on a code line; a call that is never reached passes it (review).  [build/agent225/t370/rc/S1_scope.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

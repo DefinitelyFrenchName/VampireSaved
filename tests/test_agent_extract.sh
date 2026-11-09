@@ -53,6 +53,7 @@
 # MUST-FIRE: perturbed-copy: blind-figures — a copy whose figure finder returns nothing must stop flagging the invented figure, and the selftest must FAIL (mode: the gate runs against that copy)
 #
 # Usage: tests/test_agent_extract.sh      # ci_portable, ~1 s
+# SHARES: none — its 14 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -58,6 +58,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [FREEZE=1] tests/audit_phobos_dmg_residual.sh
 #   emulator tier, MAME; twelve runs of up to 9240 frames, two at a time (~4 min quiet)
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

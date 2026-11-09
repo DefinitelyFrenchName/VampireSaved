@@ -55,6 +55,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   vsav2-as-oracle: anchors/neutral-exact/ HP-trajectory/comparative bound
 #   (17+18 replays)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

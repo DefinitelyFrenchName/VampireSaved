@@ -32,6 +32,7 @@
 #   only, so `.pending` — a pairing with no ratified class anywhere — was
 #   dropped silently, putting the blind spot over the open regression. Case 3
 #   is live: donovan-m5 must name exactly 2 NOT-EVALUATED. ROM-free, ~1s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -23,6 +23,7 @@
 # MUST-FIRE: perturbed-copy: newline-dropped — a copy of tools/package_release_platforms.py with `, newline="\n"` removed from its first text write must be named and FAIL the gate (mode: the check runs over that copy too)
 # MUST-FIRE: perturbed-copy: applier-no-newline — a copy of tools/gen_applier_page.py (#314) with `, newline="\n"` removed from its page write must be named and FAIL the gate, so the files added to FILES are read too (rule-checker run 2026-10-23-1212 Q4) (mode: the check runs over that copy too)
 # MUST-FIRE: perturbed-copy: write-text — a file whose one text write is `Path(p).write_text(s, encoding="utf-8")` must be named and FAIL the gate (rule-checker run 2026-10-23-1200 Q4) (mode: the check runs over that file too)
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

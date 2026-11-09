@@ -13,6 +13,7 @@
 #
 # MUST-FIRE: known-bad: planted-blob — 64 KiB of random bytes judged with the tracked tree (`--extra`) must FAIL section 1 (mode: section 1 judges the planted file too)
 # MUST-FIRE: shadow-tool: old-selector — a copy of the tool that lists no tracked path (the pre-#249 `??`-only selector) must pass the staged and committed blobs and FAIL section 2 (mode: the copy is the tool under test)
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

@@ -21,6 +21,7 @@
 # WHY. The maintainer (#282): the close "is almost never compeletely executed by default". A census found the ritual in
 # 58 places across 30 files, none of them complete, 8 sets disagreeing. Ruled "Doc + driver (Recommended)"
 # (DECISIONS_HISTORY.md "Ruled 2026-10-15 (14z-201) — #282 item C"): one table, read by the driver that runs it.
+# SHARES: none — its 6 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

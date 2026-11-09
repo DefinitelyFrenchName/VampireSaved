@@ -81,6 +81,7 @@
 #   move vs post-move build IDENTICAL under the V3 mask, DIFFERENT under V2
 #   (control), + unmasked first-div frame. Args: pre rompath, post rompath,
 #   replay names
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

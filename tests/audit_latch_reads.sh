@@ -65,6 +65,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [LEGS="..."] [FREEZE=1] [JOBS=N] tests/audit_latch_reads.sh
 #   emulator tier, MAME; ~3 min for the nine legs (two tap runs each).
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:f329dc8d) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

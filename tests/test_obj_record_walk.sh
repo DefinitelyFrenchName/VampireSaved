@@ -64,6 +64,7 @@
 #   see, so the gate proves the old blindness rather than asserting the new
 #   strictness. Synthetic fixture, no ROMs, no build dirs, ~1s; in
 #   tests/ci_portable.txt
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

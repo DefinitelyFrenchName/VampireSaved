@@ -87,6 +87,7 @@
 # Usage: ROMDIR=... tests/test_capture_kf_ownership.sh
 # Build dirs (code defaults, [VSP-165]): DON=build/don_m30 HUI=build/hui64
 #   PYR=build/pyron37 STOCK=build/m5_stock14 MERGED=build/m3b_merged22
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 cd "$REPO"

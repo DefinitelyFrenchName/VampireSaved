@@ -83,8 +83,8 @@
 #                                          each gate and the controls the run would execute for it run in a
 #                                          pool of N jobs (tests/lib/static_pool.py, tests/lib/static_job.sh;
 #                                          since #312 a gate's controls are jobs of their own, queued when the
-#                                          gate's job ends, beside one another when the gate is listed in
-#                                          tests/controls_concurrent.txt), then every result is
+#                                          gate's job ends; since #370 what runs beside what is each
+#                                          gate's `# SHARES:` line, tests/lib/share_pool.py), then every result is
 #                                          classified and printed in REGISTRY order exactly as a serial run
 #                                          does — the same readout, the same results.tsv; only the wall
 #                                          clock differs. `# ORDER: last` gates run alone, after the pool.
@@ -592,9 +592,10 @@ exec_controls() {  # exec_controls <gate> <tier-label>
 # THE POOL (14z-205, #299): with --jobs N > 1, every gate a tier will execute (not carried, executable) runs first in N
 # parallel jobs, its controls after it when the run's rule would execute them; run_tier then reads the results in
 # registry order. `# ORDER: last` gates run alone after the pool, as in a serial run. Since #312 (14z-207) the pool is
-# tests/lib/static_pool.py: a gate's controls are queued, at the front, when its job ends — each a job of its own when
-# the gate is listed in tests/controls_concurrent.txt (its controls share nothing they write), otherwise one job running
-# them in turn — so one gate's controls no longer hold one slot while the others idle.
+# tests/lib/static_pool.py: a gate's controls are queued, at the front, when its job ends, each a job of its own, so one
+# gate's controls no longer hold one slot while the others idle. Since #370 (14z-225) a job starts only when no running
+# job holds one of its gate's `# SHARES:` tokens (tests/lib/share_pool.py): `self` keeps a gate's own modes one after
+# another, a registry token keeps every gate holding it apart.
 pre_run() {  # pre_run <tier label> <names>
     case "$RUN_JOBS" in ''|*[!0-9]*) echo "bad --jobs '$RUN_JOBS'" >&2; exit 2 ;; esac
     [ "$RUN_JOBS" -gt 1 ] || return 0

@@ -29,6 +29,7 @@
 # MUST-FIRE: perturbed-copy: cleanup-first — a driver copy that removes a merged set's `.sha1` BEFORE its verify must read NO-EXPECTATION, and its selftest must FAIL (mode: that copy's selftest)
 #
 # Usage: tests/test_freeze_set_shape.sh      # ci_portable, ~3 s
+# SHARES: none — its 7 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

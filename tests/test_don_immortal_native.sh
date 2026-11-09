@@ -110,6 +110,7 @@
 #   The rompath's pack picks the track: a `vsavjw.zip` runs the WIDE leg
 #   (replay don/114 + the WIDE MAME binary), anything else the stock leg.
 # Runtime: ~4 min (42 MAME legs), emulator tier.
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:1ecdcc22) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

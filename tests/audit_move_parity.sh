@@ -138,6 +138,7 @@
 #   JOBS=6: the default 3-part set 25 s; ALL=1 (27 parts, 54 legs) 130 s. Both
 #   figures are wall clock, not MAME's emulated-time line — that line reads ~10x
 #   long and a gate runtime was once quoted from it (docs/project/gotchas.md).
+# SHARES: none — its 7 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:f329dc8d) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }

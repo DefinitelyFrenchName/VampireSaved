@@ -40,6 +40,7 @@
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged34] [ONLY=name] [JOBS=N] tests/test_inp_corpus.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 # Emulator tier (MAME, ~1 min per recording). NOT ci_static.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

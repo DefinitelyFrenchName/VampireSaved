@@ -23,6 +23,7 @@
 # SHEET: legs vs2,ours — moments: one per air-dash event, at the frame the leg enters the air dash (seq 0x14), or at the second R when it does not dash (the low event under vs2's row), on that leg's own field trace — not comparable: each game's stage and palette, and P2's art (each game's own copy; [VSP-168])
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [EXPECT=same|gap] [KEEP=<dir>] tests/audit_air_dash_height.sh
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

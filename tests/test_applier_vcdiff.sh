@@ -27,6 +27,7 @@
 # MUST-FIRE: perturbed-copy: flipped-patch-byte — one byte flipped in a copy of one patch must make the JS decoder produce a member that does NOT match the manifest (a wrong sha1, or a refusal); if it still matched, the comparison would not be reading the decoder's output at all (mode: the gate runs against that perturbed copy)
 #
 # Usage: ROMDIR=... tests/test_applier_vcdiff.sh [release/merged-m26/mame]   # ci_static
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

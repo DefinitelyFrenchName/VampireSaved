@@ -51,6 +51,7 @@
 #      rather than passes.
 #
 # Usage: tests/test_community_crosscheck.sh   # ci_static (~10 s; SKIPs without ../community/)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

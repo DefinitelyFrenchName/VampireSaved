@@ -37,6 +37,7 @@
 # cost more than every other close check together by 14z-198 (#268, build/agent199 measurement).
 #
 # Usage: tests/test_retraction_reach.sh
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

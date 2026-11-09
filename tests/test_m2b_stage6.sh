@@ -39,6 +39,7 @@
 # SHEET: none — the subject is a development-stage build of the M2a/tenant ladder, not a release set; its comparison with vsavj is outside #291's scope (census class S)
 #
 # Usage: ROMDIR=... [JOBS=N] tests/test_m2b_stage6.sh [outbase]
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

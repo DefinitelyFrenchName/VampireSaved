@@ -27,6 +27,7 @@
 # standard match replays.
 #
 # Usage: ROMDIR=... [JOBS=N] tests/test_m2b_scroll3.sh [rompath_dir]
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

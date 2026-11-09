@@ -44,6 +44,7 @@
 #   vs2's 80 entries) reconstructs from the two ROMs; any committed manifest
 #   row must match it byte-for-byte. Notes "not adopted" while the maintainer
 #   re-freeze decision is pending. 2 verdict controls. No emulator, ~2 s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -41,6 +41,7 @@
 # Usage: ROMDIR=... tests/audit_vanilla_specials_b.sh        # emulator tier (MAME, 2 at a time)
 #        FREEZE=1 re-freezes the map, the timing hash and the game clocks (reference legs + replay.lua); KEEP=dir keeps
 #        the traces and the timing table (KEEP/ticks.tsv — per-move values: keep it out of the tree).
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

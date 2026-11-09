@@ -64,6 +64,7 @@
 #   BASE sub-block byte-identical vsavj==vs2 (the legacy-safety premise of the
 #   wholesale port); the signed-16-bit bound (worst 0x3730); the
 #   15-block/0x11BD0 port inventory. 2 verdict controls. Static, ~5 s warm
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 ROMDIR="${ROMDIR:?set ROMDIR}"

@@ -25,6 +25,7 @@
 #
 # WHY: the 14z-194 analysis named the map as the only consumer; the census found the score ranking
 # reads the same arrays per entry, and a tenant player's score enters it (#124's 14z-195 comment).
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

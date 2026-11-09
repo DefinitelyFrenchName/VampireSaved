@@ -22,6 +22,7 @@
 # off macOS (#201). Ranges carry the same pins in ~40 bytes; this gate is the proof that they ARE the same pins.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/test_pokes_ranges.sh      # emulator tier, MAME, three runs (~1 min)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

@@ -63,6 +63,7 @@
 #   green; an unknown build REFUSES until a row is frozen; GRUNT_OURS_A2
 #   rehearses. Static half: test_kernel_voice_tables (ci_static). ~3 min, 2
 #   MAME runs
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

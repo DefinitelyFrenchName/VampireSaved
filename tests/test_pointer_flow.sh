@@ -26,6 +26,7 @@
 #
 # ROM-free in the rule-7 sense (reads build outputs only); needs the
 # build dirs on disk, SKIPs per absent build.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

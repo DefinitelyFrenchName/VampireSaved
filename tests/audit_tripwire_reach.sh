@@ -72,6 +72,7 @@
 #   pyron/donovan legs clean. Resolves the faulting PC to its fragment line so
 #   the report NAMES the target. FAILS on any fire (rule 6) — never counts
 #   them down. Honest limit in the header: a PASS is RIG-BOUNDED
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

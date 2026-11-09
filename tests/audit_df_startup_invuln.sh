@@ -89,6 +89,7 @@
 #        tests/audit_df_startup_invuln.sh
 #        (~3 min at MAME's headless speed: 22 trace legs + 4 contact legs, JOBS
 #        at a time; REUSE=1 re-runs only the checkers on a KEEP_DIR's traces)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

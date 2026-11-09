@@ -32,6 +32,7 @@
 # passing — otherwise it is a real relocation bug (see docs/project/patch_notes.md).
 #
 # Usage: ROMDIR=... [JOBS=N] tests/test_m2a_stage3_anim.sh
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

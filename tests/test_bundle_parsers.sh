@@ -43,6 +43,7 @@
 # 2 is that refusal, run.
 #
 # Usage: tests/test_bundle_parsers.sh
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

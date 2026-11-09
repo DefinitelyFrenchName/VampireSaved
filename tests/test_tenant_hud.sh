@@ -45,6 +45,7 @@
 #   variant-id HUD (14z-63): the tenant's own in-match mugshot/name via row
 #   0x13 of the 32-row-aliased HUD tables + free-pool art; host cells
 #   pristine; staged codes measured in-match. Self-builds at 0x13 unless given
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

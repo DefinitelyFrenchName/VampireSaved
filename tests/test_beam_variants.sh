@@ -54,6 +54,7 @@
 #   silent downgrade, like DF, so it asserts the ES is richer than P), and
 #   multi-tile sprites must be expanded w*h at base+row*0x10+col
 #   (obj_records_dump reports the BASE code only). Native leg only, ~1 min
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

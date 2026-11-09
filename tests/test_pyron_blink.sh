@@ -92,6 +92,7 @@
 #   (reproduces the pre-fix shape on pyron15). Checker
 #   tools/check_pyron_blink.py. Defaults build/pyron30 (14z-103; roll at each
 #   freeze)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

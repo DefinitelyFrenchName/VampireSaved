@@ -34,6 +34,7 @@
 #   audit surface. Law now in tools/qs_window.py, bounds CHECKED not clamped.
 #   14 cases incl. a terminal-byte corruption control and a control
 #   REPRODUCING the old blindness. ROM-free, ~1s; ci_portable
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

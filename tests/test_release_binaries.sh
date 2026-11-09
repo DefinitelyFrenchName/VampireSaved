@@ -90,6 +90,7 @@
 #        tests/test_release_binaries.sh
 #   defaults build/m3b_merged34 (M26, the current freeze). SKIPs when no resource
 #   dir exists for this host's os-arch (tools/build_release_emulators.sh builds one).
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:3d90dfaa) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"

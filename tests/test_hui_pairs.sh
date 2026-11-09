@@ -30,6 +30,7 @@
 #   Reflect Wall GC + Dark Force gate (14z-66): both native-matched signatures
 #   (GC seq 0x0E + blowback; DF 0x0A at both activations). Self-builds stage 4
 #   unless given a build
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

@@ -61,6 +61,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, 14z-94) the windowed MNG recorder (2.4 MB/120 frames vs
 #   `-aviwrite`'s 5.7 GB/2 min). **Not portable.**
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

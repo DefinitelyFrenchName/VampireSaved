@@ -27,6 +27,7 @@
 #   left the gate green" in WORDS and exit 1 (56 controls read HONOURED with nothing tested), and a stalled MAME leg
 #   under either mode failed the alignment check and read as the control firing. Ruled 2026-10-31 (maintainer, "Groups
 #   1-4, then re-census 5-7"): each group proven by a planted case that must read UNJUDGED, LIES or DIED.
+# SHARES: none — its 5 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:17f4f67f) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

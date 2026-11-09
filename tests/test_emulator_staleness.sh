@@ -60,12 +60,14 @@
 # after it last ran". This gate would have read "3 gates stale since 14z-171" at that
 # close. Q5: the release run's own contention roughly halved a 300 s control's headroom;
 # 0.5 is where a measured number stops being a safe cap.
+# SHARES: self git-modules-index
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 TOOL=tools/audit_emulator_staleness.py
 CAD="${VS_CADENCE:-session}"
-W="$(mktemp -d "${TMPDIR:-/tmp}/estale.XXXXXX")" || { echo "FAIL: test_emulator_staleness — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+W="$(mktemp -d "${TMPDIR:-/tmp}/estale.XXXXXX")" || { echo "FAIL: test_emulator_staleness — mktemp -d failed (W)"; exit 2; }; trap 'vs_shares_release; rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+. "$REPO/tests/lib/shares.sh"; vs_shares_claim test_emulator_staleness git-modules-index   # SHARES-CLAIM (#370, 14z-225): the host claim on what its # SHARES: line names
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 
 # THE SCRATCH REPOSITORY: two gates in the registry, one declaring, one not; a run that

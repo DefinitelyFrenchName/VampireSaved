@@ -56,6 +56,7 @@
 # serial lines — the readout cannot depend on the job count. Until 14z-209 each run ran in turn: 3,746 s in the
 # 14z-208b freeze on ERIS; the same replays split by hand 4 and 12 at a time took 730 and 522 s, every section's lines
 # equal to the single run's (fork A, build/agent209/t321/wide_split_vs_freeze.txt).
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

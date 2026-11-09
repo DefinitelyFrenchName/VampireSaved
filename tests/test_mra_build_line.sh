@@ -43,6 +43,7 @@
 #  4. idempotent: rewriting the same header again changes no byte.
 #
 # Usage: ROMDIR=... [MRA_LINE_BUILD=build/m3b_merged34] tests/test_mra_build_line.sh
+# SHARES: jtsim-scratch
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -52,7 +53,8 @@ BUILD="${MRA_LINE_BUILD:-build/m3b_merged34}"
 [ -f "emu/jtcores/.gitmodules" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/mra_build_line.XXXXXX")"
-trap 'rm -rf "$WORK"' EXIT
+trap 'vs_shares_release; rm -rf "$WORK"' EXIT
+. "$REPO/tests/lib/shares.sh"; vs_shares_claim test_mra_build_line jtsim-scratch   # SHARES-CLAIM (#370, 14z-225): the host claim on what its # SHARES: line names
 fail=0
 WIDE_MRA="Vampire Saved - CPS-2 WIDE (Japan 970519).mra"
 STOCK_MRA="Vampire Savior The Lord of Vampire (Japan 970519).mra"

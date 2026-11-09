@@ -17,6 +17,7 @@
 # MUST-FIRE: perturbed-copy: dropped-range — a copy of the record with one RANGE line removed must differ from the fresh render, and the gate must FAIL (mode: the gate compares that copy)
 #
 # Usage: tests/test_freeze_bytediff.sh      # ci_static (needs the build dirs and the freeze tags), ~85 s
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

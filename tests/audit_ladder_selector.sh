@@ -58,6 +58,7 @@
 #   SECTION 3 proves the mask is LOAD-BEARING (poking it moves the stage) —
 #   without that, 1 and 2 would be measuring a dead input and every
 #   reassurance would be vacuous. LADDER_FRAMES/LADDER_BUILD override
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

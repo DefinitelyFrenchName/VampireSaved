@@ -41,6 +41,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   Huitzil velocity-port gate (14z-66): param32 rows 0x10 static + measured
 #   walk-speed deltas (16.16-exact). Self-builds stage 4 unless given a build
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

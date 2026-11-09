@@ -58,6 +58,7 @@
 #   trampoline, a table word, a danger body — each must be CAUGHT) + a build-
 #   level negative control (FAILS on a pre-thunk build, naming why). Static,
 #   no emulator, ~40s. Defaults build/hui30
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

@@ -34,6 +34,7 @@
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged34] [JOBS=4] tests/audit_don_speed_lines.sh
 #   emulator tier, MAME; 8 runs
+# SHARES: self
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

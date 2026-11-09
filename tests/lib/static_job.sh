@@ -11,12 +11,12 @@
 # any control this job did not.
 #
 # MODES (#312): `gate` runs the gate and writes the controls the rule would execute to $W/pre/<gate>.ctlq — one name a
-# line, after a first line `concurrent` (the gate is listed in tests/controls_concurrent.txt: each control may run as its
-# own pool job, beside its siblings) or `serial` (they run one after another in one job, as before #312); no file when the
-# rule executes none. `control <name>` runs one control; `controls` runs every name of the .ctlq in order. With no mode
-# (an `# ORDER: last` gate, run alone after the pool) the gate and then its controls run in one job, as before.
+# line, after a first line `controls`; no file when the rule executes none. The pool runs each as a job of its own, and
+# the gate's `# SHARES:` line decides what may run beside it (#370, 14z-225: `self` keeps a gate's own modes one after
+# another, as the one `controls` job of #312 did). `control <name>` runs one control. With no mode (an `# ORDER: last`
+# gate, run alone after the pool) the gate and then its controls run in one job, as before.
 #
-# usage: tests/lib/static_job.sh <gate> <work dir> <exec-controls all|portable|none> <tier label> [gate|control <name>|controls]
+# usage: tests/lib/static_job.sh <gate> <work dir> <exec-controls all|portable|none> <tier label> [gate|control <name>]
 set -u
 g="$1"; W="$2"; X="$3"; L="$4"; MODE="${5:-full}"; CN="${6:-}"
 REPO="$(pwd)"; export REPO
@@ -30,7 +30,6 @@ run_control() {  # run_control <name>
 }
 case "$MODE" in
 control) run_control "$CN"; exit 0 ;;
-controls) sed 1d "$W/pre/$g.ctlq" | while read -r _n; do run_control "$_n"; done; exit 0 ;;
 gate|full) ;;
 *) echo "static_job.sh: bad mode '$MODE'" >&2; exit 2 ;;
 esac
@@ -46,8 +45,8 @@ if [ -f "$W/plan.tsv" ]; then
     _cc="$(awk -F'\t' -v g="$g" '$1 == "RERUN" && $2 == g && $4 == "carry-controls" {print $5}' "$W/plan.tsv")"
     [ -n "$_cc" ] && [ "$_cc" = "$VS_CTL_DECLARED" ] && exit 0   # JOB-CARRY-CONTROLS
 fi
-if [ "$MODE" = gate ]; then   # JOB-QUEUE-CONTROLS: the pool runs them, each as its own job when the gate allows it
-    { awk -F'\t' -v g="$g" '!/^#/ && $1 == g {f = 1} END {exit !f}' tests/controls_concurrent.txt 2>/dev/null && echo concurrent || echo serial
+if [ "$MODE" = gate ]; then   # JOB-QUEUE-CONTROLS: the pool runs each as a job of its own, kept apart by the gate's # SHARES: (#370)
+    { echo "controls"
       for _n in $(vs_ctl_declared "tests/$g.sh"); do echo "$_n"; done; } > "$W/pre/$g.ctlq.tmp"
     mv "$W/pre/$g.ctlq.tmp" "$W/pre/$g.ctlq"
     exit 0

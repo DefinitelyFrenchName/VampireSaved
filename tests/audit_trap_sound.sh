@@ -48,6 +48,7 @@
 #   14z-82d "detonation id" attribution is RETRACTED). Still locks the (b')
 #   crash fix (a crashing trap dies before ANY ring activity). The PARITY
 #   question is CLOSED by measurement — see audit_trap_parity
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

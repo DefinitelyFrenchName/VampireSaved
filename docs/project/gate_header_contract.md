@@ -3,7 +3,7 @@
 > **STATUS: REFERENCE (opened 14z-180, GitHub #171).** The declarations a gate script
 > carries in its LEADING COMMENT BLOCK beside the must-fire lines, each with one reader
 > and one census. Today: the DESCRIPTION (`# WHAT:` / `# HOW:` / `# EXPECTS:`, slice Q0,
-> ruled and live), `# FOLLOWS:` (slice Q3, live), `# MEASURES:` (slice Q2, live) and `# SHEET:` (#291, live 14z-204). The must-fire contract has its own document
+> ruled and live), `# FOLLOWS:` (slice Q3, live), `# MEASURES:` (slice Q2, live), `# SHEET:` (#291, live 14z-204) and `# SHARES:` (#370, live 14z-225). The must-fire contract has its own document
 > (`must_fire_contract.md`, a copy of BBX's grammar) and is not restated here.
 
 ## Why the header
@@ -240,4 +240,41 @@ Ground truth: `tests/test_proof_sheets.sh` sections 6-9 (controls `fighters-blin
 `build/agent205/s2/check_gate.sh`, local): the gate run plainly and with `SHEET_OUT`, the two outputs identical once the
 volatile lines are normalised (temporary paths, the shell's segfault notice, a timestamped directory), and every
 picture PROVEN; a picture refused is reported, never re-emitted until it proves.
+
+## `# SHARES:` — what a gate's jobs share (#370, live 14z-225)
+
+**The ruling (2026-11-08, 14z-224, `DECISIONS_HISTORY.md`):** *"A1: today, written down (Recommended)"*, *"B1: every gate
+has the line (Recommended)"*, *"C1: yes, host-wide lock (Recommended)"*.
+
+**The grammar**, exactly one line in the leading comment block of every registered gate:
+
+```
+# SHARES: <token> [<token> …]
+# SHARES: none — <why nothing is shared>
+```
+
+A token is `[a-z0-9-]+`. `self` means the gate's own jobs (its plain run and each control mode) never overlap one
+another — the conservative value, exactly what a gate's controls did before #312 let listed gates run them side by side.
+Any other token is a row of `tests/shares.tsv`, a registry of RESOURCES (four at landing: `git-modules-index`,
+`jtsim-scratch`, `release-assets`, `desktop-session`), each with its claim wait and the call a holding gate makes.
+
+**The readers.** `tests/lib/share_pool.py` (`read`, `tokens`, `census`; `get <script>` on the command line) is the one
+Python reader: the static pool imports it, the emulator runner calls `get`. `tests/lib/shares.sh` `vs_shares` is the shell
+reader beside the host claim (`vs_shares_claim` / `vs_shares_release`).
+
+**What it does.** The static pool starts a job only when no running job holds one of its tokens (`self` becomes
+`self:<gate>`), so a `self` gate's modes run one after another and two holders of one resource never overlap; the
+emulator runner runs a gate's controls beside one another only when its line is `none`. A gate holding a registry token
+also claims it on the host, so a hand run or a second tier on the same host waits for it, then is REFUSED (exit 3): an OS
+file lock (`fcntl.flock`) held by `tests/lib/share_lock.py` for exactly the claiming shell's lifetime, so a holder that
+crashes or is killed frees its token.
+
+**The census:** `tests/test_shares.sh` (ci_portable) — every registered gate has one well-formed line, every token is
+`self` or registered, every registry row is held, a holding gate makes its row's claim call on a code line; plus the pool
+and the claim on stubs, seven controls.
+
+**Writing one.** `none` is a claim that nothing this gate writes is read or written by another job: say why. A gate whose
+modes write one fixed path is `self`; a gate that writes a resource another gate also touches names (or adds) its token
+and claims it. Under A1 the landing kept every gate's behaviour: `none` only for a gate whose control modes a write trace
+had cleared (its row on the retired lists, its traced blob current), `self` for every other gate with two or more controls.
 

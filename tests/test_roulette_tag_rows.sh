@@ -23,6 +23,7 @@
 # The fix's scope is recorded in docs/game/engine_internals.md beside test_ladder_tenant_vs_palette.
 #
 # Usage: ROMDIR=... tests/test_roulette_tag_rows.sh
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

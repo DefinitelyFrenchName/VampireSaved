@@ -17,6 +17,7 @@
 # cap on bytes as well so long lines cannot meet it, and "50kB sounds like a good targer" (DECISIONS_HISTORY.md
 # "Ruled 2026-10-14 (14z-201) — #282's scope" and "Ruled 2026-10-15 (14z-201) — #282 item F"). A document over the
 # budget sheds detail to a subject doc or an archive; the archives themselves are indexed, not budgeted.
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

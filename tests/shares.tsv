@@ -1,0 +1,18 @@
+# tests/shares.tsv — THE SHARED RESOURCES a gate may name in its `# SHARES:` line (#370, 14z-225; maintainer-ruled
+# 2026-11-08: "A1: today, written down (Recommended)", "B1: every gate has the line (Recommended)", "C1: yes, host-wide
+# lock (Recommended)"). A registry of RESOURCES, not of gates: which gates hold a token is read from the gates.
+# Every registered gate carries exactly one header line (docs/project/gate_header_contract.md § `# SHARES:`):
+#   # SHARES: <token> [<token> …]          this gate's jobs hold these; `self` = its own jobs never overlap each other
+#   # SHARES: none — <why nothing is shared>
+# Both runners never run two jobs holding one token at once (tests/lib/share_pool.py); a gate holding a token of this
+# registry also claims it on the HOST (tests/lib/shares.sh vs_shares_claim: an OS file lock per token held by
+# tests/lib/share_lock.py for the claiming shell's lifetime, re-entrant for a
+# run nested under its holder), so a hand run or a second tier on the same host is kept apart too.
+# Held by tests/test_shares.sh: every token here is held by at least one gate, every token a gate names is here or
+# `self`, and a gate holding one of these makes its claim call (the third column).
+# token<TAB>wait seconds (how long a claim waits for a live holder before REFUSED, exit 3)<TAB>the call a holding gate makes (the census looks
+# for it on a code line, with the token when the call is vs_shares_claim)<TAB>what it protects and how a gate holds it
+git-modules-index	900	vs_shares_claim	the submodules' git index locks, .git/modules/emu/*/index.lock: a `git -C emu/<x> status`/`diff` run takes one, and a second run beside it fails on the lock (test_close_tools, test_emulator_staleness; the 14z-222 trace's SHARED rows)
+jtsim-scratch	900	vs_shares_claim	the jtsim scratch clone tools/mister_mra.sh builds in, /tmp/vampire-saved-jtsim by default: its MRA tool writes into the clone (test_mister_mra_map, test_mra_build_line, through tools/mister_mra.sh; the lock it took since #299, 14z-205c, is this token's claim)
+release-assets	900	vs_shares_claim	build/scratch/release_assets/<release>/, the unpacked release package a release gate reads and rewrites (test_release_asset_shape, audit_release_linux_desktop, audit_release_linux_cleanhost)
+desktop-session	0	vs_desktop_claim	the Linux desktop session: its null sink, PipeWire graph, X display and keyboard focus, invisible to a write trace (audit_release_linux_desktop, audit_dead_leg_linux; tests/lib/desktop_session.sh claims it, and refuses at once, as it did since 14z-223)

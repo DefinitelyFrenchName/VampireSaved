@@ -139,6 +139,7 @@
 #   (frame 4267, 3 bytes in the P1 effect-channel record pointer) with the
 #   SAME writer PC on both legs — data, not control flow. NOT in any runner
 #   (#30): that is how it stayed red 11 days
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

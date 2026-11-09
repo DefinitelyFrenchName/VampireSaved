@@ -42,6 +42,7 @@
 # Usage: ROMDIR=... [MAME_BIN=...] tests/test_replay_video_selfcheck.sh [rompath]
 #   rompath: check 4's build with the known medallion difference; default build/donovan6/rompath (the registry
 #   passes %STOCK_RP%, the stock twin, built by the same recipe — 14z-209, #306)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

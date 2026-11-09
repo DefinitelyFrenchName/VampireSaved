@@ -39,6 +39,7 @@
 #   4. Crash guard (-debug) clean on the pick replay.
 #
 # Usage: ROMDIR=... [JOBS=N] tests/test_m2a_stage1_nullreloc.sh
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

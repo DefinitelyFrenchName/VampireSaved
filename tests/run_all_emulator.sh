@@ -126,9 +126,9 @@
 #                                                        (`CONTROL=<name> tests/<g>.sh` after a PASS;
 #                                                        one results row per control; off by default —
 #                                                        it re-runs each gate once per control). In a pooled fbneo/mame
-#                                                        lane a gate listed in tests/controls_concurrent_emu.txt runs its
-#                                                        controls as pool jobs of their own, beside one another (#321,
-#                                                        14z-210); an unlisted gate runs them one after another in its slot
+#                                                        lane a gate whose `# SHARES:` line is `none` runs its controls as
+#                                                        pool jobs of their own, beside one another (#321, 14z-210; #370,
+#                                                        14z-225); any other gate runs them one after another in its slot
 #   ... --order RESULTS.tsv                              LONGEST FIRST (#321, ruled 2026-10-26 "Yes, longest first"): a
 #                                                        pooled lane starts its gates in the order of their seconds in that
 #                                                        earlier run's results.tsv, a gate's control rows counted with it;
@@ -652,14 +652,13 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
     fi
     # THE EXECUTABLE CONTROLS (--controls): one more run per declared name.
     if [ "$CONTROLS" = 1 ] && [ "$_v" = PASS ] && [ "${VS_CTL_DECLARED:-0}" != 0 ]; then
-        # CONCURRENT CONTROLS (#321, 14z-210): in a pooled fbneo/mame lane, a gate listed in
-        # tests/controls_concurrent_emu.txt (a PILOT write trace showed no control writes a path a sibling writes or
-        # reads) gives its own slot back and runs each control in a slot of its own, beside one another and beside the
+        # CONCURRENT CONTROLS (#321, 14z-210): in a pooled fbneo/mame lane, a gate whose `# SHARES:` line is `none`
+        # (#370, 14z-225: it holds no token, `self` included; tests/lib/share_pool.py reads the line) gives its own slot back and runs each control in a slot of its own, beside one another and beside the
         # pool's other gates. The release run of 14z-208b on ERIS spent 53,104 of its 60,228 s in control rows, and a
         # gate's controls held its one slot end to end (audit_hitclass_map_cost: about 7,600 s in one slot). A worker
         # holds no token while it waits for its controls, so the pool cannot deadlock on them.
         if [ -n "$SLOTFIFO" ] && [ "$_lane" != mister ] && [ "$_lane" != prereq ] \
-                && awk -F'\t' -v g="$_g" '!/^#/ && $1 == g {f = 1} END {exit !f}' tests/controls_concurrent_emu.txt 2>/dev/null; then   # CONCURRENT-CONTROLS
+                && [ "$(python3 tests/lib/share_pool.py get "tests/$_g.sh" 2>/dev/null)" = none ]; then   # CONCURRENT-CONTROLS
             printf '%s\n' "${_slot:-0}" >&8; _slot_given=1
             for _cn in $(vs_ctl_declared "tests/$_g.sh"); do
                 read -r _cslot <&8                 # BLOCKS until a slot frees

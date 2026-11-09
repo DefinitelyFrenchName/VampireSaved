@@ -43,6 +43,7 @@
 #   THE vsav2-as-oracle battery (14z-66): the m2a template's 4 locks on H's
 #   full moveset (anchors/neutral-exact/HP-trajectory/ comparative bound); RNG
 #   determinized on both legs. ~10 min, 8 MAME runs
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

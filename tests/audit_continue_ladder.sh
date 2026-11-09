@@ -78,6 +78,7 @@
 #   continuing". Leg A red would mean the behavior was OURS — reopen 102. NO
 #   kill pokes by design (audit_kill_poke_shape). Venue VALUES are lottery
 #   draws; the RESET SHAPE is the assertion. ~20 min, 2 parallel marathons.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -40,6 +40,7 @@
 #   does not), 29 NOT JUDGED, 3 risky. The unjudged count is part of the
 #   verdict. Positive control: it must re-derive the Cosmo table at 80 vs 84.
 #   tools/audit_index_space.py. Static, seconds
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

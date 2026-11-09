@@ -48,6 +48,7 @@
 #   no native signature missing, nothing ours plays foreign to vs2's library,
 #   counts bounded. Verdict control (corrupted packed sample -> foreign).
 #   tools/check_qs_voice_batch.py. Self-builds or verifies a build's zip
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 ROMDIR="${ROMDIR:?set ROMDIR}"

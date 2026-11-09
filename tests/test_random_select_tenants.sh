@@ -64,6 +64,7 @@
 #   $382 sampled 91 frames = exactly 15 + tenants; confirm on a tenant's
 #   MIDDLE frame loads that tenant's own record; must-fire control = the
 #   previous merged (CONTROL=, no tenant drawn).
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

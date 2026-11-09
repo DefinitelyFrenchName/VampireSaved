@@ -24,6 +24,7 @@
 # MUST-FIRE: shadow-tool: start-here-ignored — a copy that finds a carried item anywhere in NEXT_SESSION must accept one outside START HERE, and the selftest must FAIL (mode: that copy's selftest)
 #
 # Usage: tests/test_promise_check.sh      # ci_portable, ~3 s
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

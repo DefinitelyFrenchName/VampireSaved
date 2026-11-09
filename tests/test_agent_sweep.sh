@@ -45,6 +45,7 @@
 # MUST-FIRE: perturbed-copy: blind-leaders — a copy that treats no child of Claude as a tool shell must miss the ATTACHED plant, and the gate must FAIL (mode: the gate runs against that copy)
 #
 # Usage: tests/test_agent_sweep.sh      # ci_portable, ~10 s (macOS: ps + lsof; Linux: /proc)
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

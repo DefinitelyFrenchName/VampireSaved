@@ -23,6 +23,7 @@
 # SHEET-BUILD: CTL_BUILD freeze/merged-m22 MERGED — the control leg (must-fire pre-swap-build) runs the build BEFORE #223's swap, which a clean checkout of the commit cannot make (#291 S4-A, the maintainer's Q5)
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [CTL_BUILD=build/m3b_merged30] [KEEP=<dir>] tests/audit_landing_sound.sh
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

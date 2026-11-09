@@ -71,6 +71,7 @@
 #   `181 67e 000 000 010`, and the `05_timeout_idle` sha1 `eb3e1d04…` did NOT
 #   move and cannot — that replay scripts no direction token, which is also
 #   why the sim anchor could not move
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; T="$(mktemp -d)" || { echo "FAIL: test_rpl2siminputs — mktemp -d failed (T)"; exit 2; }; fail=0
 ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }

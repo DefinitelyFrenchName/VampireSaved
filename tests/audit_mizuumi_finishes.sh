@@ -55,6 +55,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [KEEP=<dir>] tests/audit_mizuumi_finishes.sh
 #   emulator tier, MAME; ~2.5 min (41 legs, three at a time); scope ondemand (the pristine-only ruling)
+# SHARES: self
 set -u
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

@@ -18,7 +18,7 @@
 # EXPECTS: C0 every listed soname present; per emulator: apply OK, ldd 0 not found (binary and every bundled .so),
 #   the run's exit as above, C1 0 unlisted, C2 0 unresolved, and at least one process that asked the host for a
 #   library (the emulator itself ran); each control fails.
-# FOLLOWS: tests/expected/linux_host_provided.tsv tools/cleanhost_libs.py tools/upload_release_assets.sh
+# FOLLOWS: tests/expected/linux_host_provided.tsv tools/cleanhost_libs.py tools/upload_release_assets.sh tests/lib/shares.sh tests/lib/share_lock.py tests/shares.tsv
 #   tools/package_release_platforms.py tools/build_release_emulators.sh tests/lib/controls.sh
 #   emu/fbneo/ emu/fbneo-patches/ tools/setup_fbneo.sh emu/mame-patches/ tools/setup_mame.sh build/manifest/
 #
@@ -38,6 +38,7 @@
 # version mark, the window, the sound (the desktop gate's).
 #
 # Usage: ROMDIR=... tests/audit_release_linux_cleanhost.sh   [RELEASE=merged-mNN] [ASSETS=<dir>] [IMAGE=...]
+# SHARES: self release-assets
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
@@ -59,7 +60,8 @@ PKGS="libc6 libgcc-s1 libstdc++6 libatomic1 libnsl2 zlib1g libexpat1 libglib2.0-
  libxext6 libxrender1 libxcursor1 libxfixes3 libxi6 libxrandr2 libxss1 libwayland-client0 libwayland-cursor0
  libwayland-egl1 libdrm2 libgbm1 libasound2t64 libpulse0 libudev1 python3 xvfb"
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+W="$(mktemp -d)"; trap 'vs_shares_release; rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+. "$REPO/tests/lib/shares.sh"; vs_shares_claim audit_release_linux_cleanhost release-assets   # SHARES-CLAIM (#370, 14z-225): the host claim on what its # SHARES: line names
 # a control mode writes privately (#321, 14z-210); the plain run keeps build/cleanhost_release, its registered output
 OUT="$REPO/build/cleanhost_release"; [ -n "${CONTROL:-}" ] && OUT="$W/out"
 rm -rf "$OUT"; mkdir -p "$OUT"

@@ -75,6 +75,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   B5 PREREQUISITE: the pinned MAME source build reproduces every frozen
 #   oracle log bit-for-bit (refuses to run on a WIDE-patched binary)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"

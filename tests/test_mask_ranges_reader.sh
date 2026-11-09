@@ -36,6 +36,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #61) The mask reader masks exactly the spec and refuses
 #   nonsense. **Not portable** — needs ROMDIR + a WIDE build.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

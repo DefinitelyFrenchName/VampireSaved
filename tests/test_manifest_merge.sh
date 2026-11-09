@@ -37,6 +37,7 @@
 #   new_hex_variant, and a merged build is a WIDE build by construction). A
 #   span collision is invisible to row dedup AND to patch_prg.py's overlap
 #   assertion, hence its own check. 4 permissiveness controls. No ROMs, ~1s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

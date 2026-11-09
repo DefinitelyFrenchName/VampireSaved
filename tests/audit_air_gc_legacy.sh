@@ -57,6 +57,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [CHARS="leilei zabel phobos"] [FREEZE=1] [KEEP=<dir>] tests/audit_air_gc_legacy.sh
 #   emulator tier, MAME; ~7 s (7 legs in parallel)
+# SHARES: none — its 5 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:1ecdcc22) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

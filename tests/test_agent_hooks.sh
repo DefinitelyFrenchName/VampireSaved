@@ -55,6 +55,7 @@
 # drives it through 27 cases (25 until 14z-178 added the pinned rule-checker's two), every rule both ways and fail-open, against the installed hook.
 #
 # Usage: tests/test_agent_hooks.sh      # ci_portable, ~4 s
+# SHARES: none — its 10 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

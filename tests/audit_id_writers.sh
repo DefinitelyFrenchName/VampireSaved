@@ -62,6 +62,7 @@
 #   both player structs. Fails if any legacy gameplay path writes an id in
 #   0x10-0x1F — the invariant that would make a tenant on a variant id
 #   superset-safe by construction
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

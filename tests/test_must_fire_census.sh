@@ -54,6 +54,7 @@
 # requires the gate's own FAIL. This gate only makes the doctrine countable.
 #
 # Usage: tests/test_must_fire_census.sh   [FREEZE=1 to re-freeze]   # ci_portable
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"

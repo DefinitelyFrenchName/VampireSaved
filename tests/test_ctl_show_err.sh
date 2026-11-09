@@ -31,6 +31,7 @@
 #   HONOURED — and seven in-gate twins read the copy's silence as the control firing. Ruled 2026-10-31 (maintainer):
 #   "a helper in tests/lib/controls.sh plus ~21 group-5 gates ... Each is proven by a planted case that must read DIED or
 #   UNJUDGED".
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:17f4f67f) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

@@ -52,6 +52,7 @@
 #   regenerating the patches, not before a build — a hard gate ahead of an
 #   untested change is rule 2 backwards. + _control.sh (5 cases) No ROMs, no
 #   emulator, ~5s / ~20s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

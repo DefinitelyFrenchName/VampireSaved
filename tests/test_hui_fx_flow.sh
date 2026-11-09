@@ -52,6 +52,7 @@
 #   pre/post-port from the build's own patch notes. Rig: replay 83b (2P dummy,
 #   3 spaced 236LP, FBNeo taps). Ground-truthed on hui9 + a bad-thunk negative
 #   control. Self-builds stage 6 unless given
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

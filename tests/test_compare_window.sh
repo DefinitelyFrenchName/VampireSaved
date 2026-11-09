@@ -26,6 +26,7 @@
 #   ground truth for the §4 v3 "bounded re-convergent window" class: accepts
 #   the select-screen shape; rejects flicker, a drifting onset, a run that
 #   never re-converges, and a silently-identical pair. No emulator needed
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

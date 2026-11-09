@@ -114,6 +114,7 @@
 # Runtime: ~1.5 min (90 s measured 14z-158 with section C's 16 legs; 49 s before them, measured solo at the 14z-156 close check: ten MAME legs at ~25x speed plus
 # the section B searches; MAME's "Average speed ... (48 seconds)" is EMULATED time, and a
 # runtime once read from it came out ~10x too long), emulator tier.
+# SHARES: self
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

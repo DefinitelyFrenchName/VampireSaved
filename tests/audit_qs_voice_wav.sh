@@ -41,6 +41,7 @@
 #   truncation the register/content gates were BLIND to (signed DSP pointer
 #   compare — equal data, different behavior). Synthetic-truncation verdict
 #   control. Keep BOTH gates
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 ROMDIR="${ROMDIR:?set ROMDIR}"; export ROMDIR

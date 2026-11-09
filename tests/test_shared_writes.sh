@@ -54,6 +54,7 @@
 #   pass means the set is UNCHANGED SINCE REVIEWED, not that the writes are
 #   safe; an entry frozen without checking stays wrong and green. tools/
 #   audit_shared_writes.py. Static, seconds
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

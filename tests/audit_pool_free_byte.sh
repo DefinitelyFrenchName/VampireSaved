@@ -67,6 +67,7 @@
 #   slots carry the stamper's tag and +0x7F writers are exactly the emitted
 #   thunks. Also caught: hole_b's WORD write at b8+0x7E covers +0x7F — the
 #   14z-84 zero-writes there was a word- offset accounting artifact. ~20 min
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

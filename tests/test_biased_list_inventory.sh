@@ -50,6 +50,7 @@
 # Usage: ROMDIR unused; needs the three extract-consuming build dirs'
 #        placements + the vs2 data view (regenerated if absent).
 #        BUILD_D/BUILD_H/BUILD_P override the defaults.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -32,6 +32,7 @@
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged34] [JOBS=6] tests/audit_don_row0b.sh
 #   emulator tier, MAME; 51 runs (17 rigs x 3 legs), ~10 min on the MacBook at JOBS=6
+# SHARES: self
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

@@ -66,6 +66,7 @@
 # Usage: ROMDIR=... [MAME_BIN=<reference binary, default ~/.cache/vampire-saved/mame-ref/cps2>] [JOBS=N] tests/audit_ff8130_writers.sh
 # Runtime: ~1 min (three MAME legs of 4 s, 7 s and 35 s measured 14z-157, plus the
 # first-MB decode), emulator tier.
+# SHARES: self
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"

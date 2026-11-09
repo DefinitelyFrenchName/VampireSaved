@@ -33,6 +33,7 @@
 #   PRISTINE bytes of a member the build patched (both emulators resolve a ROM
 #   entry by hash before name, so such a member silently reverts the patch —
 #   14z-60z). 4 synthetic sets, no emulator, ~1s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

@@ -56,6 +56,7 @@
 #   blank; per-CONTENT across every detonation frame — phase-free). Closes the
 #   14z-70e 'most likely fixed' guess. Replay 83d, merged build vs native, ~1
 #   min.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

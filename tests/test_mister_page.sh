@@ -86,6 +86,7 @@
 #   recounts the group-C ceilings from the romset. The rendered page is NEVER
 #   committed (`.gitignore`); the generator is. Written as the living-
 #   documentation pilot (14z-107 (10))
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

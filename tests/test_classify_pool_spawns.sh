@@ -39,6 +39,7 @@
 #   the real captures carry the SAME value in both lanes (data 00004040), so a
 #   low-lane reader is right by coincidence. Every lane case uses UNEQUAL
 #   lanes. Caught the tool's first version. No ROMs, ~1s; in ci_portable
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

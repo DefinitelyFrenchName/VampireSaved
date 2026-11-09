@@ -36,6 +36,7 @@
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] tests/audit_ranking_tenant.sh [--freeze-clock]
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"

@@ -93,6 +93,7 @@
 #   native leg, our leg, 3 verdict controls). BEAM_WALK_EXPECT=walks (default
 #   since 14z-71) | absent reproduces the pre-fix state. Defaults to the
 #   current huitzil solo (build/hui51, re-pointed each freeze). ~2 min
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

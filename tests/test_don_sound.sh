@@ -52,6 +52,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   sound-ring gate: NO vsavj music-range id may be enqueued + frozen per-
 #   replay id inventories (sound is invisible to every other gate)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

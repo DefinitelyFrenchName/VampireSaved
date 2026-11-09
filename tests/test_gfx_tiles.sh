@@ -20,6 +20,7 @@
 #      repack fact that makes naive index-preserving porting impossible.
 #   3. The naive-slicing trap stays documented: contiguous 32-byte
 #      slicing must NOT reproduce lock 2 (cross-set match collapses).
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

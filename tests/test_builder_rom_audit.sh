@@ -23,6 +23,7 @@
 #      A gate that fires after the zip is packed still leaves a bad artifact on
 #      disk for someone to pick up;
 #   3. the check is not vacuous: a real $ROMDIR gets PAST it.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

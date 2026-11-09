@@ -42,6 +42,7 @@
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [EXPECT=held|draw] [KEEP=<dir>]
 #        tests/audit_tenant_continue_switch.sh
 #   emulator tier, MAME; ~1.5 min (two legs, each a tap run and a dump run in parallel)
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:1ecdcc22) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

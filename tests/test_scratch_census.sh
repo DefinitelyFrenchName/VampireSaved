@@ -24,6 +24,7 @@
 # MUST-FIRE: perturbed-copy: stale-ignored — a copy that does not count a row naming a missing file must pass that case, and the selftest must FAIL (mode: that copy's selftest)
 #
 # Usage: tests/test_scratch_census.sh      # ci_portable, ~2 s
+# SHARES: none — its 7 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

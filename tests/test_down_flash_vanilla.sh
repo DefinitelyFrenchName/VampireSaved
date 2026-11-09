@@ -33,6 +33,7 @@
 # (+96), 17272 (+57). The +N varies with the fall animation; the window is
 # generous on purpose — the claim is "one, after the down", not the offset.
 # Usage: ROMDIR=... [MAME_BIN=<ref or wide binary>] tests/test_down_flash_vanilla.sh
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

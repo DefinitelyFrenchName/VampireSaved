@@ -18,6 +18,7 @@
 #
 # The tags are real and permanent (freeze tags are never moved or deleted), so the expected plan is a
 # property of the stub and the uploader's walk, not of what GitHub hosts today.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

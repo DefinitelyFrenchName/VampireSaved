@@ -28,6 +28,7 @@
 #   ground truth for the §4 v4 composite class (frozen flicker inventory +
 #   frozen bounded windows, RATIFIED 2026-08-06): 7 synthetic cases + a no-
 #   loophole check. No emulator. donovan-m5w freezes 7 replays in this class
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 WORK="$(mktemp -d)"

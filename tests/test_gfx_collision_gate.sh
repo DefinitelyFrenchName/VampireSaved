@@ -32,6 +32,7 @@
 #   same-source skip, different- bytes MUST-RAISE control naming both
 #   provenances, and the single-write- path textual lock. Emits
 #   gfx_written.json (the S2 chain ledger). No ROMs, ~1s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

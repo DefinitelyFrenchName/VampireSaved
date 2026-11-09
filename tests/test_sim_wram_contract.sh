@@ -95,6 +95,7 @@
 #   stray frame, a wrong address, `--contiguous` and its hole) plus the lane's
 #   frame-output default (`--frame-output off` -> `-d JTFRAME_SIM_NOVIDEO=1`)
 #   with a flipped-default control and the shape of fork patch 0008
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 T="$(mktemp -d)" || { echo "FAIL: test_sim_wram_contract — mktemp -d failed (T)"; exit 2; }; fail=0

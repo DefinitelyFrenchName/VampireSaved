@@ -26,6 +26,7 @@
 # MUST-FIRE: perturbed-copy: ambiguity-off — a copy whose census allows a name matching scratch and another class must pass the synthetic ambiguous name, and the selftest must FAIL (mode: that copy's selftest)
 #
 # Usage: tests/test_build_dirs.sh      # ci_portable, ~10 s
+# SHARES: none — its 5 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

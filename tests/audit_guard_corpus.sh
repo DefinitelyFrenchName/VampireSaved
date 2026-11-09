@@ -62,6 +62,7 @@
 # must FAIL with the vec4 tripwire for unresolved vs2 0x494de.
 # (26's select window is later than the standard skeletons', hence the
 # late schedule — the same one audit_tripwire_reach uses.)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

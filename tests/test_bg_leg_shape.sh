@@ -26,6 +26,7 @@
 # that the right subshell got the `set +e` — only that a group which captures
 # `$?` under errexit cannot lose it. A group capturing no status is not
 # flagged: its verdict comes from its artifacts.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

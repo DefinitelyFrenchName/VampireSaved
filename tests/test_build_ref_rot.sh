@@ -83,6 +83,7 @@
 #   loads perfectly (that is how #96 happened one level up). Currency reports
 #   and never fails: a superseded reference is often correct, and only the
 #   gate's author knows which. Today: 3 current, 16 superseded.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

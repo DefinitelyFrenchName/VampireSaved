@@ -38,6 +38,7 @@
 #   accent/march census (14z-63): 4 frozen family-base sites (0 direct T0/T1
 #   refs), all jsr-routed on variant builds. Static + negative control, ~30s
 #   (self-builds)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

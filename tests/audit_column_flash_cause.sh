@@ -50,6 +50,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [BUILD=build/m3b_merged34] [FREEZE=1] tests/audit_column_flash_cause.sh
 #   emulator tier, MAME; three runs of 2870 frames at once
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:1ecdcc22) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

@@ -17,6 +17,7 @@
 # MUST-FIRE: shadow-tool: gen-log-required — a copy that opens NEW/gen.log unconditionally must stop on the solo pair, and the gate must FAIL (mode: the solo case runs that copy)
 #
 # Usage: tests/test_attribute_patch_delta.sh      # ci_static (needs the four build dirs), ~10 s
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -164,14 +164,14 @@ failure of the check, and THE STATED LIMIT of rule [a] in the six ground-truth g
 with a stated limit (Recommended)", after rule-checker runs 2026-11-09-1743, -1744 and -1745 each found a way past a
 text check of shell source): the lint covers echo or printf written on one line, sent to stdout or stderr; any other
 printer (awk, cat of a file, tee), a line assembled at run time (the literal split, or built in a variable, a function,
-a command substitution or a format) are review. Stated by the session, not ruled by the maintainer: the reader is
+a command substitution or a format) are review. Stated by the session and accepted by the maintainer 2026-11-09 (14z-225: "(a) Accept them as stated limits."): the reader is
 textual — it reads each statement as written, never as the shell evaluates it — so a one-line echo or printf it
 mis-splits, a redirect target held in a variable, a later redirect that overrides an earlier one, eval, aliases and
 functions pass too (rule-checker runs 2026-11-09-1748 and -1749). Every other gate stays under
 the strict rule: the literal may not appear anywhere in a code file under tests/ or tools/, at any depth. In every file
 a literal assembled at run time (split, formatted, built in a variable) passes the lint, which reads the literal written
 whole, and code outside tests/ and tools/ is not read, nor a data file a gate prints (a fixture, a kept mode log):
-review (rule-checker runs 2026-11-09-1746 and -1747; stated by the session, not ruled by the maintainer).
+review (rule-checker runs 2026-11-09-1746 and -1747; stated by the session and accepted by the maintainer 2026-11-09 (14z-225: "(a) Accept them as stated limits.")).
 
 **Migrating a gate:**
 

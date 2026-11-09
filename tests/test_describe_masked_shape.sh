@@ -42,6 +42,7 @@
 #   signature (never re-converges = NOT expressible, must be root-caused) +
 #   both threshold boundaries (flicker<=2 frames, re-convergence>60) + the
 #   length-mismatch report. Static, ~1 s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

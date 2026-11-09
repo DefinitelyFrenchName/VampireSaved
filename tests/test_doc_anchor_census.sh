@@ -58,6 +58,7 @@
 #   controls (between-file move, section move, history-twin anchor, a stray
 #   token in an archive). `--list-files` prints every file this tool and
 #   checkskills read, for copies
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

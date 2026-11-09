@@ -64,6 +64,7 @@
 #   Huitzil air-movement gate (14z-66): the float hovers (Y pinned) and the
 #   air dash engages (seq 0x14, flat advance) — mode signatures, not just no-
 #   crash. Self-builds stage 4 unless given a build
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

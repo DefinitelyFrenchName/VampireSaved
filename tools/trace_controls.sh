@@ -3,14 +3,15 @@
 # Each declared must-fire control <c> of each gate <g> runs as `CONTROL=<c> sh tests/<g>.sh` under
 # `strace -f -qq -y -e trace=open,openat,creat,rename,renameat,renameat2` (with -y a successful open prints the absolute
 # path of the fd it returns), from the repository root this script lives in. A gate's controls run one after another;
-# up to JOBS gates (default 8) run at once. Linux only (strace). tools/controls_overlap.py scores the traces; a gate
-# whose controls write no path a sibling writes or reads earns a row in tests/controls_concurrent.txt, with
-# `git hash-object tests/<g>.sh` as its traced blob (tests/test_controls_concurrent.sh holds the list to it).
+# up to JOBS gates (default 8) run at once. Linux only (strace). tools/controls_overlap.py scores the traces. Until #370
+# (14z-225) a gate whose controls wrote no path a sibling writes or reads earned a row in tests/controls_concurrent.txt;
+# since then a gate DECLARES what it shares (`# SHARES:`, tests/test_shares.sh), and a trace is the evidence behind a
+# `none` (the cross-job audit of #370's design item 4 is not built yet).
 # usage: ROMDIR=... tools/trace_controls.sh <out dir> <gate>...     writes <out>/st/<g>.<c>.st, <out>/out/<g>.<c>.out,
 #        <out>/done.tsv (gate, control, exit, seconds, root) and <out>/head.txt (the commit and git status traced)
 #   EMULATOR GATES (#321, 14z-210): CMDS=<gate<TAB>expanded args<TAB>timeout file> runs each control as the emulator
 #   runner would (CTL_TMO_MULT times the row's timeout, default 2); STRACE_OPTS=--seccomp-bpf filters in the kernel. The
-#   scored list is tests/controls_concurrent_emu.txt (first trace: PILOT at 688edef8, 200 controls of 61 gates, 15,664 s).
+#   scored list was tests/controls_concurrent_emu.txt until #370 (first trace: PILOT at 688edef8, 200 controls of 61 gates, 15,664 s).
 set -u
 CMDS="${CMDS:-}"; CTL_TMO_MULT="${CTL_TMO_MULT:-2}"; CTL_TIMEOUT="${CTL_TIMEOUT:-2400}"; STRACE_OPTS="${STRACE_OPTS:-}"
 O="${1:?out dir}"; shift; [ "$#" -gt 0 ] || { echo "usage: $0 <out dir> <gate>..." >&2; exit 2; }

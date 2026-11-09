@@ -10,6 +10,7 @@
 # HOW: reconstructs the pre-fix runner into a scratch copy and runs the gate against it.
 # EXPECTS: the gate FAILS on the pre-fix runner; a gate that has never seen the defect is
 #   indistinguishable from one that cannot.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

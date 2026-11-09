@@ -107,6 +107,7 @@
 # Static? No — 4 MAME runs, 2 at a time, ~4 min.
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [EXPECT_MATCH=1]
 #        tests/audit_pyron_capture_block.sh
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

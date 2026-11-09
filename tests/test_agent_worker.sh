@@ -34,6 +34,7 @@
 # MUST-FIRE: perturbed-copy: off-spec-command — the worker's C1 call rewritten to `wc -c` in a copy must fail conformance, and the gate must FAIL (mode: the gate reads that copy)
 #
 # Usage: tests/test_agent_worker.sh      # ci_portable, ~1 s (needs git and commit d5653d1f)
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

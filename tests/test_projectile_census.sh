@@ -40,6 +40,7 @@
 #   event the types that first appear after the input; frozen
 #   `tests/expected/projectile_census.txt`. Run after any change to the rigs
 #   or a tenant's projectile handlers
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

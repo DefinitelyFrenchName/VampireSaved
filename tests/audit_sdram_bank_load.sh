@@ -128,6 +128,7 @@
 #   reproduces the frozen 14z-107 table unchanged. `test_mister_gfxc_fetch`
 #   now passes `--stats`, so a tenant-match run answers the fetch question and
 #   the bank-load question from ONE simulation
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 

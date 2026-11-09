@@ -59,6 +59,7 @@
 #   maintainer named). Must-fire control: the same replay with FOUR presses
 #   must not arm, not set $3BC and not morph. Replay 113; only the FIRST morph
 #   is deterministic (the arcade draw is a lottery past ~8500).
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -110,6 +110,7 @@
 #   SHIPPED ON IT: the 14z-91 fix relocates the WALKER instead (see obj_hook
 #   in patch_index), so tenant types stay above the vanilla entry count where
 #   vanilla cannot reach them BY CONSTRUCTION. ~2 min, JOBS-parallel
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

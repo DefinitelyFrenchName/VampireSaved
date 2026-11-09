@@ -15,6 +15,7 @@
 #
 # Usage: ROMDIR=/path/to/roms tests/test_attract_determinism.sh [set] [frames]
 # Defaults: vsavj, 3600 frames. PASS = per-frame checksum logs identical.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 SET="${1:-vsavj}"

@@ -48,6 +48,7 @@
 #   after-pack, stale rompath, no rompath) + a positive control + the sibling
 #   gate. GATE_SRC=<dir> reruns it against the pre-fix gates, where it must
 #   FAIL. No ROMs, no emulator, ~1s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

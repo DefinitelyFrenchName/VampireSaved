@@ -64,6 +64,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [PART=huitzil_7] tests/audit_tick_phase.sh
 #   emulator tier, MAME; the two legs run in parallel, native vsav2 — measured 14z-172 on this MacBook, solo: ~60 s wall
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:37618e57) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

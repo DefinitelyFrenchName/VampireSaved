@@ -33,6 +33,7 @@
 # HANDOFF's review-triage table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #51) Both record walkers examine the last long that fits.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

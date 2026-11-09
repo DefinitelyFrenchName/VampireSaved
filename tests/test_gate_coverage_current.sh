@@ -21,6 +21,7 @@
 # description rendering lives beside the index, not in it (the generator's docstring).
 #
 # Usage: tests/test_gate_coverage_current.sh
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

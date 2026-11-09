@@ -42,6 +42,7 @@
 #   previous run's log/.tap/side-channel outputs behind, because the
 #   completion check is an ARTIFACT check (grep ^END). Measured pre-fix: rc=1
 #   but $OUT still present with its old content. ROMDIR, ~5s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

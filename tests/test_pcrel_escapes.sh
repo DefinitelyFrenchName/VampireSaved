@@ -41,6 +41,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #22) The pc-rel DATA-escape set is unchanged since
 #   reviewed. **Not portable** — needs builds + `vsav2_data.bin`.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

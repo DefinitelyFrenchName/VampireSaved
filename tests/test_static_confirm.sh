@@ -87,6 +87,7 @@
 # MUST-FIRE: perturbed-copy: prose-pairing — a copy of N-B whose prose regex skips short quoted strings (pairing a path's closing quote with the next opening one) must mark the gate stale whose `[ -f "$D/x.diverge" ] && echo "... STATE.md ..."` line names STATE.md only in a message, and the selftest must FAIL (mode: that copy's selftest)
 #
 # Usage: tests/test_static_confirm.sh      # ci_portable, ~2 min with its 44 controls (123 s and 139 s, 14z-207, load 7-8)
+# SHARES: none — its 44 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

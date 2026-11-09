@@ -132,6 +132,7 @@
 #   range at three in-match frames; CASES= selects the six cases. Expectations
 #   frozen BOTH ways: if anim crashes again that is a REGRESSION. On-demand,
 #   ~4.5 min
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

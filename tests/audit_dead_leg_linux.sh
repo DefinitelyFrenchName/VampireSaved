@@ -19,7 +19,7 @@
 # EXPECTS: PASS with 5 rows; a Linux host with podman, a live GNOME session for this user, ROMDIR, and the release's
 #   linux-x86_64 binaries under release/<name>/ (or ASSETS=<dir of zips>), as the two target gates need. Elsewhere it
 #   SKIPs and says so: at release it runs on PILOT, after the two gates it checks.
-# FOLLOWS: tests/test_dead_leg_unjudged.sh tests/expected/dead_leg_unjudged_linux.tsv tests/audit_release_linux_cleanhost.sh
+# FOLLOWS: tests/test_dead_leg_unjudged.sh tests/expected/dead_leg_unjudged_linux.tsv tests/audit_release_linux_cleanhost.sh tests/lib/shares.sh tests/lib/share_lock.py tests/shares.tsv
 #   tests/audit_release_linux_desktop.sh tests/lib/controls.sh tests/lib/classify.sh tools/desktop_session_play.py
 #   tests/lib/desktop_session.sh emu/fbneo/ emu/fbneo-patches/ tools/setup_fbneo.sh
 #
@@ -32,6 +32,7 @@
 #   (static tier, the Mac) cannot judge their modes. Asked where those rows should run, the maintainer: "A. A small
 #   release-cadence emulator gate that judges the 5 rows on PILOT at release (my recommendation). It sits alongside the
 #   two gates it checks. Off Linux it SKIPs visibly, like they do, and a red blocks the release. -> agreed."
+# SHARES: self desktop-session release-assets
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd -P)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
@@ -64,6 +65,7 @@ trap 'exit 143' INT TERM
 # gate or a release emulator already running, so a desktop run refused inside a row (which reads UNJUDGED, a row's frozen
 # class) can only be one of its own; its nested target-gate runs claim nothing (VS_DESKTOP_OWNER).
 vs_desktop_claim audit_dead_leg_linux
+vs_shares_claim audit_dead_leg_linux release-assets   # SHARES-CLAIM (#370, 14z-225): the release package it unpacks (desktop-session is vs_desktop_claim's)
 leftovers() { vs_desktop_procs; }
 leftovers > "$W/procs.before"
 DLU_TABLE="$REPO/tests/expected/dead_leg_unjudged_linux.tsv" JOBS=1 /bin/sh "$REPO/tests/test_dead_leg_unjudged.sh" > "$W/inner.log" 2>&1; rc=$?

@@ -30,6 +30,7 @@
 # WHY: #310 (14z-215, the maintainer: "Next session, first batch (Recommended)"): ~20 group-5 gates had no planted proof
 #   of their own, and a miswired call or refusal line would let a crash read HONOURED in its perturbed copy. 14z-216's
 #   discovery (build/agent216/t310/FINDINGS.md) and 14z-218's per-call pass found the rows this table freezes.
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd -P)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

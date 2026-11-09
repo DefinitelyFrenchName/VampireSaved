@@ -32,6 +32,7 @@
 # see a variable sandbox key whose values repeat, so #296 reads it at run time: this inventory first (run over the
 # emulator lanes to attribute every reuse), refusal by default after (step 2, 14z-206, once the one reuse the ERIS
 # inventory found, audit_wide_phase_a's replay-keyed sandbox, was keyed by section and replay).
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

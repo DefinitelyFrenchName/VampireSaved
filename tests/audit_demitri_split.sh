@@ -37,6 +37,7 @@
 # VSAVJ AND VS2"). Scratch origin: build/agent187b/t192/ (run.sh, summ.py, chain_of.py, a2_kinds.py).
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [FREEZE=1] tests/audit_demitri_split.sh   # emulator tier, MAME, two runs (~1 min)
+# SHARES: self
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

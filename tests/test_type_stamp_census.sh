@@ -40,6 +40,7 @@
 #   positive control on the six measured sites + negative control on the two
 #   unported stamps (three until 14z-222). Drift = FAIL (re-review, never absorb). 2 verdict
 #   controls. No emulator, ~5 s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

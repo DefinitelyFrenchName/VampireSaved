@@ -112,6 +112,7 @@
 #   Victor control leg. ~5 min, 2 parallel MAME runs. ROOT-CAUSED 14z-98 (see
 #   the next row); a probe with the x026142 pcrel_escape_fix flips this to
 #   FLOWED 560. Flip EXPECT_STALL when the fix ships.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

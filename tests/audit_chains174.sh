@@ -57,6 +57,7 @@
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [DON=build/don_m30 HUI=build/hui64 PYR=build/pyron49] [FREEZE=1] [KEEP=<dir>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_chains174.sh
 #   RNG_WORD / RNG_UNTIL (#183, 14z-186): a PROBE knob, as audit_move_parity's; FREEZE=1 refuses either
 #   emulator tier, MAME; ~2 min (6 legs in parallel)
+# SHARES: none — its 5 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:1ecdcc22) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

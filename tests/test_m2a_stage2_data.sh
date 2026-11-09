@@ -33,6 +33,7 @@
 #      diverges exactly at 2886.
 #
 # Usage: ROMDIR=... [JOBS=N] tests/test_m2a_stage2_data.sh
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

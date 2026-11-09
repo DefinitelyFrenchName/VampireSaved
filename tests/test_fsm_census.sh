@@ -36,6 +36,7 @@
 #   enumerated (tools/audit_fsm_census.py, family-aware node-record signature
 #   + vs2 classify oracle) and locked to build/manifest/fsm_census.toml. TWO
 #   negative controls. Needs ROMDIR (vs2 oracle). ci_static, seconds.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

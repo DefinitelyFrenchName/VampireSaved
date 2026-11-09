@@ -92,6 +92,7 @@
 #   build's CRCs. TWO must-fire controls: untrimmed -> 73,670,720 B /
 #   `qsnd_start` 71,936 KiB (and the generator SILENTLY writes the wrapped
 #   word); `length` +0x400 -> the frozen table fails
+# SHARES: self jtsim-scratch
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -105,7 +106,8 @@ command -v go >/dev/null 2>&1 || {
     [ -x "$JTF" ] || { echo "SKIP: no go toolchain and no prebuilt jtframe"; exit 0; }; }
 
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/mister_mra_map.XXXXXX")" || { echo "FAIL: test_mister_mra_map — mktemp -d failed (WORK)"; exit 2; }
-trap 'rm -rf "$WORK"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+trap 'vs_shares_release; rm -rf "$WORK"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+. "$REPO/tests/lib/shares.sh"; vs_shares_claim test_mister_mra_map jtsim-scratch   # SHARES-CLAIM (#370, 14z-225): the host claim on what its # SHARES: line names
 MRA="$REPO/tools/mister_mra.sh"
 SRC="$REPO/emu/jtcores"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

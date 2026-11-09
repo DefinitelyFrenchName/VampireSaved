@@ -85,6 +85,7 @@
 #   (the MAP screen comes AFTER the win screen — the two 14z-99 game gotchas).
 #   Rigs: replays/103_tenant_2pwin_auto (= 61 + three AUTO lines) +
 #   replays/104_1p_auto_ko_win. ~10 min, 4 MAME runs.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -33,6 +33,7 @@
 #   name/portrait garble class (shared TT-placeholder rows deduped to tenant
 #   0's compare). Static over patch.json + fragment + manifests, ground-
 #   truthed FAILING on the pre-fix build. ~1s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

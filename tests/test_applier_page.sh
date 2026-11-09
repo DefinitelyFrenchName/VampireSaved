@@ -75,6 +75,7 @@
 # MUST-FIRE: perturbed-copy: page-without-csp — a copy of the page shell with its Content-Security-Policy meta removed must make section 1 fail; the CSP is what makes "no network of any kind" a property the BROWSER enforces rather than one a denylist guesses at, and a denylist cannot prove absence, so a page that lost it must not ship (mode: the gate generates from that shell)
 #
 # Usage: ROMDIR=... tests/test_applier_page.sh [release/merged-m26/fbneo]   # ci_static
+# SHARES: self
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

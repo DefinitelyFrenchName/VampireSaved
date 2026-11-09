@@ -31,6 +31,7 @@
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged34] [JOBS=3] tests/audit_don_trail_nodraw.sh
 #   emulator tier, MAME; 6 runs
+# SHARES: self
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

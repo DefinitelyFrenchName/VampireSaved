@@ -46,6 +46,7 @@
 #   (registry.tsv), so it follows each freeze — today donovan-m9-stage4, V2
 #   basis. It used to pin donovan-m2c + the V1 basis + three first-divergence
 #   constants.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

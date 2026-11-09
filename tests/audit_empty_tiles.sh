@@ -43,6 +43,7 @@
 #   can see it (records/codes/walk all correct). Complete, not a sample.
 #   Ground-truthed: PASSES on build/hui14, FAILS on build/hui12 naming both
 #   shadow tiles. RUN FOR EVERY NEW TENANT
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

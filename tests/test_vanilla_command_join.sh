@@ -62,6 +62,7 @@
 #
 # Usage: ROMDIR=... tests/test_vanilla_command_join.sh   # emulator tier (MAME, 31 legs in parallel; 29-30 s on ERIS, 14z-189)
 #        CHARS="BU ZA" to measure a subset; FREEZE=1 to re-freeze; KEEP=dir keeps the traces.
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

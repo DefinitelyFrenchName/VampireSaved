@@ -50,6 +50,7 @@
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged34] [FREEZE=1] tests/test_defense_rows_census.sh
 #   static tier (the decrypt cache, a build's data view); measured 14z-168 on this MacBook: ~2 s
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

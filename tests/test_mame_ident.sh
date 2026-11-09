@@ -15,6 +15,7 @@
 #
 # WHY: the #118 gates (audit_mizuumi_inputs, audit_extra_pass, audit_mizuumi_attack) proved only that $MAME_BIN was
 # executable; their logs named the path, never the MAME.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

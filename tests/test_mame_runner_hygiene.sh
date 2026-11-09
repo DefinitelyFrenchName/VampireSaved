@@ -12,6 +12,7 @@
 #   stale log in place (the FBNeo sibling has cleared its outputs since 14z-90, #12, tests/test_fbneo_runner_hygiene.sh).
 #
 # MUST-FIRE: shadow-tool: no-clear — a copy of the wrapper with its clearing step removed (the pre-#253 wrapper) must return success on the stale log under the silent stub and FAIL section 1 (mode: the copy is the wrapper under test)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

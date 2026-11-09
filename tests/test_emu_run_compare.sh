@@ -17,6 +17,7 @@
 # MUST-FIRE: perturbed-copy: one-side-counted — a copy that counts every row of run A as common must take a row B never ran, and the selftest must FAIL (mode: that copy's selftest)
 #
 # Usage: tests/test_emu_run_compare.sh      # ci_portable, ~1 s
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

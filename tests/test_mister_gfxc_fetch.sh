@@ -149,6 +149,7 @@
 #   the ABSOLUTE SDRAM address instead of relative to the armed window's base,
 #   and a liveness control demanding vanilla obj traffic in a leg that cannot
 #   boot by construction
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }

@@ -55,6 +55,7 @@
 #   proves the non-tenant FALLBACK reproduces vsav's own type-6 head and
 #   rejoins at 0x01B6B2, which is the entire safety argument and which legacy
 #   never exercises. Static, seconds
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

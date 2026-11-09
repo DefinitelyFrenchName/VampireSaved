@@ -79,6 +79,7 @@
 #   3,759 emulated frames and type 10's 2,817 (#228 step 3); over the whole replay the control reads 3,872 and type 10
 #   13,508 — sections 1 and 3 print them.
 #   The zeros of row 16 hold over every frame of all six replays.)
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:37618e57) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

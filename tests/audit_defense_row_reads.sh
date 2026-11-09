@@ -64,6 +64,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [JOBS=6] [LEGS="victim attacker suite vsavj"] [FREEZE=1] tests/audit_defense_row_reads.sh
 #   emulator tier, MAME; 221 tap runs (14z-183; 218 when measured 14z-169) on this MacBook, solo, JOBS=6: see PROVENANCE
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

@@ -35,6 +35,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #18) A patch applies only to the source set it was
 #   verified against. **Not portable.**
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

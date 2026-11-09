@@ -45,6 +45,7 @@
 #   shared by run_suite.sh and the M2 battery. Every class in both directions;
 #   it caught a real bug in the lift (the diverge spec's temp-file STEM). No
 #   ROMs, no emulator, ~2s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

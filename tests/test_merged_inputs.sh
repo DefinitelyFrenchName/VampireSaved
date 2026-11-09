@@ -51,6 +51,7 @@
 #   dirs are byte-equal, because the latter is false and cosmetic:
 #   `build/m5_wide/extract/regions.json` predates two `extract_char.py`
 #   changes. **Not portable.**
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -32,6 +32,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #62) Every `.masked` spec cites a basis frozen under its
 #   own mask.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

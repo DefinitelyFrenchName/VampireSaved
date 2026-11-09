@@ -32,6 +32,7 @@
 # (no core line where FBNeo prints them); 5 an error line FAILS; then the controls.
 #
 # Usage: tests/test_fbneo_boot_log.sh
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

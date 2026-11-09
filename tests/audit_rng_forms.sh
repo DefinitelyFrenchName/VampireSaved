@@ -38,6 +38,7 @@
 #   REUSE=1 with KEEP re-reads a work dir an earlier run of THIS audit filled (the control modes on the real tables,
 #   seconds instead of hours); a form whose tables are missing is run
 #   emulator tier, MAME; ~8 min on this MacBook (nine gate runs, each parallel inside; 7 min 30 s measured 14z-186)
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

@@ -54,6 +54,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [JOBS=6] [FREEZE=1] tests/audit_move_parity_attribution.sh
 #   emulator tier, MAME; ~12 ablation steps over the 19 parts carrying a DIFF — measured 14z-168 on this MacBook, solo: ~5 min wall
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

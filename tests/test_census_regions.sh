@@ -50,6 +50,7 @@
 #   pcrel-escape censuses — H's frozen inventory (5 sites, 89/35 + 9/6
 #   escapes, adjacency-safe class, 2 known false positives, the x05c800 KNOWN-
 #   OPEN latent pair) + Pyron clean. Self-builds stage 4 unless given a build
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

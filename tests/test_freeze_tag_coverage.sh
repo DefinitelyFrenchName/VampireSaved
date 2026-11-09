@@ -62,6 +62,7 @@
 #      contain (a copy with one fingerprint perturbed)  -> section 3 fires
 #
 # Env: REGISTRY=<path> (default tests/expected/registry.tsv).
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 SELF="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 cd "$(dirname "$0")/.."

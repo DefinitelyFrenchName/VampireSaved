@@ -115,6 +115,7 @@
 #   header says widening the mask is NOT the remedy. Cross-check: the dispatch
 #   counts reproduce dispatch_census.toml exactly on a different register. ~5
 #   min
+# SHARES: none — its 5 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

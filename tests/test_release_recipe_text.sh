@@ -27,6 +27,7 @@
 # MUST-FIRE: perturbed-copy: recipe-route-dropped — the rendered README without its "By hand, or with the recipe package" paragraph must FAIL: a recipe player is again sent to a launcher that only runs a prebuilt program (#240)
 #
 # Usage: tests/test_release_recipe_text.sh      # ci_portable, ~1 s, no ROMDIR, no emulator, no ROM bytes
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

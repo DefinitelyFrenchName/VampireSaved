@@ -72,6 +72,7 @@
 #   character-AGNOSTIC, so adding a tenant is a row in CLASSES, not a new
 #   replay. Verdict control: an UNPOKED run must be REFUSED, else every ok is
 #   vacuous. Needs the MERGED build by construction. ~10s, 7 runs
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

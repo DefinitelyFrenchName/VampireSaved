@@ -15,6 +15,7 @@
 #
 # MUST-FIRE: shadow-tool: name-unchecked — a copy of the packager with the name check (and the staging names' accidental `/` guard) removed must replace `victim` on a successful `--name ../victim` run and FAIL section 1 (mode: the copy is the packager under test)
 # MUST-FIRE: shadow-tool: delete-first — a copy of the packager that builds in place after deleting the old package (the pre-#247 order) must lose `good/sentinel` on a failed run and FAIL section 2 (mode: the copy is the packager under test)
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

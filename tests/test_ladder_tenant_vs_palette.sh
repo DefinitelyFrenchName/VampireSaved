@@ -101,6 +101,7 @@
 #   0 px). The tag shows the BASE character's name/ art for a tenant (cosmetic
 #   backlog). 4 -debug legs, red-poke A/B, liveness via the P2 hitbox base;
 #   FREEZE=1. Replay 111 = 110 cut at 3600. ~4 min.
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

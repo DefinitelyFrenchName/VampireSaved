@@ -53,6 +53,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [KEEP=<dir>] tests/audit_sas_penguin_count.sh
 #   emulator tier, MAME; ~15 s (twelve legs in parallel)
+# SHARES: self
 set -u
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

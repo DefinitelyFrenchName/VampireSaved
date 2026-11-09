@@ -58,6 +58,7 @@
 # first spawn tripped type 64's tripwire).
 #
 # Usage: ROMDIR=... tests/test_pyron_soak.sh
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

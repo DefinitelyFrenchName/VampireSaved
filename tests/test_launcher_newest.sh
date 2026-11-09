@@ -13,6 +13,7 @@
 #   "prefer the newest one, always"). The Windows PLAY.bat is NOT covered here (it needs cmd).
 #
 # MUST-FIRE: shadow-tool: first-found — the template with its candidate loop restored to first-found and FBNeo's roms/ copy made only when absent (the pre-#248 launcher) must report the old roms/ set and FAIL section 1 (mode: that template renders the launchers)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

@@ -48,6 +48,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   B5b: FBNeo write tap (non-perturbing + re-derives a known MAME finding),
 #   pokes, and address-resolved dumps cross-checked byte-for-byte against MAME
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

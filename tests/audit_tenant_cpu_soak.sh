@@ -45,6 +45,7 @@
 # Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [BUILD=build/m3b_merged34] [FRAMES=22880] [FREEZE=1] [KEEP=<dir>]
 #        tests/audit_tenant_cpu_soak.sh
 #   emulator tier, MAME; 12 legs in parallel, ~20000 match frames each
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

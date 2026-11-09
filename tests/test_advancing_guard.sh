@@ -86,6 +86,7 @@
 #   at a weighted >=10, vsavj +1/ press with an RNG roll below 8. Four legs
 #   (vs2 + vsavj), 44 frozen lines; FREEZE=1; rig = name_moves victim part 4
 #   (regeneration-checked). ~3 min.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 : "${ROMDIR:?set ROMDIR}"

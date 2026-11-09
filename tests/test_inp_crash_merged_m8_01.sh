@@ -25,6 +25,7 @@
 #         fix's acceptance; flip the default in the same commit as the fix).
 # Usage: ROMDIR=... [MODE=defect|clean] [BUILD=build/m3b_merged34] tests/test_inp_crash_merged_m8_01.sh
 # Emulator tier (MAME, ~1 min). NOT ci_static.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

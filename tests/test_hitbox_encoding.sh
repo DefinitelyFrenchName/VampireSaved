@@ -75,6 +75,7 @@
 #   the un-mirrored convention), and victim `+0x54` = record `+0x17` on the
 #   fighter, projectile, multi-hit and column paths. Run after any change to
 #   `tools/hitbox_records.py`, the rigs or the extracts
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

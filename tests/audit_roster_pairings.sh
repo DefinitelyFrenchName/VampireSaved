@@ -60,6 +60,7 @@
 #   ONLY=<class> reproduces one tenant's row; BASES=<file> one pairing. NOT a
 #   replacement for test_tenant_pairings: that stays as the ~1 min six-
 #   ordering gate for routine use, and shares tests/lib/pairing.sh.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

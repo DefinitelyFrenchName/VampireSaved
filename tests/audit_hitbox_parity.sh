@@ -35,6 +35,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [PARTS="donovan_1 pyron_4 huitzil_1"] [FREEZE=1] [CONTROL=<name>] tests/audit_hitbox_parity.sh
 #   emulator tier, MAME: six legs in parallel, ~2 min.
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:1ecdcc22) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"; if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi

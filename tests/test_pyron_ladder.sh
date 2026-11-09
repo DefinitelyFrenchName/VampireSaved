@@ -48,6 +48,7 @@
 #   invariant (stage 4 exempts exactly the four generator hook sites), forced-
 #   pick boot probe, stage-3 UNMASKED legacy bit-identity + stage-4 masked
 #   EXACT (V2 basis; V3 parked 14z-88)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

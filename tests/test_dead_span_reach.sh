@@ -64,6 +64,7 @@
 # Usage: [MERGED=build/m3b_merged34] [DON=build/don_m30] [HUI=build/hui64] [PYR=build/pyron49] [STOCK=build/m5_stock25]
 #   tests/test_dead_span_reach.sh       static tier (built images, no ROMDIR, no emulator); ~19 min on the MacBook (18:42 measured
 #   14z-223 with the controls on both spans; 10:31 with them on the first span only)
+# SHARES: none — its 22 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:3d90dfaa) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

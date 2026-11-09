@@ -36,6 +36,7 @@
 # MUST-FIRE: known-bad: drift-clock — the breakpoint leg under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync) must cover fewer emulated frames than it counts and read a game clock unlike the reference's (in-gate; as a mode the breakpoint leg runs the old clock and the gate FAILs)
 #
 # Usage: ROMDIR=... tests/test_emu_clock.sh      # emulator tier, prereq lane, MAME (~4 min)
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

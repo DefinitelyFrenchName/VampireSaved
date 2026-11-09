@@ -74,6 +74,7 @@
 #
 # Usage: ROMDIR=... [JOBS=2] [OUT=<dir>] [EXP=<sha256 file>] [CLOCKS=<tsv>] [FRAMEDATA_OUT=<dir>] [FREEZE=1]
 #        [LEGS_FROM=<dir>] tests/audit_guard_cancels.sh [--freeze-clock]
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"

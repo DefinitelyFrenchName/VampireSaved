@@ -52,6 +52,7 @@
 #   (1640/1640 probes), with a must-fire control; section 3 proves the
 #   parameters load-bearing (183/1640 change when freed), so #43(b) is a real
 #   change and section 2 is not vacuous. **Not portable.**
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -35,6 +35,7 @@
 # tests/test_m3a_reproducible.sh and the freeze's attribution cover.
 #
 # Usage: tests/test_effect_placeholders.sh    (ci_portable, ~1 s)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

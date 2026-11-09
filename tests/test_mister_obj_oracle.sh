@@ -72,6 +72,7 @@
 #   the authored M6 mark (codes `fe40/fe41`, pal row 0x19) IDENTICAL across
 #   implementations. Must-fire: a one-bit promoted-code change turns 1c/1d red
 #   (verified end to end); 3z fails if the select list is CONSTANT
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

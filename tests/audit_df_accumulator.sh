@@ -68,6 +68,7 @@
 #   cr.LP/MP/HP add 20/30/40, no reaction, break past 60, decay 240), hphk
 #   (never arms), nodf (the must-fire negative), merged (field trace byte-
 #   identical = superset). 9 frozen lines; FREEZE=1; replay df/105. ~3 min.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

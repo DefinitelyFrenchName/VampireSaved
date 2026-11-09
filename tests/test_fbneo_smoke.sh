@@ -14,6 +14,7 @@
 # Usage: ROMDIR=/path/to/roms tests/test_fbneo_smoke.sh [set] [seconds]
 # PASS = all ROM members load OK, emulation starts, and the process is still
 # alive after the soak period (we kill it ourselves).
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 SET="${1:-vsavj}"

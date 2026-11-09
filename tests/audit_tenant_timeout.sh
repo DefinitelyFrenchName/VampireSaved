@@ -90,6 +90,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [JOBS=4]
 #        tests/audit_tenant_timeout.sh          (~7 legs x ~2 min, JOBS at a time)
+# SHARES: self
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -42,6 +42,7 @@
 #   REFUSED check names what is missing its row reads REFUSED there, so this gate FAILs on such a host (red, never a false
 #   green; its tier runs on the Mac). The two Linux-only release gates' rows are judged on PILOT at release by a gate of
 #   their own (ruled 14z-223, STATE). tests/expected/dead_leg_unjudged.tsv's header names every batch's gates.
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

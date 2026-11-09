@@ -64,6 +64,7 @@
 #   boot ROM-checksum sweep touches every byte), and runtime (no crash, the EX
 #   still FIRES, the match survives — a watchdog reset is not a 68k exception,
 #   so the field trace proves it, not the guard). Defaults to build/pyron18
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

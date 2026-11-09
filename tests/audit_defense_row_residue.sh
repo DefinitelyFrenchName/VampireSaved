@@ -86,6 +86,7 @@
 # Emulator tier (MAME -debug, 16 legs in parallel — curve and threshold per victim and game — ~6 min). Usage:
 #   ROMDIR=... [MAME_BIN=$HOME/.cache/vampire-saved/mame/cps2] \
 #     [MERGED=build/m3b_merged34] [VICTIMS="10 13 0a 03"] [KEEP=dir] tests/audit_defense_row_residue.sh [--freeze-clock]
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 : "${ROMDIR:?set ROMDIR}"

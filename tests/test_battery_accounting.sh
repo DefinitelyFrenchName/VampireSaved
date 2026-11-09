@@ -30,6 +30,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #24) `run_battery_m2.sh` cannot print BATTERY GREEN while
 #   gates self-skip; counts branch skips by group size.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

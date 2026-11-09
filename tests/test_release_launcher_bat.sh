@@ -51,6 +51,7 @@
 # the MAME launcher's refusals had never run anywhere.
 #
 # Usage: tests/test_release_launcher_bat.sh [release/merged-m26]   # ci_portable (no ROMDIR, no emulator, no ROM bytes)
+# SHARES: none — its 7 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

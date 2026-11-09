@@ -40,6 +40,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [FREEZE=1] tests/audit_entrance_draw.sh
 #   emulator tier, MAME; 12 short field_trace runs in parallel — measured 14z-168 on this MacBook, solo: ~15 s wall
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

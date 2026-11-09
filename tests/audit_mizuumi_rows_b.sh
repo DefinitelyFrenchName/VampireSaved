@@ -59,6 +59,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [KEEP=<dir>] tests/audit_mizuumi_rows_b.sh
 #   emulator tier, MAME; ~1 min (twelve legs in parallel; 26_don_arcade_mash is 40,600 frames)
+# SHARES: self
 set -u
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

@@ -18,6 +18,7 @@
 # lets a reader open an entry with one Read at its offset. Every edit above an entry moves the numbers, so the index
 # is regenerated in the commit that changes the archive (`python3 tools/gen_history_index.py`), and this gate fails a
 # stale one. The tool writes only the block: archived entries are never rewritten (CLAUDE.md [VSP-17]).
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

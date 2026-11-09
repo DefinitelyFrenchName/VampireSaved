@@ -68,6 +68,7 @@
 # caused, never by a table lookup of our own.
 #
 # Usage: ROMDIR=... [JOBS=5] [OUT=<dir>] [SHEET=<workbook.xlsx>] tests/audit_ground_throws.sh [--freeze-clock]
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"

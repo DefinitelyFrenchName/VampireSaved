@@ -37,6 +37,7 @@
 #
 # CONFIRM: always — the CORE of a session run (#269, 14z-200): it reads the commits in origin/main..HEAD, which move with every commit and fetch,
 # none of which a changed tracked path shows, so tests/run_all_static.sh --confirm never carries it.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

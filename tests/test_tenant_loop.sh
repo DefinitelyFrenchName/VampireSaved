@@ -61,6 +61,7 @@
 #   declaration order, each element with its own data pointer); 5 zero
 #   collisions AND patch_prg actually applying it. 5 VERDICT CONTROLS, one of
 #   which caught ITSELF perturbing nothing (`set() or {...}` is falsy)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

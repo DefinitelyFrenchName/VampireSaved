@@ -37,6 +37,7 @@
 #   word is a real trap and must not be. Written first and it CAUGHT ITS
 #   AUTHOR: the high-word fixture encoded the wrong width. No ROMs, ~1s; in
 #   ci_portable
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

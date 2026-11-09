@@ -42,6 +42,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #77) FBNeo replay frames are bounded before the
 #   arithmetic; the cap is re-derived from `tests/replays`, not trusted.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

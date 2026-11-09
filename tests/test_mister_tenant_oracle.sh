@@ -95,6 +95,7 @@
 #   the TIMER, which is compared but is not an anchor input — a byte-swap
 #   control is weaker because it destroys the anchor and never exercises the
 #   field comparison at all
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }

@@ -58,6 +58,7 @@
 #   (cell-gated) / P2 side / the STOCK twin (profile-gated => 0x08). Every leg
 #   asserts id AND loaded base. No pokes — the pick is made with the sticks.
 #   Verdict control. Defaults build/m3b_merged13 + build/m5_stock6
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

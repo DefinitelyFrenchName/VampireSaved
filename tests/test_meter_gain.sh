@@ -58,6 +58,7 @@
 #
 # Usage: ROMDIR=... tests/test_meter_gain.sh   [FREEZE=1]   (~4 min, 8 MAME runs in parallel)
 #        SKIPs without ../community/vsav-framedata.xlsx (third-party, outside the tree)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

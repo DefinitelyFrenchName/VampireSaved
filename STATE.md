@@ -93,8 +93,8 @@ figures v35, rc_runs v35, tiers v36). The tier's results: `build/agent224/close/
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
-- **#369 lands with a shrink-only debt list and a lint with a stated limit (2026-11-08/09, 14z-224):** a mode is HONOURED only on its own `CONTROL CAUGHT:` line unless its gate is on `tests/expected/ctl_caught_debt.tsv`, which only shrinks — `DECISIONS_HISTORY.md` "Ruled 2026-11-08 (14z-224) — #369's design …" and "Ruled 2026-11-09 (14z-224) — #369's lint …".
-- **#370 is built as A1, B1, C1 (2026-11-08, 14z-224):** today's sharing written down, every gate carries a `# SHARES:` line, a host-wide per-token lock — `DECISIONS_HISTORY.md` "Ruled 2026-11-08 (14z-224) — #370's design …".
+- **#369 lands with a shrink-only debt list and a lint with a stated limit (2026-11-08/09, 14z-224):** a mode is HONOURED only on its own `CONTROL CAUGHT:` line unless its gate is on `tests/expected/ctl_caught_debt.tsv`, which only shrinks — `DECISIONS_HISTORY.md` "Ruled 2026-11-08 (14z-224) — #369's design …" and "Ruled 2026-11-09 (14z-224) — #369's lint …"; the further limits the session named are accepted as stated limits (14z-225) — `DECISIONS_HISTORY.md` "Ruled 2026-11-09 (14z-225) — #369's lint: the further limits the session named stand".
+- **#370 is built as A1, B1, C1 (2026-11-08, 14z-224):** today's sharing written down, every gate carries a `# SHARES:` line, a host-wide per-token lock — `DECISIONS_HISTORY.md` "Ruled 2026-11-08 (14z-224) — #370's design …"; the host lock is an OS file lock (`fcntl.flock`, `tests/lib/share_lock.py`), never a hand-written one (14z-225) — "Ruled 2026-11-09 (14z-225) — #370's host claim is an OS file lock …".
 - **#356 is built as Option 1 (a tenant-only copy of the speed-line effect with vs2's 14-row tables), with the raw allocator, and frozen as M25 as built (frozen 14z-220, `91bde83b`); its one-frame Dark Force phase is accepted and is #360 (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356" and "Ruled 2026-11-03 (14z-219) — #356".
 - **#345's option A1b is built and its timing ACCEPTED: frozen in M25 with #356 (14z-220, `91bde83b`) — ours loses no logic frame in Blizzard Sword where native does; the moved expectations (pass_overrun, the stale lag exemption, donovan_2's parity and RNG-form rows) re-frozen at the freeze, each through its own rule-checker run; vsavj's table PRG:0x1F3FD2 is never touched; B stays held (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #345", "Ruled 2026-11-03 (14z-219) — #345: option A is built as A1b" and "… the built A1b's timing is accepted".
 - **#345's rows may turn DIFF under a non-zero RNG; the parity gates keep the 0000 pin (2026-11-01, 14z-216):** `tools/rng_forms.py` exempts rows `after:` a SLOWDOWN root, by name — `DECISIONS_HISTORY.md` "Ruled 2026-11-01 (14z-216) — #345's rows under a non-zero RNG".
@@ -192,17 +192,6 @@ them would reduce the legacy footprint from 5 bytes to 2.
 
 Only undecided items live here; a ruling moves its entry to `DECISIONS_HISTORY.md` in the
 commit that records it (CLAUDE.md [VSP-17]).
-
-- **#369's lint: do the limits the session named, beyond the ruled one, stand?** (14z-224; the ruled limit:
-  `DECISIONS_HISTORY.md` "Ruled 2026-11-09 (14z-224) — #369's lint lands with a stated limit …".) The session named
-  more than was ruled: in the six ground-truth gates, the textual reader misses a mis-split one-line echo, a variable
-  redirect target, a later redirect overriding an earlier one, `eval`, aliases and functions; in every gate, CAUGHT text
-  assembled at run time, code outside `tests/` and `tools/`, and a printed data file holding the text pass; a
-  `vs_ctl_caught` call handed the wrong file is review (`tools/ctl_caught_lint.py`'s docstring, `docs/project/
-  must_fire_contract.md` § #369). Options: (a) accept them as stated limits; (b) close them first with an evidence file
-  (the helper also writes its CAUGHT record where the gate cannot write; the classifier reads that, not the log), a
-  change to the helper, the classifier and the 3 migrated gates. Recommendation: decide before the 310-gate migration,
-  since every migrated gate would use (b)'s form.
 
 ## THE DEADNESS REGISTER (opened 14z-71, maintainer's standing instruction)
 

@@ -37,6 +37,7 @@
 #   byte-for-byte; idempotent re-chain; D->H cumulative; and the MUST-FAIL
 #   control — P onto H dies at the known strip collision naming both sources.
 #   >>> S3 flips section 4 to full-chain success. ~6 min
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

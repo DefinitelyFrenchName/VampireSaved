@@ -54,6 +54,7 @@
 #   walk over all 128 (cell,direction) pairs measured in MAME; four negative
 #   controls on the checker's verdicts; and all 16 cell screen positions
 #   measured
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 . "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69

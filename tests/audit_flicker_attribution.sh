@@ -101,6 +101,7 @@
 #   on an IDENTICAL pair — these frames are in the specs BECAUSE they differ,
 #   so identity means the rig died, not that the build improved. ~3 min, 4
 #   MAME runs
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:7150f4c3) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

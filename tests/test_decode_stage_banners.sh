@@ -53,6 +53,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #92) the stage-banner decoder — incl. the control
 #   requiring a base-as-ANCHOR decode to FAIL LOUDLY. **Not portable.**
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

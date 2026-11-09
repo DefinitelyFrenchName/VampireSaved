@@ -51,6 +51,7 @@
 #
 # Usage: [ROMDIR=...] [FREEZE=1] tests/test_same_data_p2.sh   # ci_static, ~20 s;
 #   ROMDIR only when the build/out decrypt cache is absent (tests/lib/decrypt_cache.sh)
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

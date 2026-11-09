@@ -47,6 +47,7 @@
 #   OWN bank word and breaks that (Huitzil's beam). Frozen counts: H 26 type-4
 #   (the POSITIVE CONTROL — its first version was blind and read 0 for him), D
 #   1, PYRON 0 (so his delta-0 placement needs no strip-tiles). Static
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

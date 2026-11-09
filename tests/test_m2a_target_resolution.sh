@@ -40,6 +40,7 @@
 # happen to stop early: m2a_run_masked is replaced with a loud failure, so if
 # a future edit makes this gate reach a replay it fails immediately instead
 # of quietly costing the cheap tier four minutes. Measured runtime: ~1 s.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

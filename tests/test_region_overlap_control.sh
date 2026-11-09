@@ -29,6 +29,7 @@
 #   trio constants can fail. Points section 5 at the superseded trio (must
 #   reject: 2000 vs 2012) and names an absent build (must FAIL, not SKIP),
 #   plus a positive control. No ROMs, no emulator, ~2 min
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

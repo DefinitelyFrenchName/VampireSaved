@@ -47,6 +47,7 @@
 #   40,000 vanilla attract frames traced
 #   (`build/attract_roster_trace_14z118.log`), all eight in table order. One
 #   negative control (a tenant id planted in the table must fail)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

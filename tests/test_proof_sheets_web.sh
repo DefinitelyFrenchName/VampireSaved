@@ -41,6 +41,7 @@
 # WHY: the sheets are reduced screenshots of a copyrighted game; the ruling allows them public only reduced, credited and
 #   free of local paths, and a web build that quietly ships one full-size picture or one page without credits breaks it.
 #   Scope `ondemand` (the maintainer, 2026-10-23: gates on the capture sheets "really should be ondemand scope").
+# SHARES: none — its 15 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

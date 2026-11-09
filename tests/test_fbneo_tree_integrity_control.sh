@@ -28,6 +28,7 @@
 # control that mutates emu/fbneo would be worse than the defect.
 #
 # Usage: tests/test_fbneo_tree_integrity_control.sh   (no ROMs/emulator, ~20s)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -35,6 +35,7 @@
 #   INVARIANT (every op = free space or a variant row) + legacy replay bit-
 #   identity. Build any tenant: TENANT_MANIFEST=... TENANT_CHAR=0x10
 #   tools/build_donovan.sh
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

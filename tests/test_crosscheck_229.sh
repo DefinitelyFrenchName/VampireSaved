@@ -39,6 +39,7 @@
 #
 # Usage: tests/test_crosscheck_229.sh            # static tier, ROM-free
 #        CONTROL=<name> tests/test_crosscheck_229.sh
+# SHARES: none — its 8 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

@@ -27,6 +27,7 @@
 # MUST-FIRE: shadow-tool: prepare-by-line — a copy that finds a prepare only by a "prepared run" line must miss the tail-cut prepare, and the comparison must FAIL (mode: the gate reads that copy)
 #
 # Usage: tests/test_close_loop_cost.sh      # ci_portable, ~1 s
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

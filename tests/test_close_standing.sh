@@ -31,6 +31,7 @@
 # MUST-FIRE: perturbed-copy: unpaired-plant — a copy of the template whose plant row expects exit 0 must fail the lint (mode: the lint on that copy)
 #
 # Usage: tests/test_close_standing.sh      # ci_portable, ~3 s
+# SHARES: none — its 9 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

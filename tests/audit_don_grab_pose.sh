@@ -137,6 +137,7 @@
 #   defect; flip at the fix. VICTIMS= overrides the set. Rig:
 #   replays/96_don_victor_grab.rpl (4 connects/run, no HP pokes). ~12 min, 8
 #   MAME runs (2 at a time).
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -66,6 +66,7 @@
 #   2" WAS this artifact (settled by the no-poke MAME retest, 14z-98 (5): real
 #   tenant losses judge). THE RULE: kill pokes write both words. ~7 min, 2
 #   parallel MAME runs.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

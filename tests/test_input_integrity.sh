@@ -46,6 +46,7 @@
 #   ground truth for the input-integrity check: silent on clean runs, catches
 #   a stray un-scripted press at the right frame. MAME's window takes focus
 #   even under -video none, so host keys reach the emulated controls
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

@@ -53,10 +53,12 @@
 # this gate is about the CUT, not about the upload.
 #
 # Usage: tests/test_release_asset_shape.sh   [RELEASE=merged-mNN]
+# SHARES: self release-assets
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+W="$(mktemp -d)"; trap 'vs_shares_release; rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+. "$REPO/tests/lib/shares.sh"; vs_shares_claim test_release_asset_shape release-assets   # SHARES-CLAIM (#370, 14z-225): the host claim on what its # SHARES: line names
 fail=0
 ok()  { echo "  ok    $*"; }
 bad() { echo "  FAIL  $*"; fail=1; }

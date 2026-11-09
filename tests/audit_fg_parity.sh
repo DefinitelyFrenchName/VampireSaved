@@ -52,6 +52,7 @@
 #   applier staged into vs2's $FF3494 family, vsavj reads $FF3442). Ground-
 #   truthed FAILING on the pre-fix merged; 2 verdict controls (tick removed,
 #   no stocks)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

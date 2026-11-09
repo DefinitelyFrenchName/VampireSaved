@@ -57,6 +57,7 @@
 #   it had just verified bit-for- bit. Scratch repo + stubbed runner; the
 #   verdict control reconstructs the pre-fix tool and requires the defect.
 #   ROM-free, ~1s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 SRC="${GATE_SRC:-$REPO/tools}"

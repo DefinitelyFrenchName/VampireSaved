@@ -23,6 +23,7 @@
 # MUST-FIRE: shadow-tool: identity-unchecked — a copy of run_all_static.sh whose REUSE-IDENTITY comparison is disabled must reuse on a changed identity, and sections 3 to 5 must FAIL (mode: that copy is the synthetic repo's static runner)
 # MUST-FIRE: shadow-tool: emu-identity-unchecked — a copy of run_all_emulator.sh whose REUSE-IDENTITY comparison is disabled must reuse on a changed instrument, and section 8 must FAIL (mode: that copy is the synthetic repo's emulator runner)
 # MUST-FIRE: shadow-tool: release-only-off — a copy of run_all_static.sh whose REUSE-RELEASE-ONLY refusal is disabled must accept --reuse at --cadence freeze, and section 6 must FAIL (mode: that copy is the synthetic repo's static runner)
+# SHARES: none — its 7 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:9ad0f0ff) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -59,6 +59,7 @@
 # anchor; an address-index section that is no heading. Section 8 is the
 # must-NOT-fire side: a `<name>` inside a code span renders and does not trip
 # the tag check. Section 9 carries its own control, on the rendered tree.
+# SHARES: none — its 5 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

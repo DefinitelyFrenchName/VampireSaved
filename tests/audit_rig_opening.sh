@@ -61,6 +61,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [BUILD=build/m3b_merged34] [FREEZE=1] tests/audit_rig_opening.sh
 #   emulator tier, MAME; two field_trace runs in parallel — measured 14z-172 on this MacBook, solo: ~5 s wall
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:f329dc8d) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

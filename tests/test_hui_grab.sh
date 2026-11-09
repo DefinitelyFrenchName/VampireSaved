@@ -43,6 +43,7 @@
 #   Circuit Scrapper gate (14z-66): the 2P-dummy grab connects with the NATIVE
 #   damage datum (frame-identical A/B of record). Early-window 2P pokes only —
 #   see the replay 80 header. Self-builds stage 4 unless given a build
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

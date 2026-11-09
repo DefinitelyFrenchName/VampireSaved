@@ -49,6 +49,7 @@
 # MUST-FIRE: perturbed-copy: broken-page — a copy of the page with one byte of its inlined manifest's declared set key changed must make the browser run FAIL, because the page would then build a set it cannot vouch for; if the run still passed, the gate would not be reading the page's verdict at all (mode: the gate drives that copy)
 #
 # Usage: ROMDIR=... tests/test_applier_page_browser.sh [release/merged-m26/fbneo]   # ci_static
+# SHARES: self
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

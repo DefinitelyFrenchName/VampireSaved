@@ -7,6 +7,7 @@
 #   known flicker inventories classify as PASS or FAIL as designed.
 # HOW: synthetic logs through tools/compare_flicker.py (no emulator, fast).
 # EXPECTS: every synthetic case as designed.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 W="$(mktemp -d)"

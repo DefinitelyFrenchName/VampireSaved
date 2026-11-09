@@ -67,6 +67,7 @@
 #
 # Static, no emulator, ~1 s. Needs the current merged build dir.
 # Usage: tests/test_freeze_artifacts_current.sh
+# SHARES: none — its 6 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 cd "$REPO"

@@ -29,6 +29,7 @@
 #      content — must FAIL (exit 3).
 #
 # Usage: ROMDIR=... tests/test_compare_fields_selfcheck.sh
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

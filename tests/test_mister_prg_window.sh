@@ -82,6 +82,7 @@
 #   construction); and both legs issue the same number of 68k bus READ cycles
 #   into the window. `--pos-log DIR --neg-log DIR` re-analyses finished runs;
 #   `--freeze` rewrites the expectation deliberately
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

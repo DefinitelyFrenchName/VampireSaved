@@ -77,6 +77,7 @@
 # MUST-FIRE: shadow-tool: who-swapped — a copy of tools/proof_sheets.py whose who() swaps P1 and P2 must read the fixture's pair the wrong way round, so the page's per-sheet characters rest on the right id for each side (the maintainer, 14z-206: each gate's characters and setup; in-gate: the fixture's P1 and P2 differ, so a swap is visible)
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/test_proof_sheets.sh   # emulator tier (MAME), ~17 s (measured 14z-204)
+# SHARES: self
 set -u
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

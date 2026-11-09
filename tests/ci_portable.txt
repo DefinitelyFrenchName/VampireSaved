@@ -377,9 +377,12 @@ test_tmp_hygiene
 # test_signal_traps.sh — a shell script that traps INT, TERM, HUP or QUIT ends in that trap (#359, 14z-221c): the premise
 # measured on sh/bash/dash, the census of tests/ and tools/ (tools/signal_traps.py), known answers; one control. ~14 s.
 test_signal_traps
-# test_controls_concurrent.sh — the concurrent-controls list still describes the gates it names (#315, 14z-207), and the scorer
-# certifies only HONOURED control runs (#349, 14z-218); four controls. ~4 s.
+# test_controls_concurrent.sh — the write-trace scorer certifies only HONOURED control runs (#349, 14z-218); its list census
+# was replaced by #370's # SHARES: lines (14z-225); one control. ~2 s.
 test_controls_concurrent
+# test_shares.sh — #370 (14z-225): every registered gate declares what it shares, every token registered, held and claimed;
+# the static pool keeps token holders apart and a self gate's modes in turn; the host claim waits, refuses, nests, frees on a holder's death, never two holders; ten controls. ~60 s.
+test_shares
 # #196 (14z-189): an unset MAME_BIN makes tools/run_mame.sh run the PINNED build for the set (WIDE for vsavjw,
 # the reference build for stock sets), never the mame on PATH; a missing default is refused; one control. ~1 s.
 test_mame_default_bin

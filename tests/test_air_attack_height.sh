@@ -38,6 +38,7 @@
 # (Phobos) at 0x0018 where ours read 0 (ours takes vs2's row since M23, 14z-192, #222).
 #
 # Usage: ROMDIR=... tests/test_air_attack_height.sh
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

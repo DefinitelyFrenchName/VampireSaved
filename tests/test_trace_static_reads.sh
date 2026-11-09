@@ -36,6 +36,7 @@
 #
 # The real-data run lives on Linux: `python3 tools/trace_static_reads.py all --out DIR` on PILOT (strace), whose
 # figures a predictor change quotes. This gate proves the scorer and its control, never a predictor.
+# SHARES: none — its 6 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

@@ -31,6 +31,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   WIDE Phase A measurements (rerunnable; ground- truths its own instrument
 #   before trusting nulls)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

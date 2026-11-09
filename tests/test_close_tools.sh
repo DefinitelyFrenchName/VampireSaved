@@ -76,10 +76,12 @@
 # none of which a changed tracked path shows, so tests/run_all_static.sh --confirm never carries it. Since #288 (14z-202,
 # `ee9dc1f0`) the gate is `ondemand` in tests/ci_cadence.tsv, so a session run defers it and the mark has no effect
 # until a cadence brings the gate back (#300).
+# SHARES: self git-modules-index
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d "${TMPDIR:-/tmp}/closetools.XXXXXX")" || { echo "FAIL: test_close_tools — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+W="$(mktemp -d "${TMPDIR:-/tmp}/closetools.XXXXXX")" || { echo "FAIL: test_close_tools — mktemp -d failed (W)"; exit 2; }; trap 'vs_shares_release; rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+. "$REPO/tests/lib/shares.sh"; vs_shares_claim test_close_tools git-modules-index   # SHARES-CLAIM (#370, 14z-225): the host claim on what its # SHARES: line names
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 unset RETRACTION_GREP_UNIVERSE   # a test harness's stand-in for the tree, set below for ONE control only (#268)
 

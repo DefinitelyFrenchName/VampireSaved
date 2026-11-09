@@ -79,6 +79,7 @@
 #   EXPECT_*=0 legs read NO-KO/ NEITHER without it. Cuts his inputs at f6100 +
 #   one both-words 5hp pin; the CPU's own hit kills through the real judge.
 #   REFUSED with the defect EXPECTs (the pin would mask the hp:=1 shape).
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

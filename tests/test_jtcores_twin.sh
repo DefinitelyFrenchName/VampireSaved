@@ -58,6 +58,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (tier ci_portable) pin, cps2w-vs-cps2 twin, the patch SERIES == `format-
 #   patch` per commit
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO/emu/jtcores"

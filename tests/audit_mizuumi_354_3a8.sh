@@ -55,6 +55,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [KEEP=<dir>] [CONTROL=<name>] tests/audit_mizuumi_354_3a8.sh
 #   emulator tier, MAME; scope ondemand (the pristine-only ruling); ~2.5 min on the Mac (26 legs, three at a time)
+# SHARES: self
 set -u
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"; export ROMDIR

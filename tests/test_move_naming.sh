@@ -78,6 +78,7 @@
 #   Lightning ES = `0x284A64` (replay 56); negative control: a swapped line
 #   fails the compare. Run after any change to a move list's seq ids, the rig
 #   schedules, the decoder or the vs2 extracts
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

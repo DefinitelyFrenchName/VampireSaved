@@ -135,6 +135,7 @@
 #   wait-state boundary and the surviving `!RnW` on `objcfg_cs`. TWO more
 #   must-fire controls: the promote's gate bypassed, and the promote reading
 #   `y[15]` instead of `y[12]` — the profile's first draft
+# SHARES: none — its 7 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

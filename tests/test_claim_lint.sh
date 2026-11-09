@@ -29,6 +29,7 @@
 # same sentence before a reader is spent on it; it does not judge truth.
 #
 # Usage: tests/test_claim_lint.sh      # ci_portable, ~1 s
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

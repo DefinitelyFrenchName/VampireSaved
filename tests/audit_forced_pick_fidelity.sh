@@ -78,6 +78,7 @@
 # Usage: ROMDIR=... [MAME_BIN=...] [ROWS="huitzil pyron donovan-self"] [JOBS=6] [FREEZE=1] [MEASURE=1 [WHOLE=1]] [KEEP=<dir>] tests/audit_forced_pick_fidelity.sh
 #   emulator tier, MAME, native vsav2 only (no build). MEASURE=1 prints every
 #   differing offset with its values and classification and freezes nothing.
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:f329dc8d) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }

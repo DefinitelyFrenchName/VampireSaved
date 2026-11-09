@@ -48,6 +48,7 @@
 #   a FROZEN generation now, so drift EITHER way fails. 5 cases: growth,
 #   shrink, the frozen shape, a required replay with no spec, and an
 #   unresolvable target (must name rule 6). No ROMs, no emulator, ~3s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -58,6 +58,7 @@
 # writes into a build dir.
 #
 # Env: BUILDS="don_m19 hui53 pyron37" to re-point at another freeze.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 cd "$(dirname "$0")/.."
 BUILDS="${BUILDS:-don_m30 hui64 pyron49}"

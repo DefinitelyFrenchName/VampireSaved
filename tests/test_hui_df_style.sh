@@ -90,6 +90,7 @@
 #   DF_STYLE_EXPECT=matches when fixed. Three verdict controls. Defaults to
 #   the CURRENT huitzil solo (build/hui51 since 14z-117b; re-pointed at every
 #   freeze — read the script's BUILD default, not this line)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

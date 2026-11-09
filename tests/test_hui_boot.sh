@@ -49,6 +49,7 @@
 #   Huitzil stage-4 BOOT gate (14z-65): the forced-pick match forms with HIS
 #   data (base read from the build's own patch), guard clean, legacy bit-
 #   identical
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:69321107) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

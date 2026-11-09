@@ -60,6 +60,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [MERGED=build/m3b_merged34] [FREEZE=1] [CONTROL=air-grounded|air-class|ours-drift|dome-drift|box-drift|merge-corrupt|stale-image] tests/audit_trap_air_hit.sh
 #   emulator tier, MAME: four legs in parallel, ~2 min.
+# SHARES: none — its 7 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:1ecdcc22) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 ROMDIR="${ROMDIR:?set ROMDIR}"; if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"

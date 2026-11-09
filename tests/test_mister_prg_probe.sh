@@ -68,6 +68,7 @@
 #   received as garbage. Also asserts the byte order is DERIVED from the
 #   control rather than hard-coded, and that `--prgprobe` refuses `--core
 #   cps2`
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

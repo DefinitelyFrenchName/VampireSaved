@@ -43,6 +43,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   freezes the id space: 0 out-of-range variant rows, the 5 sites that fold
 #   the id to 4 bits, and vsav2's 2-fold/6-widened reference shape
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

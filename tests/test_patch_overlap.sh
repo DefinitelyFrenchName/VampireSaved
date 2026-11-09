@@ -15,6 +15,7 @@
 #   ground truth for the patch_prg op-overlap assertion (14z-65): two ops
 #   writing one word is a NAMED build error; disjoint and word-adjacent ops
 #   stay clean. ~2s, no emulator
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

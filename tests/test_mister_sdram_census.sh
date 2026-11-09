@@ -94,6 +94,7 @@
 #   fire: leg B must FAIL the WIDE map, and A re-run with one expected
 #   constant moved 1 KiB must be rejected (twice, one per bank).
 #   `CENSUS_KEEP=<dir>` caches the bank images
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

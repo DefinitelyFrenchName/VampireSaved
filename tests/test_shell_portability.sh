@@ -46,6 +46,7 @@
 #   heredoc bodies first (these scripts embed Python and TOML; an unstripped
 #   census reports ~16 false [[table]] hits). A script that needs bash must
 #   say so in its shebang — today exactly one does. No ROMs, no emulator, ~1s
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

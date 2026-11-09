@@ -27,6 +27,7 @@
 # MUST-FIRE: perturbed-copy: runner-unpinned — a copy of tests/run_all_static.sh without its pin line must FAIL (2) (mode: (2) reads that copy)
 # MUST-FIRE: perturbed-copy: lib-untracked — the tracked-library check run on a path git does not track (a runner sources the library only when it is there) must FAIL (2) (mode: (2) checks that path)
 # MUST-FIRE: perturbed-copy: pin-late — a copy of tests/run_all_emulator.sh with its pin line moved to the end must FAIL (2) (mode: (2) reads that copy)
+# SHARES: none — its 5 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

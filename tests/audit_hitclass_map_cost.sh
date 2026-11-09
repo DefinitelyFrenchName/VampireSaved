@@ -173,6 +173,7 @@
 #   transits the map) mean different things, and folding them is what produced
 #   the retracted claim. HITCLASS_TENANT_ONLY=1 skips 1+2. Verdict logic
 #   ground-truthed by tests/test_classify_hitclass_probe.sh
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:69321107) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

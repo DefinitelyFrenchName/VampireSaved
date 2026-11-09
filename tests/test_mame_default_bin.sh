@@ -18,6 +18,7 @@
 # host-dependent instrument (#196). Measured before the change (build/agent189/t196/, STATE 14z-189): the 15 gates
 # that never set MAME_BIN gave the same verdict and output under the PATH binary, the reference build and the WIDE
 # build, teardown-segfault PIDs aside; the runner exports MAME_BIN, so a tier is unchanged.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

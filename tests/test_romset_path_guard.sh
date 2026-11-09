@@ -44,6 +44,7 @@
 #   (review-triage, #76) `build_wide_romset` cannot take the reference set as
 #   its own output. The one failure in that file with **no undo** (rule 7
 #   forbids in-tree romset copies).
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

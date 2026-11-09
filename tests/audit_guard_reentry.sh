@@ -59,6 +59,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [FREEZE=1] tests/audit_guard_reentry.sh
 #   emulator tier, MAME; three field_trace and three snapshot legs, then 12 act legs — measured 14z-168 on this MacBook, solo: ~20 s wall
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:f329dc8d) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

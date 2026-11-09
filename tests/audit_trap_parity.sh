@@ -68,6 +68,7 @@
 #   sound_stub — same sample bytes both). RE-FROZEN 14z-86, ground-truthed
 #   failing on the pre-pilot shape. FORBIDS 0739/073a on ours (music ids on
 #   vsavj). Verdict control + per-leg liveness
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

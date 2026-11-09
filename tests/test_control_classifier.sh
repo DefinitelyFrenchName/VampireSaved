@@ -28,6 +28,7 @@
 #   move exactly five rows, and the three gates behind them (test_bundle_parsers, test_df_startup_provenance,
 #   test_defense_rows_census) were fixed in the same change: two modes had tested nothing (build/agent213/t310/).
 #   #369 (14z-223 post-mortem): listing the wrong answers never finished; a mode now needs its own check's evidence.
+# SHARES: none — its 5 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:17f4f67f) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

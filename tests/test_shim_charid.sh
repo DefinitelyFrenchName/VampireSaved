@@ -66,6 +66,7 @@
 #   forms a Donovan match and returns a meaningless zero, so section 0 proves
 #   the probe is armed before any verdict. Verdict control: offset +0x000 must
 #   NOT read the id. ~44s. Defaults build/m5_wide, id 0x13
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -59,6 +59,7 @@
 # (SKIP without it, which --strict counts as failure).
 #
 # Usage: ROMDIR=... [FREEZE=1] tests/test_latch_readers.sh
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }

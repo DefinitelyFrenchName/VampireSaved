@@ -63,6 +63,7 @@
 #   ruled remap) + seq7==4 + freeze>=0x10, native its own 0x52; ALSO asserts
 #   the accepted deviation (Phobos' 11f attacker freeze) PRESENT so drift is
 #   loud. Fails on huitzil-m9- by design
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

@@ -69,6 +69,7 @@
 #   asserting uniformity once fixed. STRIP LUA COMMENTS when censusing — the
 #   banners quote `held[frame + 1]` (measured: a naive grep turned 10 deviants
 #   into 3). ROM-free, ~1s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

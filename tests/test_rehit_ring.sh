@@ -53,6 +53,7 @@
 # removed from MO's tap fails 4.
 #
 # Usage: ROMDIR=... tests/test_rehit_ring.sh   (~4 min, 6 MAME runs in parallel)
+# SHARES: self
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

@@ -27,6 +27,7 @@
 # MUST-FIRE: perturbed-copy: external-fetch — a copy of the built page with one <script src="https://..."> added must be named by the fetch check, which must FAIL (in-gate: that copy is checked; mode: the gate checks that copy instead of the page)
 #
 # Usage: tests/test_ledger_page.sh      # ci_portable, ~2 s
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

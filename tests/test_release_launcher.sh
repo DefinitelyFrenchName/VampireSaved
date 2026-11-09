@@ -30,6 +30,7 @@
 # MUST-FIRE: perturbed-copy: launcher-accepts-unpatched — a copy whose emulator binary does NOT carry the profile must be REFUSED by the launcher; without that check a player runs a stock emulator, gets "Unknown system: vsavjw" and has no idea why (mode: the gate stages that copy as the success path)
 #
 # Usage: tests/test_release_launcher.sh [release/merged-m26]   # ci_portable (no ROMDIR, no emulator, no ROM bytes)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

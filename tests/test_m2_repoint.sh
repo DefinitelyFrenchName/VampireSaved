@@ -26,6 +26,7 @@
 #      4278 — exactly where its CPU demo shows Jedah (char id 0x0F verified).
 #
 # Usage: ROMDIR=... [JOBS=N] tests/test_m2_repoint.sh
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

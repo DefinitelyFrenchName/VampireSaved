@@ -75,6 +75,7 @@
 # Controls 2 and 3 perturb a COPY of the decrypted view, never the cache;
 # control 5 perturbs a COPY of the frozen set (since 14z-206, #299) and the
 # tracked file is never written, which the guard at the end asserts.
+# SHARES: none — its 6 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO=$(cd "$(dirname "$0")/.." && pwd)
 cd "$REPO" || exit 1

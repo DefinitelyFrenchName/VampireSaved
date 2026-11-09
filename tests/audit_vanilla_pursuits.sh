@@ -73,6 +73,7 @@
 # Usage: ROMDIR=... [JOBS=1] [OUT=<dir>] [SHEET=<workbook.xlsx>] tests/audit_vanilla_pursuits.sh [--freeze-clock]
 #   (~14 min on an M2 Pro at JOBS=1: 60 rig legs ~6 min, 120 band legs ~6.5 min; a control mode other than
 #   band-moved skips the band legs)
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"

@@ -32,6 +32,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #19) The PRG suffix class excludes `m` members. **Not
 #   portable.**
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

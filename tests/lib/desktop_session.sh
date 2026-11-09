@@ -5,6 +5,8 @@
 # each other, and worse: inside audit_dead_leg_linux a desktop run refused because a sibling plays (the driver's `stray`
 # exit 3) reads UNJUDGED, which IS a dead-leg row's frozen class, so the row would pass without its dead instrument having
 # been judged. Nothing in tests/run_all_emulator.sh keeps two gates apart in a pooled run, so each gate claims the session.
+# SINCE #370 (14z-225) the claim IS the `desktop-session` token's host claim (tests/lib/shares.sh vs_shares_claim, wait 0
+# in tests/shares.tsv: refused at once, as before); the owner file stays, as the driver's view of who owns the session.
 #
 #   vs_desktop_claim <gate>   claim the session for this shell's lifetime: refuse (REFUSED:, exit 3 — UNJUDGED under a
 #                             control mode, red in a plain run) when another live harness owns it, or when a release
@@ -16,6 +18,7 @@
 #   vs_desktop_procs          the pids of release emulators and sink recorders now running, one per line, sorted.
 # The owner file: /run/user/<uid>/vampire-saved-desktop.owner, "<pid> <gate>". A file naming a dead pid is stale and ignored.
 VS_DESKTOP_OWNER_FILE="/run/user/$(id -u)/vampire-saved-desktop.owner"
+. "${REPO:?desktop_session.sh needs REPO}/tests/lib/shares.sh"
 VS_DESKTOP_CLAIMED=""
 
 vs_desktop_procs() {   # only the release package's binaries (the path the desktop gate unpacks) and the driver's recorder
@@ -29,6 +32,7 @@ vs_desktop_claim() {
         echo "REFUSED: $1 — another harness owns the desktop session: $(cat "$VS_DESKTOP_OWNER_FILE" 2>/dev/null) (run one desktop gate at a time)"
         exit 3
     fi
+    vs_shares_claim "$1" desktop-session   # DESKTOP-CLAIM (#370): the host claim; REFUSED, exit 3, beside a live holder
     echo "$$ $1" > "$VS_DESKTOP_OWNER_FILE" || { echo "REFUSED: $1 — cannot write $VS_DESKTOP_OWNER_FILE"; exit 3; }
     VS_DESKTOP_CLAIMED=1; VS_DESKTOP_OWNER=$$; export VS_DESKTOP_OWNER
     sleep 3   # a sibling's driver that passed its owner check just before this claim has started its processes by now
@@ -43,5 +47,6 @@ vs_desktop_claim() {
 
 vs_desktop_release() {
     [ -n "$VS_DESKTOP_CLAIMED" ] && [ "$(cut -d' ' -f1 "$VS_DESKTOP_OWNER_FILE" 2>/dev/null)" = "$$" ] && rm -f "$VS_DESKTOP_OWNER_FILE"
+    vs_shares_release
     return 0
 }

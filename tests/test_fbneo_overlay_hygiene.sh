@@ -36,6 +36,7 @@
 # `tests/test_fbneo_overlay_hygiene_control.sh` reconstructs the PRE-FIX
 # runner and requires section 2 to FAIL against it — because a hygiene gate
 # that has never seen the defect is indistinguishable from one that cannot.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

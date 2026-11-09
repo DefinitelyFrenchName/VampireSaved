@@ -43,6 +43,7 @@
 #   BUILDER_CMD and GUARDED_RUNNER: never-started and empty-log rigs must FAIL
 #   and be named `dead`; a live rig must still score `runs`. Pre-fix the same
 #   rig exited 0 and printed the budget claim. ROMDIR, no emulator, seconds
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

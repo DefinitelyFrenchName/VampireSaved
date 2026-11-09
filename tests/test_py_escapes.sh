@@ -11,6 +11,7 @@
 #   on every packaging run (the Mac's 3.9 stays silent).
 #
 # MUST-FIRE: perturbed-copy: planted-escape — a file holding "\`" in a plain string, compiled by the same check, must be named and FAIL the gate (mode: the check runs over that file too)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

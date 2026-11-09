@@ -96,6 +96,7 @@
 # it was frozen (build/agent184/t180/): native writes the third pair at 0x028B5A/5E on the KO frame and
 # ours at the placed 0x0CFDA8/AC to vsavj's live pair; the meters after the KO equal native's on
 # M20, and on merged-m19 (the unfixed stores) the thrower's and the victim's are swapped.
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:f329dc8d) and its plain run always pooled (#370 A1, 14z-225)
 KO_donovan_2="5962 6260"   # <poke frame> <frames>: Sharirum Luna [6MP] at 5960 + 2, run to the KO + ~250
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [PARTS="pyron_3 huitzil_3 donovan_5 donovan_2_ko legacy_demitri"] [FREEZE=1] tests/audit_throw_registration.sh

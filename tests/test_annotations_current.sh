@@ -44,6 +44,7 @@
 #   engine_internals prose and ~265 only in code. Four must-fire controls on a
 #   synthetic root. Regenerate after any edit that adds or removes a program
 #   address: `python3 tools/gen_annotations.py`.
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

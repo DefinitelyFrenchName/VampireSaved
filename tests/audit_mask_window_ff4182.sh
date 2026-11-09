@@ -48,6 +48,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   on-demand: proves the masked palette-staging window hides the designed
 #   diff and nothing else
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

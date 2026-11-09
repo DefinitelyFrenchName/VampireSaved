@@ -101,6 +101,7 @@
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged34] tests/audit_continue_switch.sh
 # ~18 min (one guarded 40,620-frame MAME marathon). On-demand.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

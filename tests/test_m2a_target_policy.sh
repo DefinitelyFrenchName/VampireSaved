@@ -25,6 +25,7 @@
 # defect #96 was filed for.
 #
 # Usage: tests/test_m2a_target_policy.sh
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

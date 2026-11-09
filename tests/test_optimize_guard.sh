@@ -30,6 +30,7 @@
 #   rather than weakening them. Its systemic section — any assert-using tool a
 #   builder invokes must carry the guard — is what found four of the six; #79
 #   named two.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

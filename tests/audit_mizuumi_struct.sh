@@ -75,6 +75,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [KEEP=<dir>] [FREEZE=1] tests/audit_mizuumi_struct.sh
 #   emulator tier, MAME; ~4 min (23 legs in parallel, then the two poked legs)
+# SHARES: self
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

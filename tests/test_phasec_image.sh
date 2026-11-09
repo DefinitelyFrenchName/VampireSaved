@@ -41,6 +41,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   Phase C step 2: image grows to 6MB, WIDE romset shaped+runs, extension
 #   PROVABLY READ (negative control), stock build untouched
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # ABSOLUTE, and it is load-bearing (14z-132). Section 4 runs each leg from

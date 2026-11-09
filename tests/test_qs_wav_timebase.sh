@@ -37,6 +37,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #85) The WAV audit converts frames at the CPS rate
 #   (59.6374 Hz), not 60.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

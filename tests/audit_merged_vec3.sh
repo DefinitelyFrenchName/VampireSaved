@@ -93,6 +93,7 @@
 #   compares the base against the placements-derived healthy value. FAILS BY
 #   DESIGN until the fix lands; then it is the regression gate. Rig control:
 #   no PROBE at 2886 on hui29 = rig dead, hard fail
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:69321107) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

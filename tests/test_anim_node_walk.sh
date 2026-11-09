@@ -48,6 +48,7 @@
 #   first countdown = dur or dur−1; negative control: a stride-0x17 decode
 #   must leave most pointers off-graph. Run after any change to the decoder or
 #   the node-format claims in `engine_internals.md`
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

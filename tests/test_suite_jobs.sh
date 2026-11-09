@@ -13,6 +13,7 @@
 #   verdicts or frozen files are not the serial suite's.
 #
 # MUST-FIRE: shadow-tool: rc-ignored — a copy of run_suite.sh whose read-back ignores a run's exit status must print a verdict where the serial suite prints RUN-FAIL (mode: that copy is the suite the 8-job runs drive; the compare must fail)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

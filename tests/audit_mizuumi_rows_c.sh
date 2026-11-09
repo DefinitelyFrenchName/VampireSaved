@@ -85,6 +85,7 @@
 # Usage: ROMDIR=... [MAME_BIN=...] [KEEP=<dir>] tests/audit_mizuumi_rows_c.sh
 #   emulator tier, MAME; scope ondemand (the pristine-only ruling); ~2-3 min on the M2 Pro (70 legs, three at a time; then fourteen
 #   control re-judgements of the same legs, ~25 s)
+# SHARES: self
 set -u
 SELF="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }

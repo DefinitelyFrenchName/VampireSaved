@@ -104,6 +104,7 @@
 #        tests/test_readme_recording.sh
 #   SKIPs when this host has no release MAME, no source-built MAME or no release tree.
 # Runtime: ~50 s (six MAME legs; 47 s wall measured solo 14z-158), emulator tier.
+# SHARES: none — its 5 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:1ecdcc22) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"

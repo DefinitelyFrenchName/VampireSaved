@@ -50,6 +50,7 @@
 #     reports ~365 for every move -- identical numbers are the tell.
 #
 # Usage: ROMDIR=... [JOBS=N] tests/test_tick_durations.sh   (~22 min, 6 MAME runs)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

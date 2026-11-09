@@ -41,6 +41,7 @@
 #   word of each palette row = 5*row — the check that would have caught
 #   shipping Donovan's palette), all 8 colour sets, and the portrait POSITION
 #   row. Static, seconds. Negative control: FAILS on build/hui10
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

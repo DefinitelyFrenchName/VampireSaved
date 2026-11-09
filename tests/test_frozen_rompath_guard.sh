@@ -46,6 +46,7 @@
 #   Track-mismatch check, NOT a frozen-reference check — the latter would
 #   block HANDOFF's own documented `build_donovan.sh 6 build/don_m4` recipe.
 #   Runs on a COPY. ON-DEMAND, ~8 min (two real builds)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

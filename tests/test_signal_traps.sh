@@ -21,6 +21,7 @@
 # WHY A PREMISE SECTION: the rule rests on a shell behaviour, so the gate re-measures it each run instead of citing it;
 #   a host whose shell stopped resuming would show here. INT is not measured: a background job of a non-interactive
 #   shell starts with INT ignored, and an ignored-at-entry signal cannot be trapped.
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
@@ -116,12 +117,15 @@ echo "== 2b. a second method: plain grep, sharing nothing with the reader (14z-2
 # Every tracked file under tests/ and tools/ outside tests/rulecheck/, in ANY language, for (A) a line naming trap and a
 # stopping signal, (B) a signal list on a line without the word trap (a multi-line action's tail), minus comment lines and
 # the accepted forms; a hit must be one of the ALLOWED lines (fixture or prose text, by exact content), never a new one.
+# The share_lock.py line (#370, 14z-225) is no resuming trap: the host claim's helper ignores HUP on purpose and lives
+# exactly as long as its owner shell (SHARE-LOCK-OWNER), so a hangup that spares the owner never frees its token.
 # This gate and tools/signal_traps.py hold bad forms as fixtures by design and are left out. Grep-pattern-bound: a trap
 # built in a variable or a signal list split across lines is beyond it (stated, not tested).
 GA="$W/grep_allowed.txt"
 cat > "$GA" <<'ALLOWED'
 tests/test_tmp_hygiene.sh	trap 'rm -rf "$Q/x"' INT TERM
 tests/test_tmp_hygiene.sh	else ok "eight safe trap forms not named (a later trap, \"\$M\" alone, another variable, trap text in quotes, an INT-only trap, a heredoc, a trap after a later-line [ -n ] guard, the word trap as an argument)"; fi
+tests/lib/share_lock.py	    signal.signal(signal.SIGHUP, signal.SIG_IGN)
 ALLOWED
 git -C "$REPO" ls-files tests tools | grep -v '^tests/rulecheck/' | grep -vx 'tests/test_signal_traps.sh' | grep -vx 'tools/signal_traps.py' > "$W/grep_files.txt"
 printf '#!/bin/sh\nW="$(mktemp -d)" || exit 2\ntrap '"'"'rm -rf "$W"'"'"' EXIT INT TERM\n' > "$W/plant2b.sh"

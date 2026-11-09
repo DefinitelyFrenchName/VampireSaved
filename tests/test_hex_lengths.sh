@@ -23,6 +23,7 @@
 # length-preserving. What actually goes wrong is an unverified write plus a
 # provenance note recording the wrong span. Section 3 pins the real shape so a
 # later reader does not re-derive the resize story from the issue text.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

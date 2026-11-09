@@ -22,7 +22,7 @@
 #   emulator's node to auto_null and from auto_null to pw-record, and every 5 s window of the
 #   emulator's own stream above -45 dBFS RMS (the sink measured 14z-194 at -27 to -36 dBFS after
 #   select); each control fails.
-# FOLLOWS: tools/upload_release_assets.sh tools/desktop_session_play.py tools/desktop_audio_check.py
+# FOLLOWS: tools/upload_release_assets.sh tools/desktop_session_play.py tools/desktop_audio_check.py tests/lib/shares.sh tests/lib/share_lock.py tests/shares.tsv
 #   tools/desktop_mark_check.py build/manifest/version_font.json build/manifest/donovan.toml
 #   build/manifest/huitzil.toml build/manifest/pyron.toml tests/lib/desktop_session.sh
 #   build/manifest/ tests/lib/controls.sh emu/fbneo/ emu/fbneo-patches/ tools/setup_fbneo.sh
@@ -69,6 +69,7 @@
 # loads and saves that state, so every run here gets a FRESH XDG_DATA_HOME (a first-run player).
 #
 # Usage: ROMDIR=... tests/audit_release_linux_desktop.sh   [RELEASE=merged-mNN] [ASSETS=<dir>]
+# SHARES: self desktop-session release-assets
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
@@ -90,6 +91,7 @@ W="$(mktemp -d)"; trap 'vs_desktop_release; rm -rf "$W"' EXIT; trap 'exit 130' I
 # one harness at a time on the desktop session (#310 group 7, 14z-223): REFUSED (exit 3) beside another desktop gate or a
 # leftover release emulator; under audit_dead_leg_linux (its owner) it claims and checks nothing
 vs_desktop_claim audit_release_linux_desktop
+vs_shares_claim audit_release_linux_desktop release-assets   # SHARES-CLAIM (#370, 14z-225): the release package it unpacks (desktop-session is vs_desktop_claim's)
 # a control mode writes privately, its mesa cache too (#321, 14z-210: modes side by side wiped and wrote one OUT and
 # one ~/.cache/mesa_shader_cache); the plain run keeps build/desktop_release, its registered output
 OUT="$REPO/build/desktop_release"; [ -n "${CONTROL:-}" ] && { OUT="$W/out"; export XDG_CACHE_HOME="$W/xdg_cache"; }

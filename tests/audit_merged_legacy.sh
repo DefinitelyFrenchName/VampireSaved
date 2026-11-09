@@ -128,6 +128,7 @@
 #   measured and attributed, awaiting rulings (STATE "DECISIONS PENDING —
 #   14z-89"): 21/26 arm the type-6 tripwire on legacy, 12 measures the UNION
 #   of the two solo shapes. Failing logs kept in build/gate_failures/
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

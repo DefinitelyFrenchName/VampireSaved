@@ -63,6 +63,7 @@
 #   14z-103; the 14z-73 grab_hold_keyframes fix is what it guards, Δ=0) |
 #   =differs reproduces the pre-fix ~109px teleport (needs a pre-14z-73
 #   build). Checker tools/check_grab_victim.py. Defaults hui46
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

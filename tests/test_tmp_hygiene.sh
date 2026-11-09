@@ -49,6 +49,7 @@
 # MUST-FIRE: perturbed-copy: planted-trapped — a shell gate whose `trap 'rm -rf "$A/sub"' EXIT` is set before its guarded A="$(mktemp -d)" || exit 2, with the fourteen other trap-order forms of tests/trap_forms.sh, must be named TRAPPED and FAIL the gate (#337) (mode: the census reads that script with the tree)
 # MUST-FIRE: perturbed-copy: planted-unread-trap — a shell gate whose `trap "$CMD" EXIT` (an action that is only a variable) and an unbalanced-quote trap the trap-order reader cannot read must be named UNREADTRAP and FAIL the gate (#337, rule-checker run 2026-10-30-1406) (mode: the census reads that script with the tree)
 # MUST-FIRE: known-bad: shim-blind — the dynamic check with the failing mktemp left OFF the PATH: the synthetic unguarded script then carries on with a real W, and the guarded gates run past their mktemp, so the check names its own shim dead and FAILs (in-gate: the unguarded script must carry on with W EMPTY under the shim; mode: the shim is left off and the gate FAILs)
+# SHARES: none — its 7 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

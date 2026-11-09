@@ -56,6 +56,7 @@
 #   Closes the coverage gap #99 fell through. Emulator, ~18 min/leg. NOTE #99
 #   does not reproduce here on MAME (P1-mash) — the gate is COVERAGE, not a
 #   crash lock.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

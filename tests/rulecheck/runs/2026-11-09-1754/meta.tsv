@@ -1,0 +1,13 @@
+decision	expectation
+subject	#370 stage 1: the # SHARES: field on every registered gate, the token-aware static pool, the host claim, the census gate, the two concurrent-controls lists retired
+session	14z-225
+model	rule-checker@163e4ce9cf7b
+claim	#370 stage 1, as ruled (A1, B1, C1, RULING.txt, on design.md), can land on main as S1_scope.md states it: every registered gate carries exactly one `# SHARES:` line: the 512 gates registered before this stage were written by ruling A1 (plan.tsv, evidence_counts.txt: 453 none, 51 self, 8 naming a registry token), and the tree holds plan.tsv's line for 511 of today's 513, the other two hand-written and named (lines_vs_plan.txt: test_controls_concurrent, test_shares); the static pool keeps token holders apart and runs a self gate's modes one after another (both run on stubs driven from their headers), the emulator runner runs a gate's controls side by side only when its line is none, the host claim waits, refuses, nests and takes over a dead holder's lock, and the census gate test_shares reads 513 gates with 0 problems, with its ten controls each HONOURED on its own CONTROL CAUGHT line (bookkeeping.txt), now with rule-checker run 2026-11-09-1751's two findings (rc1751_verdict_b.txt) answered — the owner-less lock defect under set -e fixed and controlled (claim-ownerless-dies), the untested ERIS premise named — and run 2026-11-09-1752's two (rc1752_verdict_b.txt) — the static pool's self path run and controlled (self-ignored), the two hand-written lines compared and named — and run 2026-11-09-1753's two (rc1753_verdict_a.txt) — the owner-less lock now taken over at any wait and controlled (claim-ownerless-refused), the four earlier mode logs re-run on the final library, and the static tier still to run named; the changed runner gates and their changed-section modes pass and fire (direct_results.txt), the five static holding gates pass (holding_plain.txt), and the two concurrent-controls lists and tools/controls_concurrent.py are retired; the emulator token scheduler and the freeze-cadence cross-job audit are NOT built, #370 stays open, and every limit is named in S1_scope.md (one jtsim-scratch lock for every scratch path, the three gates this session edited now self until their queued PILOT trace runs, nothing run on Linux or on ERIS (WSL2 or MINGW64), no emulator tier on this tree, and no static tier yet: the tier of record runs on the staged tree before the commit).
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	1 flag(s): D-ABSOLUTE 1
+deliverables	build/agent225/t370/rc/S1_scope.md
+action	2026-11-09-1751
+redoes	2026-11-09-1753

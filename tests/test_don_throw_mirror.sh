@@ -53,6 +53,7 @@
 #   the Donovan-victim block — static 2-byte assertion + a matched runtime
 #   control pair on replay 65. SKIPs on variant-id builds (correct by
 #   construction)
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:69321107) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

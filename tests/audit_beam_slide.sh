@@ -42,6 +42,7 @@
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged34] [KEEP=<dir>: the two traces are copied there] tests/audit_beam_slide.sh
 #   emulator tier, MAME; 2 runs
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"; export ROMDIR

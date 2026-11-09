@@ -39,6 +39,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #46) `select_port` is chainable, idempotent, and free of
 #   unreachable code — while KEEPING the round-22 analysis.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

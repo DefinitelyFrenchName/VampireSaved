@@ -8,8 +8,8 @@
 #   placeholder expansion, the exported MAME_BIN, the controls reader, a --dry-run
 #   writing no commit of record (#219), and since 14z-209 (#321, #323, #305): a red prereq gate followed by a green one
 #   still STOPS, the fbneo and mame lanes share one pool, --skip leaves a host-covered gate out by name, and a cold
-#   decrypt cache is built before the tier; since 14z-210 (#321): a listed gate's controls run beside one another in a
-#   pool (an unlisted gate's, and any gate's at --jobs 1, one after another) without deadlocking a full pool, and
+#   decrypt cache is built before the tier; since 14z-210 (#321): a SHARES-none gate's controls (#370) run beside one another
+#   in a pool (a self gate's, and any gate's at --jobs 1, one after another) without deadlocking a full pool, and
 #   --order starts a pooled lane longest first; and a control mode that says `NOT JUDGED: ` reads UNJUDGED (#310);
 #   and a control mode stopped by its host (a full disk, a failed mktemp, a refused write) reads DIED (#321); and one
 #   that died under set -e on a tool's error, the tool's line last in its log, reads DIED while a tool error before the
@@ -45,7 +45,7 @@
 # MUST-FIRE: shadow-tool: env-honoured — a copy of tests/lib/classify.sh whose ENV-ERROR branch is disabled must read a control mode that FAILs on `mktemp: No space left on device` as an honoured PASS, and section 14k must FAIL (mode: that copy is the classifier every section's runner sources; #321, 14z-210)
 # MUST-FIRE: shadow-tool: tool-honoured — a copy of tests/lib/classify.sh whose TOOL-ERROR branch is disabled must read a control mode that dies under `set -e` on `awk: can't open file` (exit 2, the tool's error its last line) as an honoured PASS, and section 14o must FAIL (mode: that copy is the classifier every section's runner sources; #367, 14z-223)
 # MUST-FIRE: shadow-tool: jobs-leak — a copy of the runner whose own job count is named JOBS again must hand a caller-exported JOBS=7 to a gate as its --jobs 2, and section 20 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
-# MUST-FIRE: shadow-tool: concurrent-off — a copy of the runner whose CONCURRENT-CONTROLS test is always false must run a listed gate's two controls one after another, and section 18 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
+# MUST-FIRE: shadow-tool: concurrent-off — a copy of the runner whose CONCURRENT-CONTROLS test is always false must run a SHARES-none gate's two controls one after another, and section 18 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
 # MUST-FIRE: shadow-tool: order-ignored — a copy of the runner whose ORDER-SORT step is disabled must start a pooled lane's gates in registry order under --order, and section 19 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
 # MUST-FIRE: shadow-tool: tmp-ignored — a copy of the runner whose DISK-TMPDIR test is always false must leave a gate with no TMPDIR from the caller writing its temp files in /tmp, and section 21 must FAIL (mode: that copy is the runner; #321, 14z-210)
 # MUST-FIRE: shadow-tool: lost-unread — a copy of the runner whose LOST-ROWS check is disabled must print GREEN for a pooled lane in which one gate's worker died before writing its row, and section 22 must FAIL (mode: that copy is the runner; #321, 14z-210: PILOT printed GREEN on PASS 1 of 3)
@@ -87,6 +87,7 @@
 #                                prereq gate AFTER the red one must not un-stop it
 #   --scope release              `out` rows are excluded; --scope all includes
 #   %PLACEHOLDER% expansion      the build set reaches the gate's argv
+# SHARES: self
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -176,7 +177,7 @@ grep -q '_l="\$2"' "$T/controls_lanevar.sh" || fail "could not restore the share
 sed 's@    decrypt_cache_warm "$LOGDIR/decrypt_warm.err" || :   # DECRYPT-WARM@    :   # DECRYPT-WARM disabled@' "$RUNNER" > "$T/runner_warmoff.sh"
 cmp -s "$RUNNER" "$T/runner_warmoff.sh" && fail "could not disable the decrypt warm-up — the DECRYPT-WARM line moved"
 # the concurrent-controls test made always false; the longest-first sort disabled (#321, 14z-210)
-sed 's@                && awk -F.\\t. -v g="$_g" .!/^#/ && $1 == g {f = 1} END {exit !f}. tests/controls_concurrent_emu.txt 2>/dev/null; then   # CONCURRENT-CONTROLS@                \&\& false; then   # CONCURRENT-CONTROLS disabled@' "$RUNNER" > "$T/runner_ccoff.sh"
+sed 's@                \&\& \[ "$(python3 tests/lib/share_pool.py get "tests/$_g.sh" 2>/dev/null)" = none \]; then   # CONCURRENT-CONTROLS@                \&\& false; then   # CONCURRENT-CONTROLS disabled@' "$RUNNER" > "$T/runner_ccoff.sh"
 cmp -s "$RUNNER" "$T/runner_ccoff.sh" && fail "could not disable the concurrent-controls test — the CONCURRENT-CONTROLS line moved"
 sed 's@    if \[ -n "$ORDER" \] && \[ "$_jobs" -gt 1 \]; then   # ORDER-SORT@    if false; then   # ORDER-SORT disabled@' "$RUNNER" > "$T/runner_orderoff.sh"
 cmp -s "$RUNNER" "$T/runner_orderoff.sh" && fail "could not disable the longest-first sort — the ORDER-SORT line moved"
@@ -244,6 +245,7 @@ sed "s@        elif _vs_tool_death \"\$_clog\" > /dev/null; then   # TOOL-ERROR 
 cmp -s "$REPO/tests/lib/classify.sh" "$T/classify_tool.sh" && fail "could not disable the TOOL-ERROR branch — the line moved"
 ln -s "$CTLLIB" "$FR/tests/lib/controls.sh"   # the controls reader beside it (14z-147)
 ln -s "$MEASLIB" "$FR/tests/lib/measures.sh"   # the measurement reader too (14z-180): the runner must survive a gate that declares nothing
+ln -s "$REPO/tests/lib/share_pool.py" "$FR/tests/lib/share_pool.py"   # the # SHARES: reader (#370, 14z-225)
 
 # Stub tools so the runner's preconditions execute for real.
 printf '#!/usr/bin/env python3\nimport sys\n' > "$FR/tools/audit_roms.py"
@@ -1054,11 +1056,12 @@ if ! vs_ctl_is decrypt-warm-off; then
 fi
 rm -rf "$FR/build/out" "$FR/tools/cps2_decrypt.py" "$FR/tests/lib/decrypt_cache.sh"
 
-echo "18. a LISTED gate's controls run beside one another in a pool; an unlisted gate's, and --jobs 1, one after another (#321, 14z-210)"
+echo "18. a SHARES-none gate's controls run beside one another in a pool; a self gate's, and --jobs 1, one after another (#321, 14z-210; #370, 14z-225)"
 # g_cc declares two controls; each control mode writes its start second, sleeps 3 s and FAILs as it must. Beside one
 # another their starts are at most a second apart; one after another, at least three.
-mkcc() {  # mkcc <name> — a stub gate with two controls that record when they started
+mkcc() {  # mkcc <name> <none|self> — a stub gate with two controls that record when they started, and its # SHARES: line
     { echo '#!/bin/sh'; echo "# $1.sh — a stub"
+      if [ "$2" = none ]; then echo "# SHARES: none — section 18's stub: each control writes its own file"; else echo "# SHARES: $2"; fi
       echo '# MUST-FIRE: perturbed-copy: ca — a planted fault must fail'
       echo '# MUST-FIRE: perturbed-copy: cb — another planted fault must fail'
       echo ': "${MAME_BIN:-}"'
@@ -1066,7 +1069,7 @@ mkcc() {  # mkcc <name> — a stub gate with two controls that record when they 
       echo 'echo "PASS: fine"; echo "CONTROL FIRED: ca — caught"; echo "CONTROL FIRED: cb — caught"; exit 0'; } > "$FR/tests/$1.sh"
     chmod +x "$FR/tests/$1.sh"
 }
-mkcc g_cc; mkcc g_cc2
+mkcc g_cc self; mkcc g_cc2 self
 gap18() {  # gap18 <gate> -> the seconds between its two controls' starts
     _a="$(cat "$T/cc_$1_ca" 2>/dev/null || echo 0)"; _b="$(cat "$T/cc_$1_cb" 2>/dev/null || echo 999)"
     _d=$((_a - _b)); [ "$_d" -lt 0 ] && _d=$((0 - _d)); echo "$_d"
@@ -1075,42 +1078,42 @@ honoured18() {  # honoured18 <log dir> <gate> -> true when both control rows are
     [ "$(awk -F'\t' -v g="$2" '$1 == g "@ca" || $1 == g "@cb" {if ($4 == "PASS" && $6 ~ /honoured/) n++} END {print n + 0}' "$1/results.tsv")" = 2 ]
 }
 reg "$(row g_cc mame release - '')"
-printf '# a fake list\ng_cc\t%s\tfake\ttest\n' "$(printf '%040d' 0)" > "$FR/tests/controls_concurrent_emu.txt"
+mkcc g_cc none
 rm -f "$T"/cc_*; run --lane mame --controls --jobs 4 --log "$T/l18a" >/dev/null 2>&1 || true
 g18a="$(gap18 g_cc)"; w18=1; [ "${VS_TIMING_SQUEEZE:-0}" = 1 ] && w18=-1   # the squeeze knob: no gap passes
-if ! honoured18 "$T/l18a" g_cc; then fail "listed, --jobs 4: a control row is not an honoured PASS"
-elif [ "$g18a" -le "$w18" ]; then ok "listed, --jobs 4: the two controls started ${g18a}s apart, both honoured"
-else timing_fail concurrent-off "listed, --jobs 4: the controls started ${g18a}s apart (want <= $w18)"
-     vs_ctl_is concurrent-off && vs_ctl_fired concurrent-off "with the test always false the listed gate's controls ran one after another (${g18a}s apart)"; fi
+if ! honoured18 "$T/l18a" g_cc; then fail "SHARES none, --jobs 4: a control row is not an honoured PASS"
+elif [ "$g18a" -le "$w18" ]; then ok "SHARES none, --jobs 4: the two controls started ${g18a}s apart, both honoured"
+else timing_fail concurrent-off "SHARES none, --jobs 4: the controls started ${g18a}s apart (want <= $w18)"
+     vs_ctl_is concurrent-off && vs_ctl_fired concurrent-off "with the test always false the SHARES-none gate's controls ran one after another (${g18a}s apart)"; fi
 rm -f "$T"/cc_*; run --lane mame --controls --jobs 1 --log "$T/l18b" >/dev/null 2>&1 || true
 g18b="$(gap18 g_cc)"
-[ "$g18b" -ge 3 ] && honoured18 "$T/l18b" g_cc && ok "listed, --jobs 1: one after another (${g18b}s apart)" \
-    || fail "listed, --jobs 1: the controls started ${g18b}s apart (want >= 3)"
-: > "$FR/tests/controls_concurrent_emu.txt"
+[ "$g18b" -ge 3 ] && honoured18 "$T/l18b" g_cc && ok "SHARES none, --jobs 1: one after another (${g18b}s apart)" \
+    || fail "SHARES none, --jobs 1: the controls started ${g18b}s apart (want >= 3)"
+mkcc g_cc self
 rm -f "$T"/cc_*; run --lane mame --controls --jobs 4 --log "$T/l18c" >/dev/null 2>&1 || true
 g18c="$(gap18 g_cc)"
-[ "$g18c" -ge 3 ] && honoured18 "$T/l18c" g_cc && ok "unlisted, --jobs 4: one after another (${g18c}s apart)" \
-    || fail "unlisted, --jobs 4: the controls started ${g18c}s apart (want >= 3)"
-# A FULL POOL DOES NOT DEADLOCK: two listed gates, two slots, four controls — each worker gives its slot back before it
+[ "$g18c" -ge 3 ] && honoured18 "$T/l18c" g_cc && ok "SHARES self, --jobs 4: one after another (${g18c}s apart)" \
+    || fail "SHARES self, --jobs 4: the controls started ${g18c}s apart (want >= 3)"
+# A FULL POOL DOES NOT DEADLOCK: two SHARES-none gates, two slots, four controls — each worker gives its slot back before it
 # asks for its controls' slots. A watchdog kills the run after 60 s.
 reg "$(row g_cc mame release - '')" "$(row g_cc2 mame release - '')"
-printf 'g_cc\t%s\tfake\ttest\ng_cc2\t%s\tfake\ttest\n' "$(printf '%040d' 0)" "$(printf '%040d' 0)" > "$FR/tests/controls_concurrent_emu.txt"
+mkcc g_cc none; mkcc g_cc2 none
 rm -f "$T"/cc_*
 ( cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator.sh --lane mame --controls --jobs 2 --log "$T/l18d" > "$T/l18d.out" 2>&1 ) &
 _p18=$!; _w=0; while kill -0 "$_p18" 2>/dev/null && [ "$_w" -lt 60 ]; do sleep 1; _w=$((_w + 1)); done
-if kill -0 "$_p18" 2>/dev/null; then kill "$_p18" 2>/dev/null; pkill -P "$_p18" 2>/dev/null; timing_fail - "two listed gates in a pool of two did not finish in 60 s (a deadlock)"
+if kill -0 "$_p18" 2>/dev/null; then kill "$_p18" 2>/dev/null; pkill -P "$_p18" 2>/dev/null; timing_fail - "two SHARES-none gates in a pool of two did not finish in 60 s (a deadlock)"
 else wait "$_p18" 2>/dev/null || true
-     honoured18 "$T/l18d" g_cc && honoured18 "$T/l18d" g_cc2 && ok "two listed gates, two slots: all four controls ran and were honoured, in ${_w}s" \
-         || fail "two listed gates, two slots: a control row is missing or not honoured"; fi
+     honoured18 "$T/l18d" g_cc && honoured18 "$T/l18d" g_cc2 && ok "two SHARES-none gates, two slots: all four controls ran and were honoured, in ${_w}s" \
+         || fail "two SHARES-none gates, two slots: a control row is missing or not honoured"; fi
 if ! vs_ctl_is concurrent-off; then
-    reg "$(row g_cc mame release - '')"; printf 'g_cc\t%s\tfake\ttest\n' "$(printf '%040d' 0)" > "$FR/tests/controls_concurrent_emu.txt"
+    reg "$(row g_cc mame release - '')"; mkcc g_cc none
     ln -s "$T/runner_ccoff.sh" "$FR/tests/run_all_emulator_ccoff.sh"; rm -f "$T"/cc_*
     (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator_ccoff.sh --lane mame --controls --jobs 4 --log "$T/l18e" >/dev/null 2>&1) || true
     rm -f "$FR/tests/run_all_emulator_ccoff.sh"; g18e="$(gap18 g_cc)"
-    [ "$g18e" -ge 3 ] && vs_ctl_fired concurrent-off "a runner whose concurrent test is always false ran the listed gate's controls ${g18e}s apart — section 18 catches it" \
+    [ "$g18e" -ge 3 ] && vs_ctl_fired concurrent-off "a runner whose concurrent test is always false ran the SHARES-none gate's controls ${g18e}s apart — section 18 catches it" \
         || { vs_ctl_dead concurrent-off "the disabled runner still ran them ${g18e}s apart"; fail "concurrent-off"; }
 fi
-: > "$FR/tests/controls_concurrent_emu.txt"; rm -f "$FR/tests/g_cc.sh" "$FR/tests/g_cc2.sh" "$T"/cc_*
+rm -f "$FR/tests/g_cc.sh" "$FR/tests/g_cc2.sh" "$T"/cc_*
 
 echo "19. --order starts a pooled lane LONGEST FIRST; --jobs 1 and no --order keep registry order (#321, 14z-210)"
 # The earlier run gives g_o1 100 s plus a 250 s control row (350 in all) and g_o3 300 s; g_o2 has no row, so its cost is

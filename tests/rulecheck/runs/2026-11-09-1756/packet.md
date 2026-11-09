@@ -1,0 +1,63 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: #370 stage 1: the # SHARES: field on every registered gate, the token-aware static pool, the host claim, the census gate, the two concurrent-controls lists retired
+Claim (the working agent's sentence): #370 stage 1, as ruled (A1, B1, C1, RULING.txt, on design.md), can land on main as S1_scope.md states it: every registered gate carries exactly one `# SHARES:` line: the 512 gates registered before this stage were written by ruling A1 (plan.tsv, evidence_counts.txt: 453 none, 51 self, 8 naming a registry token), and the tree holds plan.tsv's line for 511 of today's 513, the other two hand-written and named (lines_vs_plan.txt: test_controls_concurrent, test_shares); the static pool keeps token holders apart and runs a self gate's modes one after another (both run on stubs driven from their headers), the emulator runner runs a gate's controls side by side only when its line is none, the host claim — an OS file lock held for the claiming shell's lifetime, on the maintainer's ruling "Kernel lock (Recommended)" — waits, refuses, nests, is freed by its holder's death and never has two holders, and the census gate test_shares reads 513 gates with 0 problems, with its ten controls each HONOURED on its own CONTROL CAUGHT line (bookkeeping.txt), now with rule-checker run 2026-11-09-1751's two findings (rc1751_verdict_b.txt) answered — the owner-less lock defect under set -e fixed and controlled (claim-ownerless-dies), the untested ERIS premise named — and run 2026-11-09-1752's two (rc1752_verdict_b.txt) — the static pool's self path run and controlled (self-ignored), the two hand-written lines compared and named — and run 2026-11-09-1753's two (rc1753_verdict_a.txt) — the owner-less lock now taken over at any wait and controlled (claim-ownerless-refused), the four earlier mode logs re-run on the final library, and the static tier still to run named — and run 2026-11-09-1754's one (rc1754_verdict_a.txt) — the wait asserted (waited 1s of 1, and 2 s read from the registry) and controlled (claim-wait-ignored) — and run 2026-11-09-1755's one (rc1755_verdict_b.txt), the race between two waiters, closed by replacing the mkdir lock with the kernel lock and controlled (lock-nb-ignored, owner-death-ignored), the mkdir lock's owner-less and stale controls retired with its code; the changed runner gates and their changed-section modes pass and fire (direct_results.txt), the five static holding gates pass (holding_plain.txt), and the two concurrent-controls lists and tools/controls_concurrent.py are retired; the emulator token scheduler and the freeze-cadence cross-job audit are NOT built, #370 stays open, and every limit is named in S1_scope.md (one jtsim-scratch lock for every scratch path, the three gates this session edited now self with no PILOT trace queued, nothing run on Linux or on ERIS (WSL2 or MINGW64, where a native Windows Python has no fcntl), a lock helper killed on its own freeing the token, no emulator tier on this tree, and no static tier yet: the tier of record runs on the staged tree before the commit).
+Artifacts (read every one, in full):
+  - build/agent225/t370/rc/RULING.txt
+  - build/agent225/t370/rc/S1_scope.md
+  - build/agent225/t370/rc/bookkeeping.txt
+  - build/agent225/t370/rc/design.md
+  - build/agent225/t370/rc/direct_results.txt
+  - build/agent225/t370/rc/docs_registry.diff.txt
+  - build/agent225/t370/rc/evidence_counts.txt
+  - build/agent225/t370/rc/gate_tests.diff.txt
+  - build/agent225/t370/rc/holding_gates.diff.txt
+  - build/agent225/t370/rc/holding_plain.txt
+  - build/agent225/t370/rc/land_shares.py
+  - build/agent225/t370/rc/lines_vs_plan.txt
+  - build/agent225/t370/rc/new_files.txt
+  - build/agent225/t370/rc/plain_test_close_tools.log
+  - build/agent225/t370/rc/plain_test_controls_concurrent.log
+  - build/agent225/t370/rc/plain_test_controls_contract.log
+  - build/agent225/t370/rc/plain_test_ctl_caught_lint.log
+  - build/agent225/t370/rc/plain_test_emulator_staleness.log
+  - build/agent225/t370/rc/plain_test_expectation_provenance.log
+  - build/agent225/t370/rc/plain_test_gate_coverage_current.log
+  - build/agent225/t370/rc/plain_test_gate_descriptions.log
+  - build/agent225/t370/rc/plain_test_gate_follows.log
+  - build/agent225/t370/rc/plain_test_gate_index_current.log
+  - build/agent225/t370/rc/plain_test_header_defaults.log
+  - build/agent225/t370/rc/plain_test_jtsim_scratch_heal.log
+  - build/agent225/t370/rc/plain_test_mister_mra_map.log
+  - build/agent225/t370/rc/plain_test_mra_build_line.log
+  - build/agent225/t370/rc/plain_test_must_fire_census.log
+  - build/agent225/t370/rc/plain_test_release_asset_shape.log
+  - build/agent225/t370/rc/plain_test_shares.log
+  - build/agent225/t370/rc/plain_test_sheet_census.log
+  - build/agent225/t370/rc/plain_test_signal_traps.log
+  - build/agent225/t370/rc/rc1751_verdict_b.txt
+  - build/agent225/t370/rc/rc1752_verdict_b.txt
+  - build/agent225/t370/rc/rc1753_verdict_a.txt
+  - build/agent225/t370/rc/rc1754_verdict_a.txt
+  - build/agent225/t370/rc/rc1755_verdict_b.txt
+  - build/agent225/t370/rc/runners_libs.diff.txt
+  - build/agent225/t370/rc/test_controls_concurrent@refused-certified.log
+  - build/agent225/t370/rc/test_emulator_runner.log
+  - build/agent225/t370/rc/test_emulator_runner@concurrent-off.log
+  - build/agent225/t370/rc/test_jtsim_scratch_heal@lock-removed.log
+  - build/agent225/t370/rc/test_shares@claim-nesting-ignored.log
+  - build/agent225/t370/rc/test_shares@claim-wait-ignored.log
+  - build/agent225/t370/rc/test_shares@lock-nb-ignored.log
+  - build/agent225/t370/rc/test_shares@no-line.log
+  - build/agent225/t370/rc/test_shares@owner-death-ignored.log
+  - build/agent225/t370/rc/test_shares@pool-tokens-ignored.log
+  - build/agent225/t370/rc/test_shares@self-ignored.log
+  - build/agent225/t370/rc/test_shares@unclaimed.log
+  - build/agent225/t370/rc/test_shares@unheld.log
+  - build/agent225/t370/rc/test_shares@unknown-token.log
+  - build/agent225/t370/rc/test_static_runner.log
+  - build/agent225/t370/rc/test_static_runner@pool-concurrency-off.log
+  - build/agent225/t370/rc/test_static_runner@pool-controls-early.log
+  - build/agent225/t370/rc/plan.tsv.lines-1-256 (lines 1-256 of build/agent225/t370/rc/plan.tsv)
+  - build/agent225/t370/rc/plan.tsv.lines-257-512 (lines 257-512 of build/agent225/t370/rc/plan.tsv)

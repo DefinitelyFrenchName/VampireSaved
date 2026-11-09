@@ -45,6 +45,7 @@
 #   `tests/expected/reactions_<tenant>.txt` (`FREEZE=1` re-freezes from the
 #   run, 14z-121); both ids asserted from the trace. Run after any change to
 #   the extracts, the decoder, the victim rigs or a reaction-set remap
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

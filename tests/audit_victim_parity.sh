@@ -93,6 +93,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [DON=build/don_m30 HUI=build/hui64 PYR=build/pyron49] [TENANTS="donovan pyron huitzil"] [FREEZE=1] [CONTROL=<name>] [GOT_OUT=<rows.tsv>] [KEEP=<dir>] tests/audit_victim_parity.sh
 #   emulator tier, MAME: 15 legs, a tenant's legs in parallel (~2 min per tenant on this MacBook).
+# SHARES: none — its 10 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:1ecdcc22) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

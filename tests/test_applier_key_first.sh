@@ -13,6 +13,7 @@
 #   were written, so the command failed while a playable-looking set sat in the output for a launcher to pick.
 #
 # MUST-FIRE: shadow-tool: write-first — a copy of the applier with the key check moved after the write (the pre-#255 order) must leave a set in the empty output on a key mismatch and FAIL section 2 (mode: the copy is the applier under test)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

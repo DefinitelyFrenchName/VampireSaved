@@ -51,6 +51,7 @@
 #   register-sourced/computed stamps the static scan cannot see). 117-stamp
 #   rig-liveness control. Run BEFORE trusting any renumber-path change.
 #   Measured 14z-82: all writers in inventory; 118/120 NOT OBSERVED
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

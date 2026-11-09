@@ -75,6 +75,7 @@
 #   the verdict combines, or it would never execute while section A is red.
 #   Table A is CLEAN. NOT in ci_portable: needs the DATA view + build dirs, so
 #   a clean checkout would SKIP and that job fails on SKIP. ~2s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

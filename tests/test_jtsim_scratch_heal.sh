@@ -13,8 +13,9 @@
 #   from the local emu/jtcores checkout (no network), reaped as the 03:35 maintenance did it —
 #   its gitdir HEAD, worktree gitfile and tracked files gone — must be healed back to the
 #   commit the superproject records; its control cuts only the submodule heal. Section 6 (#299, 14z-205c): the
-#   tool's LOCK on the scratch — a live holder is waited for and the run gives up loudly, a dead holder is taken
-#   over, and the lock is gone after a run; its control cuts the lock block.
+#   tool's LOCK on the scratch (since #370, 14z-225, the jtsim-scratch host claim: an OS file lock held by
+#   tests/lib/share_lock.py) — a live holder is waited for and the run gives up loudly, a SIGKILLed holder frees it, and
+#   nothing holds it after a run; its control cuts the lock block.
 # EXPECTS: the three shapes handled as stated and the control failing; a red is the 0-second
 #   'Cannot open macros.def' red returning between two static runs.
 #
@@ -47,6 +48,7 @@
 #     doing it for free.
 #
 # Usage: tests/test_jtsim_scratch_heal.sh
+# SHARES: self
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -57,6 +59,7 @@ PIN="$(sed -n 's/^PINNED="\([0-9a-f]*\)".*/\1/p' tools/setup_jtcores.sh)"
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/jtsim_heal.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT
 S="$WORK/scratch"
+VS_SHARES_DIR="$WORK/shares"; export VS_SHARES_DIR   # the tool's host claim (#370) taken in this run's own directory
 fail=0
 missing() { git -C "$S" ls-files --deleted | wc -l | tr -d ' '; }
 hollow() {  # delete the first N tracked files, macros.def among them — the reaper's shape
@@ -161,14 +164,14 @@ else
              || vs_ctl_fired submodule-heal-removed "without the submodule heal $SM stays broken (HEAD $(git -C "$S/$SM" rev-parse --short HEAD 2>/dev/null || echo none), want ${WANT%%${WANT#???????}})"
 fi
 
-echo "== 6. THE LOCK (#299): a live holder is waited for, a dead one taken over, none left behind =="
-LOCK="$WORK/.lock-scratch"
-sleep 120 & HOLDER=$!
-mkdir "$LOCK" && echo "$HOLDER" > "$LOCK/pid"
+echo "== 6. THE LOCK (#299; the jtsim-scratch host claim since #370): a live holder is waited for, a dead one taken over, none left behind =="
+LOCK="$VS_SHARES_DIR/jtsim-scratch.flock"
+sh -c '. "$1/tests/lib/shares.sh"; vs_shares_claim section6 jtsim-scratch; exec sleep 120' _ "$REPO" > /dev/null 2>&1 & HOLDER=$!
+_i=0; while [ "$(cut -d' ' -f1 "$LOCK" 2>/dev/null)" != "$HOLDER" ] && [ "$_i" -lt 100 ]; do sleep 0.1; _i=$((_i + 1)); done
 if MRA_LOCK_WAIT=2 JTSIM_SCRATCH="$S" $TOOL6 --ensure-scratch --quiet > "$WORK/lock6.log" 2>&1; then
     echo "  FAIL: the tool ran while pid $HOLDER held the scratch"; fail=1
 else
-    grep -q "locked by pid $HOLDER" "$WORK/lock6.log" && [ "$(cat "$LOCK/pid" 2>/dev/null)" = "$HOLDER" ] \
+    grep -q "held on this host by $HOLDER section6 .*waited 2s of 2)" "$WORK/lock6.log" && [ "$(cut -d' ' -f1 "$LOCK" 2>/dev/null)" = "$HOLDER" ] \
         && echo "  ok: held by a live pid, the run waited 2 s and gave up; the holder's lock untouched" \
         || { echo "  FAIL: refused, but not on the lock: $(tail -1 "$WORK/lock6.log")"; fail=1; }
 fi
@@ -177,10 +180,11 @@ if ! vs_ctl_is lock-removed; then
         vs_ctl_fired lock-removed "without the lock the tool ran through a scratch pid $HOLDER held"
     else vs_ctl_dead lock-removed "the lock-less copy refused a held scratch"; fail=1; fi
 fi
-kill "$HOLDER" 2>/dev/null; wait "$HOLDER" 2>/dev/null || true
-JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure with a dead holder's lock"; fail=1; }
-[ ! -e "$LOCK" ] && echo "  ok: a dead holder's lock taken over, and none left after the run" \
-                 || { echo "  FAIL: a lock is left at $LOCK"; fail=1; }
+kill -9 "$HOLDER" 2>/dev/null; wait "$HOLDER" 2>/dev/null || true
+MRA_LOCK_WAIT=3 JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure after the holder died"; fail=1; }
+if MRA_LOCK_WAIT=0 JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet > "$WORK/lock6b.log" 2>&1; then
+    echo "  ok: the holder SIGKILLed, its token freed for the next run, and nothing left holding it after that run"
+else echo "  FAIL: the token is still held after the run: $(tail -1 "$WORK/lock6b.log")"; fail=1; fi
 
 if [ "$fail" -eq 0 ]; then echo "PASS: a hollowed jtsim scratch clone is healed, re-cloned when its store is gone, the scratch is locked, and the controls fire"
 else echo "FAIL: jtsim scratch heal"; exit 1; fi

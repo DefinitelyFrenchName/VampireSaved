@@ -33,6 +33,7 @@
 #   exact, vanilla-span identity, the b0==0 reachability law, 3 verdict
 #   controls (corrupt byte / live-id refusal / non-zero-span refusal). Static,
 #   ~5 s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 ROMDIR="${ROMDIR:?set ROMDIR}"

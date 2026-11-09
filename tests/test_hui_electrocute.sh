@@ -79,6 +79,7 @@
 #   voices (0x8e/0x91) measured PRE-match — a +0x382 poke confound is open on
 #   the native leg, so freezing them would ratify a possible rig artifact. ~2
 #   min
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

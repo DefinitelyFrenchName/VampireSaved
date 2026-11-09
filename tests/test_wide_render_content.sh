@@ -68,6 +68,7 @@
 #   a true-shadow audit control + liveness (replay 36). This is the gate whose
 #   absence let the sprite garble reach a playtest — AND the gate that sat
 #   stale-red from 14z-64 to 14z-67 (GOTCHAS: the not-in-the-battery class)
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

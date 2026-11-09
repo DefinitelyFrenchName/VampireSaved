@@ -32,6 +32,7 @@
 #        tests/audit_stock_emulator_stall.sh
 #   defaults build/m3b_merged34 (re-pointed 14z-148 at M18, 14z-170 at M19); the reference binary is the
 #   WIDE=0 build of tools/setup_mame.sh. MAME_BIN (the WIDE binary) as every MAME gate.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"

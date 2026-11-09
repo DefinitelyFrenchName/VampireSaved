@@ -79,6 +79,7 @@
 #   the shim runs, then 6,000-9,700 identical incl. a full round-2). An
 #   IDENTICAL result FAILS — that means the rig stopped forming the match. On-
 #   demand, ~15 min
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:69321107) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

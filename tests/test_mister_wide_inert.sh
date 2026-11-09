@@ -57,6 +57,7 @@
 #
 # Usage: ROMDIR=... [JTSIM_SCRATCH=...] [WINDOW_FIRST=540 WINDOW_LAST=640]
 #        tests/test_mister_wide_inert.sh
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -27,8 +27,8 @@
 #   the controls readout, every results and control row but its seconds), with and without --confirm; each gate and
 #   control runs once, `# ORDER: last` runs after the pool, and the pool never runs a control the plan carries.
 #   Since #312 (14z-207, section 24): the pool runs a gate's controls as jobs of their own, queued only when the gate's
-#   job has ended; a gate listed in tests/controls_concurrent.txt has its controls run beside one another, any other gate has
-#   them run one after another, and either way the readout and the results tables are the serial run's.
+#   job has ended; since #370 (14z-225) a gate whose `# SHARES:` line is `none` has its controls run beside one another,
+#   a `self` gate has them run one after another, and either way the readout and the results tables are the serial run's.
 #   Since #299 (14z-205c, section 12d): a control mode whose gate prints its OWN `CONTROL DEAD` beside a Python
 #   exception line is DIED; an exception beside ANOTHER control's DEAD stays honoured, and since #310 (14z-213) its own
 #   DEAD alone reads LIES (tests/test_control_classifier.sh holds #310's rules on their own known answers).
@@ -63,8 +63,8 @@
 # MUST-FIRE: shadow-tool: pool-blind — a copy of run_all_static.sh whose PARALLEL-PRE read of a gate's pool result is disabled must run every gate a second time after the pool, and section 24 must FAIL (mode: that copy drives section 24)
 # MUST-FIRE: shadow-tool: pool-order-ignored — a copy of run_all_static.sh whose POOL-ORDER-LAST test is disabled must run the `# ORDER: last` stub inside the pool, before the slow stub ends, and section 24 must FAIL (mode: that copy drives section 24)
 # MUST-FIRE: shadow-tool: job-carry-blind — a copy of tests/lib/static_job.sh whose JOB-CARRY-CONTROLS exit is disabled must run g_f's control although the --confirm plan carries it, and section 24 must FAIL (mode: that copy is the job section 24 runs)
-# MUST-FIRE: shadow-tool: pool-concurrency-off — a copy of tests/lib/static_pool.py whose POOL-CONCURRENT branch is disabled must run the concurrent-listed stub's three controls one after another, and section 24 must FAIL (mode: that copy is the pool section 24 runs; #312, 14z-207)
-# MUST-FIRE: shadow-tool: pool-controls-early — a copy of tests/lib/static_pool.py that queues the concurrent stub's controls with the gates, not when the gate's job ends, must start one of them before the stub's gate run ended, and section 24 must FAIL (mode: that copy is the pool section 24 runs; #312, 14z-207)
+# MUST-FIRE: shadow-tool: pool-concurrency-off — a copy of tests/lib/static_pool.py whose POOL-TOKENS line reads every gate as `self` (blind to its `# SHARES:` line) must run the SHARES-none stub's three controls one after another, and section 24 must FAIL (mode: that copy is the pool section 24 runs; #312, 14z-207; #370, 14z-225)
+# MUST-FIRE: shadow-tool: pool-controls-early — a copy of tests/lib/static_pool.py that queues the SHARES-none stub's controls with the gates, not when the gate's job ends, must start one of them before the stub's gate run ended, and section 24 must FAIL (mode: that copy is the pool section 24 runs; #312, 14z-207)
 # MUST-FIRE: shadow-tool: runrec-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-RESULTS copy is disabled must leave a run given STATIC_RESULTS_OUT with no results in its own run record, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
 # MUST-FIRE: shadow-tool: runrec-controls-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-CONTROLS copy is disabled must leave the run record without the control times, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
 # MUST-FIRE: shadow-tool: decrypt-warm-off — a copy of run_all_static.sh whose DECRYPT-WARM call is disabled must leave a stub that reads build/out directly on a cold cache, and section 28 must FAIL (mode: that copy drives section 28; section 29 fires it in-run; #299, 14z-206)
@@ -96,6 +96,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #30) ground truth for `run_all_static.sh`'s PASS/SKIP/FAIL
 #   classifier. Sharpest case: SKIP in PROSE must still count PASS.
+# SHARES: self
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -1038,13 +1039,14 @@ JOB_C="$T/static_job_carryblind.sh"
 sed 's|    \[ -n "$_cc" \] && \[ "$_cc" = "$VS_CTL_DECLARED" \] && exit 0   # JOB-CARRY-CONTROLS|    :   # JOB-CARRY-CONTROLS disabled|' "$REPO/tests/lib/static_job.sh" > "$JOB_C"
 cmp -s "$REPO/tests/lib/static_job.sh" "$JOB_C" && fail "could not disable the job's carried controls — the JOB-CARRY-CONTROLS line moved"
 POOL_S="$T/static_pool_serial.py"
-sed 's|    if lines\[0\] == "concurrent":   # POOL-CONCURRENT|    if False:   # POOL-CONCURRENT disabled|' "$REPO/tests/lib/static_pool.py" > "$POOL_S"
-cmp -s "$REPO/tests/lib/static_pool.py" "$POOL_S" && fail "could not disable the pool's concurrent controls — the POOL-CONCURRENT line moved"
+sed 's|        TOK\[g\] = share_pool.tokens(os.path.join("tests", g + ".sh"), g)   # POOL-TOKENS|        TOK[g] = frozenset(["self:" + g])   # POOL-TOKENS disabled|' "$REPO/tests/lib/static_pool.py" > "$POOL_S"
+cmp -s "$REPO/tests/lib/static_pool.py" "$POOL_S" && fail "could not blind the pool to # SHARES: — the POOL-TOKENS line moved"
 POOL_E="$T/static_pool_early.py"
-sed 's|^queue = collections.deque(("gate", g, "") for g in gates)$|queue = collections.deque([("gate", g, "") for g in gates] + [("control", "g_k", c) for c in ("flip", "flop", "flap") if "g_k" in gates])   # POOL-EARLY shadow|' "$REPO/tests/lib/static_pool.py" > "$POOL_E"
+sed 's|^    pool.queue.append((("gate", g, ""), toks(g), None))   # POOL-GATES$|    pool.queue.extend([(("gate", g, ""), toks(g), None)] + [(("control", g, c), toks(g), None) for c in (("flip", "flop", "flap") if g == "g_k" else ())])   # POOL-EARLY shadow|' "$REPO/tests/lib/static_pool.py" > "$POOL_E"
 cmp -s "$REPO/tests/lib/static_pool.py" "$POOL_E" && fail "could not make the pool queue controls early — its queue line moved"
 FJ="$T/repo299"; mkdir -p "$FJ/tests/lib" "$FJ/tools" "$FJ/data"; debt_stubs "$FJ"
 for _l in classify controls measures; do ln -s "$REPO/tests/lib/$_l.sh" "$FJ/tests/lib/$_l.sh"; done
+ln -s "$REPO/tests/lib/share_pool.py" "$FJ/tests/lib/share_pool.py"   # the pool reads each gate's # SHARES: through it (#370)
 cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$REPO/tools/build_dirs.py" "$REPO/tests/expected/build_dirs.tsv" "$FJ/tools/"
 mkj() {  # mkj <name> <exit> <body line> [control]: a stub that logs each run, after its body (and each control run), outside the repo
     { echo "#!/bin/sh"; echo "# $1.sh — a stub of section 24"
@@ -1061,13 +1063,13 @@ mkj g_d 0 "echo 'SKIP: no build at build/nope'"
 mkj g_l 0 "echo 'PASS: l'"
 mkj g_f 0 "cat data/list.tsv > /dev/null; echo 'PASS: f'" ctl
 { echo "#!/bin/sh"; echo "# g_k.sh — the #312 stub of section 24: three controls the pool may run beside one another"
+  echo "# SHARES: none — section 24's stub: each control writes only its own lines (#370)"
   for _c in flip flop flap; do echo "# MUST-FIRE: perturbed-copy: $_c — a $_c must fail"; done
   echo 'case "${CONTROL:-}" in flip|flop|flap) echo "ctl g_k $CONTROL" >> "'"$T"'/j.ctl"; if [ -f "'"$T"'/k.on" ]; then echo "start $CONTROL $(date +%s)" >> "'"$T"'/k.log"; sleep 2; echo "end $CONTROL $(date +%s)" >> "'"$T"'/k.log"; fi; echo "FAIL: the $CONTROL was caught"; exit 1 ;; esac'
   echo "if [ -f '$T/k.on' ]; then sleep 2; echo \"gate_end \$(date +%s)\" >> '$T/k.log'; fi; echo g_k >> '$T/j.ran'"
   for _c in flip flop flap; do echo "echo 'CONTROL FIRED: $_c — caught'"; done
   echo "echo 'PASS: k'"; } > "$FJ/tests/g_k.sh"
 chmod +x "$FJ/tests/g_k.sh"
-printf '# the gates whose controls may run beside one another (#312)\ng_k\tsection 24 stub\n' > "$FJ/tests/controls_concurrent.txt"
 printf 'g_l\ng_a\ng_b\ng_c\ng_d\ng_f\ng_k\n' > "$FJ/tests/ci_portable.txt"; : > "$FJ/tests/ci_static.txt"
 printf 'name\nf\n' > "$FJ/data/list.tsv"
 (cd "$FJ" && git init -q && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
@@ -1119,7 +1121,7 @@ s24 "$R24" "$J24" "$P24" confirm
 [ "$S24b" = ok ] && echo "  ok: at --jobs 4 each of the 6 stubs ran once and each of the 2 controls ran once (the pool's results are the ones read)" || fail "section 24: the parallel run ran a gate or a control twice, or not at all"
 [ "$S24c" = ok ] && echo "  ok: at --jobs 4 the ORDER: last stub ran after the pool" || fail "section 24: ORDER: last did not run after the pool"
 [ "$S24d" = ok ] && echo "  ok: --confirm at --jobs 4 reads as at --jobs 1; g_f re-runs (R2) and the pool does not run the control the plan carries" || fail "section 24: --confirm under --jobs differs, or the pool ran a carried control"
-[ "$S24e" = ok ] && echo "  ok: at --jobs 4 the concurrent-listed stub's three controls ran beside one another, each started after its gate's run ended (#312)" || timing_fail "pool-concurrency-off pool-controls-early" "section 24: a concurrent gate's controls ran one after another, or before their gate ended (#312)"
+[ "$S24e" = ok ] && echo "  ok: at --jobs 4 the SHARES-none stub's three controls ran beside one another, each started after its gate's run ended (#312)" || timing_fail "pool-concurrency-off pool-controls-early" "section 24: a SHARES-none gate's controls ran one after another, or before their gate ended (#312, #370)"
 
 echo "== 25. MUST-FIRE: section 24's properties, each broken by its shadow =="
 if ! vs_ctl_is pool-blind && ! vs_ctl_is pool-order-ignored && ! vs_ctl_is job-carry-blind && ! vs_ctl_is pool-concurrency-off && ! vs_ctl_is pool-controls-early; then
@@ -1133,7 +1135,7 @@ if ! vs_ctl_is pool-blind && ! vs_ctl_is pool-order-ignored && ! vs_ctl_is job-c
     [ "$S24d" = bad ] && vs_ctl_fired job-carry-blind "a job blind to the plan's carried controls runs g_f's control under --confirm — section 24 catches it" \
         || { rc=1; vs_ctl_dead job-carry-blind "the carry-blind job still left g_f's control unrun" || :; }
     s24 "$RUNNER" "$REPO/tests/lib/static_job.sh" "$POOL_S" > /dev/null
-    [ "$S24e" = bad ] && vs_ctl_fired pool-concurrency-off "a pool that runs a concurrent gate's controls one after another — section 24 catches it" \
+    [ "$S24e" = bad ] && vs_ctl_fired pool-concurrency-off "a pool blind to # SHARES: runs a SHARES-none gate's controls one after another — section 24 catches it" \
         || { rc=1; vs_ctl_dead pool-concurrency-off "the serialising pool still overlapped g_k's controls" || :; }
     s24 "$RUNNER" "$REPO/tests/lib/static_job.sh" "$POOL_E" > /dev/null
     [ "$S24e" = bad ] && vs_ctl_fired pool-controls-early "a pool that queues the controls with the gates starts one before its gate ended — section 24 catches it" \

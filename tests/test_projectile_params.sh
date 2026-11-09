@@ -61,6 +61,7 @@
 #   rows (27 tabled spawns, one tick allowed; the seven tabled types each
 #   measured); a perturbed row must fail. Run after any change to the decoder,
 #   the rigs, or a projectile handler region
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 DON="${DON:-build/don_m30}"; PYR="${PYR:-build/pyron49}"; HUI="${HUI:-build/hui64}"

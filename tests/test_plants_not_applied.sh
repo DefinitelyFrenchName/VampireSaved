@@ -33,6 +33,7 @@
 #   control that tested nothing certified as caught. The maintainer ruled the fix and its proof (2026-10-31): "Each is
 #   proven by a planted case that must read DIED or UNJUDGED". The mode logs of 14z-215 showed no foreign row on today's
 #   copies; these plants make one.
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:f329dc8d) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

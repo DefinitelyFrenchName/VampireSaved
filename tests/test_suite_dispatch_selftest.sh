@@ -41,6 +41,7 @@
 #   tests/test_suite_dispatch.sh. Three negative controls: an unlisted kind,
 #   an owner that no longer reads its kind, and a false battery-chain claim —
 #   each must turn the gate RED and name the reason. ROMDIR, no emulator, ~10s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

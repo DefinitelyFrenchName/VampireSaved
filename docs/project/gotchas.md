@@ -7358,7 +7358,10 @@ could not pass. **The fix** (maintainer-ruled 2026-10-20, *"Lock in mister_mra.s
 beside the scratch (`.lock-<scratch name>`, outside `run_on_snapshot.sh`'s `$JTSIM_SCRATCH*` copy glob) from the clone
 to the copy-out, takes over a dead holder's lock, and gives up loudly after `MRA_LOCK_WAIT` seconds (default 900);
 `tests/test_jtsim_scratch_heal.sh` section 6 locks it, with the control `lock-removed`. With the lock, four concurrent
-pairs all passed. **Not covered:** `tools/run_sim_jtcps2.sh` takes the lock only for its `--ensure-scratch` call and then
+pairs all passed. **Since #370 (14z-225)** the lock IS the `jtsim-scratch` token's host claim (`tests/lib/shares.sh`: an OS file
+lock held by `tests/lib/share_lock.py`, one lock for every scratch path, under `/tmp/vampire-saved-shares-<uid>/`, REFUSED
+with exit 3 after the wait), and the two gates
+declare `# SHARES: … jtsim-scratch`, so a pooled tier never starts them together. **Not covered:** `tools/run_sim_jtcps2.sh` takes the lock only for its `--ensure-scratch` call and then
 runs jtsim in the scratch unlocked; the Verilator lane gives each job slot its own `-slotN` scratch. **The rule:** a
 gate that writes shared scratch outside its own `mktemp -d` is a `--jobs` hazard; give it its own directory or a lock,
 and look for the next one in the trace of a parallel run, where a gate that passes alone fails.

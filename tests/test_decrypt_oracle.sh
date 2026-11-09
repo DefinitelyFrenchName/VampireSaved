@@ -14,6 +14,7 @@
 #
 # Usage: ROMDIR=/path/to/roms tests/test_decrypt_oracle.sh [set]   (default vsavj)
 # PASS = our decrypted image is byte-identical to MAME's opcode space.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 SET="${1:-vsavj}"

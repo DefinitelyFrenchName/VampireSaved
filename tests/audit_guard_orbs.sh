@@ -38,6 +38,7 @@
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged34] [KEEP=<dir>: the two traces are copied there] tests/audit_guard_orbs.sh
 #   emulator tier, MAME; 2 runs
+# SHARES: self
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"; export ROMDIR

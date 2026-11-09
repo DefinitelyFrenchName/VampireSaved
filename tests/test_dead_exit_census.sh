@@ -39,6 +39,7 @@
 #   in words; groups 1-2 (ruled 2026-10-31, maintainer: "Groups 1-4, then re-census 5-7") moved every one to
 #   vs_ctl_left_green, and this scan's first run found two more in the inverted shape (test_charid_names,
 #   test_module_refs, four controls). Without the census a new gate copying the old block brings the false honour back.
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:17f4f67f) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

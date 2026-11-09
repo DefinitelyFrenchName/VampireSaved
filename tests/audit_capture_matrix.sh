@@ -75,6 +75,7 @@
 # Static, no emulator, ~2 s. Needs $ROMDIR and a build dir.
 # Usage: ROMDIR=... tests/audit_capture_matrix.sh
 # Build dir (code default, [VSP-165]): MERGED=build/m3b_merged34
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 cd "$REPO"

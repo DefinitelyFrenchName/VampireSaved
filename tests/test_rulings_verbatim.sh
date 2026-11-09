@@ -35,6 +35,7 @@
 # MUST-FIRE: perturbed-copy: meta-counted — a copy that reads isMeta records as the maintainer's must count the skill load (an unhomed message in the clean case, a verified quote in the harness-text case), and the selftest must FAIL (mode: that copy's selftest)
 #
 # Usage: tests/test_rulings_verbatim.sh      # ci_portable, ~1 s
+# SHARES: none — its 8 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

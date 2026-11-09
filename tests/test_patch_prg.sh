@@ -15,6 +15,7 @@
 # code blob decrypts back to its plaintext in MAME's real opcode space;
 # (3) an injected data blob is readable raw. This is what makes patch_prg
 # trustworthy for M2 (superset invariant depends on the null case).
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"

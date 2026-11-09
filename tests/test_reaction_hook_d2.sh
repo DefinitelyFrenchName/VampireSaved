@@ -53,6 +53,7 @@
 #   vsav2.zip (table 0x016DE4, entries 0x50-0x53), asserts dispatcher 2 byte-
 #   identical to vsavj's own decrypted dump (ruling (a)), and the census 6/6
 #   native-0x51. THREE verdict controls. ci_static, seconds.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

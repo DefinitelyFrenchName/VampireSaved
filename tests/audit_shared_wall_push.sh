@@ -52,6 +52,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [PARTS="legacy_lilith huitzil_3"] [FREEZE=1] tests/audit_shared_wall_push.sh
 #   emulator tier, MAME; ~20 s (4 tap runs and 4 field traces, in parallel)
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent_emu.txt, eris:1ecdcc22) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

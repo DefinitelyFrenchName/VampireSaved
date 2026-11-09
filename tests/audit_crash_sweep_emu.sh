@@ -21,6 +21,7 @@
 #
 # WHY: #310 — test_crash_sweep.sh is static-tier; its emulator rows need MAME and the builds, so they run in the
 #   emulator tier (tests/ci_emulator.tsv) from this wrapper.
+# SHARES: self
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd -P)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

@@ -76,6 +76,7 @@
 #   the pristine dumps, byte-identical x42 + fingerprint + manifest; the
 #   applier refuses corrupted patch / wrong sha1 / wrong dump without writing;
 #   rule 7 verbatim-chunk scan with a must-fire control. Needs xdelta3.
+# SHARES: none — its 10 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:3ce6645c) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

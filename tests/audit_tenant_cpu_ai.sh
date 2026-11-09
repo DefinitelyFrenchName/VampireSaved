@@ -80,6 +80,7 @@
 # Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [BUILD=build/m3b_merged34] [JOBS=5] [FREEZE=1] [KEEP=<dir>]
 #        tests/audit_tenant_cpu_ai.sh
 #   emulator tier, MAME; 12 legs of 22,880 frames (one of 3,000), JOBS at once; ~1 min on the Mac (M2 Pro) at JOBS=5
+# SHARES: self
 set -u
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

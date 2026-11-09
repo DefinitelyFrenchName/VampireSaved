@@ -25,6 +25,7 @@
 # SHEET: none — a static comparison of program bytes; the picture is audit_don_row0c's capture sheets
 #
 # Usage: ROMDIR=... tests/test_perframe_hook.sh [MERGED_BUILD] [SOLO_BUILD]   static tier; seconds
+# SHARES: none — its 6 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

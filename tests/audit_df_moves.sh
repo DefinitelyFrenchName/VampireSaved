@@ -86,6 +86,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged34] [FREEZE=1] tests/audit_df_moves.sh
 #   emulator tier, MAME; 10 legs in parallel — measured 14z-168 on this MacBook, solo: ~40 s wall
+# SHARES: none — its 10 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:f329dc8d) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

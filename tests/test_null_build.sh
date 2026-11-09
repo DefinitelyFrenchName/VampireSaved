@@ -11,6 +11,7 @@
 # Usage: ROMDIR=/path/to/roms tests/test_null_build.sh
 # PASS = (a) two builds are byte-identical zips, and (b) every member's SHA-1
 # equals the frozen reference manifest entry (docs/checksums.txt).
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"

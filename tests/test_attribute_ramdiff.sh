@@ -35,6 +35,7 @@
 #   14z-90 (issue #21): attribute_ramdiff must refuse when both logs resolve
 #   to the SAME dump file (MAME dump names are directory-scoped). A genuine
 #   zero-diff between DISTINCT files stays a note. No ROMs, no emulator, ~1s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

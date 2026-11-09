@@ -43,6 +43,7 @@
 #   bearing: 7591 raw -> 2000, i.e. 73% of the raw number is an artefact of
 #   three INDEPENDENT builds' allocators. tools/audit_region_overlap.py (--no-
 #   normalise is the control only, never a verdict). Static, ~1s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

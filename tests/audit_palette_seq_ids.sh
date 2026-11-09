@@ -76,6 +76,7 @@
 #   because the answer is {0x26, 0x27} — and the palette path never transits
 #   work RAM, so this audit is its ONLY guard. Use GUARD_PROBE_MAX: the
 #   default 400-hit cap truncated it once and hid id 0x27
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:69321107) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

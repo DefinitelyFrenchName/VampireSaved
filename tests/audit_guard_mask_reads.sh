@@ -84,6 +84,7 @@
 #   ROMDIR=... [MAME_BIN=$HOME/.cache/vampire-saved/mame/cps2] \
 #     [MERGED=build/m3b_merged34] [KEEP=dir] tests/audit_guard_mask_reads.sh [--freeze-clock]
 #   (KEEP copies the traces and dumps out before the workdir is removed.)
+# SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent_emu.txt, pilot:fb6f31ca) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 : "${ROMDIR:?set ROMDIR}"

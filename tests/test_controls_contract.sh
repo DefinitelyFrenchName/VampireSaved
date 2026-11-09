@@ -30,6 +30,7 @@
 # 2026-09-08), so the cases here are also what keeps the copy from drifting.
 #
 # Usage: tests/test_controls_contract.sh    # ci_portable
+# SHARES: none — its 4 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:17f4f67f) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"

@@ -29,6 +29,7 @@
 # 2026-10-13-1028, 2026-10-15-1091): a red tier read as green, a close tier called green, a commit made without its
 # tier. The two ways the guard could go blind are the two controls: the tree not compared (shape (iii)) and the
 # strict flag not read (shape (i), a run with a SKIP printing GREEN without --strict).
+# SHARES: none — its 5 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

@@ -56,6 +56,7 @@
 #   row_hex selection, and the multi-tenant refusal in BOTH directions
 #   (asserted by no test before this; the loop slice deletes the refusal and
 #   flips it). Pure functions, no ROMs, no emulator. ~1s
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -48,6 +48,7 @@
 #   id diff must be EMPTY (the per-node sfx helper class is FIXED —
 #   pyr/hui_sfx_records curated arrays; pre-fix the diff was music 0x729 + 4
 #   ids). Any new id or a missing solo id FAILS. Solo default: pyron22
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

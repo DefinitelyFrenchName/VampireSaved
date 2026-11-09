@@ -34,6 +34,7 @@
 #   the one a directory check cannot catch, where MAME would resolve by hash
 #   out of $ROMDIR and compare vanilla to vanilla. Plus a positive control.
 #   ROMDIR, ~40s
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

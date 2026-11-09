@@ -39,6 +39,7 @@
 #   licence (only the 2 envelope-base immediates differ below 0x34F1), the
 #   ejection content lock (vs2 0x255800 == vsav 0x18D800), + 2 verdict
 #   controls. Static, ~5 s. tools/audit_qs_id_table.py
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 ROMDIR="${ROMDIR:?set ROMDIR}"

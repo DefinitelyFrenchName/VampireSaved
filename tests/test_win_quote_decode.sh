@@ -33,6 +33,7 @@
 #   5  VERDICT CONTROLS (must fire): a perturbed offset, an overlong record
 #
 # Usage: ROMDIR=... tests/test_win_quote_decode.sh
+# SHARES: none — its 2 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

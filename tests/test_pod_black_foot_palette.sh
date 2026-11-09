@@ -58,6 +58,7 @@
 # freeze's re-point sweep must leave the default alone.
 #
 # Usage: ROMDIR=... [JOBS=N] tests/test_pod_black_foot_palette.sh   (~2.5 min, 3 MAME runs — 145 s measured 2026-09-15; it said ~7 min, 2 runs until then)
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"

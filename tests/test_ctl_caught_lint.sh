@@ -20,7 +20,7 @@
 #   (maintainer, 2026-11-09: "Land with a stated limit (Recommended)"): in the six ground-truth gates the lint covers
 #   echo or printf written on one line, sent to stdout or stderr; any other printer (awk, cat of a file, tee), a line
 #   assembled at run time (the literal split, or built in a variable, function, command substitution or format) are
-#   review. Stated by the session, NOT ruled by the maintainer: the reader is textual, so a one-line echo/printf it
+#   review. Stated by the session and accepted by the maintainer 2026-11-09 (14z-225: "(a) Accept them as stated limits."): the reader is textual, so a one-line echo/printf it
 #   mis-splits, a redirect target held in a variable and a later redirect overriding an earlier one pass too; and in ANY
 #   file a literal assembled at run time (split, formatted, built in a variable) passes rule [a], which reads the
 #   literal written whole; code outside tests/ and tools/ is not read.
@@ -46,6 +46,7 @@
 # MUST-FIRE: perturbed-copy: truth-printf — the same as `printf '%s\n' "CONTROL CAUGHT: ..."` must be named under [a], or the literal in an argument rather than the format would pass (rule-checker run 2026-11-09-1744)
 #
 # Usage: tests/test_ctl_caught_lint.sh
+# SHARES: none — its 18 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:d795d10f) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

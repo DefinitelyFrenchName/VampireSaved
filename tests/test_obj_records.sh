@@ -58,6 +58,7 @@
 #   BUFFERED with a runtime page select — the walker reports the terminator so
 #   live/idle pages are distinguished, never assumed. No fixture committed
 #   (ORAM is ROM-derived, rule 7)
+# SHARES: self
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

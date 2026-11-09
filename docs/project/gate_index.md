@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**517 scripts** — 156 ci_portable, 98 ci_static, 263 emulator-tier (run by name).
+**518 scripts** — 157 ci_portable, 98 ci_static, 263 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 67 | the suite runners and their own ground truth |
+| [runner](#runner) | 68 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -58,7 +58,7 @@ the suite runners and their own ground truth.
 | `tests/test_close_loop_cost.sh` | test | ci_portable | — | the close-loop cost reader counts every pass of a close's check runner and the packet's span, whatever interpreter ran the runner and however a prepare's output was cut (`tools/agent/close_loop_cost.py`, 14z-187b, GitHub #187). | 14z-187b |
 | `tests/test_close_standing.sh` | test | ci_portable | — | the standing close-check set renders with every list derived and every plant generated, its claim comes from the run of record, and a finding is appended in the table's form (GitHub #204, #206, #207; 14z-189). | 14z-189 |
 | `tests/test_control_classifier.sh` | test | ci_portable | — | THE CONTROL CLASSIFIER'S RULES ON KNOWN ANSWERS: #310's (14z-213) and #369's (14z-224). ci_portable: no ROM, ~1 s. | 14z-213 |
-| `tests/test_controls_concurrent.sh` | test | ci_portable | — | THE CONCURRENT-CONTROLS LIST STILL DESCRIBES THE GATES IT NAMES (#315, 14z-207). ci_portable: no ROM, ~2 s. | 14z-207 |
+| `tests/test_controls_concurrent.sh` | test | ci_portable | — | THE WRITE-TRACE SCORER'S GROUND TRUTH (#315, 14z-207; #349, 14z-218). ci_portable: no ROM, ~2 s. | 14z-207 |
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-224 |
 | `tests/test_crash_sweep.sh` | test | ci_static | ROMDIR | EVERY CALL OF vs_ctl_show_err IS PROVEN BY A PLANTED CRASH (#310, 14z-218). Freeze cadence. | 14z-218 |
 | `tests/test_ctl_caught_lint.sh` | test | ci_portable | — | A CONTROL MODE IS HONOURED ONLY ON POSITIVE EVIDENCE FROM ITS OWN CHECK: THE STATIC HALF (GitHub #369, 14z-224; maintainer-ruled 2026-11-08 "A1, B1, c1" on build/agent224/t369/design.md). ci_portable, ~10 s. | 14z-224 |
@@ -94,6 +94,7 @@ the suite runners and their own ground truth.
 | `tests/test_runner_collation.sh` | test | ci_portable | — | THE RUNNERS SORT IN BYTE ORDER WHATEVER THE CALLER'S LOCALE (#278, 14z-208b). ci_portable: no ROM, ~1 s. | 14z-208b |
 | `tests/test_scratch_census.sh` | test | ci_portable | — | every scratch program a session wrote is classed, and each class holds (`tools/scratch_census.py`, 14z-185b, GitHub #190 P4). | 14z-185b |
 | `tests/test_session_metrics.sh` | test | ci_portable | — | the session dashboard's collector reads every source as its rule says and labels every figure with its class (`tools/session_metrics.py`, 14z-198, GitHub #264). | 14z-198 |
+| `tests/test_shares.sh` | test | ci_portable | — | GATES DECLARE WHAT THEY SHARE; THE POOL AND THE HOST CLAIM KEEP HOLDERS APART (#370, 14z-225). ci_portable: no ROM, ~25 s. | 14z-225 |
 | `tests/test_sheet_census.sh` | test | ci_portable | — | EVERY EMULATOR GATE SAYS WHAT ITS COMPARATIVE SHEET SHOWS, OR IS ON THE RETROFIT'S DEBT LIST (GitHub #291 slice S1, 14z-204; the design ruled 2026-10-17: "Declared in each gate (Recommended)"). | 14z-204 |
 | `tests/test_shell_portability.sh` | test | ci_portable | — | a `#!/bin/sh` script must actually be POSIX sh (14z-90, GitHub issue #15). | 14z-90 |
 | `tests/test_signal_traps.sh` | test | ci_portable | — | A SCRIPT THAT TRAPS INT, TERM, HUP OR QUIT ENDS IN THAT TRAP (#359, 14z-221c). ci_portable: no ROM, ~14 s. | 14z-221c |
@@ -156,13 +157,13 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_bundle_parsers.sh` | test | ci_portable | — | the LINUX and WINDOWS library bundlers (tools/bundle_elf_libs.py, tools/bundle_win_dlls.py) read real `ldd`, `readelf -d` and `objdump -p` output, walk a closure, and tell a closure the tools said NOTHING about (refused) from one they descr… | 14z-149 |
 | `tests/test_crash_guard.sh` | test | emulator | MAME, a build dir | ground truth for the crash guard (verdict-logic doctrine, CLAUDE.md §4: a detector is trusted only after it classifies known-good and known-bad scenarios correctly). | 14z-197 |
 | `tests/test_crypt_boundary.sh` | test | ci_static | ROMDIR | code in the WIDE extension must be stored RAW. | 14z-123 |
-| `tests/test_decrypt_oracle.sh` | test | emulator | MAME | verify tools/cps2_decrypt.py against MAME's own cps2crypt implementation (dual-implementation agreement). | — |
+| `tests/test_decrypt_oracle.sh` | test | emulator | MAME | verify tools/cps2_decrypt.py against MAME's own cps2crypt implementation (dual-implementation agreement). | 14z-225 |
 | `tests/test_emu_clock.sh` | test | emulator | MAME, ~4 min | THE SHARED INSTRUMENT CLOCK STAYS ON EMULATED TIME UNDER BREAKPOINTS (14z-197, GitHub #228 step 4). | 14z-197 |
 | `tests/test_fbneo_boot_log.sh` | test | ci_portable | — | the verdict logic of tests/lib/fbneo_boot_log.sh (what a healthy FBNeo WIDE boot log must show) against RECORDED boot logs from two real hosts: | 2026-09-13 |
 | `tests/test_fbneo_instruments.sh` | test | emulator | MAME, FBNeo | ground truth for the B5b FBNeo instruments. | 14z-123 |
 | `tests/test_fbneo_overlay_hygiene.sh` | test | ci_portable | — | a non-overlay FBNeo run must not inherit a previous run's overlay (14z-94, GitHub #38). ~2 s, no emulator, no ROMs. | 14z-94 |
-| `tests/test_fbneo_overlay_hygiene_control.sh` | test | ci_portable | — | the ground truth for #38's gate. Reconstructs the PRE-FIX runner (bare `ln -sfn`, no clear) and requires tests/test_fbneo_overlay_hygiene.sh to FAIL against it. | — |
-| `tests/test_fbneo_replay_determinism.sh` | test | emulator | FBNeo | patched FBNeo runs a scripted replay with identical work-RAM checksums across two fresh-sandbox runs. (Guards the EEPROM-sandboxing fix — see docs/GOTCHAS.md.) | — |
+| `tests/test_fbneo_overlay_hygiene_control.sh` | test | ci_portable | — | the ground truth for #38's gate. Reconstructs the PRE-FIX runner (bare `ln -sfn`, no clear) and requires tests/test_fbneo_overlay_hygiene.sh to FAIL against it. | 14z-225 |
+| `tests/test_fbneo_replay_determinism.sh` | test | emulator | FBNeo | patched FBNeo runs a scripted replay with identical work-RAM checksums across two fresh-sandbox runs. (Guards the EEPROM-sandboxing fix — see docs/GOTCHAS.md.) | 14z-225 |
 | `tests/test_fbneo_runner_hygiene.sh` | test | emulator | FBNeo, ~5 s | a failed FBNeo run must not leave the PREVIOUS run's artifacts behind (14z-90, GitHub issue #12, shell half). | 14z-90 |
 | `tests/test_fbneo_smoke.sh` | test | emulator | FBNeo | M0: the FBNeo headless runner boots vsavj and survives a soak without crashing. | M0 |
 | `tests/test_fbneo_tree_integrity.sh` | test | ci_static | ROMDIR | the emu/fbneo working tree must be EXACTLY the pinned upstream commit plus the two tracked patches (14z-90, issue #36). | 14z-90 |
@@ -283,8 +284,8 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 | `tests/test_classify_hitclass_probe.sh` | test | ci_portable | — | ground truth for the hit-class probe classifier (14z-93). No ROMs, no emulator, ~1s. | 14z-93 |
 | `tests/test_classify_pool_spawns.sh` | test | ci_portable | — | ground truth for the projectile-pool spawn classifier (14z-93). No ROMs, no emulator, ~1s. | 14z-93 |
 | `tests/test_compare_composite.sh` | test | ci_portable | — | ground truth for tools/compare_composite.py, the PROPOSED §4 composite class (frozen flicker inventory + frozen bounded windows). | 14z-123 |
-| `tests/test_compare_fields_selfcheck.sh` | test | emulator | MAME, FBNeo | ground truth for the dual-emulator field comparator (verdict-logic doctrine): its verdicts are trusted only after it agrees on known-good content and disagrees on known-different content. | — |
-| `tests/test_compare_flicker.sh` | test | ci_portable | — | ground truth for the flicker comparator's verdict logic (CLAUDE.md §4: classification code is validated before its verdicts are trusted). Synthetic logs, no emulator, fast. | — |
+| `tests/test_compare_fields_selfcheck.sh` | test | emulator | MAME, FBNeo | ground truth for the dual-emulator field comparator (verdict-logic doctrine): its verdicts are trusted only after it agrees on known-good content and disagrees on known-different content. | 14z-225 |
+| `tests/test_compare_flicker.sh` | test | ci_portable | — | ground truth for the flicker comparator's verdict logic (CLAUDE.md §4: classification code is validated before its verdicts are trusted). Synthetic logs, no emulator, fast. | 14z-225 |
 | `tests/test_compare_window.sh` | test | ci_portable | — | ground truth for the "bounded re-convergent window" comparison class (CLAUDE.md §4 v3). | 14z-123 |
 | `tests/test_describe_masked_shape.sh` | test | ci_portable | — | ground truth for tools/describe_masked_shape.py, the classifier that turns a measured masked divergence into a PROPOSED expectation line in the ratified §4 vocabulary. | 14z-89 |
 | `tests/test_down_flash_mechanism.sh` | test | emulator | MAME | THE MECHANISM behind GitHub #113's one-frame white-out, measured 2026-09-01 (14z-126b) and locked here. | 2026-09-01 |
@@ -409,7 +410,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/test_hui_walk.sh` | test | emulator | MAME, a build dir | Huitzil velocity-port gate (14z-66, playtest round-1 item 2 "feels a bit slower"). | 14z-66 |
 | `tests/test_hui_winscreen.sh` | test | ci_static | ROMDIR | the Huitzil WIN-SCREEN gate (14z-68m). | 14z-68m |
 | `tests/test_ladder_tenant_vs_palette.sh` | test | emulator | MAME, a build dir, ~5 min | THE ARCADE-LADDER "VS PALETTE POOL" (PRG:0x3A3CA0 + id*32) MEASURED ON SCREEN for a TENANT opponent (14z-123, the documentation rationalization pass, inferred_claims.md row 7). | 14z-123 |
-| `tests/test_m2a_flavor_selector.sh` | test | emulator | MAME, a build dir | the Start-hold flavor selector (stage 5). | — |
+| `tests/test_m2a_flavor_selector.sh` | test | emulator | MAME, a build dir | the Start-hold flavor selector (stage 5). | 14z-225 |
 | `tests/test_m2b_scroll3.sh` | test | emulator | MAME, a build dir | scroll3-vs-OBJ-band exclusivity check (M2b). The Donovan tile placement overwrites vsav bank-2 OBJ positions 0x2AD8F-0x2EEBB (Jedah's band). scroll1/2 cannot address bank 2 (measured: CPS2 draw path, no mapper, offsets pin them to bank 1); | M2b |
 | `tests/test_m2b_stage6.sh` | test | emulator | MAME, a build dir | the M2b (graphics) build gate: 1. Build stage 6 (includes tools/verify_gfx_build.py: record/entry parity, tile-code containment, placed bank table — the static output checks that caught the fmt-0 count corruption). 2. | M2b |
 | `tests/test_oboro_select.sh` | test | emulator | MAME, FBNeo, a build dir, ~4 min | THE OBORO SELECT HOOK (W1, 14z-105; maintainer-ruled 2026-08-22: vanilla vsavj Oboro, selected by hand). | 14z-105 |
@@ -614,6 +615,6 @@ the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generatio
 | `tests/test_mister_wide_gate.sh` | test | ci_portable | — | THE CPS-2 WIDE RUNTIME PROFILE GATE, on MiSTer. 14z-107 (6), slice D1; EXTENDED 14z-107 (9) for slice D2. ROM-free; seconds without Verilator, ~30 s with it. | 14z-107 (6) |
 | `tests/test_mister_wide_inert.sh` | test | emulator | Verilator, MAME, ~11 min | THE FPGA SUPERSET INVARIANT, MEASURED DIRECTLY. 14z-107 (6), slice D1. | 14z-107 (6) |
 | `tests/test_mra_build_line.sh` | test | ci_static | ROMDIR | the WIDE MRA names the FREEZE it was generated for, and can never name the wrong one (14z-133b). Static tier: ROMDIR + the merged build + emu/jtcores; ~1 min (three ROM-free MRA generations). | 14z-133b |
-| `tests/test_mra_parts.sh` | test | ci_portable | — | ground-truth for tools/check_mra_parts.py's VERDICT LOGIC. | — |
+| `tests/test_mra_parts.sh` | test | ci_portable | — | ground-truth for tools/check_mra_parts.py's VERDICT LOGIC. | 14z-225 |
 | `tests/test_rpl2siminputs.sh` | test | ci_portable | — | the .rpl -> jtframe sim_inputs.hex translator (14z-106): bit mapping locked against test.cpp's parse_inputs, a frozen translation of a real replay, and the refusals must FIRE (P2, button 4, service). ROM-free, seconds, ci_portable. | 14z-106 |
 | `tests/test_sim_wram_contract.sh` | test | ci_portable | — | the ROM-free half of the MiSTer simulation oracle (14z-107). It locks the CONTRACT between the fork's Verilator work-RAM hook and tools/compare_fields.py, without a ROM, an emulator or an hour of simulation (the live end-to-end run is tests… | 14z-107 |

@@ -63,6 +63,7 @@
 #   it DEAD. Edits the generator in place; trap restores on EXIT/INT/TERM and
 #   a section asserts byte-identity. ~9s. Run it WITH test_m3a_reproducible.sh
 #   on every M3b machinery commit — opposite questions
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

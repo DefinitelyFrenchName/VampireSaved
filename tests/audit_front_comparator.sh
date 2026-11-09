@@ -62,6 +62,7 @@
 #   fighter's current ANIM NODE (a per-pose depth key, 19-value vocabulary
 #   frozen); identity exact on every non-capture frame of replay 37 (5,486/0).
 #   Pristine vsavj, reference MAME, ~1 min.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

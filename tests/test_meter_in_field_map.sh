@@ -30,6 +30,7 @@
 # documentation pass ruled a gate's WHY lives in the gate):
 #   (review-triage, #83) The dual-emulator oracle actually compares meter,
 #   bound to `ram.md`.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

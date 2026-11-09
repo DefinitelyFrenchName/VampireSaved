@@ -12,6 +12,7 @@
 # SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
 #
 # Usage: ROMDIR=... tests/test_fbneo_replay_determinism.sh [set] [replay]
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 
 SET="${1:-vsavj}"

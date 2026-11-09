@@ -36,6 +36,7 @@
 # the adversary must report both ROTTED. Then the fallback: with no preferred
 # name present, the FIRST BY NAME is judged, whatever order the files were
 # created in.
+# SHARES: none — one control mode, so no two of its own jobs to keep apart, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

@@ -52,6 +52,7 @@
 #   all 256 entries, and 0x2a1/0x2a2 FREE in both games' Z80 tables (the
 #   silence premise). 2 verdict controls. Static, ~5 s warm. Dynamic half:
 #   audit_hui_grunt + replay 95
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 ROMDIR="${ROMDIR:?set ROMDIR}"

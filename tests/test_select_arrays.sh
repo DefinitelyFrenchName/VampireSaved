@@ -54,6 +54,7 @@
 #   at +0x80, indexed by cell/id with NO 4-bit fold, rows 0x10-0x1F variant
 #   aliases. A tenant at 0x13 costs SIX longs. Static model + a one-byte
 #   corruption control + the ENGINE's own row sequence for each piece. ~13s
+# SHARES: self
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

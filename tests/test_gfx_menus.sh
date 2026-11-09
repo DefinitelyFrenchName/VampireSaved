@@ -33,6 +33,7 @@
 #               record assert + build-time byte-exact art placement).
 #   frame 1250  speed-select menu (wheel visible behind it: same mask)
 # Regenerate goldens (vanilla): tests/test_gfx_menus.sh --freeze
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -e
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

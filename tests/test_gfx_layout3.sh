@@ -37,6 +37,7 @@
 #   premise, frozen H/P/D tile inventories, H/P delta-0 disjoint from D's
 #   frozen band by interval, the flip-condition bound. Static, ~90s. Ledger:
 #   build/manifest/gfx_layout3.toml
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that

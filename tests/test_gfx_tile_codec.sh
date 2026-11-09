@@ -38,6 +38,7 @@
 #   pixel 7-i within each 8-px half, pen 15 transparent), round trips both
 #   ways, and the PRE-FIX mirrored mapping reconstructed inline and required
 #   to DISAGREE on an asymmetric tile.
+# SHARES: none — no control mode, and its plain run always pooled (#370 A1, 14z-225)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
