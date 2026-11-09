@@ -434,9 +434,14 @@ test_proof_sheets_web
 # test_mizuumi_candidates.sh — #118 (14z-213): docs/game/atlas/mizuumi_candidates.tsv's derived columns equal what
 # docs/game/atlas/ram.md says (tools/mizuumi_candidates.py check); the verdict rules on known answers; two controls. ~1 s.
 test_mizuumi_candidates
-# test_control_classifier.sh — #310 (14z-213): tests/lib/classify.sh's rules for a mode run that FAILs without judging
-# (its own CONTROL DEAD, a SKIP exit, its own exit-3 REFUSED, a hidden crash) on known answers; four controls. ~1 s.
+# test_control_classifier.sh — #310 (14z-213) and #369 (14z-224): tests/lib/classify.sh's rules for a mode run that FAILs without judging
+# (its own CONTROL DEAD, a SKIP exit, its own exit-3 REFUSED, a hidden crash) and #369's positive-evidence rule (CONTROL CAUGHT,
+# the debt list) on known answers; five controls. ~1 s.
 test_control_classifier
+# test_ctl_caught_lint.sh — #369 (14z-224): tools/ctl_caught_lint.py — CONTROL CAUGHT printed only through vs_ctl_caught, no
+# catch-all ERE, no vs_ctl_fired "$VS_CTL" off the debt list, every mode-declaring gate migrated or listed, per-mode EREs, and
+# tests/expected/ctl_caught_debt.tsv only shrinking; seven controls (planted gates). ~3 s.
+test_ctl_caught_lint
 # test_instr_align_unjudged.sh — #310 group 1 (14z-215): tests/lib/instr_align.sh's NOT JUDGED lines and
 # tests/lib/controls.sh vs_ctl_left_green on stub drift-family gates classified as the runners do; five controls. ~2 s.
 test_instr_align_unjudged

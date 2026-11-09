@@ -1,0 +1,17 @@
+  FLAG FIGURE: 177
+  FLAG D-ABSOLUTE: This note is the design, put before any code.  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: Four of these cross gates (the submodule index locks, the release assets, the desktop session, the jtsim scratch); the lists, which compare a gate's modes on...  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: It is exactly today's "unlisted": the conservative value for a gate whose modes nobody has shown to be separable.  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: A job starts only when no running job holds any of its tokens; otherwise the next queued job that can start does (no job waits holding a slot).  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: This compares ACROSS gates, which today's per-gate traces never did.  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: **The control the ticket asks for:** a pooled run of two stub jobs that hold one token, each sleeping and logging its start and end, must not overlap — and a...  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: What every gate declares when the rule lands.**  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: Nothing runs side by side that does not today, and nothing runs apart that runs side by side today, except where a cross-gate share becomes a token (the subm...  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: Where a gate's declaration lives when it holds nothing.**  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: - **B2: absence means none,** and only sharing gates carry a line.  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: Small edit; but a gate nobody thought about reads the same as a gate shown to share nothing.  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: - **C2: the runners only.** Simpler; a hand run beside a tier can collide, as it could before the desktop lock.  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: The concurrent-list re-traces stop being needed when this lands — including the one running on PILOT now for #369's commit.  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: The share inventory (what the tree does today, last bullet) was read by hand from the two lists' headers and their git history; nothing checks it is complete...  [build/agent224/t370/design.md]
+  FLAG D-ABSOLUTE: Nothing is built.  [build/agent224/t370/design.md]
+packet_check: 16 flag(s): D-ABSOLUTE 15, FIGURE 1

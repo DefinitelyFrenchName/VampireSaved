@@ -198,6 +198,14 @@ GLOSSARY = [
     ("MEASURED / DERIVED / ESTIMATED", "Every figure's class. MEASURED: read from a record the work wrote. "
                                        "DERIVED: arithmetic on measured figures, the formula stated. ESTIMATED: a "
                                        "heuristic, its rule stated, and it can be wrong."),
+    ("Resolved", "An action whose last run is VIOLATED, answered question by question with `rulecheck resolve` (what "
+                 "changed, or why the finding is accepted) and not run again. A VIOLATED verdict stops the action until "
+                 "it is resolved; the rule has never required a re-check that comes back OK."),
+    ("Eras", "Three spans of sessions, by how actions ended. To 14z-182 a VIOLATED run was resolved and the action went on, "
+             "almost never re-checked. From 14z-183 a re-check until OK became common; no rule change is recorded there, "
+             "the boundary is read from the per-session counts (14z-183 is the first session where most actions end OK). "
+             "From the first session whose runs record their action (14z-212), runs are grouped into actions exactly; "
+             "before it the grouping is ESTIMATED (see Linking)."),
     ("Linking", "The ledger before 2026-10-29 records no action id, so its runs are grouped into actions by rule: a "
                 "subject that names the run it follows ('after run 682'), else similar wording within the session "
                 "(ESTIMATED). Since then every run records its action."),
@@ -239,6 +247,10 @@ JS = r"""
   const caught = planted.filter(r => r.plant === 'CAUGHT').length;
   const firstOk = A.filter(a => a.verdict === 'OK').length, finalOk = A.filter(a => a.final === 'OK').length;
   const stopped = A.filter(a => a.final === 'VIOLATED').length;
+  // RESOLVED (14z-224): an action whose last run is VIOLATED and carries its resolution — answered, not run again
+  const runById = {}; for (const r of R) runById[r.id] = r;
+  const isResolved = a => a.final === 'VIOLATED' && !!(runById[a.last] && runById[a.last].resolution);
+  const resolved = A.filter(isResolved).length;
   const runs = A.reduce((s, a) => s + a.runs, 0);
   const med = xs => { if (!xs.length) return null; const t = xs.slice().sort((a, b) => a - b), m = t.length >> 1; return t.length % 2 ? t[m] : (t[m - 1] + t[m]) / 2; };
   const fmtH = h => h < 1 ? Math.round(h * 60) + ' min' : h.toFixed(1) + ' h';
@@ -247,14 +259,43 @@ JS = r"""
   out.append(el('h2', {}, 'At a glance'), el('div', {class:'tiles'},
     tile(A.length, 'actions checked', runs + ' runs of these actions (calibrations not counted)'),
     tile(pct(firstOk, A.length), 'OK at the first check', firstOk + ' of ' + A.length + ' actions passed without a re-check'),
-    tile(pct(finalOk, A.length), 'OK in the end', finalOk + ' passed, at once or after re-checks; ' + stopped + ' end on a VIOLATED run: ' +
-      'withdrawn, or re-checked under wording the linking did not follow (ESTIMATED)'),
+    tile(pct(finalOk, A.length), 'OK in the end', finalOk + ' of ' + A.length + ' actions whose last run is OK, at once or after ' +
+      're-checks (all sessions; by era below)'),
+    tile(pct(resolved, A.length), 'resolved, not re-run', resolved + ' end on a VIOLATED run answered with its resolution and not run ' +
+      'again' + (stopped > resolved ? '; ' + (stopped - resolved) + ' end VIOLATED with no resolution on record' : '')),
     tile(A.length ? (runs / A.length).toFixed(1) : '–', 'checks per action', 'mean runs until the last one'),
     tile(med(H) == null ? '–' : fmtH(med(H)), 'median time to pass', 'from an action\'s first packet to the one that passed ' +
       '(0 when the first passed); ' + H.length + ' passed actions have both times on record'),
     tile(pct(caught, planted.length), 'plants caught', caught + ' of ' + planted.length + ' runs: the readers stayed alive')));
   out.append(el('p', {class:'sub'}, 'Actions are those of the sessions on this page; runs recorded under a transcript id no session ' +
     'could be given are not among them. Grouping runs into actions is partly ESTIMATED (see Linking, below).'));
+  // ---- 1b. by era (14z-224): the headline mixes three ways of working; each is shown on its own (see Eras, below)
+  const sn = s => { const m = /^14z-(\d+)/.exec(s); return m ? +m[1] : null; };
+  const recN = A.filter(a => /(^| )RECORDED( |$)/.test(a.links || '') && sn(a.session) != null).map(a => sn(a.session));
+  const exactFrom = recN.length ? Math.min(...recN) : null;
+  const ERAS = [['to 14z-182', 'resolved and went on', n => n <= 182],
+                ['14z-183 to ' + (exactFrom ? '14z-' + (exactFrom - 1) : 'now'), 're-checked until OK, often',
+                 n => n >= 183 && (exactFrom == null || n < exactFrom)]];
+  if (exactFrom) ERAS.push(['14z-' + exactFrom + ' on', 're-checked until OK', n => n >= exactFrom]);
+  const isRec = x => /(^| )RECORDED( |$)/.test(x.links || '');
+  const et = el('table', {}, el('tr', {}, el('th', {}, 'era'), el('th', {}, 'practice'), el('th', {class:'n'}, 'actions'),
+    el('th', {class:'n'}, 'OK at the first check'), el('th', {class:'n'}, 'OK in the end'), el('th', {class:'n'}, 'resolved, not re-run'),
+    el('th', {}, 'grouping into actions')));
+  for (const [name, how, inEra] of ERAS) {
+    const a = A.filter(x => sn(x.session) != null && inEra(sn(x.session)));
+    if (!a.length) continue;
+    const nr = a.filter(isRec).length;   // grouped exactly (MEASURED) or by the Linking rule (ESTIMATED)
+    const grp = nr === a.length ? cls('MEASURED') : nr === 0 ? cls('ESTIMATED')
+      : el('span', {}, cls('MEASURED'), ' ' + nr + ', ', cls('ESTIMATED'), ' ' + (a.length - nr));
+    const f = a.filter(x => x.verdict === 'OK').length, z = a.filter(x => x.final === 'OK').length, rs = a.filter(isResolved).length;
+    et.append(el('tr', {}, el('td', {}, name), el('td', {}, how), el('td', {class:'n'}, a.length),
+      el('td', {class:'n'}, f + ' (' + pct(f, a.length) + ')'), el('td', {class:'n'}, z + ' (' + pct(z, a.length) + ')'),
+      el('td', {class:'n'}, rs + ' (' + pct(rs, a.length) + ')'), el('td', {}, grp)));
+  }
+  const unkeyedA = A.filter(x => sn(x.session) == null).length;
+  out.append(el('h3', {}, 'By era'), et, el('p', {class:'sub'}, 'Each era\'s actions by the session of their first run. ' +
+    'An action ends OK, or resolved: answered with its resolution and not run again (see Resolved and Eras, below).' +
+    (unkeyedA ? ' ' + unkeyedA + ' action(s) of sessions with no 14z key are in the headline only.' : '')));
 
   // ---- 2. trends: one single-series bar chart each, oldest session first
   const S = sessions.filter(s => A.some(a => a.session === s));

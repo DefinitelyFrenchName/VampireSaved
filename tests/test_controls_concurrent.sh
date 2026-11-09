@@ -90,7 +90,9 @@ echo "== 4. tools/controls_overlap.py's verdicts on synthetic traces (the freeze
 T="$W/tr"; mkdir -p "$T/st" "$T/out"; : > "$T/done.tsv"; EXIT=1
 st() {  # st <gate> <control> <strace line>...: one trace file, its done.tsv row (exit $EXIT), a FAIL output (HONOURED)
     g="$1"; c="$2"; shift 2; printf '%s\n' "$@" > "$T/st/$g.$c.st"; printf '%s\t%s\t%s\t0\t/r\n' "$g" "$c" "$EXIT" >> "$T/done.tsv"
-    echo "FAIL: $g (control mode)" > "$T/out/$g.$c.out"
+    # #369 (14z-224): an honoured run carries its own check's evidence, the CONTROL CAUGHT line vs_ctl_caught prints; the
+    # scorer classifies through tests/lib/classify.sh, which reads a FAIL without one (the gate not on the debt list) UNJUDGED
+    printf 'FAIL: %s (control mode)\nCONTROL CAUGHT: %s — FAIL: %s (control mode)\n' "$g" "$c" "$g" > "$T/out/$g.$c.out"
 }
 # THE SCORER UNDER TEST (#349): the tracked tool, or under CONTROL=refused-certified its shadow copy with the HONOURED-only
 # rule cut back to the pre-#349 one (only a SKIP-shaped run, LIES or UNJUDGED, leaves a gate uncertified)

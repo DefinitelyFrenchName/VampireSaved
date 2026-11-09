@@ -88,12 +88,16 @@ fi
 EOF
 chmod +x "$W/g_drift.sh"
 _n=0
+# #369 (14z-224): the stubs stand for gates on the shrink-only debt list tests/expected/ctl_caught_debt.tsv, the
+# pre-#369 fall-through these cases were written for; a scratch copy of the list naming them reaches the stub run and
+# the classifier through REPO (the tracked list is never written). tests/test_control_classifier.sh holds the strict path.
+mkdir -p "$W/debt/tests/expected"; { cat "$REPO/tests/expected/ctl_caught_debt.tsv"; echo g_drift.sh; } > "$W/debt/tests/expected/ctl_caught_debt.tsv"
 run_stub() {  # run_stub <mode or -> <env words...>: runs the stub gate; sets LOG, ST, CLASS
     _n=$((_n + 1)); _m="$1"; shift; [ "$_m" = - ] && _m=""
     SW="$W/s$_n"; mkdir -p "$SW"; LOG="$SW.log"
     env CONTROL="$_m" CTLS="$CTLS" IAL="$IAL" SW="$SW" STUB_RL=none STUB_ONE=none STUB_STAGE=none STUB_CDRIFT=none \
-        STUB_CSKIP=none "$@" sh "$W/g_drift.sh" > "$LOG" 2>&1 </dev/null && ST=0 || ST=$?
-    CLASS="$(sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" "$5"; echo "$VS_CTL_EXEC"' _ "$CLS" "$ST" "$LOG" "$W/g_drift.sh" "$_m")"
+        STUB_CSKIP=none REPO="$W/debt" "$@" sh "$W/g_drift.sh" > "$LOG" 2>&1 </dev/null && ST=0 || ST=$?
+    CLASS="$(REPO="$W/debt" sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" "$5"; echo "$VS_CTL_EXEC"' _ "$CLS" "$ST" "$LOG" "$W/g_drift.sh" "$_m")"
 }
 expect() {  # expect <label> <class> <mode> <env words...>
     _l="$1"; _c="$2"; shift 2; run_stub "$@"

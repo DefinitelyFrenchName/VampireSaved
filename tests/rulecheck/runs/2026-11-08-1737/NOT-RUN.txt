@@ -1,0 +1,1 @@
+NOT RUN: the packet check's second look found the design's A1 claim ('nothing runs side by side that does not today') rests on a dependency the design never stated — a gate's controls start only after its own plain run ends; re-prepared after the design states it

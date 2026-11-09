@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**516 scripts** — 155 ci_portable, 98 ci_static, 263 emulator-tier (run by name).
+**517 scripts** — 156 ci_portable, 98 ci_static, 263 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 66 | the suite runners and their own ground truth |
+| [runner](#runner) | 67 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -57,10 +57,11 @@ the suite runners and their own ground truth.
 | `tests/test_close_checks.sh` | test | ci_portable | — | the close's check runner times every check, re-runs one alone, and never lets a partial run read as the run of record (`tools/close_checks.py`, 14z-185b, GitHub #187). | 14z-185b |
 | `tests/test_close_loop_cost.sh` | test | ci_portable | — | the close-loop cost reader counts every pass of a close's check runner and the packet's span, whatever interpreter ran the runner and however a prepare's output was cut (`tools/agent/close_loop_cost.py`, 14z-187b, GitHub #187). | 14z-187b |
 | `tests/test_close_standing.sh` | test | ci_portable | — | the standing close-check set renders with every list derived and every plant generated, its claim comes from the run of record, and a finding is appended in the table's form (GitHub #204, #206, #207; 14z-189). | 14z-189 |
-| `tests/test_control_classifier.sh` | test | ci_portable | — | THE CONTROL CLASSIFIER'S #310 RULES ON KNOWN ANSWERS (14z-213). ci_portable: no ROM, ~1 s. | 14z-213 |
+| `tests/test_control_classifier.sh` | test | ci_portable | — | THE CONTROL CLASSIFIER'S RULES ON KNOWN ANSWERS: #310's (14z-213) and #369's (14z-224). ci_portable: no ROM, ~1 s. | 14z-213 |
 | `tests/test_controls_concurrent.sh` | test | ci_portable | — | THE CONCURRENT-CONTROLS LIST STILL DESCRIBES THE GATES IT NAMES (#315, 14z-207). ci_portable: no ROM, ~2 s. | 14z-207 |
-| `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |
+| `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-224 |
 | `tests/test_crash_sweep.sh` | test | ci_static | ROMDIR | EVERY CALL OF vs_ctl_show_err IS PROVEN BY A PLANTED CRASH (#310, 14z-218). Freeze cadence. | 14z-218 |
+| `tests/test_ctl_caught_lint.sh` | test | ci_portable | — | A CONTROL MODE IS HONOURED ONLY ON POSITIVE EVIDENCE FROM ITS OWN CHECK: THE STATIC HALF (GitHub #369, 14z-224; maintainer-ruled 2026-11-08 "A1, B1, c1" on build/agent224/t369/design.md). ci_portable, ~10 s. | 14z-224 |
 | `tests/test_ctl_show_err.sh` | test | ci_portable | — | A PERTURBED COPY THAT CRASHED IS NOT THE CONTROL FIRING (#310 group 5, 14z-215). ci_portable: no ROM, ~3 s. | 14z-215 |
 | `tests/test_dead_exit_census.sh` | test | ci_portable | — | NO CONTROL MODE'S DEAD BRANCH IS PRINTED IN WORDS ONLY (#310 group 2, 14z-215). ci_portable: no ROM, ~2 s. | 14z-215 |
 | `tests/test_dead_leg_unjudged.sh` | test | ci_static | ROMDIR | A DEAD EMULATOR LEG IS NOT THE CONTROL FIRING (#310 group 7, 14z-221). Needs ROMDIR (the gates' own ROM checks), every leg dead except the live MAME legs of the PATH:verilator rows' verilator-only runs: | 14z-221 |

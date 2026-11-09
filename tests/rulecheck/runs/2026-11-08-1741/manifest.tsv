@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent224/t370/design.md	7dd90e8d1236fd2b1b71b297c5a115bff2a2f488
+build/agent224/t370/issue370.md	5c58f9eb6ce3eafee54027a262e534b7705f3dd9
+build/agent224/t370/census.sh	fb40f12e22736a6baa2ce411363824139a4d5f8f
+build/agent224/t370/census.txt	d7ef7b5c03cb3d805c9c0cec25e12922c738792b
+build/agent224/t370/changed_by_369.txt	d57f71476fba6d63362b60e0b2dac47992ae0e6d
+tests/controls_concurrent.txt	8e7268e89259812fa1853553599af43dca3c95e5
+tests/controls_concurrent_emu.txt	840ef185a3c406511fd291efc93a3fe7e8884441
+tests/lib/static_pool.py	24464961052d88b463b39b13bf40d02400db906c
+tests/lib/static_job.sh	e43178573b2b9d2224a1677b9a9fc4612f9a83c5
+tests/run_all_emulator.sh.lines-640-680 (lines 640-680 of tests/run_all_emulator.sh)	b1b13d711ad6fd3409f40bb087650c20e1a3d445
+tests/run_all_emulator.sh.lines-700-855 (lines 700-855 of tests/run_all_emulator.sh)	465eb318e5ec2484e700b9ccc5360d023a4daf62
+tests/lib/desktop_session.sh	f61469094dc9b40f390d483a34fe950ce829ee35
+tools/mister_mra.sh.lines-88-118 (lines 88-118 of tools/mister_mra.sh)	fc51bdc457acb1ad43311b9d7d40d10e36a6e851
+tools/controls_overlap.py	9aed88b10d4d91b84c7e401cbba23c8b6d7d927a
+DECISIONS_HISTORY.md.lines-9893-9905 (lines 9893-9905 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-08 (14z-223) — the #310 post-mortem's three recommendations: positive evidence, dec")	e8b3a042360f15e1dae7ea6656f6c2d595b56129
+build/agent223/postmortem/postmortem_310.md	caf0a0fe824dc99099d47c6621c85a9bb39356a9

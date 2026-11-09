@@ -224,6 +224,7 @@ declares	test_crash_guard
 declares	test_crash_sweep
 declares	test_crosscheck_229
 declares	test_crypt_boundary
+declares	test_ctl_caught_lint
 declares	test_ctl_show_err
 declares	test_dead_exit_census
 declares	test_dead_leg_unjudged

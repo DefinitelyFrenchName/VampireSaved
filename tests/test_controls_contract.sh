@@ -3,7 +3,9 @@
 # tests/lib/controls.sh: the four regexes of the R10 grammar, the leading
 # comment block as the header (a bare `#` continues it, a non-comment line
 # ends it), the declared-vs-fired readback the classifier turns into FAIL, the
-# `CONTROL=<name>` mode with its REFUSED exit, and the `none` declaration.
+# `CONTROL=<name>` mode with its REFUSED exit, and the `none` declaration; and
+# #369's helpers (14z-224): vs_ctl_caught, vs_ctl_fired under a mode, the debt
+# list, and a CONTROL CAUGHT line in a plain run turning the controls block RED.
 # (14z-147, step two of the maintainer's must-fire ruling.) ROM-free, ~1 s.
 #
 # WHAT: the must-fire contract's reader (tests/lib/controls.sh) reads what the grammar says:
@@ -18,6 +20,8 @@
 #
 # MUST-FIRE: known-bad: dead-control-log — a synthetic gate that declares a control and prints `CONTROL DEAD:` for it must classify FAIL through the shipped classifier, or a dead control would keep its gate green
 # MUST-FIRE: known-bad: undeclared-firing — a synthetic log printing `CONTROL FIRED:` for a name no header declares must classify FAIL, or a control nobody can review would count
+# MUST-FIRE: shadow-tool: fired-under-mode — a copy of tests/lib/controls.sh whose #369 vs_ctl_fired branch is disabled must print `CONTROL FIRED:` under a mode in a gate off the debt list, and section 7 must FAIL (mode: that copy is the library section 7 tests)
+# MUST-FIRE: shadow-tool: plain-caught-green — a copy of tests/lib/controls.sh whose #369 plain-run CAUGHT check is disabled must read a plain PASS carrying a `CONTROL CAUGHT:` line OK, and section 7 must FAIL (mode: as above)
 #
 # WHY. CLAUDE.md §4 [VSP-19]: verdict logic is itself tested. This reader is
 # what every runner now trusts to say whether a gate's controls fired; a reader
@@ -31,7 +35,21 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
 T="$(mktemp -d)" || { echo "FAIL: test_controls_contract — mktemp -d failed (T)"; exit 2; }; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
-rc=0; ok() { echo "  ok: $*"; }; bad() { echo "  FAIL: $*"; rc=1; }
+: > "$T/main.log"
+rc=0; ok() { echo "  ok: $*"; }; bad() { echo "  FAIL: $*" | tee -a "$T/main.log"; rc=1; }
+# each mode's own finding (#369): the line its perturbation makes this gate's own check print
+LIB7="$REPO/tests/lib/controls.sh"; WANT=""
+shadow7() {  # shadow7 <marker>: a copy of controls.sh with the marked `if` made false, as LIB7
+    sed "s@^\\(    if \\).*$1\$@\\1false; then   # disabled by test_controls_contract@" "$REPO/tests/lib/controls.sh" > "$T/controls7.sh"
+    cmp -s "$REPO/tests/lib/controls.sh" "$T/controls7.sh" && { echo "FAIL: test_controls_contract — could not disable '$1' (the line moved)"; exit 1; }
+    LIB7="$T/controls7.sh"
+}
+case "${VS_CTL:-}" in
+dead-control-log)   WANT="FAIL: a green controls block changed the verdict to FAIL" ;;
+undeclared-firing)  WANT="FAIL: an undeclared gate was failed: FAIL" ;;
+fired-under-mode)   shadow7 '# #369 fired-under-mode'; WANT="FAIL: 7d vs_ctl_fired under a mode, off the debt list" ;;
+plain-caught-green) shadow7 '# #369 plain-caught'; WANT="FAIL: 7g a plain PASS carrying a CONTROL CAUGHT line" ;;
+esac
 
 mkgate() {  # mkgate <path> <header lines...>  — a stub whose header is the argument list
     _p="$1"; shift
@@ -75,11 +93,11 @@ echo "== 4. the classifier turns a red block into plain FAIL (and leaves the res
 . "$REPO/tests/lib/classify.sh"
 printf 'PASS: fine\nCONTROL FIRED: alpha — x\nCONTROL DEAD: beta-2 — the copy passed\n' > "$T/dead.log"
 vs_classify 0 "$T/dead.log" 90 "$T/g1.sh"
-if [ "$VS_VERDICT" = FAIL ]; then vs_ctl_fired dead-control-log "exit 0 + a CONTROL DEAD line classifies FAIL: $VS_DETAIL"
+if [ "$VS_VERDICT" = FAIL ]; then [ -n "${VS_CTL:-}" ] || vs_ctl_fired dead-control-log "exit 0 + a CONTROL DEAD line classifies FAIL: $VS_DETAIL"
 else vs_ctl_dead dead-control-log "exit 0 + a CONTROL DEAD line classified $VS_VERDICT"; rc=1; fi
 printf 'PASS: fine\nCONTROL FIRED: ghost — nobody declared me\n' > "$T/ghost.log"
 vs_classify 0 "$T/ghost.log" 90 "$T/g5.sh"
-if [ "$VS_VERDICT" = FAIL ]; then vs_ctl_fired undeclared-firing "a FIRED line no header declares classifies FAIL: $VS_DETAIL"
+if [ "$VS_VERDICT" = FAIL ]; then [ -n "${VS_CTL:-}" ] || vs_ctl_fired undeclared-firing "a FIRED line no header declares classifies FAIL: $VS_DETAIL"
 else vs_ctl_dead undeclared-firing "an undeclared firing classified $VS_VERDICT"; rc=1; fi
 # THE MODES (#310, 14z-210): each plants its known-bad log where this section expects a good one, so the gate's own
 # check reads it and FAILs. Until then neither mode perturbed anything: both "failed" only because CONTROL leaked
@@ -120,10 +138,57 @@ LIB="$REPO/tests/lib/controls.sh" CONTROL=nope sh "$T/g6.sh" > "$T/o3" 2>&1 && s
 
 echo "== 6. this gate declares what it prints (dogfood) =="
 for n in $(vs_ctl_declared "$0"); do
-    grep -q "vs_ctl_fired $n " "$0" && ok "declared control '$n' has a FIRED site in the code" || bad "declared control '$n' is never fired by this gate"
+    grep -qE "(vs_ctl_fired|fire7) $n( |\$)" "$0" && ok "declared control '$n' has a FIRED site in the code" || bad "declared control '$n' is never fired by this gate"
 done
 
+echo "== 7. #369: vs_ctl_caught, vs_ctl_fired under a mode, the debt list, CAUGHT in a plain run =="
+# a stub gate that calls the helpers of LIB7 (the real library, or a mode's copy); REPO points at a scratch debt list
+mkdir -p "$T/fake/tests/expected"; printf '# scratch\ng7l.sh\n' > "$T/fake/tests/expected/ctl_caught_debt.tsv"
+printf '  ok    row 1\n  FAIL  [E1 tag-a] row 2 judged wrong\n  FAIL  [E1 tag-b] row 3\n' > "$T/main7.out"
+cat > "$T/g7.sh" <<'EOF7'
+#!/bin/sh
+# g7.sh — calls one helper: $1 = fired | caught, then its arguments
+. "$LIB"
+h="$1"; shift
+if [ "$h" = fired ]; then vs_ctl_fired "$@"; else vs_ctl_caught "$@"; fi
+echo "rc=$?"
+EOF7
+cp "$T/g7.sh" "$T/g7l.sh"
+run7() { env -u CONTROL -u VS_CTL LIB="$LIB7" REPO="$T/fake" "$@" 2>&1; }   # never this gate's own mode (#310)
+o="$(run7 sh "$T/g7.sh" caught "$T/main7.out" '\[E1 tag-b\]')"
+[ "$o" = "rc=0" ] && ok "7a vs_ctl_caught in a plain run prints nothing and returns 0" || bad "7a vs_ctl_caught in a plain run printed: $o"
+o="$(run7 env CONTROL=flip sh "$T/g7.sh" caught "$T/main7.out" '\[E1 tag-b\]')"
+[ "$o" = "CONTROL CAUGHT: flip — FAIL  [E1 tag-b] row 3
+rc=0" ] && ok "7b under a mode, the finding present: CAUGHT with the first matching line, unindented; returns 0" || bad "7b under a mode with the finding present: $o"
+o="$(run7 env CONTROL=flip sh "$T/g7.sh" caught "$T/main7.out" '\[E1 tag-c\]')"
+case "$o" in "NOT JUDGED: under control mode flip, the check failed without its finding"*"rc=1") ok "7c under a mode, the finding absent: NOT JUDGED, returns 1" ;; *) bad "7c under a mode with the finding absent: $o" ;; esac
+for e in '' . '.*' FAIL '^FAIL' '^ *FAIL'; do
+    o="$(run7 env CONTROL=flip sh "$T/g7.sh" caught "$T/main7.out" "$e")"
+    case "$o" in "NOT JUDGED: under control mode flip, vs_ctl_caught was given"*"rc=1") ok "7c' the catch-all ERE '$e' is refused (NOT JUDGED)" ;; *) bad "7c' the catch-all ERE '$e' was accepted: $o" ;; esac
+done
+o="$(run7 env CONTROL=flip sh "$T/g7.sh" caught "$T/no_such.out" 'tag-b')"
+case "$o" in "NOT JUDGED:"*"rc=1") ok "7c'' a missing output file: NOT JUDGED" ;; *) bad "7c'' a missing output file: $o" ;; esac
+o="$(run7 env CONTROL=flip sh "$T/g7.sh" fired flip "planted copy failed")"
+case "$o" in "NOT JUDGED: under control mode flip, vs_ctl_fired was called for 'flip'"*) ok "7d under a mode, off the debt list, vs_ctl_fired prints NOT JUDGED and no FIRED line" ;; *) bad "7d vs_ctl_fired under a mode, off the debt list, printed: $o" ;; esac
+o="$(run7 env CONTROL=flip sh "$T/g7l.sh" fired flip "planted copy failed")"
+case "$o" in "CONTROL FIRED: flip — planted copy failed"*) ok "7e under a mode, ON the debt list (g7l.sh), vs_ctl_fired keeps its line" ;; *) bad "7e vs_ctl_fired in a listed gate under a mode printed: $o" ;; esac
+o="$(run7 sh "$T/g7.sh" fired flip "planted copy failed")"
+case "$o" in "CONTROL FIRED: flip — planted copy failed"*) ok "7f in a plain run vs_ctl_fired prints its line" ;; *) bad "7f vs_ctl_fired in a plain run printed: $o" ;; esac
+printf 'PASS: fine\nCONTROL FIRED: alpha — x\nCONTROL FIRED: beta-2 — y\nCONTROL CAUGHT: alpha — FAIL  [E1] row 3\n' > "$T/caught_plain.log"
+o="$( . "$LIB7"; vs_ctl_read "$T/g1.sh" "$T/caught_plain.log"; echo "$VS_CTL_VERDICT|$VS_CTL_DETAIL" )"
+case "$o" in "RED|controls RED: a CONTROL CAUGHT line in a plain run"*) ok "7g a plain PASS carrying a CONTROL CAUGHT line reads RED (${o#*|})" ;; *) bad "7g a plain PASS carrying a CONTROL CAUGHT line read $o" ;; esac
+fire7() {  # fire7 <control>: a mode run of this gate on its own copy must FAIL with its own CAUGHT line
+    _o="$(CONTROL=$1 sh "$0" 2>&1)"; _s=$?
+    if [ "$_s" = 1 ] && printf '%s\n' "$_o" | grep -q "^CONTROL CAUGHT: $1 — "; then vs_ctl_fired "$1" "its disabled copy made section 7 fail: $(printf '%s\n' "$_o" | grep -m1 "^CONTROL CAUGHT: $1 — " | cut -c1-100)"
+    else vs_ctl_dead "$1" "the mode run exited $_s without its own CAUGHT line" || rc=1; fi
+}
+if [ -z "${VS_CTL:-}" ]; then   # the two #369 controls, in a plain run only
+    fire7 fired-under-mode
+    fire7 plain-caught-green
+fi
+
 echo
+if [ -n "${VS_CTL:-}" ] && [ "$rc" != 0 ]; then vs_ctl_caught "$T/main.log" "$WANT"; fi
 [ "$rc" = 0 ] && echo "PASS: the must-fire contract's reader reads what the grammar says." \
              || echo "FAIL: see above."
 exit $rc

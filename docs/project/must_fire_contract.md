@@ -73,13 +73,14 @@ The runner's verdict on a control run (`vs_classify_control`, one copy, in
 
 | verdict | when | meaning |
 |---|---|---|
-| HONOURED | exit non-zero, no crash | the perturbation was caught |
+| HONOURED | exit non-zero, no class below, and the log carries `CONTROL CAUGHT: <this control> — ` (printed only by `vs_ctl_caught`) | the gate's own check found the perturbation's finding (#369, 14z-224); a gate on the debt list `tests/expected/ctl_caught_debt.tsv` is HONOURED without the line until it is migrated |
 | LIES | exit 0, or a SKIP | the perturbation left the gate green — the control tests nothing |
 | REFUSED | the gate printed `REFUSED: CONTROL=` | declared in the header, never read by the gate |
 | DIED | the shell's own error line, or a traceback | a crash is not a verdict ([VSP-108]) |
 | DIED | an environment error anywhere in the log (`No space left on device`, `mktemp: `, `cannot create …`, `Permission denied`, `Read-only file system`, `Too many open files`, `Cannot allocate memory`, `Disk quota exceeded`: `tests/lib/classify.sh` `VS_ENV_ERR`) | the host stopped the run, not its perturbation (#321, 14z-210: 28 modes read HONOURED on a full `/tmp`) |
 | DIED | no `NOT JUDGED: ` line, the log ENDS on a tool's own error lines (`awk: can't open file`, `sed: …`, `cp: …: No such file or directory`, ` source line number N`: `tests/lib/classify.sh` `VS_TOOL_ERR`), and the line before them is not the gate's own FAIL | the gate died under `set -e` on a tool's failure before its own verdict — not the perturbation; a gate that printed its FAIL and then ran a diagnostic that failed exited by its own hand (GitHub #367, 14z-223; a `set -e` death that prints nothing is not caught) |
 | UNJUDGED | a FAIL whose log has a line starting `NOT JUDGED: ` | the mode run measured nothing (#310, 14z-210) |
+| UNJUDGED | a FAIL with none of the above and no `CONTROL CAUGHT: <this control> — ` line, the gate not on the debt list | no positive evidence from its own check (#369, 14z-224) |
 | TIMEOUT | the wrapper's exits | as for any gate |
 
 Anything but HONOURED is a failure of the run, named `<gate>(control:<name>:<verdict>)`.
@@ -125,14 +126,80 @@ dead instrument, its fifth column: `FBNEO_BIN` for an FBNeo leg, batch 2, 14z-22
 is red and silent, and its gate with the `# #310 g7 NJ` lines neutered reads its frozen stripped class (the pre-fix class,
 or HONOURED where the batch also added the liveness check the pre-fix gate lacked and crashed without).
 
+## #369 — a mode is honoured only on positive evidence from its own check
+
+Ruled 2026-11-08 (14z-224, the maintainer: *"A1, B1, c1"* on `build/agent224/t369/design.md`). Until then the
+classifier's fall-through read any non-zero exit with no crash as HONOURED, and #310 spent seven batches naming the
+other ways a mode run fails (a dead leg, a refusal, a SKIP, a crash it could not see). Now the run must carry its own
+evidence:
+
+- **`vs_ctl_caught <output file> <ERE>`** (`tests/lib/controls.sh`, the ONE printer of `CONTROL CAUGHT:`). Call it where
+  a mode run ends in the gate's FAIL, on the file holding the gate's MAIN check output, with an ERE matching only the
+  finding that mode's perturbation must produce. Under a mode it prints `CONTROL CAUGHT: <mode> — <first matching line>`
+  or `NOT JUDGED: under control mode <mode>, the check failed without its finding '<ERE>'`; in a plain run it does
+  nothing. A catch-all ERE (`''`, `.`, `.*`, `FAIL`, `^FAIL`, `^ *FAIL`) is refused at run time too.
+- **`vs_ctl_fired` under a mode prints `NOT JUDGED`** in a gate off the debt list: a firing line printed during a mode
+  run comes from the gate's built-in control section (its own copy, whatever the main check did) or names the mode
+  unconditionally. In a plain run it prints `CONTROL FIRED:` as before, and the plain-run contract above is unchanged.
+- **The class names stay** (ruling B1): a crash beside a CAUGHT line is still DIED, a `NOT JUDGED` beside it still
+  UNJUDGED, its own `CONTROL DEAD` still LIES, exit 0 with it LIES. A `CONTROL CAUGHT` line in a plain PASS turns the
+  controls block RED.
+- **The debt list** (ruling C1): `tests/expected/ctl_caught_debt.tsv` lists every gate that declared a mode at
+  8464fa3f and is not yet migrated; a listed gate keeps the old fall-through and its `vs_ctl_fired`. It only shrinks.
+  #369 closes, and #310 with it, when it is empty.
+
+`tests/test_control_classifier.sh` holds the classifier (control `fallthrough-honoured`), `tests/test_controls_contract.sh`
+section 7 the helpers (`fired-under-mode`, `plain-caught-green`), and `tests/test_ctl_caught_lint.sh`
+(`tools/ctl_caught_lint.py`) the static half: the literal printed only through the helper [a] (the ground-truth gates
+that write synthetic logs may carry it, never in an echo or printf whose stdout is not sent to a file, nor at the start
+of a line, the body of a multi-line string or a heredoc), no catch-all ERE [b], no
+`vs_ctl_fired "$VS_CTL"` off the list [c], every mode-declaring gate calls the helper or is listed [d], several modes
+compute the ERE per mode [e], and the list only shrinks [debt]: a gate absent at 8464fa3f never joins it, and every row
+must be on the list's first version (its blob pinned in the gate as `ORIGIN_BLOB`) and on every committed version since,
+so a migrated gate, or a deleted row, never comes back (rule-checker run 2026-11-09-1743).
+
+**NOT HELD BY ANY LINT, HELPER OR RUN-TIME RULE — review each gate as it migrates:** a `vs_ctl_caught` call handed a file
+other than the main check's output (a copy's, or the in-gate section's), a per-mode ERE that still matches any
+failure of the check, and THE STATED LIMIT of rule [a] in the six ground-truth gates (maintainer, 2026-11-09: "Land
+with a stated limit (Recommended)", after rule-checker runs 2026-11-09-1743, -1744 and -1745 each found a way past a
+text check of shell source): the lint covers echo or printf written on one line, sent to stdout or stderr; any other
+printer (awk, cat of a file, tee), a line assembled at run time (the literal split, or built in a variable, a function,
+a command substitution or a format) are review. Stated by the session, not ruled by the maintainer: the reader is
+textual — it reads each statement as written, never as the shell evaluates it — so a one-line echo or printf it
+mis-splits, a redirect target held in a variable, a later redirect that overrides an earlier one, eval, aliases and
+functions pass too (rule-checker runs 2026-11-09-1748 and -1749). Every other gate stays under
+the strict rule: the literal may not appear anywhere in a code file under tests/ or tools/, at any depth. In every file
+a literal assembled at run time (split, formatted, built in a variable) passes the lint, which reads the literal written
+whole, and code outside tests/ and tools/ is not read, nor a data file a gate prints (a fixture, a kept mode log):
+review (rule-checker runs 2026-11-09-1746 and -1747; stated by the session, not ruled by the maintainer).
+
+**Migrating a gate:**
+
+1. The main check writes its findings to a file (`… | tee -a "$W/main.log"`, or the tool's own output file).
+2. Where a mode run ends in FAIL, call `vs_ctl_caught "$W/main.log" "$WANT"`, `WANT` set per mode (the `EXPECT` of the
+   `perturb` function below is the natural source). Retire `vs_ctl_fired "$VS_CTL"` closes and fail-flag closes.
+3. Run the in-gate control section only in a plain run (`[ -n "${VS_CTL:-}" ] || …`).
+4. Make the check non-vacuous: a check that judged zero items prints `NOT JUDGED` (`vs_ctl_nj`), never its FAIL — a
+   dead leg that wrote nothing never reaches the check, but a leg that ran and judged nothing does
+   (`tests/audit_extra_pass.sh`'s E1 failed at `n == 0` with the mode's own finding). Keep every liveness `vs_ctl_nj` line.
+5. A crash that IS the honoured outcome: `vs_ctl_show_err <copy output> <exception>` and then `vs_ctl_caught` on the
+   same output with the exception's ERE.
+6. Accept it: the plain run PASS with every control fired; every mode HONOURED on its own CAUGHT line; and, where they
+   can be built, a dead-instrument run (the leg that wrote nothing) and a starved run (a live instrument, zero judged
+   items) both UNJUDGED. Where a starved input cannot be built, say so: review only.
+7. Delete the gate's debt row in the same commit. A gate with rows in `tests/expected/crash_sweep.tsv` (its `kb` leg) or
+   the dead-leg tables (their stripped class) changes those classes when it migrates; their new specification is open
+   (#369 piece 5) — migrate such a gate only with it.
+
 ## The pattern that makes the mode cheap to write
 
 Write each perturbation as ONE function the control section and the mode both
 call (`perturb <name> <copy>` setting `EXPECT`, the substring the failure must
 carry). Under the mode the perturbed copy becomes the INPUT the main check
 reads (`ROOT`, `MANIFEST`, `REGISTRY`, `PAGE`, `SIDE_B`, the tool path for a
-shadow tool); the control section still builds its own copy and prints the
-FIRED/DEAD line. What the mode proves is then exactly what the control claims,
+shadow tool); the control section, in a plain run only, builds its own copy and prints the
+FIRED/DEAD line, and the mode's FAIL calls `vs_ctl_caught` on the main check's output with
+`EXPECT` (#369). What the mode proves is then exactly what the control claims,
 and the two cannot drift. A mode may run ONLY the section its perturbation
 reaches (`tests/test_close_tools.sh` since #268, 14z-199, where eight of its ten
 modes each re-ran a ~8-minute section none of them perturbed, 482-495 s a mode

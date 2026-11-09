@@ -62,7 +62,11 @@
 # runners as a NOTE, never failed here: 236 gates predate the grammar).
 # SKIP and FAIL are never touched: a skipped gate ran nothing, a failed gate
 # is already red.
-[ -n "${REPO:-}" ] && [ -f "$REPO/tests/lib/controls.sh" ] && . "$REPO/tests/lib/controls.sh"
+# (#369, 14z-224: from the working directory when REPO is unset — vs_classify_control reads the debt list through
+# vs_ctl_debt_listed, and the ground-truth gates call it from `sh -c` in the repo root with REPO unexported)
+for _vs_cr in "${REPO:-}" .; do
+    if [ -n "$_vs_cr" ] && [ -f "$_vs_cr/tests/lib/controls.sh" ]; then . "$_vs_cr/tests/lib/controls.sh"; break; fi
+done
 # THE MEASUREMENT CONTRACT IS READ THE SAME WAY (14z-180, GitHub #171 slice Q2,
 # ruled 2026-09-24 "Declared/fired grammar"): a PASS whose header declares
 # `# MEASURES: <name> — <floor>` and whose log lacks `MEASURED: <name> = <n>`,
@@ -130,6 +134,14 @@ vs_classify() {
 #             judged" in words, exited 1 and read HONOURED. A gate prints the marker on every path that ends a run
 #             without a verdict about what it measures; read after the crash classes (a crash stays DIED).
 #   TIMEOUT   the wrapper's exits, as for any gate
+#   HONOURED  (#369, 14z-224; maintainer-ruled 2026-11-08 "A1, B1, c1") ONLY on positive evidence: after every class above,
+#             a FAIL whose log carries `CONTROL CAUGHT: <this control's name> — ` (printed by tests/lib/controls.sh
+#             vs_ctl_caught, which greps the gate's main check output for the mode's own finding). Without it the run is
+#             UNJUDGED — no positive evidence from its own check — not HONOURED. The class names are kept (ruling B1):
+#             a crash beside a CAUGHT line is still DIED, a NOT JUDGED beside it still UNJUDGED, exit 0 with it LIES.
+#             A gate on the shrink-only debt list tests/expected/ctl_caught_debt.tsv (ruling C1) keeps the old
+#             fall-through, `reached the gate's own FAIL`, until it is migrated. Ground truth:
+#             tests/test_control_classifier.sh (its control fallthrough-honoured).
 # THE ENVIRONMENT FAILED, NOT THE GATE (#321, 14z-210; maintainer-ruled 2026-10-27, "Signatures -> DIED"): a control
 # mode whose log carries one of these was stopped by its host — a full or read-only disk, a failed mktemp, a refused
 # write, no memory or file handles — so its exit is not its perturbation firing. On ERIS's 24 GB tmpfs /tmp, filled by
@@ -186,8 +198,12 @@ vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate sc
             VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="the mode run measured nothing: $(grep -a -m1 '^NOT JUDGED: ' "$_clog" | cut -c13-92)"
         elif _vs_tool_death "$_clog" > /dev/null; then   # TOOL-ERROR (#367)
             VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a gate that died on a tool's error is not a verdict (exit $_cst): $(_vs_tool_death "$_clog" | cut -c1-90)"
-        else
-            VS_CTL_EXEC=HONOURED; VS_CTL_EXEC_DETAIL="reached the gate's own FAIL (exit $_cst)"
+        elif [ -n "$_cname" ] && grep -qa "^CONTROL CAUGHT: $_cname — " "$_clog"; then   # #369 CAUGHT
+            VS_CTL_EXEC=HONOURED; VS_CTL_EXEC_DETAIL="its own check caught it (exit $_cst): $(grep -a -m1 "^CONTROL CAUGHT: $_cname — " "$_clog" | cut -c17-106)"
+        elif ! { command -v vs_ctl_debt_listed >/dev/null 2>&1 && vs_ctl_debt_listed "$_cgate"; }; then   # #369 no positive evidence
+            VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="no positive evidence from its own check: exit $_cst with no 'CONTROL CAUGHT: ${_cname:-<no name>}' line (#369)"
+        else   # the gate is on tests/expected/ctl_caught_debt.tsv: the pre-#369 fall-through until it is migrated
+            VS_CTL_EXEC=HONOURED; VS_CTL_EXEC_DETAIL="reached the gate's own FAIL (exit $_cst; on the #369 debt list)"
         fi ;;
     esac
     return 0

@@ -1,0 +1,25 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent224/t369/design.md	a8191e1898edac050f1c6a3e7d075da15595508e
+build/agent224/t369/issue369_body.md	6bcbaa16bf763e585c9cf3b031dd79d7a52896ca
+build/agent224/t369/failflag_closings.txt	e956b54a1f4ff52df9fb8300452724a4959561f1
+build/agent224/t369/mode_var_firings.txt	9778cd22d93ad6d046be412db8233d65ad1ac59a
+build/agent224/t369/mode_var_shapes.tsv	dd0e5444ac3ef5a359da7e186a917131feeba7ac
+build/agent224/t369/static_modes_own_line_counts.txt	33a038a0d1d5503e6dc775735a378e0ee8d2b667
+build/agent223/postmortem/static_fired/modes.tsv	5e9149f7d078ae507d7279836212106d76da2a0e
+build/agent223/postmortem/static_fired/DONE	da39a3ee5e6b4b0d3255bfef95601890afd80709
+build/agent223/postmortem/static_fired.log.lines-1-12 (lines 1-12 of build/agent223/postmortem/static_fired.log)	0fee0dd188a4f81794f985401124fbdc66a7798d
+build/agent223/postmortem/wt_static_fired.sh	de01156d7b9bd391968669fd728ccddc17d10bfc
+tests/lib/classify.sh	fc6ecd59450448eaeb3006dfeb1d1753788d470d
+tests/lib/controls.sh	1363276b604e400d317180436c0a50e5913ae6a8
+docs/project/must_fire_contract.md	2bb1608d49af99053cb7bd17d07fee1c7c9d97b7
+tests/test_docshape.sh	26d187e256321cdc97f600a63aaa8d985c4661e1
+tests/audit_extra_pass.sh	3f9fe45d99bfec4de38d4aa7b9a2daa1cb316248
+tests/audit_rng_draws.sh	1cb4f1a793b68ad9dd95039ff564d3082f192626
+tests/test_mame_ident.sh	ed15101fcb720c375436806f4799fe05ce03a24f
+tests/test_power_decode.sh	b83d26a23c68ebb0ea1674fed3301d410570dbea
+tests/audit_tenant_cpu_soak.sh	e3db77ad1790f3ee042c2d4a996154510fc30168
+tests/test_agent_defs.sh	0d0361da7a688fbc5e3c93823abdce7bda417335
+tests/test_control_classifier.sh	6abf994004ee6c2e5ea6e4997a8fc58ebb015d27
+tests/run_all_static.sh.lines-560-590 (lines 560-590 of tests/run_all_static.sh)	8a3659599b2ebf5f353a3d6fb2b193d1f5de62cc
+tests/run_all_emulator.sh.lines-675-700 (lines 675-700 of tests/run_all_emulator.sh)	b6916b2d6417a3a67feaeaeec356f4d69826d5a8
+STATE.md.lines-170-195 (lines 170-195 of STATE.md)	e4a52e6ad5f09358392889cbc64ef4ffbb43edc1

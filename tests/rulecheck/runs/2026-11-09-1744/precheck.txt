@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: # the rule lands at once, with this shrink-only list).  [build/agent224/t369/rc/ctl_caught_debt.tsv]
+  FLAG D-ABSOLUTE: One gate basename per row: every gate whose header declared a  [build/agent224/t369/rc/ctl_caught_debt.tsv]
+  FLAG D-ABSOLUTE: # mode, is gone, or did not exist at 8464fa3f (a new gate never joins the list), on a row that is not on this list's  [build/agent224/t369/rc/ctl_caught_debt.tsv]
+  FLAG D-ABSOLUTE: # first version (blob pinned in that gate as ORIGIN_BLOB) and on every committed version since (a deleted row never  [build/agent224/t369/rc/ctl_caught_debt.tsv]
+packet_check: 4 flag(s): D-ABSOLUTE 4

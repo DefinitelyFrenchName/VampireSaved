@@ -118,6 +118,10 @@ timing_fail() {
 
 RUNNER="$REPO/tests/run_all_static.sh"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+# #369 (14z-224): this gate's stubs are pre-#369 gates (each prints CONTROL FIRED in its plain path), so every fake repo
+# lists them on its own debt list, as tests/expected/ctl_caught_debt.tsv lists the real ones; the strict path's ground
+# truth is tests/test_control_classifier.sh. debt_stubs <fake repo>: writes that list (every g_* name in this file).
+debt_stubs() { mkdir -p "$1/tests/expected"; grep -o 'g_[a-z0-9_]*' "$REPO/tests/test_static_runner.sh" | sort -u | sed 's/$/.sh/' > "$1/tests/expected/ctl_caught_debt.tsv"; }
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 # A SHADOW RUNNER THAT ABORTED IS NOT ITS PERTURBATION CAUGHT (#310 group 5, 14z-215). Under a control mode the shadow
@@ -198,7 +202,7 @@ elif vs_ctl_is order-ignored; then ln -s "$SHADOW_O" "$FR/tests/run_all_static.s
 else ln -s "$RUNNER" "$FR/tests/run_all_static.sh"; fi
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
 # the synthetic repo carries it too — the shipped lib, never a copy
-mkdir -p "$FR/tests/lib"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
+mkdir -p "$FR/tests/lib"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"; debt_stubs "$FR"
 # ...and the controls reader the classifier sources beside it (14z-147)
 ln -s "$REPO/tests/lib/controls.sh" "$FR/tests/lib/controls.sh"
 ln -s "$REPO/tests/lib/measures.sh" "$FR/tests/lib/measures.sh"   # the measurement reader beside it (14z-180): the first close tier died on its empty-list grep, which a fakerepo WITHOUT the library could not reach
@@ -584,8 +588,10 @@ echo "== 12b. a control mode that CRASHES with a non-zero exit is DIED, not HONO
 # classifier used to read that as the negative control reaching its predicate. The shell's
 # own line about the gate script is the evidence; a real FAIL that QUOTES another script's
 # error must stay honoured.
-mkx g_xdie127 'no_such_helper_254; exit 1'
-mkx g_xquote  'echo "tests/other.sh: line 3: x: command not found"; echo "FAIL: the flipped input was caught"; exit 1'
+# its check caught the plant, then the gate crashed (#369: a CAUGHT line beside a crash is still DIED, and only the
+# gate script handed to the classifier lets it see the crash; the unplugged copy reads the CAUGHT line HONOURED)
+mkx g_xdie127 'echo "CONTROL CAUGHT: flip — FAIL: the flipped input was caught"; no_such_helper_254; exit 1'
+mkx g_xquote  'echo "tests/other.sh: line 3: x: command not found"; echo "FAIL: the flipped input was caught"; echo "CONTROL CAUGHT: flip — FAIL: the flipped input was caught"; exit 1'
 printf 'g_xdie127\ng_xquote\n' > "$FR/tests/ci_portable.txt"
 o12c="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12c.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" || true
 printf '%s' "$o12c" | grep -E >/dev/null "^  g_xdie127 +CONTROL DIED: flip" && echo "  ok: a mode dying of command-not-found (exit 127) -> CONTROL DIED" \
@@ -813,7 +819,7 @@ rm -f "$FR/tests/run_all_static_orderignored.sh" "$FR/tests/g_last.sh" "$FR/test
 
 echo
 echo "== 18. --confirm (14z-188, #188 route A): a red is re-run, a changed input re-runs its reader, the rest is CARRIED =="
-FC="$T/confirmrepo"; mkdir -p "$FC/tests/lib" "$FC/tools" "$FC/data"
+FC="$T/confirmrepo"; mkdir -p "$FC/tests/lib" "$FC/tools" "$FC/data"; debt_stubs "$FC"
 ln -s "$RUNNER" "$FC/tests/run_all_static.sh"
 for _l in classify controls measures; do ln -s "$REPO/tests/lib/$_l.sh" "$FC/tests/lib/$_l.sh"; done
 cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$REPO/tools/build_dirs.py" "$REPO/tests/expected/build_dirs.tsv" "$FC/tools/"
@@ -935,7 +941,7 @@ if ! vs_ctl_is core-carried && ! vs_ctl_is controls-carried && ! vs_ctl_is confi
 fi
 
 echo "== 22. #286 (14z-202): an unchanged dirty submodule is not a change; a mention re-runs a gate without its controls =="
-FS="$T/repo286"; mkdir -p "$FS/tests/lib" "$FS/tools" "$FS/data"
+FS="$T/repo286"; mkdir -p "$FS/tests/lib" "$FS/tools" "$FS/data"; debt_stubs "$FS"
 ln -s "$RUNNER" "$FS/tests/run_all_static.sh"
 for _l in classify controls measures; do ln -s "$REPO/tests/lib/$_l.sh" "$FS/tests/lib/$_l.sh"; done
 SUBOFF="$T/static_confirm_suboff.py"; CTLALW="$T/static_confirm_ctlalways.py"; CTLNEV="$T/static_confirm_ctlnever.py"
@@ -1037,7 +1043,7 @@ cmp -s "$REPO/tests/lib/static_pool.py" "$POOL_S" && fail "could not disable the
 POOL_E="$T/static_pool_early.py"
 sed 's|^queue = collections.deque(("gate", g, "") for g in gates)$|queue = collections.deque([("gate", g, "") for g in gates] + [("control", "g_k", c) for c in ("flip", "flop", "flap") if "g_k" in gates])   # POOL-EARLY shadow|' "$REPO/tests/lib/static_pool.py" > "$POOL_E"
 cmp -s "$REPO/tests/lib/static_pool.py" "$POOL_E" && fail "could not make the pool queue controls early — its queue line moved"
-FJ="$T/repo299"; mkdir -p "$FJ/tests/lib" "$FJ/tools" "$FJ/data"
+FJ="$T/repo299"; mkdir -p "$FJ/tests/lib" "$FJ/tools" "$FJ/data"; debt_stubs "$FJ"
 for _l in classify controls measures; do ln -s "$REPO/tests/lib/$_l.sh" "$FJ/tests/lib/$_l.sh"; done
 cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$REPO/tools/build_dirs.py" "$REPO/tests/expected/build_dirs.tsv" "$FJ/tools/"
 mkj() {  # mkj <name> <exit> <body line> [control]: a stub that logs each run, after its body (and each control run), outside the repo
@@ -1174,7 +1180,7 @@ SHADOW_W="$T/run_all_static_decryptwarmoff.sh"
 # since #305 (14z-209) the warm-up is tests/lib/decrypt_cache.sh's decrypt_cache_warm, and the runner's DECRYPT-WARM line calls it
 sed 's@    decrypt_cache_warm "$WORK/decrypt_warm.err" || :   # DECRYPT-WARM@    :   # DECRYPT-WARM disabled@' "$RUNNER" > "$SHADOW_W"
 cmp -s "$RUNNER" "$SHADOW_W" && fail "could not disable the decrypt warm-up — the DECRYPT-WARM line moved"
-FV="$T/repo_dv"; RV="$T/romdir_dv"; mkdir -p "$FV/tests/lib" "$FV/tools" "$RV"
+FV="$T/repo_dv"; RV="$T/romdir_dv"; mkdir -p "$FV/tests/lib" "$FV/tools" "$RV"; debt_stubs "$FV"
 for _l in classify controls measures static_job decrypt_cache; do ln -s "$REPO/tests/lib/$_l.sh" "$FV/tests/lib/$_l.sh"; done
 ln -s "$REPO/tests/lib/static_pool.py" "$FV/tests/lib/static_pool.py"   # the pool (#312)
 : > "$RV/vsavj.zip"; : > "$RV/vsav2.zip"
@@ -1232,7 +1238,7 @@ echo "== 30. a strict run that leaves a new untracked file outside build/ is NOT
 SHADOW_X="$T/run_all_static_strayblind.sh"
 sed 's@    STRAY="$(LC_ALL=C comm -13 "$WORK/untracked_before.txt" "$WORK/untracked_after.txt" | tr .\\n. . .)"   # STRAY-CHECK@    STRAY=""   # STRAY-CHECK disabled@' "$RUNNER" > "$SHADOW_X"
 cmp -s "$RUNNER" "$SHADOW_X" && fail "could not disable the untracked-file comparison — the STRAY-CHECK line moved"
-FX="$T/repo_stray"; mkdir -p "$FX/tests/lib" "$FX/tools"
+FX="$T/repo_stray"; mkdir -p "$FX/tests/lib" "$FX/tools"; debt_stubs "$FX"
 for _l in classify controls measures static_job decrypt_cache; do ln -s "$REPO/tests/lib/$_l.sh" "$FX/tests/lib/$_l.sh"; done
 ln -s "$REPO/tests/lib/static_pool.py" "$FX/tests/lib/static_pool.py"
 [ ! -f "$REPO/tests/lib/collation.sh" ] || ln -s "$REPO/tests/lib/collation.sh" "$FX/tests/lib/collation.sh"
@@ -1306,7 +1312,7 @@ echo "== 34. a caller's exported JOBS reaches the gate unchanged; the runner's -
 SHADOW_J="$T/run_all_static_jobsleak.sh"
 sed 's/RUN_JOBS/JOBS/g' "$RUNNER" > "$SHADOW_J"
 cmp -s "$RUNNER" "$SHADOW_J" && fail "could not restore the JOBS name — RUN_JOBS moved"
-FJ="$T/repo_jobs"; mkdir -p "$FJ/tests/lib" "$FJ/tools"
+FJ="$T/repo_jobs"; mkdir -p "$FJ/tests/lib" "$FJ/tools"; debt_stubs "$FJ"
 for _l in classify controls measures static_job decrypt_cache; do ln -s "$REPO/tests/lib/$_l.sh" "$FJ/tests/lib/$_l.sh"; done
 ln -s "$REPO/tests/lib/static_pool.py" "$FJ/tests/lib/static_pool.py"
 [ ! -f "$REPO/tests/lib/collation.sh" ] || ln -s "$REPO/tests/lib/collation.sh" "$FJ/tests/lib/collation.sh"

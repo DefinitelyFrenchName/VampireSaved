@@ -1,0 +1,13 @@
+decision	recommendation
+subject	#370 design proposal (declared shares, scheduler, host claim, audit)
+session	14z-224
+model	rule-checker@163e4ce9cf7b
+claim	A design proposal for #370 put to the maintainer before any code is written (build/agent224/t370/design.md). It describes what the tree does today: plain gate runs already run side by side with no protection (tests/lib/static_pool.py; tests/run_all_emulator.sh's FIFO slots), only a gate's own control modes are kept apart, by the allow-lists tests/controls_concurrent.txt (117 rows) and tests/controls_concurrent_emu.txt (60 rows) read at tests/lib/static_job.sh:50 and tests/run_all_emulator.sh:661-670; registered gates per build/agent224/t370/census.txt (static 254: 94 with no control, 34 with one, 126 with two or more, 117 listed and 9 not; emulator 258: 105, 46, 107, 60 and 47; the two registries disjoint, 512 in all); and the shares the lists' headers record, two of which cross gates. It proposes a `# SHARES:` field with a reserved `self` and a four-token resource registry, a token-aware scheduler shared by both runners, an atomic per-token host claim that absorbs tests/lib/desktop_session.sh and tools/mister_mra.sh's lock, a freeze-cadence cross-job strace audit replacing the lists and tests/test_controls_concurrent.sh, a census gate, and the ticket's overlap control; and asks three decisions, recommending A1 (land today's behaviour written down: listed gates none, unlisted multi-control gates self, the known shares as tokens), B1 (every registered gate carries the line) and C1 (the host claim). NOT TESTED: nothing is built; A1's none for the 177 listed gates rests on traces that compared each gate's modes only with each other, so no cross-gate share among them has been looked for; the cost of a pooled tier under strace is not measured; the emulator runner's move to a Python scheduler is not sized; mkdir locks under ERIS's MINGW64 shell are not tested; test_dead_leg_unjudged's nine shared paths are not named; which plain runs share something no trace has seen is unknown.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	15 flag(s): D-ABSOLUTE 14, FIGURE 1
+deliverables	build/agent224/t370/design.md
+action	2026-11-08-1737
+redoes	2026-11-08-1737

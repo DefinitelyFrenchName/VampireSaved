@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**514 of 516 gates described.**
+**515 of 517 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 66 | 66 | the suite runners and their own ground truth |
+| [runner](#runner) | 67 | 67 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 66 of 66 described.
+the suite runners and their own ground truth. 67 of 67 described.
 
 ### `audit_crash_sweep_emu.sh` — audit, emulator
 
@@ -194,9 +194,9 @@ the suite runners and their own ground truth. 66 of 66 described.
 
 ### `test_control_classifier.sh` — test, ci_portable
 
-**WHAT:** tests/lib/classify.sh `vs_classify_control` (one copy, read by both runners) reads a CONTROL= mode run that FAILs WITHOUT having judged its perturbation as not honoured — #310's shapes 1-4 (ruled 2026-10-30, 14z-213: "Classifier rules 1-4 (Recommended)"): (1) the gate's own `CONTROL DEAD: <this control>` then a non-zero exit -> LIES; (2) a SKIP with a non-zero exit and no FAIL line -> UNJUDGED; (3) the gate's own refusal, a `REFUSED:` line with exit 3 -> UNJUDGED; (4) a crash it could not see: a traceback indented by `sed 's/^/  /'`, or a shell abort naming a tests/lib file -> DIED.
+**WHAT:** tests/lib/classify.sh `vs_classify_control` (one copy, read by both runners) reads a CONTROL= mode run that FAILs WITHOUT having judged its perturbation as not honoured — #310's shapes 1-4 (ruled 2026-10-30, 14z-213: "Classifier rules 1-4 (Recommended)"): (1) the gate's own `CONTROL DEAD: <this control>` then a non-zero exit -> LIES; (2) a SKIP with a non-zero exit and no FAIL line -> UNJUDGED; (3) the gate's own refusal, a `REFUSED:` line with exit 3 -> UNJUDGED; (4) a crash it could not see: a traceback indented by `sed 's/^/  /'`, or a shell abort naming a tests/lib file -> DIED. And #369 (ruled 2026-11-08, "A1, B1, c1"): a mode is HONOURED only on its own `CONTROL CAUGHT: <name> — ` line; without one a FAIL is UNJUDGED, unless the gate is on the shrink-only debt list tests/expected/ctl_caught_debt.tsv, which keeps the old fall-through (a copy of a listed gate is listed: by basename).
 
-**HOW:** synthetic mode logs fed to vs_classify_control directly ([VSP-19]: the verdict logic on ground truth), each rule with a case it must catch and a near miss it must leave HONOURED (another control's DEAD line; a tool's REFUSED quoted in an exit-1 FAIL; a SKIP beside a FAIL; the word Traceback in prose; a child script's own abort), plus the classes that were there before (#310's NOT JUDGED, a plain FAIL).
+**HOW:** synthetic mode logs fed to vs_classify_control directly ([VSP-19]: the verdict logic on ground truth). #310's rules on a debt-listed stub gate (the path they were written for), each with a case it must catch and a near miss it must leave HONOURED (another control's DEAD line; a tool's REFUSED quoted in an exit-1 FAIL; a SKIP beside a FAIL; the word Traceback in prose; a child script's own abort); #369's on an unlisted stub: no CAUGHT, another mode's, its own, its own with exit 0, beside a traceback, beside NOT JUDGED, indented, a longer name, no name, beside its own DEAD, no gate. The debt list is a scratch one ($W/fake/tests/expected/ctl_caught_debt.tsv, through REPO), never the tracked file.
 
 **EXPECTS:** every case its class; each control's disabled rule misreads its case.
 
@@ -223,6 +223,14 @@ the suite runners and their own ground truth. 66 of 66 described.
 **HOW:** (1) `python3 tools/crash_sweep.py check` on the table: every caller's every site covered by a row, or its gate on an `# EXEMPT:` line; every row well-formed (a declared mode, a live site key). (2) For each row of the selected tier (static by default; `--tier emulator`: the rows whose target gate needs an emulator, and on a Linux host with podman the `linux` rows (audit_release_linux_cleanhost) — tests/audit_crash_sweep_emu.sh runs it), two copies of the target gate, each `<gate>.sh` in its own directory under the sweep's scratch directory and never in tests/, its REPO pinned to this repository (#362: a gate walking tests/ beside the sweep read a transient copy there) (each call wrapped by its site tag; the second with the helper neutered), each run under tests/lib/crash_sweep.sh's PATH shim that turns the row's nth matching python3/sh call into a crash; the run classified with tests/lib/classify.sh exactly as both runners classify (vs_classify_control for a mode, vs_classify for PLAIN). Copies are re-made for every run.
 
 **EXPECTS:** (1) 0 problems; (2) per row: the fx leg's class is the row's (DIED|UNJUDGED for a mode, FAIL for PLAIN), the plant applied (a planted call counted) and, for a site row, its site key fired; the kb leg reads the row's kb (HONOURED / PASS). A red names the row and both legs' classes and logs. A row of another tier is listed as NOT RUN; on a host without podman the linux rows are NOT RUN too.
+
+### `test_ctl_caught_lint.sh` — test, ci_portable
+
+**WHAT:** tests/lib/classify.sh honours a mode only on `CONTROL CAUGHT: <mode> — `, which tests/lib/controls.sh vs_ctl_caught prints from the gate's main check output. tools/ctl_caught_lint.py holds what that run-time rule cannot see: [a] the literal is printed only through the helper; [b] no catch-all ERE; [c] no vs_ctl_fired naming the mode variable off the debt list; [d] every mode-declaring gate calls vs_ctl_caught or is on the shrink-only debt list tests/expected/ctl_caught_debt.tsv; [e] in a gate with several modes the ERE is computed per mode; [debt] the list only shrinks (each row one gate, once, existing, declaring a mode, not yet migrated, present at 8464fa3f, and on the list's first version, blob ORIGIN_BLOB below, and on every committed version since). The ground-truth gates that write synthetic logs may carry the literal, never in an echo/printf to their own stdout.
+
+**HOW:** the lint over the tree, the declared modes read by vs_ctl_declared (the one grammar reader), the base commit's gates by `git ls-tree`, the allowed rows by `git cat-file` of ORIGIN_BLOB and `git show` of every commit that touched the list (`git log`). Each control plants one gate (or one debt row) in a scratch copy of tests/ and the lint must name it; a near miss (a migrated gate with two modes and a per-mode ERE) must pass. The tracked tree is never written.
+
+**EXPECTS:** PASS with NOTE lines ctl_caught.debt_gates and ctl_caught.migrated_gates (the migration's progress).
 
 ### `test_ctl_show_err.sh` — test, ci_portable
 

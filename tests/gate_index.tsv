@@ -500,6 +500,7 @@ tests/test_sheet_census.sh	runner
 tests/test_proof_sheets.sh	runner
 tests/test_proof_sheets_web.sh	runner
 tests/test_control_classifier.sh	runner
+tests/test_ctl_caught_lint.sh	runner
 tests/test_instr_align_unjudged.sh	runner
 tests/test_dead_exit_census.sh	runner
 tests/test_plants_not_applied.sh	runner

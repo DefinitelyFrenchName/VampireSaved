@@ -31,7 +31,11 @@
 #   vs_ctl_mode <script>               honour $CONTROL: sets VS_CTL to the name
 #                                      (or empty); REFUSES an undeclared name
 #   vs_ctl_is <name>                   true when $VS_CTL is <name>
-#   vs_ctl_fired <name> <evidence>     print the FIRED line
+#   vs_ctl_fired <name> <evidence>     print the FIRED line (under a mode, off the
+#                                      debt list: NOT JUDGED instead, #369)
+#   vs_ctl_caught <file> <ERE>         under a mode, CONTROL CAUGHT from the main
+#                                      check's own output, or NOT JUDGED (#369)
+#   vs_ctl_debt_listed <script>        on tests/expected/ctl_caught_debt.tsv
 #   vs_ctl_dead <name> <what>          print the DEAD line (returns 1 so a
 #                                      caller can `|| fail=1`)
 #   vs_ctl_left_green <name> <line>    a mode run at the gate's green end: the
@@ -78,7 +82,51 @@ vs_ctl_mode() {  # vs_ctl_mode <script>
 
 vs_ctl_is() { [ "${VS_CTL:-}" = "$1" ]; }
 
-vs_ctl_fired() { echo "CONTROL FIRED: $1 — $2"; }
+# A CONTROL MODE IS HONOURED ONLY ON POSITIVE EVIDENCE FROM ITS OWN CHECK (#369, 14z-224; maintainer-ruled 2026-11-08
+# "A1, B1, c1" on build/agent224/t369/design.md). Until then tests/lib/classify.sh read any non-zero exit without a crash
+# as HONOURED, so a mode run that failed for any other reason (a dead leg, a check that judged nothing, a crash it could
+# not see) certified the control as caught, and #310 spent seven batches listing those other reasons.
+#
+# vs_ctl_debt_listed <gate script as invoked> — succeeds when the gate's basename is a row of the shrink-only debt list
+# tests/expected/ctl_caught_debt.tsv (ruling C1): a listed gate keeps the pre-#369 behaviour (classify.sh's fall-through
+# HONOURED, vs_ctl_fired printing its line under a mode) until it is migrated and its row removed. No list, no row.
+vs_ctl_debt_listed() {
+    _vdl_b="${1##*/}"; [ -n "$_vdl_b" ] || return 1
+    _vdl_f="${REPO:-.}/tests/expected/ctl_caught_debt.tsv"
+    [ -f "$_vdl_f" ] || return 1
+    awk -F'\t' -v g="$_vdl_b" '$1 == g { f = 1; exit } END { exit !f }' "$_vdl_f"
+}
+# vs_ctl_caught <output file> <ERE> — THE ONE PRINTER OF `CONTROL CAUGHT:` (ruling A1). Call it where a mode run ends in the
+# gate's FAIL, on the file that holds the gate's MAIN check output, with an ERE that matches only the finding the mode's
+# perturbation must produce (computed per mode in a gate with several). In a plain run it does nothing and returns 0.
+# Under a mode it prints `CONTROL CAUGHT: <mode> — <the first matching line>` and returns 0, or `NOT JUDGED: under
+# control mode <mode>, the check failed without its finding '<ERE>'` and returns 1 (classify.sh: UNJUDGED). A catch-all
+# ERE ('', '.', '.*', 'FAIL', '^FAIL', '^ *FAIL') is refused the same way. The grep proves only that the file it is
+# handed holds the finding: which file, and that the ERE names THIS mode's finding, are held by review
+# (tests/test_ctl_caught_lint.sh names its gaps). Ground truth: tests/test_controls_contract.sh section 7.
+vs_ctl_caught() {
+    _vcc_m="${VS_CTL:-${CONTROL:-}}"; [ -n "$_vcc_m" ] || return 0
+    case "$2" in
+    ''|.|'.*'|FAIL|'^FAIL'|'^ *FAIL')
+        echo "NOT JUDGED: under control mode $_vcc_m, vs_ctl_caught was given '$2', which matches any failure"; return 1 ;;
+    esac
+    _vcc_l=""; [ -f "$1" ] && _vcc_l="$(grep -aE -- "$2" "$1" | head -1)"
+    if [ -n "$_vcc_l" ]; then
+        echo "CONTROL CAUGHT: $_vcc_m — $(printf '%s' "$_vcc_l" | sed 's/^[[:space:]]*//' | cut -c1-160)"; return 0
+    fi
+    echo "NOT JUDGED: under control mode $_vcc_m, the check failed without its finding '$2'"; return 1
+}
+# vs_ctl_fired under a mode, in a gate off the debt list, prints NOT JUDGED instead of its line (#369 A1): a firing line
+# printed during a mode run comes from a gate's built-in control section (its own copy, whatever the main check did,
+# tests/test_docshape.sh) or names the mode unconditionally — neither is evidence from the mode's own check. In a plain
+# run, and in a listed gate, it prints `CONTROL FIRED: <name> — <evidence>` as before.
+vs_ctl_fired() {
+    if [ -n "${VS_CTL:-${CONTROL:-}}" ] && ! vs_ctl_debt_listed "$0"; then   # #369 fired-under-mode
+        echo "NOT JUDGED: under control mode ${VS_CTL:-$CONTROL}, vs_ctl_fired was called for '$1' — a firing line is not evidence from the mode's own check (#369)"
+        return 0
+    fi
+    echo "CONTROL FIRED: $1 — $2"
+}
 vs_ctl_dead()  { echo "CONTROL DEAD: $1 — $2"; return 1; }
 # vs_ctl_left_green <mode> <the gate's FAIL line> — a mode run that reached the gate's GREEN end (#310, 14z-215): prints
 # `CONTROL DEAD: <mode> — …` (tests/lib/classify.sh rule 1 reads its own DEAD line as LIES) and the FAIL line, and
@@ -165,7 +213,13 @@ vs_ctl_read() {  # vs_ctl_read <script> <log>
         printf '%s\n' "$_vcr_decl" | grep -x >/dev/null -- "$_vcr_n" \
             || { VS_CTL_UNDECLARED=$((VS_CTL_UNDECLARED + 1)); VS_CTL_MISSING="$VS_CTL_MISSING $_vcr_n(undeclared)"; }
     done
-    if [ "$VS_CTL_DEAD" != 0 ] || [ "$VS_CTL_UNDECLARED" != 0 ]; then
+    # #369: `CONTROL CAUGHT:` belongs to a mode run; vs_ctl_caught never prints it in a plain run, so one here was
+    # printed by hand or under a leaked CONTROL — the plain verdict cannot stand on it
+    _vcr_caught="$(grep -a -m1 '^CONTROL CAUGHT: ' "$_vcr_l" 2>/dev/null || :)"   # `|| :`: the runners run under set -e
+    if [ -n "$_vcr_caught" ]; then   # #369 plain-caught
+        VS_CTL_VERDICT=RED
+        VS_CTL_DETAIL="controls RED: a CONTROL CAUGHT line in a plain run: $(printf '%s' "$_vcr_caught" | cut -c1-80)"
+    elif [ "$VS_CTL_DEAD" != 0 ] || [ "$VS_CTL_UNDECLARED" != 0 ]; then
         VS_CTL_VERDICT=RED
         VS_CTL_DETAIL="controls RED:$VS_CTL_MISSING"
     elif [ "$VS_CTL_DECLARED" = 0 ]; then

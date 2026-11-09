@@ -530,7 +530,8 @@ def collect(a):
                       round(statistics.median(H), 2), "h", "DERIVED", hsrc, hrule)
                 for x in A:
                     act_rows.append({"action": x["id"], "session": key, "decision": x["decision"], "first": x["first"],
-                                     "verdict": x["verdict"], "final": x["final"], "violated": " ".join(x["violated"]), "runs": x["runs"], "hours": x["hours"],
+                                     "verdict": x["verdict"], "final": x["final"], "last": x["run_ids"][-1],   # the run that ended it (14z-224)
+                                     "violated": " ".join(x["violated"]), "runs": x["runs"], "hours": x["hours"],
                                      "links": " ".join(sorted(x["hows"]))})
             vo = [x for x in acts if x["void_only"] and x["id"] in {r["id"] for r in L}]
             if vo:

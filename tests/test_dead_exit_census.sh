@@ -121,9 +121,14 @@ if [ -n "${VS_CTL:-}" ]; then
 fi
 
 echo "== 2. what the census is for: the stubs under CONTROL=flip, classified as the runners do"
+# #369 (14z-224): the stubs stand for gates on the shrink-only debt list tests/expected/ctl_caught_debt.tsv, the
+# pre-#369 fall-through these cases were written for; a scratch copy of the list naming them reaches the stub run and
+# the classifier through REPO (the tracked list is never written). tests/test_control_classifier.sh holds the strict path.
+mkdir -p "$W/debt/tests/expected"; cp "$REPO/tests/expected/ctl_caught_debt.tsv" "$W/debt/tests/expected/"
 classify() {  # classify <stub>: runs it under CONTROL=flip; sets CL (vs_classify_control) and NAMED (1 if the census names it)
-    env CONTROL=flip CTLS="$REPO/tests/lib/controls.sh" sh "$W/$1" > "$W/$1.log" 2>&1 </dev/null && _s=0 || _s=$?
-    CL="$(sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" flip; echo "$VS_CTL_EXEC"' _ "$REPO/tests/lib/classify.sh" "$_s" "$W/$1.log" "$W/$1")"
+    echo "$1" >> "$W/debt/tests/expected/ctl_caught_debt.tsv"
+    env CONTROL=flip CTLS="$REPO/tests/lib/controls.sh" REPO="$W/debt" sh "$W/$1" > "$W/$1.log" 2>&1 </dev/null && _s=0 || _s=$?
+    CL="$(REPO="$W/debt" sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" flip; echo "$VS_CTL_EXEC"' _ "$REPO/tests/lib/classify.sh" "$_s" "$W/$1.log" "$W/$1")"
     python3 tools/dead_exit_census.py "$W/$1" > "$W/$1.census" 2>&1; NAMED=0; command grep -qE "^(WORDONLY|DEADEXIT) $W/$1:" "$W/$1.census" && NAMED=1
 }
 classify stub_wordonly.sh

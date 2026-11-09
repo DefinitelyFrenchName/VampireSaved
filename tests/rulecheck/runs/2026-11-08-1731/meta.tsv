@@ -1,0 +1,12 @@
+decision	recommendation
+subject	#369 design proposal (markers, verdict names, landing order)
+session	14z-224
+model	rule-checker@163e4ce9cf7b
+claim	A design proposal for #369 put to the maintainer before any code is written (build/agent224/t369/design.md). It describes what the tree does today, read at HEAD 8464fa3f: tests/lib/classify.sh vs_classify_control falls through to HONOURED and reads no CONTROL FIRED line; three shapes of mode firing exist (the fail-flag closing, 9 lines in build/agent224/t369/failflag_closings.txt; the specific branch, tests/audit_extra_pass.sh:195; the in-gate control section still run under a mode, tests/test_docshape.sh:156-185); the static table build/agent223/postmortem/static_fired/modes.tsv holds 418 modes with no own line in 84 gates and 276 with one (build/agent224/t369/static_modes_own_line_counts.txt). It asks three decisions (A marker, B verdict names, C landing order), recommending A1 (whose cost is that every declared mode migrates: 1,191 in 312 gates at the 14z-223 re-census, STATE.md 14z-223 (8)), B1 and C1, and lists four pieces of work as the ticket (build/agent224/t369/issue369_body.md) asks. NOT TESTED: nothing is built; the share of the 276 that print only from an in-gate section, and the emulator gate count behind the 117 modes, are not measured.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	15 flag(s): D-ABSOLUTE 14, D-FIGURE 1
+deliverables	build/agent224/t369/design.md
+action	2026-11-08-1731

@@ -110,6 +110,10 @@ timing_fail() {
 RUNNER="$REPO/tests/run_all_emulator.sh"
 [ -x "$RUNNER" ] || { echo "FAIL: $RUNNER is not executable"; exit 1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+# #369 (14z-224): this gate's stubs are pre-#369 gates (each prints CONTROL FIRED in its plain path), so every fake repo
+# lists them on its own debt list, as tests/expected/ctl_caught_debt.tsv lists the real ones; the strict path's ground
+# truth is tests/test_control_classifier.sh. debt_stubs <fake repo>: writes that list (every g_* name in this file).
+debt_stubs() { mkdir -p "$1/tests/expected"; grep -o 'g_[a-z0-9_]*' "$REPO/tests/test_emulator_runner.sh" | sort -u | sed 's/$/.sh/' > "$1/tests/expected/ctl_caught_debt.tsv"; }
 
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
@@ -137,7 +141,7 @@ if [ -n "${VS_CTL:-}" ]; then
     }
 fi
 FR="$T/fakerepo"
-mkdir -p "$FR/tests/lib" "$FR/tools" "$FR/build/fake_merged/rompath" "$T/roms"
+mkdir -p "$FR/tests/lib" "$FR/tools" "$FR/build/fake_merged/rompath" "$T/roms"; debt_stubs "$FR"
 # THE SHADOW TOOLS (built from the real runner, never through the symlink):
 # the export line removed; the classifier's gate-script argument removed.
 # Under CONTROL=<name> the named copy is the runner every section drives.
@@ -221,7 +225,7 @@ stale-cadence-refused) ln -s "$T/runner_stalecaddrop.sh" "$FR/tests/run_all_emul
 esac
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
 # the synthetic repo carries it too — the shipped lib, never a copy
-mkdir -p "$FR/tests/lib"
+mkdir -p "$FR/tests/lib"; debt_stubs "$FR"
 # CLSLIB: the classifier this run's synthetic repo carries (a shadow copy under its mode); a section that swaps in a
 # shadow of its own restores THIS, never the shipped one (14z-210: 14c's restore undid env-honoured's copy)
 CLSLIB="$REPO/tests/lib/classify.sh"
@@ -824,7 +828,9 @@ rm -f "$FR/tests/run_all_emulator_unplugged.sh"
 rm -f "$FR/tests/g_cfired.sh" "$FR/tests/g_cmissing.sh" "$FR/tests/g_clies.sh" "$FR/tests/g_cref.sh"
 
 echo "14b. a control mode that CRASHES with a non-zero exit is DIED, not honoured (14z-196, #254)"
-mkc g_cdie127 'no_such_helper_254; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+# its check caught the plant, then the gate crashed (#369: a CAUGHT line beside a crash is still DIED, and only the
+# gate script handed to the classifier lets it see the crash; the unplugged copy reads the CAUGHT line HONOURED)
+mkc g_cdie127 'echo "CONTROL CAUGHT: flip — FAIL: caught"; no_such_helper_254; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
 mkc g_cquote  'echo "tests/other.sh: line 3: x: command not found"; echo "FAIL: caught"; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
 reg "$(row g_cdie127 mame release - '')" "$(row g_cquote mame release - '')"
 run --lane mame --controls --log "$T/l14d" >/dev/null 2>&1 || true

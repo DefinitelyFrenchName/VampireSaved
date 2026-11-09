@@ -143,6 +143,7 @@ stub g_rel
 stub g_cad "" ': "${VS_CADENCE:-}"   # judges by cadence'
 stub e_a "" ': "${MAME_BIN:-}"   # emulator-tier marker'
 stub e_b flip ': "${MAME_BIN:-}"   # emulator-tier marker'
+printf '# the stubs keep the pre-#369 fall-through (their control FAILs with no vs_ctl_caught line of its own)\ng_sess.sh\ne_b.sh\n' > "$R/tests/expected/ctl_caught_debt.tsv"   # #369
 printf 'g_sess\ng_frz\ng_rel\ng_cad\n' > "$R/tests/ci_portable.txt"; : > "$R/tests/ci_static.txt"
 printf 'g_frz\tfreeze\t-\ng_rel\trelease\t-\n' > "$R/tests/ci_cadence.tsv"
 printf 'e_a\tmame\trelease\tromset\t-\ta stub\ne_b\tmame\trelease\tromset\t-\ta stub\n' > "$R/tests/ci_emulator.tsv"

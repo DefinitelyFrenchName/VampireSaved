@@ -113,11 +113,15 @@ else vs_ctl_dead copy-mode "the copy gave no FOUND line, or crashed" || fail=1; 
 EOF
 chmod +x "$W/g_copy.sh"
 _n=0
+# #369 (14z-224): the stubs stand for gates on the shrink-only debt list tests/expected/ctl_caught_debt.tsv, the
+# pre-#369 fall-through these cases were written for; a scratch copy of the list naming them reaches the stub run and
+# the classifier through REPO (the tracked list is never written). tests/test_control_classifier.sh holds the strict path.
+mkdir -p "$W/debt/tests/expected"; { cat "$REPO/tests/expected/ctl_caught_debt.tsv"; echo g_copy.sh; } > "$W/debt/tests/expected/ctl_caught_debt.tsv"
 run_stub() {  # run_stub <mode or -> <copy> [expected exception]: runs the stub gate; sets LOG, ST, CLASS
     _n=$((_n + 1)); _m="$1"; [ "$_m" = - ] && _m=""
     SW="$W/s$_n"; mkdir -p "$SW"; LOG="$SW.log"
-    env CONTROL="$_m" CTLS="$CTLS" SW="$SW" COPY="$C/$2" EXPECT="${3:--}" sh "$W/g_copy.sh" > "$LOG" 2>&1 </dev/null && ST=0 || ST=$?
-    CLASS="$(sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" "$5"; echo "$VS_CTL_EXEC"' _ "$CLS" "$ST" "$LOG" "$W/g_copy.sh" "$_m")"
+    env CONTROL="$_m" CTLS="$CTLS" SW="$SW" COPY="$C/$2" EXPECT="${3:--}" REPO="$W/debt" sh "$W/g_copy.sh" > "$LOG" 2>&1 </dev/null && ST=0 || ST=$?
+    CLASS="$(REPO="$W/debt" sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" "$5"; echo "$VS_CTL_EXEC"' _ "$CLS" "$ST" "$LOG" "$W/g_copy.sh" "$_m")"
 }
 expect() {  # expect <label> <class> <copy> [expected exception]: the mode run's class
     _l="$1"; _c="$2"; shift 2; run_stub copy-mode "$@"
@@ -167,8 +171,9 @@ echo "== (e) a mode whose plant cannot be planted (its controls.sh line moved) i
 moved_run() {  # moved_run <gate copy> <control> <sed on controls.sh>: the copy run with a controls.sh whose line moved; sets _got, _st, _mv
     _mv="$W/mv_$2_$(basename "$1" .sh)"; mkdir -p "$_mv/tests/lib"; cp "$1" "$_mv/tests/test_ctl_show_err.sh"
     cp "$REPO/tests/lib/classify.sh" "$_mv/tests/lib/"; sed "$3" "$REPO/tests/lib/controls.sh" > "$_mv/tests/lib/controls.sh"
+    mkdir -p "$_mv/tests/expected"; cp "$W/debt/tests/expected/ctl_caught_debt.tsv" "$_mv/tests/expected/"   # the copy is listed, as this gate is (#369)
     env CONTROL="$2" sh "$_mv/tests/test_ctl_show_err.sh" > "$_mv.log" 2>&1 </dev/null && _st=0 || _st=$?
-    _got="$(sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" "$5"; echo "$VS_CTL_EXEC"' _ "$CLS" "$_st" "$_mv.log" "$_mv/tests/test_ctl_show_err.sh" "$2")"
+    _got="$(REPO="$W/debt" sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" "$5"; echo "$VS_CTL_EXEC"' _ "$CLS" "$_st" "$_mv.log" "$_mv/tests/test_ctl_show_err.sh" "$2")"
 }
 moved() {  # moved <label> <control> <class> <sed on controls.sh>: this gate (or the mode's reverted copy) with a moved line
     moved_run "$MVSRC" "$2" "$4"

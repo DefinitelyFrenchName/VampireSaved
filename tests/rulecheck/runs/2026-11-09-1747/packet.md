@@ -1,0 +1,43 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: #369 pieces 1-3: the positive-evidence classifier rule, the vs_ctl_caught helper, the lint and the shrink-only debt list
+Claim (the working agent's sentence): #369 pieces 1-3, as ruled ("A1, B1, c1", RULING.txt, on design.md), can land on main, now with rule-checker runs 2026-11-09-1743's two findings (rc1743_verdict_a.txt), -1744's one (rc1744_verdict_b.txt), -1745's one (rc1745_verdict_a.txt) and -1746's (rc1746_verdict_a.txt) closed in code or named, -1745's as the maintainer ruled, verbatim "Land with a stated limit (Recommended)" (RULING_lint.txt): (1) tests/lib/classify.sh reads a control mode HONOURED only on a `CONTROL CAUGHT: <mode> — ` line in the mode's log and UNJUDGED otherwise, unless the gate's basename is on tests/expected/ctl_caught_debt.tsv, which keeps the pre-#369 fall-through (lib.diff.txt); (2) tests/lib/controls.sh's vs_ctl_caught prints that line only when the given ERE matches the check's own output and refuses a catch-all ERE, vs_ctl_fired under a mode off the list prints NOT JUDGED instead of a firing line, and vs_ctl_read reads RED a CAUGHT line in a plain run (lib.diff.txt); (3) tools/ctl_caught_lint.py and tests/test_ctl_caught_lint.sh: rule [a] reads every code file under tests/ and tools/ at any depth (code_files: a code extension or a `#!` line; control deep-file plants tools/zz_sub/plant.awk) and lets only the helper, the classifier and the lint carry the literal written whole, and lets the six ground-truth gates (GROUND_TRUTH, ctl_caught_lint.py.txt) carry it only where direct_prints finds no shell statement (split on unquoted ; & |) whose command word, past VAR=x, env/exec/nohup/time and a glued `(`, is echo or printf (by basename), whose text carries `CONTROL CAUGHT:` anywhere, and whose output no unquoted `>`/`>>` sends to a real file (a `>&2`, a `2>`, /dev/stdout, /dev/stderr, /dev/fd/N and /dev/tty do not), and no line beginning with the literal (a multi-line string or heredoc body) (controls truth-echo, truth-arrow, truth-stderr, truth-devstderr, truth-prefixed, truth-printf, truth-heredoc, each on a copy of test_control_classifier.sh, and a near miss whose synthetic log writes and prose pass); [b] refuses catch-all EREs, [c] the mode variable as a firing name, [d] a mode-declaring gate that neither calls the helper nor is listed, [e] a multi-mode gate's ERE without a `$`; [debt] refuses a row that is migrated, gone, declares no mode, did not exist at 8464fa3f, or is not on the list's first version (blob 9cf7c951, ORIGIN_BLOB in test_ctl_caught_lint.sh.txt; origin_blob_check.txt shows git hash-object of the list is that blob and cmp IDENTICAL) and on every committed version since (controls debt-unmigrated, debt-mode-gained, debt-returned, the last on a scratch two-commit history). test_ctl_caught_lint_plain.log: 18 planted shapes named, two near misses passing, 517 gates, 313 declaring modes, 3 migrated, 310 listed, 0 committed list versions yet; test_ctl_caught_lint_modes.txt: all 18 modes HONOURED on their own CAUGHT line. The classifier carries a control for the new rule (test_control_classifier's fallthrough-honoured mode, rule_tests.diff.txt). Shown working: on PILOT at scratch 17f4f67f the 3 migrated gates' 16 modes (the lint gate's then 7 among them) read HONOURED on their own CAUGHT line and the 5 listed consumer gates' 61 modes HONOURED by the listed fall-through, all 8 SAFE (pilot_17f4f67f_*); the lint gate's 18 modes at scratch b94c71a6, SAFE (pilot_b94c71a6_*), which its row now pins (the intermediate traces at ed4a6d36, 451969d4 and 9e55c60c are in concurrent_list.diff.txt's TRACES lines); the discovery tier at scratch fe484dd2 read PASS 160 FAIL 6 with 575 executed controls HONOURED (discovery_*), and the six reds are fixed as bookkeeping.txt says, one of them (test_release_reuse) the new rule reading an unlisted stub's mode UNJUDGED (discovery_red_test_release_reuse.log); the listed gates whose scripts then changed re-traced SAFE with every mode HONOURED (pilot_4aac3c9a_*, pilot_9ad0f0ff_*, pilot_b94c71a6_*) and re-pinned (concurrent_list.diff.txt). The commit waits for a strict GREEN static tier of the staged tree, which `tools/git-hooks/green_guard.py` (the pre-commit hook) requires. NOT TESTED: the 310 listed gates are still honoured without positive evidence — that is the debt the ruling accepts, and their migration (and piece 5, the crash_sweep and dead-leg classes) is not designed or done; the emulator tier was not run, so no emulator gate's mode ran under the new classifier (all its mode-declaring gates are listed, per the lint, so they take the old path); no emulator --controls run and no release run; the lint reads gates by pattern, so a call it cannot parse is not checked; THE STATED LIMIT the maintainer ruled (RULING_lint.txt): in the six ground-truth gates rule [a] covers echo or printf on one line to stdout or stderr, and any other printer (awk, cat of a file the gate filled, tee, any command but echo/printf), a line assembled at run time (the literal split, or built in a variable, a function, a command substitution or a format) and a statement this line reader mis-splits pass it — review, not lint; and in EVERY file, not only those six, a literal assembled at run time (split, formatted as printf 'CONTROL %s: ...' CAUGHT, built in a variable) passes rule [a], which reads the literal written whole, as does code outside tests/ and tools/ or a data file something executes (all written in ctl_caught_lint.py.txt, test_ctl_caught_lint.sh.txt and registry_docs.diff.txt); the history half of [debt] has run only on the scratch history, since the list has no committed version yet, and a clone without the file's history checks the first version alone; whether a migrated gate's ERE matches only its perturbation's finding rests on the gate author, with rule [e] checking only the `$` anchor; the final tier on the staged tree has not run yet.
+Artifacts (read every one, in full):
+  - build/agent224/t369/rc/RULING.txt
+  - build/agent224/t369/rc/RULING_lint.txt
+  - build/agent224/t369/rc/bookkeeping.txt
+  - build/agent224/t369/rc/concurrent_list.diff.txt
+  - build/agent224/t369/rc/consumers.diff.txt
+  - build/agent224/t369/rc/ctl_caught_debt.tsv
+  - build/agent224/t369/rc/ctl_caught_lint.py.txt
+  - build/agent224/t369/rc/design.md
+  - build/agent224/t369/rc/discovery_red_test_release_reuse.log
+  - build/agent224/t369/rc/discovery_results.controls.tsv
+  - build/agent224/t369/rc/discovery_tier_results.tsv
+  - build/agent224/t369/rc/discovery_tier_summary.txt
+  - build/agent224/t369/rc/lib.diff.txt
+  - build/agent224/t369/rc/origin_blob_check.txt
+  - build/agent224/t369/rc/pilot_17f4f67f_classes.tsv
+  - build/agent224/t369/rc/pilot_17f4f67f_prep.txt
+  - build/agent224/t369/rc/pilot_17f4f67f_score.txt
+  - build/agent224/t369/rc/pilot_4aac3c9a_classes.tsv
+  - build/agent224/t369/rc/pilot_4aac3c9a_prep.txt
+  - build/agent224/t369/rc/pilot_4aac3c9a_score.txt
+  - build/agent224/t369/rc/pilot_9ad0f0ff_classes.tsv
+  - build/agent224/t369/rc/pilot_9ad0f0ff_prep.txt
+  - build/agent224/t369/rc/pilot_9ad0f0ff_score.txt
+  - build/agent224/t369/rc/pilot_b94c71a6_classes.tsv
+  - build/agent224/t369/rc/pilot_b94c71a6_prep.txt
+  - build/agent224/t369/rc/pilot_b94c71a6_score.txt
+  - build/agent224/t369/rc/rc1743_verdict_a.txt
+  - build/agent224/t369/rc/rc1744_verdict_b.txt
+  - build/agent224/t369/rc/rc1745_verdict_a.txt
+  - build/agent224/t369/rc/rc1746_verdict_a.txt
+  - build/agent224/t369/rc/registry_docs.diff.txt
+  - build/agent224/t369/rc/rule_tests.diff.txt
+  - build/agent224/t369/rc/test_control_classifier_plain.log
+  - build/agent224/t369/rc/test_ctl_caught_lint.sh.txt
+  - build/agent224/t369/rc/test_ctl_caught_lint_modes.txt
+  - build/agent224/t369/rc/test_ctl_caught_lint_plain.log
+  - build/agent224/t369/rc/test_release_reuse_after_fix.log
