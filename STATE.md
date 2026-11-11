@@ -38,54 +38,71 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-224 — **#369 pieces 1-3 landed (a control mode is honoured only on a `CONTROL CAUGHT:` line from its own check; 310 gates on a shrink-only debt list; a lint with a stated limit); #369's and #370's designs ruled; the ledger page's "OK in the end" tile explained and split by era, pushed to gh-pages on the maintainer's word.** Opus 5.5, transcript `77feeeca` (compacted twice).
+## Session 14z-225 — **#370 stage 1 (every gate declares what it shares; the static pool and a kernel-lock host claim honour it); #369 migration batch 1 (210 gates off the debt list, each mode honoured only on its own CAUGHT line, piece 5 wired); #352 built and closed as a 16-cell matrix (the desktop gate reads FBNeo's own PAUSE overlay); #364 measured on PILOT and #371 filed (a timed-out emulator gate's MAME outlives it).** Opus 5.5, two transcripts: `4b144fa6` (cut short 2026-11-10 07:07 CET, the maintainer needing the Mac; `build/agent225/RESUME.md`) and `6ff1e472` (resumed 2026-11-10 19:20 CET).
 
 ### opened with
-The maintainer: **"read handoff.md, state.md and docs/next_session.md"**, then **"yes, let's focus on 369 right now"**.
-Working evidence: `build/agent224/` (local; #369 in `t369/`, its rule-checker evidence in `t369/rc/`, #370 in `t370/`).
+The first part's opener is in transcript `4b144fa6`. The resumed part: the maintainer: **"read handoff.md, state.md and
+docs/next_session.md"**; then, on the pinned re-run, **"(a) Re-run audit_pool_drop pinned on the Mac: about 2 h, but the
+evidence is complete."** and **"btw PILOT is available but not ERIS right now"**; **"if anything can be run on PILOT in
+the meantime for another ticket then, go at it"**; **"Also, can we put PILOT to good use? Any ticket that might be
+tackled?"**; **"#352"**. Working evidence: `build/agent225/` (local; `m369/`, `t352/`, `t364/`, `tier*/`, `RESUME.md`).
 
-### (1) #369 PIECES 1-3 — THE RULE, THE HELPER, THE LINT AND THE DEBT LIST (`23ccb65c`)
-The design (`build/agent224/t369/design.md`, rule-checker run 2026-11-08-1736 OK after -1731 to -1735) was ruled
-**"A1, B1, c1"** (`DECISIONS_HISTORY.md`, 14z-224). Built: `tests/lib/classify.sh`'s fall-through reads HONOURED only on
-`CONTROL CAUGHT: <mode> — `, printed by the new `vs_ctl_caught <file> <ERE>` (`tests/lib/controls.sh`), else UNJUDGED;
-a gate on `tests/expected/ctl_caught_debt.tsv` (310 rows) keeps the old fall-through. `tools/ctl_caught_lint.py`, gated by
-`tests/test_ctl_caught_lint.sh` (18 must-fire controls, two near misses): the literal only in the helper, the classifier
-and the lint; no catch-all ERE; no `vs_ctl_fired "$VS_CTL"` off the list; every mode-declaring gate calls the helper or
-is listed; a multi-mode ERE holds `$`; the list only shrinks (its rows must be on its first version, blob `9cf7c951`, and
-on every committed version). The six gates that write synthetic CAUGHT logs are read by a statement scanner with a
-stated limit, ruled **"Land with a stated limit (Recommended)"** after runs -1743 to -1745 each found a way past the
-check; the further limits the session named are an open decision ("Decisions pending"). Evidence: on PILOT at
-`17f4f67f` the 3 migrated gates' 16 modes HONOURED on CAUGHT and the 5 listed consumer gates' 61 modes HONOURED by the
-fall-through, all 8 re-traced SAFE; the lint gate's 18 modes HONOURED at `cfcdc2e3` (SAFE); the rows re-pinned on
-`tests/controls_concurrent.txt`. The discovery tier (`build/agent224/tier1/`) ran 575 controls, all HONOURED, and six
-reds, each fixed (`build/agent224/t369/rc/bookkeeping.txt`); the strict confirm tier on the staged tree `96e3da38` read
-GREEN, PASS 166 (`build/agent224/tier2/`). Rule-checker run 2026-11-09-1750 OK after -1743 to -1749.
-Next: migrate the 310 listed gates (each to `vs_ctl_caught`, its row removed); piece 5 (the crash-sweep and dead-leg
-classes) is not designed. #310 stays open until the list is empty.
+### (1) #370 STAGE 1 — `df4b0902`
+Committed in the first part (`df4b0902`, its message the record): every registered gate carries one `# SHARES:` line, the
+registry `tests/shares.tsv`, `tests/lib/share_pool.py` and `tests/lib/shares.sh`; the static pool never runs two jobs
+holding one token; the host claim is an OS file lock (`tests/lib/share_lock.py`, ruled "Kernel lock (Recommended)",
+`DECISIONS_HISTORY.md` 14z-225); the census gate `tests/test_shares.sh`; the two concurrent-controls lists retired.
+Rule-checker run 2026-11-09-1756 OK. Not built: the emulator token scheduler and the freeze-cadence cross-job write
+audit (#370 stays open).
 
-### (2) #370 — THE DESIGN, RULED A1, B1, C1
-Drafted on **"draft the #370 design"** (`build/agent224/t370/design.md`, rule-checker run 2026-11-08-1742 OK after -1738
-to -1741) and ruled A1, B1 and C1, each the recommended option (`DECISIONS_HISTORY.md`, 14z-224). Nothing is built; it
-follows #369's pieces 1-3, now committed.
+### (2) #369 MIGRATION BATCH 1 — `25621357`
+210 gates leave `tests/expected/ctl_caught_debt.tsv` (310 rows to 100; the 100 left are the gates piece 5's frozen
+dead-leg and crash-sweep columns tie to), each declared mode ending in `vs_ctl_caught` on its main check's finding;
+piece 5 wired as ruled "Name the speaker (Recommended)" (`DECISIONS_HISTORY.md` 14z-225). 829 of 831 declared modes
+HONOURED on their own CAUGHT line on PILOT, ERIS and the Mac; the Mac re-runs pinned to the staged tree
+(`build/agent225/m369/rc/`: `mac_pinned2.txt`, `audit_pool_drop` plain PASS in 8,173 s on the maintainer's "(a)";
+`mac_pinned3.txt`, every gate directly reading a path that differs from PILOT's checkout, 225 modes HONOURED). The
+rule-checker found one real defect at round 9: `audit_dead_leg_linux`'s nj-stripped ERE lacked UNJUDGED-CAUGHT (the twin
+of r6's fix), fixed and swept for the class. Rule-checker run 2026-11-11-1770 OK after 2026-11-10-1757 to 2026-11-11-1768
+(-1767 refused at record, a reader having failed the spawn check, and -1769 withdrawn before spawning; both `NOT-RUN.txt`);
+on run -1767's finding the maintainer chose **"Name the gap, re-check now"**. Strict confirm tier GREEN on the commit's
+tree (`build/agent225/tier7/`, PASS 169). Limits named in `build/agent225/m369/rc/M369_scope.md`; the session-named
+ones are an open decision ("Decisions pending").
 
-### (3) THE LEDGER PAGE — "59% OK IN THE END" EXPLAINED; THE TILE SPLIT BY ERA
-The maintainer asked why the page read an estimated 59% OK in the end when every action seemed to end checked. The
-answer: until 14z-182 a VIOLATED run was answered with its resolution and the action went on, never re-checked, and
-those actions end on a VIOLATED run. On **"Actually both would help"**, `tools/ledger_page.py` gained a "resolved, not
-re-run" tile and a by-era table (to 14z-182; 14z-183 to 14z-211; 14z-212 on, grouped exactly), with `last` added to
-`tools/session_metrics.py`'s action rows (committed in `23ccb65c`). On **"push the ledger page now. my own website copy I
-handle on my own …"** it was pushed to `gh-pages` as `87372240` (`build/agent224/ledger_push/`); the close republishes it.
+### (3) #352 — THE DESKTOP GATE READS FBNEO'S PAUSE OVERLAY — `511d4c59`
+Measured on PILOT's live desktop: FBNeo pauses on a focus loss or minimise and resumes behind the step schedule — the M24
+symptom reproduced by a minimise (capture sheet `build/agent225/t352/sheet_352.png` sent to the maintainer). Built as
+ruled ("build it this way but only as a release-time mode"; `DECISIONS_HISTORY.md` 14z-225): `tools/desktop_pause_check.py`
+(template from FBNeo's font; a missing PIL or font or a broken capture "PAUSE unread"), a paused or unreadable FBNeo leg
+not judged and the gate FAIL, the in-gate audio and mark controls DEAD on such a leg, the control `minimised` a CONTROL=
+mode only, X's active window logged per capture, the static gate `tests/test_desktop_pause_check.sh`. After three failed
+rounds the maintainer chose **"Close it as a matrix, then commit"**: 16 cells, 16 of 16 (`build/agent225/t352/matrix.tsv`).
+Found and fixed on the way: the in-gate wrong-mark read a paused capture as FIRED; an unreadable capture counted as a
+pause. Rule-checker run 2026-11-11-1777 OK after -1771 (withdrawn) to -1776; strict confirm tier GREEN on the commit's
+tree (`build/agent225/tier8/`). #352 is done; it is labelled `done unshipped` until a release runs its mode.
 
-### CLOSE (14z-224, 2026-11-09)
-Riding this close: the records of (1)-(3) (`DECISIONS_HISTORY.md`'s three 14z-224 rulings, the open decision on #369's
-lint limits, two standing-ruling lines, the gotcha "A TEXT LINT OF SHELL SOURCE CANNOT BE MADE AIRTIGHT", the rows of
-#310, #369 and #370). Commits this sitting before the close: `23ccb65c` (#369 pieces 1-3, the ledger tiles). Pushed
-mid-sitting on the maintainer's word: the ledger page, `gh-pages` `87372240`. Tickets closed: none; filed: none.
-Steps: sections (this group); next-session (the 14z-223 opener, 105 lines, quoted, to `docs/NEXT_SESSION_HISTORY.md`);
-rollover (the 14z-223 group, 164 lines, to `STATE_HISTORY.md` with its ledger line); indexes (by the driver); dashboard
-(14z-163..14z-224, 3,787 figures, 0 unclassed; five assets uploaded, `datasets` re-pointed: actions v15, costly v35,
-figures v35, rc_runs v35, tiers v36). The tier's results: `build/agent224/close/tier_results.tsv`, the next close's
-`--prev`.
+### (4) #364 MEASURED ON PILOT; #371 FILED; THE RUNNER-REAP DESIGN PROTOTYPED
+On **"go at it"**: the census (276 files with an EXIT trap and no TERM trap, 160 of them emulator gates); on PILOT's dash an
+EXIT-only trap ran 0 times under TERM, INT and HUP; on the real emulator runner a timed-out gate left its work directory
+and the runner's own temp directory (its `rm -rf` raced a MAME still writing), and the split-form trap did not stop it.
+Worse: the timed-out gate's MAME processes outlived gate and runner at 100 % CPU (they catch TERM; `timeout -k`'s KILL
+never fires once the gate's shell is gone) — filed as **#371** on **"file it separately"**, and #364 commented. Design R
+(the runner ends the gate's whole session, TERM then KILL, then removes a per-gate TMPDIR) prototyped on PILOT with zero
+survivors and the passing gates' verdicts unchanged (`build/agent225/t364/design.md`, local). The recommendation between
+R, the 276-file patch and R with a lint has not been put: it needs its rule-checker run first (next session).
+
+### CLOSE (14z-225, 2026-11-11)
+Riding this close: the records of (1)-(4) (`DECISIONS_HISTORY.md`'s two #352 rulings of 14z-225, the open decision on
+#369 batch 1's session-named limits, the standing-ruling line for #352, the rows of #352, #364, #369, #370 and the new
+#371; #344's row set to `parked`, the label the maintainer's account added on GitHub 2026-11-08). Commits this sitting
+before the close: `df4b0902` (#370 stage 1), `25621357` (#369 batch 1), `511d4c59` (#352). Tickets closed: none; filed:
+#371; #352 labelled `done unshipped` with its "done, awaiting release" comment. Steps: sections (this group);
+next-session (the 14z-224 opener, 109 lines, quoted, to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-224 group,
+48 lines, to `STATE_HISTORY.md` with its ledger line); indexes (by the driver); dashboard (14z-163..14z-225, 3,834
+figures, 0 unclassed; five assets uploaded, `datasets` re-pointed: actions v16, costly v36, figures v36, rc_runs v36,
+tiers v37). The tier confirms on `build/agent225/tier8/tier_results.tsv` (`511d4c59`'s GREEN tier), not on 14z-224's
+close results: the sitting's three commits each ran their own strict confirm tier after that close. The tier's
+results: `build/agent225/close/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
@@ -93,6 +110,7 @@ figures v35, rc_runs v35, tiers v36). The tier's results: `build/agent224/close/
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **#352: the desktop gate's `minimised` control is a release-time mode only, its in-gate form the drawn overlay (2026-11-10/11, 14z-225)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-10 (14z-225) — #352: the PAUSE-reading gate change …" and "Ruled 2026-11-11 (14z-225) — #352 is finished as a matrix, then committed".
 - **#369 lands with a shrink-only debt list and a lint with a stated limit (2026-11-08/09, 14z-224):** a mode is HONOURED only on its own `CONTROL CAUGHT:` line unless its gate is on `tests/expected/ctl_caught_debt.tsv`, which only shrinks — `DECISIONS_HISTORY.md` "Ruled 2026-11-08 (14z-224) — #369's design …" and "Ruled 2026-11-09 (14z-224) — #369's lint …"; the further limits the session named are accepted as stated limits (14z-225) — `DECISIONS_HISTORY.md` "Ruled 2026-11-09 (14z-225) — #369's lint: the further limits the session named stand".
 - **#370 is built as A1, B1, C1 (2026-11-08, 14z-224):** today's sharing written down, every gate carries a `# SHARES:` line, a host-wide per-token lock — `DECISIONS_HISTORY.md` "Ruled 2026-11-08 (14z-224) — #370's design …"; the host lock is an OS file lock (`fcntl.flock`, `tests/lib/share_lock.py`), never a hand-written one (14z-225) — "Ruled 2026-11-09 (14z-225) — #370's host claim is an OS file lock …".
 - **#356 is built as Option 1 (a tenant-only copy of the speed-line effect with vs2's 14-row tables), with the raw allocator, and frozen as M25 as built (frozen 14z-220, `91bde83b`); its one-frame Dark Force phase is accepted and is #360 (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356" and "Ruled 2026-11-03 (14z-219) — #356".
@@ -192,6 +210,17 @@ them would reduce the legacy footprint from 5 bytes to 2.
 
 Only undecided items live here; a ruling moves its entry to `DECISIONS_HISTORY.md` in the
 commit that records it (CLAUDE.md [VSP-17]).
+
+- **#369 batch 1's session-named limits (14z-225):** eight review CHECKs of round r6 kept as named limits, not fixed —
+  `test_must_fire_census`'s header-only class excluding a gate whose only verdict call is `vs_ctl_caught`; two of #369's
+  own refusal lines read as speaker "own" in `classify.sh` (unreachable in-tree); `test_checkdocs` and
+  `test_signal_traps` line 155 (pre-existing: LIES where UNJUDGED is right, never a false HONOURED);
+  `test_plants_not_applied`'s CAUGHT line being its own comparison echo; and the EREs of `audit_vanilla_specials_a`
+  swapped-chains, `audit_vanilla_specials_b` swapped-strengths and `audit_vanilla_pursuits` class-raw/tick-dropped
+  matching any drift of the perturbed rows — plus ERE tightness in general, which the #369 contract leaves to review
+  (`build/agent225/m369/rc/M369_scope.md`; reviews.tsv rows 132-139). Options: (a) accept them as stated limits, as the
+  maintainer did for 14z-224's; (b) fix the eight in the next #369 batch; (c) accept the pre-existing ones, fix the
+  rest. No recommendation is made here: one is an action and would need its rule-checker run.
 
 ## THE DEADNESS REGISTER (opened 14z-71, maintainer's standing instruction)
 

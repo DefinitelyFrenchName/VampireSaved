@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 370
+# issues: 371
 number	state	reason	closed	labels	title
+371	OPEN	-	-	bug,severity: medium,test-integrity	A timed-out emulator gate's MAME processes outlive the gate and the runner (they catch TERM; the runner's -k KILL never fires)
 370	OPEN	-	-	enhancement,test-integrity	Gates declare what they share; the runners never run two jobs holding the same token (replaces the write-traced concurrent-control allow-lists)
 369	OPEN	-	-	enhancement,test-integrity	A control mode is honoured only on positive evidence from its own check (replaces #310's failure-shape enumeration)
 368	CLOSED	COMPLETED	2026-11-08	bug,test-integrity	audit_flicker_attribution's shared-sandbox control fires on a dead leg, never on the frozen-basis check it names
@@ -22,7 +23,7 @@ number	state	reason	closed	labels	title
 355	CLOSED	COMPLETED	2026-11-02	bug	close.py red_base takes a plan-refused tier's header-only results file as the re-run's --confirm base
 354	CLOSED	COMPLETED	2026-11-06	enhancement	no gate checks what reaches #294's dead span PRG:0x024024 in the built image
 353	CLOSED	COMPLETED	2026-11-03	bug	run_all_emulator.sh --log on an existing directory appends to its results.tsv: a re-run inherits the earlier run's verdicts
-352	OPEN	-	-	enhancement	audit_release_linux_desktop reports a paused FBNeo window as missing mark and silence instead of NOT JUDGED: paused
+352	OPEN	-	-	done unshipped,enhancement	audit_release_linux_desktop reports a paused FBNeo window as missing mark and silence instead of NOT JUDGED: paused
 351	CLOSED	COMPLETED	2026-11-02	bug	proof_sheets run --host cannot run gates whose control build is a freeze tag; the release recipe offers --host pilot
 350	CLOSED	COMPLETED	2026-11-02	bug	publish_sheets.sh hangs at the ssh password prompt: timeout without --foreground takes the terminal from rsync/ssh
 349	CLOSED	COMPLETED	2026-11-02	bug	controls_overlap.py reads a gate SAFE when all its control runs were REFUSED (only SKIP reads HOLLOW)
@@ -30,7 +31,7 @@ number	state	reason	closed	labels	title
 347	CLOSED	COMPLETED	2026-11-03	bug	run_all_emulator.sh --stale --freeze refuses when any stale gate is outside a freeze (the audit names at its default cadence)
 346	CLOSED	COMPLETED	2026-11-07	bug,cosmetic	Donovan's Blizzard Sword snowflake drags a blue ice streak on our build that native vs2 does not draw
 345	CLOSED	COMPLETED	2026-11-07	bug,severity: medium	Donovan's Blizzard Sword overruns its frame at different frames than native vs2: two move-parity events differ (donovan_2:2, donovan_11:12)
-344	OPEN	-	-	cosmetic	Donovan's body and sword colours inside Dark Force differ from vs2's (rows 0x0A/0x0C)
+344	OPEN	-	-	cosmetic,parked	Donovan's body and sword colours inside Dark Force differ from vs2's (rows 0x0A/0x0C)
 343	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	audit_tenant_timeout's 'round 2 spawns live' check passes on the next match's refill (after $FF810E = 0xFF), not on a round 2
 342	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	$FF8120 is the winner's PERFECT flag, not the round winner's side: ram.md row wrong, three gates' winner checks measure 'winner unhurt'
 341	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	test_tickets' parked-disagrees control went DEAD once the newest ticket was closed (it perturbs the first row whatever its state)

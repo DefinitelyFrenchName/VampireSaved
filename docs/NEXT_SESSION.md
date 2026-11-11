@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-224 CLOSE, 2026-11-09)
+# NEXT SESSION — orientation (rewritten at the 14z-225 CLOSE, 2026-11-11)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -25,23 +25,22 @@ Say so at the opener. Never spawn any agent at `max`. A recommendation leans onl
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
 idle env --default-signal=PIPE`: the inhibitor alone leaves SIGPIPE ignored for every child, gotchas.md, 14z-223). It crashed
-once on 2026-11-08 (no shutdown record; the maintainer brought it back). Idle at the 14z-224 close, its checkout
-`~/vampire-saved` detached at the scratch `cfcdc2e3` (never pushed): move it to `main` first. **ERIS** (WSL2, 24 threads,
-47 GB) runs the release shape; idle through 14z-224, its checkout `~/vampire-saved` detached at the scratch `7150f4c3`
-(never pushed): move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
+once on 2026-11-08 (no shutdown record; the maintainer brought it back). Idle at the 14z-225 close, its checkout
+`~/vampire-saved` on `main` at `df4b0902` (fetch: it lacks the 14z-225 commits until the push). **ERIS** (WSL2, 24 threads,
+47 GB) runs the release shape; not reached in 14z-225's second part, its checkout `~/vampire-saved` last at the scratch `f0007e54`
+(never pushed, the #369 batch-1 run): move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
 commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS)
 or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shell splits it at a pipe and mangles quotes), and
 a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-224's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-225's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
-- **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
-  control as a pool job of its own; a listed gate whose script changed must be re-traced on PILOT before it stays listed
-  (`tests/test_controls_concurrent.sh`), and the static list `tests/controls_concurrent.txt` the same. Both lists are to be
-  replaced by declared shares (#370). The two Linux desktop gates claim the desktop session (`tests/lib/desktop_session.sh`)
-  and run alone; `audit_dead_leg_linux` runs AFTER the two Linux release gates at release.
+- **Declared shares (#370 stage 1, `df4b0902`):** every gate carries one `# SHARES:` line; the emulator runner runs a
+  gate's controls side by side only when its line is `none`; the two concurrent-controls lists are retired. The two Linux
+  desktop gates claim the desktop session (`tests/lib/desktop_session.sh`) and run alone; `audit_dead_leg_linux` runs
+  AFTER the two Linux release gates at release.
 - **`--order <an earlier run>/results.tsv`** starts a pooled lane longest first.
 - **Temp files on disk:** unless the caller set `TMPDIR`, a run's gates write under `build/tmp/emu_<stamp>.<pid>/`
   (removed at the end); the run refuses to start with under 10 GB free there (`VS_TMP_MIN_GB`).
@@ -68,42 +67,51 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **#369 — migrate the 310 gates on `tests/expected/ctl_caught_debt.tsv`** (STATE 14z-224 (1); `DECISIONS_HISTORY.md`
-   14z-224): each gate's modes to `vs_ctl_caught <its check's output> <the mode's finding>`, its row removed in the same
-   commit; a migrated gate's modes must read HONOURED on CAUGHT (and every listed gate it changes re-traced, or its
-   concurrent row taken off). Work in batches by family; at each batch boundary apply the standing lesson below. Piece 5
-   (the crash-sweep `fx` classes and the dead-leg tables under the new rule) is NOT designed: design it and show it before
-   the batches reach those gates. #369 closes, and **#310 with it** (ruled), when the list is empty and deleted.
-2. **#370 — build it as ruled: A1, B1, C1** (`DECISIONS_HISTORY.md` 14z-224; design `build/agent224/t370/design.md`,
-   local, summarised in the ruling). The design's order: interleave with #369's migration — each migrated gate gets its
-   `# SHARES:` line in the same edit — or land the field and scheduler first; say which at the opener.
-3. **#364 — under dash an EXIT-only cleanup trap does not run on TERM** (`docs/platform/gotchas.md`): about 277 scripts.
-4. **Ask the maintainer for the order of the rest.** Open tickets: bug #310 (closes with #369), #364; evolution #369,
-   #370, #348, #352; cosmetic #344, #360. Parked: #123, #124, #125, #128.
+1. **Ask the open decision first:** #369 batch 1's session-named limits (STATE "Decisions pending").
+2. **#364 / #371 — put the recommendation through its rule-checker run, then to the maintainer.** Measured and prototyped
+   on PILOT in 14z-225 (`build/agent225/t364/design.md`, local; STATE 14z-225 (4)): design R, the emulator runner ending a
+   timed-out gate's whole session (TERM, a bounded wait, KILL) and removing a per-gate TMPDIR, ran with zero survivors and
+   the passing gates' verdicts unchanged (`session_run.py`). The options against it: the 276-file trap patch; R plus a lint
+   for new files. Not yet measured: the Mac, the pooled lanes at `--jobs N`, the desktop and Verilator gates.
+3. **#369 batch 2 — the 100 rows left on `tests/expected/ctl_caught_debt.tsv`:** the gates the dead-leg and crash-sweep
+   tables tie to, so each migration re-measures its rows (contract step 7: the stripped / kb column becomes UNJUDGED-CAUGHT).
+   `audit_release_linux_desktop` is among them. At the batch boundary apply the standing lesson below. #369 closes, and
+   #310 with it, when the list is empty and deleted.
+4. **#370's remaining work:** the emulator runner's token scheduler and the freeze-cadence cross-job write audit.
+5. **Ask the maintainer for the order of the rest.** Open tickets: bug #310 (closes with #369), #364, #371; evolution
+   #369, #370, #348; cosmetic #360. #352 is done, labelled `done unshipped` until a release runs its mode. Parked:
+   #123, #124, #125, #128, #344 (labelled `parked` on GitHub 2026-11-08 by the maintainer's account).
 
 **THE STANDING LESSON OF 14z-223** (feedback memory `step-back-before-patch-series`, gotcha "A FIX THAT LISTS THE WRONG
-ANSWERS NEVER FINISHES"): at every batch boundary of a multi-batch ticket, if the next batch repeats a patch family,
-write the one-paragraph alternative design and ask before starting it.
+ANSWERS NEVER FINISHES"): at every batch boundary of a multi-batch ticket, if the next batch repeats a patch family, write
+the one-paragraph alternative design and ask before starting it. **14z-225 applied it twice**: #369 batch 1's evidence
+gaps closed as a class (every gate directly reading a changed path re-run, not one gate per finding), and #352 closed as
+a matrix (every leg state under every way the gate runs, 16 cells) after three rounds that each found one narrower branch.
 
 ## PARKED (not open work)
 
 - #124 (Killshread's aura palette), #123, #125, #128 (Marionette, parked again 14z-216).
+- #344 (cosmetic; the `parked` label added 2026-11-08 by the maintainer's account, the row reconciled at the 14z-225 close).
 - **VampireSaved-Rebuilt#1** holds what is left of #120, closed 14z-205.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A text lint of shell source cannot be made airtight** (gotcha, 14z-224): `tools/ctl_caught_lint.py` lost to one more
-  shape in each of runs -1743 to -1749; it now states what it covers. Do not patch it shape by shape again: the limits stand
-  as stated (ruled 14z-225, `DECISIONS_HISTORY.md`).
-- **zsh expands a word that starts with `=`** (`echo ======` looks up a command named `=====`); quote separators.
-- **The rule-checker found a real gap in seven rounds on one commit** (runs -1743 to -1749): for a lint, list the shapes it
-  claims to see and the ones it does not BEFORE preparing, and plant a control for each claimed one.
-- **A `{ …; } >>` block's redirect is invisible to a line reader**: a planted near miss must give each line its own
-  redirect (`tests/test_ctl_caught_lint.sh`).
+- **`pgrep mame` is blind to the emulators:** the binary is `cps2` (and `fbneo`): count with `pgrep -x cps2`. A timed-out
+  emulator gate's MAME catches TERM and outlives its gate and runner (gotcha, #371).
+- **A pinned working-tree run sees no untracked file:** the Mac pins checked the index tree and unstaged changes under
+  tests/ and tools/ only; `test_retraction_reach` and `test_rule_checker` passed on untracked files. Evidence meant to
+  stand for a tree is run on a snapshot (`tests/run_on_snapshot.sh`), or the limit is named.
+- **`rulecheck.py record` refuses a run whose reader failed the spawn check** (a transient permission-check failure on the
+  first spawn of -1767): such a run is marked `NOT-RUN.txt` and redone with `--redoes`; so is a packet withdrawn before
+  spawning (-1769, -1771) when re-reading it shows a defect — cheaper than spending a round on it.
+- **`prepare` refuses an artifact a reader cannot read whole** (over ~25,000 tokens): pass it as `path:FIRST-LAST` slices.
+- **zsh: `path` is the array tied to `PATH`** — a loop variable named `path` empties the command search path; and `$S:t`
+  is a modifier (write `"${S}:path"`).
+- **FBNeo's SDL2 pause outlasts its cause** (gotcha, #352): a key step's focus resumes it, behind the step schedule.
 
-## WHAT HAPPENED THIS SITTING (14z-224)
+## WHAT HAPPENED THIS SITTING (14z-225)
 
-- **Committed:** `23ccb65c` (#369 pieces 1-3, the ledger page's era tiles).
-- **Ruled:** #369's design (A1, B1, C1), #370's design (A1, B1, C1), #369's lint limit (`DECISIONS_HISTORY.md`, 14z-224).
-- **Pushed mid-sitting on the maintainer's word:** the ledger page to `gh-pages` (`87372240`).
-- **Closed:** none. **Filed:** none.
+- **Committed:** `df4b0902` (#370 stage 1), `25621357` (#369 batch 1), `511d4c59` (#352).
+- **Ruled:** #352's design ("build it this way but only as a release-time mode") and its finish ("Close it as a matrix,
+  then commit") (`DECISIONS_HISTORY.md` 14z-225); the first part's three rulings are recorded there too.
+- **Filed:** #371. **Commented:** #364 (the PILOT measurement), #352 (the measurement and a correction). **Closed:** none.
