@@ -34,6 +34,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d "${TMPDIR:-/tmp}/pcheck.XXXXXX")" || { echo "FAIL: test_packet_check — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+: > "$W/main.log"
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 
 if [ -z "${VS_CTL:-}" ] || vs_ctl_is deliverable-ignored || vs_ctl_is replay-unbound || vs_ctl_is tally-any-flag; then
@@ -42,6 +43,7 @@ v=""; vs_ctl_is deliverable-ignored && { v="--deliverable-ignored"; echo "MODE: 
 vs_ctl_is tally-any-flag && { v="--tally-any-flag"; echo "MODE: control tally-any-flag — the self-test runs the tally that refuses on any flag kind"; }
 vs_ctl_is replay-unbound && { v="--replay-unbound"; echo "MODE: control replay-unbound — the self-test runs the replay that takes slot a by default and skips the manifest"; }
 out="$(python3 tools/packet_check.py --selftest $v 2>&1)"
+printf '%s\n' "$out" >> "$W/main.log"   # #369: the self-test's own output is the main check's findings
 if printf '%s\n' "$out" | grep >/dev/null '^SELFTEST PASS'; then ok "SELFTEST PASS ($(printf '%s\n' "$out" | grep -c '^  ok ') cases)"
 elif printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL'; then
     bad "$(printf '%s\n' "$out" | grep 'WRONG' | tr '\n' ' ' | cut -c1-200)"
@@ -92,6 +94,7 @@ tool=tools/rulecheck.py
 if vs_ctl_is unkept-flags; then echo "MODE: control unkept-flags — the section runs a copy of rulecheck.py that does not write precheck.txt"
     unkept "$W/rulecheck_unkept.py" || { echo "REFUSED: the shadow tool could not be built"; exit 3; }; tool="$W/rulecheck_unkept.py"; fi
 got="$(prepare_probe "$tool" "$W/root")"
+printf 'prepare probe: %s\n' "$got" >> "$W/main.log"
 case "$got" in
 PRECHECK-OK) ok "PRECHECK-OK — prepared with 2 flags kept (precheck.txt, meta.tsv), an unlisted --deliverable refused" ;;
 *) bad "the prepare probe: $got"
@@ -119,5 +122,16 @@ if [ "$g" = FLAGS-NOT-KEPT ]; then echo "CONTROL FIRED: unkept-flags — the pro
 else echo "CONTROL DEAD: unkept-flags — the probe read $g on the copy that keeps no flags"; fail=1; fi
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: the mode's own finding in the main check's output
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "RED: test_packet_check (control mode $VS_CTL changed no verdict)"
+    case "$VS_CTL" in
+        deliverable-ignored) WANT='^ *WRONG  D-ABSOLUTE and D-FIGURE: ' ;;
+        replay-unbound)      WANT='^ *WRONG  replay: no slot in control\.txt' ;;
+        tally-any-flag)      WANT='^ *WRONG  replay: the AS FILED tally refuses the OK run' ;;
+        unkept-flags)        WANT='^prepare probe: FLAGS-NOT-KEPT$' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT"
+    echo "RED: test_packet_check (control mode $VS_CTL)"; exit 1
+fi
 if [ "$fail" = 0 ]; then echo "GREEN: test_packet_check — the check's logic and prepare's flags"; exit 0; fi
 echo "RED: test_packet_check"; exit 1

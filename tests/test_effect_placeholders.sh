@@ -42,7 +42,8 @@ cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
 rc=0
-python3 - "$MODE" <<'PY' || rc=$?
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT   # #369: the check's output, read by vs_ctl_caught under a mode
+python3 - "$MODE" <<'PY' > "$W/main.log" 2>&1 || rc=$?
 import sys
 sys.path.insert(0, "tools")
 from gen_donovan_patch import resolve_tagged_placeholders
@@ -93,5 +94,11 @@ b3 = bytearray(record(0x00123456, 0x11E2)); st = resolve(b3, [6], LA)
 chk(st == [6] and b3 == bytearray(record(0x00123456, 0x11E2)), f"reported ({st}) and not rewritten")
 sys.exit(1 if bad else 0)
 PY
+cat "$W/main.log"
+if [ -n "$MODE" ]; then   # #369: honoured only on section 1's straddle check failing on the shadow scan
+    [ "$rc" = 0 ] && vs_ctl_left_green "$MODE" "FAIL: test_effect_placeholders (control mode $MODE)"
+    vs_ctl_caught "$W/main.log" '^  FAIL  both pointers resolve to 0x3fee04 / 0x3fee18 and the tiles stay 11e2 / 0695: ' || :
+    echo "FAIL: test_effect_placeholders"; exit 1
+fi
 [ "$rc" = 0 ] && echo "PASS: test_effect_placeholders — placeholders resolve at their recorded offsets only; the straddle, 0xEE source data and a lost placeholder are each handled" && exit 0
 echo "FAIL: test_effect_placeholders"; exit 1

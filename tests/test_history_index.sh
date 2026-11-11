@@ -30,24 +30,36 @@ W="$(mktemp -d)" || { echo "FAIL: test_history_index — mktemp -d failed (W)"; 
 
 FILES="$(python3 -c "import sys; sys.path.insert(0, 'tools'); import gen_history_index as g; print(' '.join(sorted(set(g.archives('.')) | set(g.ENTRY))))")"
 mkcopy() { for f in $FILES; do [ -f "$f" ] || continue; mkdir -p "$1/$(dirname "$f")"; cp "$f" "$1/$f"; done; }
-perturb() {  # perturb <name> <dir>; EXPECT = the failure's substring
+perturb() {  # perturb <name> <dir>; EXPECT = the failure's substring; WANT = the mode's finding in the main check's output (#369)
     case "$1" in
-    new-entry)            printf '\n## Ruled 2099-01-01 (14z-999) — a synthetic entry for the control\nbody\n' >> "$2/DECISIONS_HISTORY.md"; EXPECT="STALE index in DECISIONS_HISTORY.md" ;;
+    new-entry)            printf '\n## Ruled 2099-01-01 (14z-999) — a synthetic entry for the control\nbody\n' >> "$2/DECISIONS_HISTORY.md"; EXPECT="STALE index in DECISIONS_HISTORY.md"
+                          WANT='^STALE index in DECISIONS_HISTORY\.md ' ;;   # (the --check lists only the first 5 shifted lines, never the new one; the file is the finding, the copy proven current first)
     hand-edited-index)    python3 - "$2/docs/project/tenant_manifest_history.md" <<'PY'
 import sys
 p = sys.argv[1]; s = open(p).read()
 s = s.replace("<!-- /HISTORY INDEX -->", "- L1 a line somebody hand-added\n<!-- /HISTORY INDEX -->", 1)
 open(p, "w").write(s)
 PY
-                          EXPECT="STALE index in docs/project/tenant_manifest_history.md" ;;
-    unconfigured-archive) printf '# A synthetic archive\n\n## an entry\n' > "$2/docs/project/zz_control_history.md"; EXPECT="UNCONFIGURED archive docs/project/zz_control_history.md" ;;
+                          EXPECT="STALE index in docs/project/tenant_manifest_history.md"
+                          WANT='^STALE index in docs/project/tenant_manifest_history\.md ' ;;
+    unconfigured-archive) printf '# A synthetic archive\n\n## an entry\n' > "$2/docs/project/zz_control_history.md"; EXPECT="UNCONFIGURED archive docs/project/zz_control_history.md"
+                          WANT='^UNCONFIGURED archive docs/project/zz_control_history\.md: ' ;;
     *) echo "no such perturbation: $1"; exit 3 ;;
     esac
 }
 
 # THE EXECUTABLE FORM: under CONTROL=<name> the perturbed copy IS the tree the main check reads, and this run must FAIL.
 ROOT="$REPO"
-if [ -n "$VS_CTL" ]; then mkcopy "$W/mode"; perturb "$VS_CTL" "$W/mode"; ROOT="$W/mode"; fi
+if [ -n "$VS_CTL" ]; then
+    mkcopy "$W/mode"
+    # The tool's STALE line names the FILE, never the planted line, so it is the mode's finding only when the copy was
+    # current before the perturbation: an unperturbed copy that already fails --check judges nothing (#369 fix round).
+    if ! python3 tools/gen_history_index.py --root "$W/mode" --check >"$W/base.log" 2>&1; then
+        vs_ctl_nj "the unperturbed copy already fails --check, so the mode's finding cannot be told from it: $(head -1 "$W/base.log" | cut -c1-120)"
+        echo "FAIL"; exit 1
+    fi
+    perturb "$VS_CTL" "$W/mode"; ROOT="$W/mode"
+fi
 
 echo "== test_history_index: every archive opens with a current generated index =="
 if python3 tools/gen_history_index.py --root "$ROOT" --check >"$W/tree.log" 2>&1; then
@@ -66,6 +78,8 @@ control() {  # control <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log" | head -8
     fi
 }
-for n in $(vs_ctl_declared "$0"); do control "$n"; done
+if [ -z "$VS_CTL" ]; then for n in $(vs_ctl_declared "$0"); do control "$n"; done   # #369: the copies' controls in a plain run only
+elif [ "$fail" != 0 ]; then vs_ctl_caught "$W/tree.log" "$WANT"   # #369: the mode's own finding (WANT set by the mode's perturb above)
+fi
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

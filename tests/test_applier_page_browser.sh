@@ -81,7 +81,7 @@ case "$_cp$_cr" in
 esac
 trap 'rm -rf "$W"' EXIT
 fails=0
-note() { echo "  $*"; }
+note() { echo "  $*" | tee -a "$W/main.log"; }   # the checks' findings land in main.log (#369)
 
 python3 tools/gen_applier_page.py "$REL" -o "$W/apply_release.html" | sed 's/^/  /'
 
@@ -328,7 +328,8 @@ if vs_ctl_is broken-page; then
         vs_ctl_dead broken-page "a page declaring the wrong set key still passed the browser run" || true
         echo "FAIL: test_applier_page_browser"; exit 1
     fi
-    vs_ctl_fired broken-page "the page with a changed declared set key does not reach an ok panel: standalone_panel=$(get standalone_panel)"
+    WANT="^  [(]a[)] standalone panel: got 'bad', expected 'ok'\$"   # #369: the page leg's own finding
+    vs_ctl_caught "$W/main.log" "$WANT" || :
     echo "FAIL: test_applier_page_browser (control mode: the broken page was correctly caught)"
     exit 1
 fi
@@ -362,10 +363,16 @@ case "$_j" in
         note "  NO VERDICT ABOUT THE BROKEN PAGE IS CLAIMED; the control did not fire, which the contract reads as FAIL"
         # starved-control-leg's mode starves this leg ON PURPOSE: there, ending here IS its honoured outcome (#310)
         vs_ctl_is starved-control-leg || echo "NOT JUDGED: the control leg's browser run did not complete (#310)"
+        if vs_ctl_is starved-control-leg; then   # #369: judge_ctl read the starved leg INCOMPLETE
+            WANT="^  THE CONTROL'S BROWSER RUN DID NOT COMPLETE [(]twice[)] — the driver stopped after"
+            vs_ctl_caught "$W/main.log" "$WANT" || :
+        fi
         echo "FAIL: test_applier_page_browser (the control's browser run did not complete; control NOT judged)"; exit 1 ;;
     fired*)
+        vs_ctl_is starved-control-leg && vs_ctl_left_green starved-control-leg "FAIL: test_applier_page_browser — the starved control leg completed and was read as a verdict"
         vs_ctl_fired broken-page "a page declaring the wrong set key refuses instead of handing over a file: ${_j#fired }" ;;
     *)
+        vs_ctl_is starved-control-leg && vs_ctl_left_green starved-control-leg "FAIL: test_applier_page_browser — the starved control leg completed and was read as a verdict"
         vs_ctl_dead broken-page "the page with a changed declared set key completed its run with ${_j#dead }" || true
         echo "FAIL: test_applier_page_browser"; exit 1 ;;
 esac

@@ -143,6 +143,17 @@ fired_for() {
     esac
 }
 
+# want_for <expect-key>: fired_for's own finding as an ERE over the tool's output $W/out, for vs_ctl_caught (#369)
+want_for() {
+    case "$1" in
+        A) echo '^VERDICT REACHED OTHERWISE.*other refs A [1-9]' ;; C) echo '^VERDICT REACHED OTHERWISE.* C [1-9][0-9]* T' ;;
+        T) echo '^VERDICT REACHED OTHERWISE.* T [1-9][0-9]* D ' ;; tdata) echo '^REF T.*\(data view' ;;
+        D) echo '^VERDICT REACHED OTHERWISE.* D [1-9][0-9]* R ' ;; R) echo '^VERDICT REACHED OTHERWISE.* R [1-9][0-9]*;' ;;
+        seen) echo '^VERDICT REACHED OTHERWISE.*seen 0 of' ;; fence) echo '^VERDICT REACHED OTHERWISE.*fenced no' ;;
+        straddle) echo '^FENCE.*STRADDLING the span start' ;;
+    esac
+}
+
 for c in $CTL; do
     name="${c%%:*}"; rest="${c#*:}"; plant="${rest%%:*}"; key="${rest#*:}"
     if vs_ctl_is "$name"; then
@@ -157,6 +168,7 @@ for c in $CTL; do
         fi
         [ "$jrc" -eq 0 ] && vs_ctl_left_green "$name" "FAIL: the $plant plant left the span reached only by its row"
         fired_for "$key" || { vs_ctl_nj "the $plant plant failed the span, but not by its own rule ($(verdict))"; echo "FAIL: test_dead_span_reach (control mode)"; exit 1; }
+        WANT="$(want_for "$key")"; vs_ctl_caught "$W/out" "$WANT"
         echo "FAIL (mode): as required — the $plant plant made the span REACHED OTHERWISE"; exit 1
     fi
 done

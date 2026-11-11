@@ -87,7 +87,10 @@ if [ -z "$expect" ]; then
 fi
 [ -n "$expect" ] || { echo "  FAIL: neither registry.tsv nor a freeze tag carries this build's whole-set key $wkey"; fail=1; }
 zsha="$(shasum "$BUILD/rompath/vsavjw.zip" | cut -c1-40)"
-tools/mister_mra.sh --core cps2w --wide "$GEN_BUILD" --no-rom --quiet --out "$WORK/a" || { echo "  FAIL: generation with --wide failed"; fail=1; }
+# #369: section 1's generation output is the main check's output (the mode's finding is the tool's refusal there)
+tools/mister_mra.sh --core cps2w --wide "$GEN_BUILD" --no-rom --quiet --out "$WORK/a" > "$WORK/main.log" 2>&1 && gen=0 || gen=$?
+cat "$WORK/main.log"
+[ "$gen" = 0 ] || { echo "  FAIL: generation with --wide failed"; fail=1; }
 if grep -q "BUILD  $expect " "$WORK/a/mra/$WIDE_MRA" 2>/dev/null; then echo "  ok: header names $expect (build_fingerprint's own resolution)"
 else echo "  FAIL: header does not name $expect: $(grep -m1 'BUILD' "$WORK/a/mra/$WIDE_MRA" 2>/dev/null)"; fail=1; fi
 grep -q "vsavjw.zip  sha1 $zsha" "$WORK/a/mra/$WIDE_MRA" && echo "  ok: header carries the zip's sha1 $zsha" \
@@ -104,7 +107,8 @@ grep -q "BUILD  not stated" "$WORK/b/mra/$WIDE_MRA" && echo "  ok: 'BUILD  not s
     || { echo "  FAIL: an unnamed MRA claims a build: $(grep -m1 BUILD "$WORK/b/mra/$WIDE_MRA")"; fail=1; }
 
 echo "== 3. MUST-FIRE CONTROL: a rompath the MRA was not generated for is REFUSED =="
-if tools/mister_mra.sh --core cps2w --wide "$WORK/bad" --no-rom --quiet --out "$WORK/c" > "$WORK/c.log" 2>&1; then
+if [ -n "${VS_CTL:-}" ]; then echo "  (control mode: the in-gate control runs only in a plain run; section 1 generated for the bad rompath)"
+elif tools/mister_mra.sh --core cps2w --wide "$WORK/bad" --no-rom --quiet --out "$WORK/c" > "$WORK/c.log" 2>&1; then
     vs_ctl_dead foreign-rompath "the generator ACCEPTED a build whose vsw.37m CRC the MRA does not carry"; fail=1
 else
     grep -q "REFUSING to name build" "$WORK/c.log" && vs_ctl_fired foreign-rompath "refused: $(grep -o 'REFUSING to name build[^:]*' "$WORK/c.log" | head -1)" \
@@ -120,5 +124,10 @@ if [ -f "$WORK/a.before" ]; then
     cmp -s "$WORK/a/mra/$WIDE_MRA" "$WORK/a.before" && echo "  ok: a second rewrite changes no byte" || { echo "  FAIL: the rewrite is not idempotent"; fail=1; }
 fi
 
+if [ -n "${VS_CTL:-}" ]; then
+    [ "$fail" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: mra build line (control mode $VS_CTL changed no verdict)"
+    vs_ctl_caught "$WORK/main.log" '^mra_header: REFUSING to name build .*/bad in .*: [1-9][0-9]* of [0-9]+ CRC parts do not resolve in ' || :
+    echo "FAIL: mra build line (control mode $VS_CTL)"; exit 1
+fi
 if [ "$fail" -eq 0 ]; then echo "PASS: the WIDE MRA names its freeze, an unnamed one says so, the wrong build is refused, and the rewrite is idempotent"
 else echo "FAIL: mra build line"; exit 1; fi

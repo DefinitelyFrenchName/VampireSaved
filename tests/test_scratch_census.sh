@@ -67,5 +67,18 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: each failure condition fails the census, and a clean class file passes"
-else echo "FAIL: test_scratch_census"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_scratch_census"; echo "PASS: each failure condition fails the census, and a clean class file passes"
+else
+    # #369: a mode is honoured only on its own finding in the selftest's output (the case its perturbation breaks)
+    case "${VS_CTL:-}" in
+        unclassed-ignored) WANT='^ *FAIL: case UNCLASSED: 0 failure\(s\), expected at least one$' ;;
+        untracked-ignored) WANT='^ *FAIL: case PROMOTED untracked: 0 failure\(s\), expected at least one$' ;;
+        handoff-ignored) WANT='^ *FAIL: case PROMOTED not in HANDOFF: 0 failure\(s\), expected at least one$' ;;
+        unrun-ignored) WANT='^ *FAIL: case CLOSE-CHECK not run: 0 failure\(s\), expected at least one$' ;;
+        named-ignored) WANT='^ *FAIL: case CLOSE-CHECK named by a tracked file: 0 failure\(s\), expected at least one$' ;;
+        noreason-ignored) WANT='^ *FAIL: case NO REASON: 0 failure\(s\), expected at least one$' ;;
+        stale-ignored) WANT='^ *FAIL: case STALE: 0 failure\(s\), expected at least one$' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/self.txt" "$WANT" || :
+    echo "FAIL: test_scratch_census"; exit 1; fi

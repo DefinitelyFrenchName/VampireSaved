@@ -79,7 +79,10 @@ done
 grep -q 'boom: run 2 of 05_runfail' "$T/v1.out" || fail "the serial suite did not show the failing run's own output"
 if cmp -s "$T/v1.out" "$T/v8.out"; then ok "identical outputs ($(wc -l < "$T/v1.out" | tr -d ' ') lines; RUN-FAIL, NONDETERMINISTIC, SKIP, PENDING included)"
 else fail "SUITE_JOBS=8 printed something else:"; diff "$T/v1.out" "$T/v8.out" | head -8 | sed 's/^/        /'
-     vs_ctl_is rc-ignored && vs_ctl_fired rc-ignored "a read-back that ignores the exit status prints $(diff "$T/v1.out" "$T/v8.out" | grep '^>' | grep -c . | tr -d ' ') line(s) the serial suite does not"; fi
+     diff "$T/v1.out" "$T/v8.out" > "$T/v.diff" || :; cat "$T/v.diff" >> "$T/main.log"   # #369: section 1's finding
+     # ... summed up: the serial lines the pool lost, and what it printed in the first one's place (a dead or short pool
+     # leg loses every line, so a finding of exactly one lost line is the pool's own output, otherwise intact)
+     echo "LOST $(grep -c '^< ' "$T/v.diff" || :) serial line(s): $(grep '^< ' "$T/v.diff" | sed 's/^< //' | tr '\n' '|' || :) IN ITS PLACE: $(grep -m1 '^> ' "$T/v.diff" | sed 's/^> //' || :)" >> "$T/main.log"; fi
 
 if ! vs_ctl_is rc-ignored; then   # the control, inline: the copy that ignores a run's exit status must differ
     suite vc run_suite_rcignored.sh 8
@@ -104,5 +107,9 @@ echo "== 4. a SUITE_JOBS that is not a positive integer is refused"
 ( cd "$FR" && ROMDIR="$T/romdir" SUITE_JOBS=0 sh ./tests/run_suite.sh vsavj ) > "$T/bad.out" 2>&1 && st=0 || st=$?
 [ "$st" = 2 ] && grep -q 'SUITE_JOBS must be a positive integer' "$T/bad.out" && ok "SUITE_JOBS=0 refused (exit 2)" || fail "SUITE_JOBS=0 was not refused (exit $st)"
 
+# #369: the mode is honoured only on its own finding in section 1: the serial suite's RUN-FAIL, and only it, the 8-job copy
+# did not print, a verdict printed in its place
+[ "$rc" = 0 ] || vs_ctl_caught "$T/main.log" '^LOST 1 serial line\(s\): RUN-FAIL\| IN ITS PLACE: (PASS|FAIL|NONDETERMINISTIC|NO-EXPECTATION)( |$)' || :
+[ "$rc" = 0 ] && [ -n "${VS_CTL:-}" ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_suite_jobs"
 [ "$rc" = 0 ] && echo "PASS: test_suite_jobs" || echo "FAIL: test_suite_jobs"
 exit "$rc"

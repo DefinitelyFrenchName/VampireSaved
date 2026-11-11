@@ -198,4 +198,11 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
+if [ -n "${VS_CTL:-}" ] && [ "$fail" != 0 ]; then   # #369: the finding the shadow walker must produce in section 2
+    case "$VS_CTL" in
+        unsigned-read)       WANT="^BAD vsavj BU a2:0x5e: walked \\('$(printf '%#x' $((0x11632e + 65536)))', " ;;   # 64 KiB past its chain
+        negative-ends-table) WANT="^BAD vsavj BU a2:0x5e: not an entry of the walked table\$" ;;
+    esac
+    vs_ctl_caught "$W/main.txt" "$WANT" || :
+fi
 [ "$fail" = 0 ] && echo "PASS: test_anim_signed_offsets" || { echo "FAIL: test_anim_signed_offsets"; exit 1; }

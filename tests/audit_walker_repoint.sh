@@ -26,7 +26,7 @@
 #
 # MUST-FIRE: known-bad: drift-clock — a breakpoint run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 4,250 emulated frames of 18,520 counted on 24_don_winmash) must miss its frozen game clock (in-gate: one extra run of 21_don_mash on the build; mode: every breakpoint run runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
-# MUST-FIRE: known-bad: vanilla-walker-reached — after the relocation no caller reaches a vanilla walker, so a nonzero hit on one must fail section 1 (mode: a vanilla-walker hit count is forced nonzero so the "still reached" FAIL fires and the gate FAILs)
+# MUST-FIRE: known-bad: vanilla-walker-reached — after the relocation no caller reaches a vanilla walker, so a nonzero hit on one must fail section 1 (mode: a vanilla-walker hit is planted in a copy of the build's breakpoint trace, which section 1 reads, so the "still reached" FAIL fires and the gate FAILs)
 #
 # WHY (14z-91). The obj_hook legacy-cycle fix copies each walker into free
 # space and rewrites the operand of every `jsr <walker>`. Completeness is
@@ -156,17 +156,26 @@ echo "== 1. on $BUILD: vanilla entries silent, relocated entries live =="
 run_leg new "$BUILD" "$OLD,$NEW" "$_clk"
 n=$(complete_for new)
 [ "$n" = "$(echo "$REPLAYS" | wc -w | tr -d ' ')" ] || {
-    echo "  FAIL: only $n of $(echo "$REPLAYS" | wc -w | tr -d ' ') runs completed"; fail=1; }
+    echo "  FAIL: only $n of $(echo "$REPLAYS" | wc -w | tr -d ' ') runs completed"; fail=1
+    vs_ctl_nj "only $n of the build's breakpoint runs completed, so section 1 read an incomplete trace"; }
+# THE EXECUTABLE MODE (#369): a vanilla-walker hit is PLANTED in a COPY of the build's trace (an `SP` line on the first
+# vanilla site, appended to the first completed run's file), and section 1 reads the copy through total_for, so the
+# FAIL comes out of the same parse that reads the real hits. The relocated sites below are read from the real trace.
+T1=new
+if [ "$MODE" = vanilla-walker-reached ]; then
+    for f in "$W"/new_*.txt; do if [ -f "$f" ]; then cp "$f" "$W/vwr_${f#"$W"/new_}"; fi; done
+    pf="$(grep -l SPEND "$W"/vwr_*.txt 2>/dev/null | head -1)"
+    if [ -n "$pf" ]; then echo "SP $(printf '%06x' $((0x${OLD%%,*}))) hits 1 min 0 max 0" >> "$pf"; T1=vwr
+    else vs_ctl_nj "no completed breakpoint run to plant the vanilla-walker hit in"; fail=1; fi
+fi
 for s in $(echo "$OLD" | tr ',' ' '); do
-    h=$(total_for new "$s")
-    # THE EXECUTABLE MODE: force a vanilla-walker hit so the "still reached" FAIL fires.
-    if [ "$MODE" = vanilla-walker-reached ]; then h=1; fi
+    h=$(total_for "$T1" "$s")
     if [ "${h:-0}" = "0" ]; then
         echo "  ok: vanilla $s never reached ($h hits)"
-        vs_ctl_fired vanilla-walker-reached "vanilla walker $s is never reached (0 hits); the mode forces a hit and the gate FAILs"
+        [ -n "$MODE" ] || vs_ctl_fired vanilla-walker-reached "vanilla walker $s is never reached (0 hits); the mode forces a hit and the gate FAILs"   # #369: a plain run's line only
     else
-        [ -z "$MODE" ] && echo "CONTROL DEAD: vanilla-walker-reached — vanilla walker $s reached $h time(s)"   # in its mode the hit is forced: the FAIL below is the control honoured (#310 rule 1)
-        echo "  FAIL: vanilla walker $s still reached $h time(s) — a caller was"
+        [ -z "$MODE" ] && echo "CONTROL DEAD: vanilla-walker-reached — vanilla walker $s reached $h time(s)"   # in its mode the hit is planted in the trace copy: the FAIL below is the control's finding (#310 rule 1)
+        echo "  FAIL: vanilla walker $s still reached $h time(s) — a caller was" | tee -a "$W/main.log"   # #369: the vanilla-walker-reached mode's finding
         echo "        MISSED. Legacy stays bit-identical (it is vanilla), but a"
         echo "        tenant object dispatched there over-indexes the vanilla"
         echo "        table. Re-run tools/audit_walker_callers.py and look for a"
@@ -180,6 +189,7 @@ for s in $(echo "$NEW" | tr ',' ' '); do
     else
         echo "  FAIL: relocated walker $s NEVER ran — the repoint did not take,"
         echo "        or this replay set does not reach it."
+        vs_ctl_nj "relocated walker $s never ran on the build: the breakpoint trace is not shown live"
         fail=1
     fi
 done
@@ -257,12 +267,25 @@ run_leg stage "$BUILD" "$OLD,$NEW" "INSTR_REFERENCE=1 $_skip" "$SR"
 RL="$(ia_replaylua_at vsavjw "$PWD/$BUILD/rompath;$ROMDIR" "$PWD/tests/replays/$SR.rpl" "$SF" "$W/rl")"
 sa="$(ia_anchor "$W/stage_$SR.align")"
 if [ -n "$RL" ] && [ "$sa" = "$RL" ]; then echo "  ok: the staging reference leg reproduces replay.lua at frame $SF ($sa)"
-else echo "  FAIL: the staging reference leg reads ${sa:-nothing} at frame $SF, replay.lua ${RL:-nothing}"; fail=1
+else echo "  FAIL: the staging reference leg reads ${sa:-nothing} at frame $SF, replay.lua ${RL:-nothing}" | tee -a "$W/main.log"; fail=1
     if [ -n "$MODE" ] && { [ -z "$sa" ] || [ -z "$RL" ]; }; then echo "NOT JUDGED: control mode $MODE: the staging leg read ${sa:-nothing}, replay.lua ${RL:-nothing} (#310)"; fi
 fi
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL: audit_walker_repoint (control mode: $MODE)"; exit 1; }
+    if [ "$fail" = 1 ]; then   # #369: the mode is honoured only on its own finding in the alignment check's output
+        case "$MODE" in
+        drift-clock) WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+        first-frame-skip) WANT='FAIL: the staging reference leg reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+        esac
+        cat "$W/align_bad.txt" >> "$W/main.log"
+        vs_ctl_caught "$W/main.log" "$WANT" || :; echo "FAIL: audit_walker_repoint (control mode: $MODE)"; exit 1
+    fi
     vs_ctl_left_green "$MODE" "FAIL: audit_walker_repoint — control mode $MODE left the gate green"
+fi
+if [ "$MODE" = vanilla-walker-reached ]; then   # #369: its finding is section 1's "still reached" FAIL on the planted site
+    [ "$fail" = 1 ] || vs_ctl_left_green "$MODE" "WALKER REPOINT: FAIL — control mode $MODE left the gate green"
+    WANT="FAIL: vanilla walker ${OLD%%,*} still reached [1-9][0-9]* time\\(s\\) — a caller was\$"
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "WALKER REPOINT: FAIL"; exit 1
 fi
 IA_NJ=0   # #310: the legs below are the controls' own, not a mode's measurement
 run_leg cdrift "$BUILD" "$OLD,$NEW" "INSTR_CLOCK=frame_done" "$SR"

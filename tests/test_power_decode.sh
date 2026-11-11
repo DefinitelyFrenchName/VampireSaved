@@ -30,7 +30,8 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d "${TMPDIR:-/tmp}/powdec.XXXXXX")" || { echo "FAIL: test_power_decode — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # main.log: the check's findings (#369)
+: > "$W/main.log"
 
 if [ -f build/out/vsavj_opcodes.bin ] && [ -f build/out/vsav2_opcodes.bin ] && [ -f build/out/vsavj_data.bin ]; then
     OPJ=build/out/vsavj_opcodes.bin; OP2=build/out/vsav2_opcodes.bin; DATJ=build/out/vsavj_data.bin
@@ -131,8 +132,14 @@ print(f"  NOTE  {len(seen)} distinct records over 15 characters: bit 5 (nostat) 
 PY
 
 echo "== 4. controls"
-if vs_ctl_is mask-moved || vs_ctl_is raw-power; then
-    vs_ctl_fired "$VS_CTL" "the perturbed input ran in its section (mode)"
+if vs_ctl_is mask-moved || vs_ctl_is raw-power; then   # #369: the mode is judged on its own section's finding
+    echo "  (control mode $VS_CTL: the in-gate controls run only in a plain run)"
+    [ "$fail" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL (control mode $VS_CTL changed no verdict)"
+    case "$VS_CTL" in
+        mask-moved) WANT='^  FAIL  BAD vsavj 0x018b8e scaler andi\.w #\$1f,d2 \(the class\): 0242003f$' ;;
+        raw-power)  WANT="^  FAIL  Zabel's P pursuit \\(a2:0x56\\) reads '128 130 .*' \\(want: 0 2 .*\\)\$" ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL"; exit 1
 else
     perturb_mask "$OPJ" "$W/opj_bad.bin" && words "$W/opj_bad.bin" "$OP2" > "$W/w_bad.txt" 2>&1
     grep -q '^BAD vsavj 0x018b8e' "$W/w_bad.txt" && vs_ctl_fired mask-moved "the 0x3F copy fails the vsavj class mask" \

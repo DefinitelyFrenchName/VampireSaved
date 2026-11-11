@@ -100,7 +100,9 @@ out="$(python3 tools/signal_traps.py --root "$REPO" ${EXTRA:+--extra "$EXTRA"} 2
 echo "$out" | grep -v '^[0-9]' | head -20 | sed 's/^/        /'
 last="$(echo "$out" | tail -1)"
 if [ -n "$EXTRA" ]; then   # the mode's own finding: the planted script named RESUMES
-    if echo "$out" | grep >/dev/null "^RESUMES	$EXTRA:3	"; then
+    if echo "$out" | grep >/dev/null "^RESUMES	$EXTRA:3	"; then   # #369: honoured on the census's own RESUMES line
+        printf '%s\n' "$out" > "$W/main.log"
+        vs_ctl_caught "$W/main.log" "^RESUMES	$(printf '%s' "$EXTRA" | sed 's/[][\.*^$()+?{}|]/\\&/g'):3	" || :
         echo "FAIL: test_signal_traps (control mode: the planted trap was named RESUMES)"; exit 1; fi
     if [ "$rc" != 0 ]; then printf '%s\n' "$out" > "$W/mode.out"; vs_ctl_show_err "$W/mode.out" || :
         echo "NOT JUDGED: $VS_CTL — the census failed (exit $rc) without naming the planted trap"; echo "FAIL: test_signal_traps"; exit 1; fi
@@ -146,7 +148,9 @@ done < "$W/grep_hits.txt"
 [ "$ng" -ge 5000 ] || bad "the grep read $ng tracked files, under the 5000 floor: a blinded file list"
 if [ "$nnew" = 0 ]; then ok "plain grep over $ng tracked files: $nh hit(s), every one an allowed fixture or prose line, no resuming trap"
 else
-    if vs_ctl_is grep-planted && grep -q "plant2b.sh" "$W/grep_hits.txt"; then echo "FAIL: test_signal_traps (control mode: the planted trap was named NEW)"; exit 1; fi
+    if vs_ctl_is grep-planted && grep -q "plant2b.sh" "$W/grep_hits.txt"; then   # #369: honoured on the grep's own hit
+        vs_ctl_caught "$W/grep_hits.txt" "/plant2b\.sh:3:trap .* EXIT INT TERM$" || :
+        echo "FAIL: test_signal_traps (control mode: the planted trap was named NEW)"; exit 1; fi
     bad "plain grep over $ng tracked files: $nnew hit(s) outside the allowed lines (above) — a trap the reader may not have judged"; fi
 if vs_ctl_is grep-planted; then vs_ctl_left_green grep-planted "FAIL: test_signal_traps — the planted trap was not named by the grep"; fi
 echo "$W/plant2b.sh" > "$W/grep_plant_list.txt"; grep2b "$W/grep_plant_list.txt" "$W/grep_plant_hits.txt"

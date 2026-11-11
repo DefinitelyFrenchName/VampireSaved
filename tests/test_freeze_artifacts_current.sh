@@ -86,8 +86,9 @@ done
 echo "== the current freeze, per tests/run_all_emulator.sh: $MERGED (don $DON, hui $HUI, pyr $PYR, stock $STOCK)"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 FAC_MODE="${VS_CTL:-}"; export FAC_MODE
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT   # #369: the check's output, read by vs_ctl_caught under a mode
 
-MERGED="$MERGED" DON="$DON" HUI="$HUI" PYR="$PYR" STOCK="$STOCK" python3 - <<'PY'
+MERGED="$MERGED" DON="$DON" HUI="$HUI" PYR="$PYR" STOCK="$STOCK" python3 - <<'PY' > "$W/main.log" 2>&1 && rc=0 || rc=$?
 import json, os, re, sys
 from pathlib import Path
 merged = os.environ["MERGED"]
@@ -158,8 +159,9 @@ else:
         notes.append(f"2: {exp} records {want} — current")
 
 # ── 3. MUST-FIRE CONTROLS ───────────────────────────────────────────────────
-# Each perturbs the REAL comparison, not a copy of its own conclusion.
-if src.exists() and dst.exists():
+# Each perturbs the REAL comparison, not a copy of its own conclusion. A plain run only (#369: under a mode a
+# firing line is never the mode's evidence; the mode's finding is read from the FAIL lines by vs_ctl_caught).
+if not MODE and src.exists() and dst.exists():
     a = ops(src)
     pert = [dict(o) for o in a]
     if pert:
@@ -174,7 +176,9 @@ if src.exists() and dst.exists():
             fired("one-value-change", "a one-VALUE change at an unchanged op count is caught (instance 3, the shape a count-based check would miss)")
 
 hdr_txt = "# frozen on merged-m0 (build/definitely_not_the_current_dir)"
-if re.findall(r"\(build/([A-Za-z0-9_]+)\)", hdr_txt)[0] == merged.split("/", 1)[1]:
+if MODE:
+    pass
+elif re.findall(r"\(build/([A-Za-z0-9_]+)\)", hdr_txt)[0] == merged.split("/", 1)[1]:
     dead("non-current-header", "a wrong build dir in the header reads as current")
 else:
     fired("non-current-header", "a header naming a non-current build dir is caught by section 2")
@@ -357,7 +361,7 @@ def ctl(name, row, want_fail, must_contain=None):
     else:
         fails.append(f"4c: MUST-NOT-FIRE {name} DID NOT STAY QUIET — {fs[:2]}")
 
-for name, row in CTL_ROWS.items():
+for name, row in (CTL_ROWS.items() if not MODE else ()):   # the in-gate controls: a plain run only (#369)
     ctl(name, row, True, {"stale-dir": "names build/don_m3", "stale-fingerprint": "fingerprint deadbeef",
                           "unregistered-but-registered": "UNREGISTERED", "program-key-alias": "names huitzil-m26"}[name])
 if truth.get("DON", {}).get("names"):
@@ -376,3 +380,19 @@ if fails:
 print("\nPASS: every romset-following tracked artifact is current with "
       f"{merged}")
 PY
+cat "$W/main.log"
+[ "$rc" = 3 ] && exit 3   # a REFUSED mode
+if [ -n "${VS_CTL:-}" ]; then   # #369: honoured only on the FAIL line of the section the mode perturbs
+    [ "$rc" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_freeze_artifacts_current (control mode $VS_CTL)"
+    case "$VS_CTL" in
+        one-value-change) WANT='^FAIL: 1: build/merged1 is STALE against [^ ]+: [0-9]+ vs [0-9]+ ops, 1 only in merged1, 1 only in the build' ;;
+        non-current-header) WANT="^FAIL: 2: tests/expect/mister_prg_window\\.txt is STALE: its header records \\['definitely_not_the_current_dir'\\]" ;;
+        stale-dir) WANT='^FAIL: 4: STALE — names build/don_m3 as current for the DON track' ;;
+        stale-fingerprint) WANT='^FAIL: 4: STALE — names fingerprint deadbeef as current for the DON track' ;;
+        unregistered-but-registered) WANT='^FAIL: 4: STALE — a cell says UNREGISTERED / NOT yet frozen but names build/' ;;
+        program-key-alias) WANT='^FAIL: 4: STALE — names huitzil-m26 as current for the HUI track' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: test_freeze_artifacts_current (control mode $VS_CTL)"; exit 1
+fi
+exit "$rc"

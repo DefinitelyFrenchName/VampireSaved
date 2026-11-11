@@ -132,7 +132,9 @@ else
             # THE EXECUTABLE FORM: the same comparison under the PERTURBED binding
             # (cmp_matchers --control exits 0 when the results MOVED) is read as
             # the main result — a moved result is the rule-6 finding, so FAIL
-            if python3 tests/lib/cmp_matchers.py "$ROMDIR" "$W/rb_old.py" --control; then
+            python3 tests/lib/cmp_matchers.py "$ROMDIR" "$W/rb_old.py" --control > "$W/main.log" 2>&1 && _cm=0 || _cm=$?   # #369: the mode's evidence
+            cat "$W/main.log"
+            if [ "$_cm" = 0 ]; then
                 bad "the refactor MOVED a result under the perturbed binding (the mode) — this is a rule-6 finding."
             else
                 ok "pinned parameters reproduce the drifted copy on every probe"
@@ -146,7 +148,8 @@ else
         # MUST-FIRE: "1640 of 1640 identical" is equally consistent with a
         # comparison that cannot detect anything at all. Perturb the binding
         # and require the same comparison to go red.
-        if python3 tests/lib/cmp_matchers.py "$ROMDIR" "$W/rb_old.py" --control; then
+        if [ -n "${VS_CTL:-}" ]; then :   # the in-gate control runs only in a plain run (#369)
+        elif python3 tests/lib/cmp_matchers.py "$ROMDIR" "$W/rb_old.py" --control; then
             vs_ctl_fired moved-result "the comparison DOES detect a moved result"
         else
             vs_ctl_dead moved-result "section 2's result proves nothing"; bad "control did not fire"
@@ -276,5 +279,10 @@ assert status == "verified" and cand == 0x100, (status, cand)
 print(f"  ok: control — the single-site case still resolves ({status})")
 PYCHK
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: the moved probes, counted by section 2's own comparison
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: reconcile matcher (control mode $VS_CTL changed no verdict)"
+    vs_ctl_caught "$W/main.log" '^  CONTROL \(ALLOW_FALLBACK forced True\): [1-9][0-9]* of [0-9]+ probes moved$' || :
+    echo "FAIL: reconcile matcher (control mode $VS_CTL)"; exit 1
+fi
 [ "$fail" = 0 ] && echo "PASS: one matcher, pinned inert, parameters load-bearing" \
     || { echo "FAIL: reconcile matcher"; exit 1; }

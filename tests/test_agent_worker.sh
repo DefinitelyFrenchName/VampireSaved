@@ -123,7 +123,9 @@ if [ -n "$VS_CTL" ]; then
     echo "MODE: control $VS_CTL — judging a copy of the fixture with that defect planted"
 fi
 echo "== the frozen measurer run ($target)"
-judge "$target" || { echo "FAIL: the worker's figures are not all traceable to the commands it ran"; fail=1; }
+judge "$target" > "$W/main.log" 2>&1 && jrc=0 || jrc=$?
+cat "$W/main.log"
+[ "$jrc" = 0 ] || { echo "FAIL: the worker's figures are not all traceable to the commands it ran"; fail=1; }
 
 if [ -z "$VS_CTL" ]; then
     echo "== controls: one planted defect per copy, each must fail the judgement"
@@ -137,6 +139,14 @@ if [ -z "$VS_CTL" ]; then
     done
 fi
 
+if [ -n "$VS_CTL" ] && [ "$fail" -ne 0 ]; then   # #369: the judgement's own finding for the planted defect
+    case "$VS_CTL" in
+        planted-figure)          WANT='^  FAIL  W#: figures in the report that no result the worker got contains: 274$' ;;
+        blind-worker-transcript) WANT='^  FAIL  NO WORKER TRANSCRIPT: ' ;;
+        off-spec-command)        WANT="^  FAIL  conformance: spec commands not run \\['C1'\\], calls not in the spec \\[.*wc -c'\\]\$" ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+fi
 if [ "$fail" -eq 0 ]; then echo "PASS: a real worker run returned figures each traceable to a spec command it ran, at its definition's caps, and nothing off-spec"
 else echo "FAIL: test_agent_worker"; fi
 exit "$fail"

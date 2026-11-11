@@ -238,7 +238,7 @@ the suite runners and their own ground truth. 68 of 68 described.
 
 **HOW:** a stub gate written into a scratch directory sources tests/lib/controls.sh (or a control's copy with one branch disabled); its mode runs a perturbed copy — a Python script or a shell script chosen per case — and fails on it the way the 21 group-5 gates do (the copy's tail in the FAIL line, then vs_ctl_show_err), and its plain run is the twin (fired only on the copy's positive FOUND line and no crash). Each case runs it under CONTROL=copy-mode (or none) and classifies the log with vs_classify_control exactly as both runners do.
 
-**EXPECTS:** (a) a copy raising KeyError on its main path, after printing a FOUND line, reads DIED; (b) the twin given that copy, and the shell copy with a syntax error, print CONTROL DEAD; (c) a shell copy with a syntax error, one that aborts on a `${VAR:?}` demand, and a Python copy with a SyntaxError read UNJUDGED; (d) with FileNotFoundError expected, a copy raising it reads HONOURED and one raising KeyError, or exiting 1 with no exception, reads UNJUDGED; the near misses — a Python and a shell copy exiting 1 on a FOUND line — read HONOURED and their twin fires; (e) this gate's own mode run whose controls.sh line moved (tb-hidden, expected-blind) is REFUSED and reads UNJUDGED. Each control's disabled branch misreads its case HONOURED (or the twin FIRED); refusal-reverted's pre-fix copy makes (e) read HONOURED.
+**EXPECTS:** (a) a copy raising KeyError on its main path, after printing a FOUND line, reads DIED; (b) the twin given that copy, and the shell copy with a syntax error, print CONTROL DEAD; (c) a shell copy with a syntax error, one that aborts on a `${VAR:?}` demand, and a Python copy with a SyntaxError read UNJUDGED; (d) with FileNotFoundError expected, a copy raising it reads HONOURED and one raising KeyError, or exiting 1 with no exception, reads UNJUDGED; the near misses — a Python and a shell copy exiting 1 on a FOUND line — read HONOURED and their twin fires; (e) this gate's own mode run whose controls.sh line moved (tb-hidden, expected-blind) is REFUSED and reads UNJUDGED. Each control's disabled branch misreads its case HONOURED (or the twin FIRED); refusal-reverted's pre-fix copy makes (e) read UNJUDGED-CAUGHT (#369 piece 5, maintainer-ruled 2026-11-09 "Name the speaker": tests/lib/classify.sh vs_ctl_class_word — UNJUDGED made so only by #369's backstop, the gate's own REFUSED line gone).
 
 ### `test_dead_exit_census.sh` — test, ci_portable
 
@@ -382,7 +382,7 @@ the suite runners and their own ground truth. 68 of 68 described.
 
 **HOW:** each scratch tree is symbolic links to this tree with the planted files real copies (test_rule_checker's tests/rulecheck a real copy too: its probes write there); audit_latch_reads runs with a stub MAME (exit 0), empty zips and LEGS=phobos-real, so it refuses or fails before any emulator could start; the rule-checker plant is an assert placed after the line each shadow rewrites, false only once that line is rewritten.
 
-**EXPECTS:** each plant its class above; the four controls fire.
+**EXPECTS:** each plant its class above; the four controls fire. #369 PIECE 5 (maintainer-ruled 2026-11-09, "Name the speaker"): "must read HONOURED" below holds while the copied gate is on tests/expected/ctl_caught_debt.tsv; once it is migrated its reverted copy must read UNJUDGED-CAUGHT on every plant instead (tests/lib/classify.sh vs_ctl_class_word: UNJUDGED by #369's backstop alone, the 14z-215 line gone) — the plain UNJUDGED (that line still speaking) or a HONOURED (a pattern that also matches the plant's crash: test_rule_checker's unfiltered-plants, 14z-225) is the control dead. rw() reads the list, so the expectation follows each gate as it migrates.
 
 ### `test_poke_readback.sh` — test, ci_portable
 
@@ -2556,7 +2556,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **WHAT:** Donovan's 421+P is a standing multi-hit that never knocks down a standing opponent (the maintainer's gameplay lock), the sworded deity's fatal hit runs the complete death chain, and the total damage stays within the measured native bound.
 
-**HOW:** replays on MAME against a stock build reading the victim's node family, hits and damage from dumps; the control forces the victim node into the knockdown family.
+**HOW:** replays on MAME against a stock build reading the victim's node family, hits and damage from dumps; the control plants a knockdown-family node in a copy of the victim dumps.
 
 **EXPECTS:** multi-hit, no knockdown, the death chain complete, damage within bound; the knockdown control fails. The two-sided native comparison is test_don_immortal_native's; this gate keeps the one-sided locks honest.
 

@@ -48,7 +48,8 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { echo "  ok    $*"; }
-bad() { echo "  FAIL  $*"; fail=1; }
+bad() { echo "  FAIL  $*" | tee -a "$W/findings.log"; fail=1; }   # findings.log: the check's findings (#369)
+: > "$W/findings.log"
 command -v zip >/dev/null 2>&1 || { echo "FAIL: no zip(1) — the uploader needs it"; exit 1; }
 command -v unzip >/dev/null 2>&1 || { echo "FAIL: no unzip(1) — the served-content check needs it"; exit 1; }
 sha256_of() {
@@ -127,7 +128,8 @@ else
     bad "the uploader's dry run failed:"; tail -8 "$W/main.log" | sed 's/^/        /'
 fi
 
-# the control: with the filter disabled a planted .DS_Store MUST reach an asset list
+# the control: with the filter disabled a planted .DS_Store MUST reach an asset list (a plain run only, #369)
+if [ -z "${VS_CTL:-}" ]; then
 mkroot "$W/ctl" "$W/helper_off.sh"
 cut_assets "$W/ctl" || true
 n="$(cat "$W/ctl/build/scratch/release_assets/merged-m99"/*.list 2>/dev/null | grep -c 'DS_Store' || true)"
@@ -135,6 +137,7 @@ if [ "${n:-0}" -gt 0 ]; then
     vs_ctl_fired filter-disabled "with the filter passing everything, $n .DS_Store path(s) reached the asset lists"
 else
     vs_ctl_dead filter-disabled "no .DS_Store reached an asset list with the filter disabled — the uploader does not route its listing through the definition" || fail=1
+fi
 fi
 
 echo "== 3. the three release listings use the one definition"
@@ -147,5 +150,10 @@ for s in tools/upload_release_assets.sh tests/test_release_asset_shape.sh tests/
 done
 
 echo
+if [ -n "${VS_CTL:-}" ]; then   # #369: a planted .DS_Store reached an asset list of the real uploader's own dry run
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: control mode $VS_CTL changed no verdict"
+    vs_ctl_caught "$W/findings.log" '^  FAIL  a \.DS_Store reached the list of: [^ ]+\.zip\.list ' || :
+    echo "FAIL: a release listing or the uploader does not ignore .DS_Store (control mode $VS_CTL)"; exit 1
+fi
 [ "$fail" = 0 ] && echo "PASS: .DS_Store is never shipped and never counted" \
     || { echo "FAIL: a release listing or the uploader does not ignore .DS_Store (see above)"; exit 1; }

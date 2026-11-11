@@ -62,7 +62,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO/emu/jtcores"
-fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
+fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1" | tee -a "$W/main.log"; fail=1; }   # #369: the main check's findings ($W is made before the first bad)
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 [ -f "$SRC/.gitmodules" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 77; }
 
@@ -85,6 +85,10 @@ B_YAML="$B/game.yaml"
 # IS what 2a / 2a2 read — and this run must FAIL.
 if vs_ctl_is undeclared-hdl-file; then hdl="$(printf '%s\n' "$hdl" | sed 's/$/jtcps2w_extra.v /')"; fi
 if vs_ctl_is undeclared-yaml-pull; then { cat "$B/game.yaml"; echo "      - jtcps2w_extra.v"; } > "$W/mode_game.yaml"; B_YAML="$W/mode_game.yaml"; fi
+case "$VS_CTL" in   # #369: the finding each perturbation must produce in 2a / 2a2's own output
+undeclared-hdl-file)  WANT="FAIL 2a cores/cps2w/hdl holds \[[^]]*jtcps2w_extra\.v \], declared \[" ;;
+undeclared-yaml-pull) WANT="^ *> >       - jtcps2w_extra\.v\$" ;;
+esac
 want='jtcps15_sound.v jtcps1_obj_draw.v jtcps1_prom_we.v jtcps1_sdram.v jtcps1_video.v jtcps2_decrypt.v jtcps2_game.v jtcps2_main.v jtcps2_obj.v jtcps2_obj_scan.v jtcps2w_obj_bank.v jtcps2w_profile.v jtcps2w_qsnd_bank.v pal_lut.hex '
 [ "$hdl" = "$want" ] && ok "2a cores/cps2w/hdl holds exactly the declared override set" \
                      || bad "2a cores/cps2w/hdl holds [$hdl], declared [$want]"
@@ -93,7 +97,7 @@ diff "$A/game.yaml" "$B_YAML" | grep '^[<>]' | grep -v '^> *#' | grep -v '^> *$'
 if cmp -s "$W/yaml.txt" "$EXP"; then
     ok "2a2 game.yaml delta is exactly the declared D1+D2 override list ($(wc -l < "$EXP" | tr -d ' ') lines)"
 else
-    bad "2a2 game.yaml delta drifted:"; diff "$EXP" "$W/yaml.txt" | head -20 | sed 's/^/       /'
+    bad "2a2 game.yaml delta drifted:"; diff "$EXP" "$W/yaml.txt" | head -20 | sed 's/^/       /' | tee -a "$W/main.log"
 fi
 d="$(diff "$A/macros.def" "$B/macros.def" | grep '^[<>]' | tr '\n' '|')"
 [ "$d" = "< CORENAME=JTCPS2|> CORENAME=JTCPS2W|" ] && ok "2b macros.def differs by CORENAME only" || bad "2b macros.def delta: $d"
@@ -182,7 +186,11 @@ want="$(printf '%s ' $NAMES)"
 # 4 MUST-FIRE CONTROLS, both text twins of what 2a checks — an UNDECLARED RTL
 # file must fail whether it appears on disk or only in the pull list. This is
 # the property check 2a inherited from the "game.yaml identical" era and the
-# one that must survive every future slice.
+# one that must survive every future slice. A plain run only (#369): a mode is judged on 2a / 2a2's own output.
+if [ -n "$VS_CTL" ]; then
+    [ $fail = 0 ] || { vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL test_jtcores_twin"; exit 1; }
+    echo "PASS test_jtcores_twin"; exit 0
+fi
 extra="$(ls "$SRC/cores/cps2w/hdl" 2>/dev/null | tr '\n' ' ' | sed 's/$/jtcps2w_extra.v /')"
 [ "$extra" = "$want" ] \
     && { vs_ctl_dead undeclared-hdl-file "an extra hdl file compared equal to the declared set"; bad "4a"; } \

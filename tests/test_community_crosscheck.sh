@@ -153,6 +153,10 @@ echo "== 4. the generated page is current"
 if cmp -s "$W/page.md" "$PAGE"; then ok "$PAGE equals a regeneration"
 else nope "$PAGE is stale — regenerate"; diff "$PAGE" "$W/page.md" | head -10; fi
 
+# #369: under the mode, the classification's own row for the perturbed character (got.txt, what section 3 compares)
+[ -z "${VS_CTL:-}" ] || [ $bad -eq 0 ] || vs_ctl_caught "$W/got.txt" "$(printf '^DE\tstartup\tINCONSISTENT\t')" || :
+
+if [ -z "${VS_CTL:-}" ]; then   # the in-gate controls: a plain run only (#369)
 echo "== 5. must-fire controls"
 # (a) perturb ONE derived startup on a character whose startup column is a clean offset
 perturb_startup "$W/v.json" "$W/v_bad.json" || nope "control (a): could not perturb"
@@ -166,6 +170,7 @@ esac
 out="$(CONTROL= SHEET=/nonexistent-workbook.xlsx sh "$0" 2>&1 | head -1)"
 case "$out" in SKIP:*) ok "control (b): a missing workbook SKIPs, never passes vacuously";;
                     *) nope "control (b): a missing workbook did not SKIP (got: $out)";; esac
+fi
 
 [ $bad -eq 0 ] && echo "PASS" || echo "FAIL ($bad)"
 exit $bad

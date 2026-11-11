@@ -101,7 +101,19 @@ fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 || { echo "SKIP: the vsavj data view could not be made"; exit 0; }
 # WHICH ROM AND WHICH IMAGE (14z-209, rule-checker run 2026-10-25-1294 Q1/Q4): tests/lib/pristine_vsavj.sh.
 . "$REPO/tests/lib/pristine_vsavj.sh"
-vs_pristine_vsavj "$W/pv" "$W/vsavj_data.bin" || { echo "FAIL: audit_guard_cancels (the ROM or the analysed image is not pristine vsavj)"; exit 1; }
+if vs_pristine_vsavj "$W/pv" "$W/vsavj_data.bin" > "$W/pv.log"; then cat "$W/pv.log"; else
+    cat "$W/pv.log"
+    # #369: a provenance mode is honoured only on its own check's FAIL line; under any other mode the run judged nothing
+    case "$MODE" in
+    foreign-image) WANT='^FAIL: the analysed image .* is not vsavj.s data view decrypted afresh from ROMDIR' ;;
+    foreign-romset) WANT='^FAIL: ROMDIR is not the pristine reference set ' ;;
+    foreign-rompath) WANT='^FAIL: MAME_ROMPATH is set ' ;;
+    foreign-mame) WANT='^FAIL: the MAME the legs run is not the pin.s release:' ;;
+    *) WANT='' ;;
+    esac
+    if [ -n "$WANT" ]; then vs_ctl_caught "$W/pv.log" "$WANT" || :; else vs_ctl_nj "the ROM provenance check failed before the gate's own checks ran"; fi
+    echo "FAIL: audit_guard_cancels (the ROM or the analysed image is not pristine vsavj)"; exit 1
+fi
 if [ -z "$MODE" ]; then vs_pristine_vsavj_controls "$W/pv" || { echo "FAIL: audit_guard_cancels (a provenance control is dead)"; exit 1; }; fi
 GCB="$(python3 $T gcbuttons)"                 # TAB_BTN for the 57 committing buttons
 WCX="$(python3 $T whiffconnects)"             # the whiffs measured to reach P2 anyway (data, tools/gc_rigs.py)
@@ -155,6 +167,7 @@ for r in $ALL_TRACE; do grep -q '^END ' "$W/legs/$r/trace/trace.txt" 2>/dev/null
 for r in $ALL_NOSTOP; do grep -q '^END ' "$W/legs/$r/nostop/run.log" 2>/dev/null || { bad "leg $r/nostop did not end"; dead=1; }
     grep -qE '^(CRASH|PCWEEDS|SOFTRESET)' "$W/legs/$r/nostop/run.log" 2>/dev/null && { bad "leg $r/nostop CRASHED"; dead=1; }; done
 [ "$dead" = 0 ] && ok "every leg ended clean"
+[ "$dead" = 0 ] || vs_ctl_nj "a leg did not end or CRASHED: its missing rows change the table and the identity clause, which is not a finding"
 : > "$W/manifest_t.tsv"; : > "$W/manifest_g.tsv"
 for r in $ALL_TRACE; do ia_note_run "$W/manifest_t.tsv" trace "$r" vsavj - "$W/rigs/$r.rpl" "$(cat "$W/legs/$r/trace/env")" "$W/legs/$r/trace/align"; done
 for r in $ALL_NOSTOP; do ia_note_run "$W/manifest_g.tsv" nostop "$r" vsavj - "$W/rigs/$r.rpl" "$(cat "$W/legs/$r/nostop/env")" "$W/legs/$r/nostop/align"; done
@@ -302,13 +315,31 @@ if [ -n "${FREEZE:-}" ] && [ -z "$MODE" ]; then
 fi
 WANT="$(cut -d' ' -f1 "$EXP" 2>/dev/null)"
 if [ "$H" = "$WANT" ]; then ok "the 291-event table equals the frozen hash"
-else bad "the table's hash $H is not the frozen ${WANT:-<none>}"
+else _hb="the table's hash $H is not the frozen ${WANT:-<none>}"; bad "$_hb"
+    printf '  FAIL  %s\n' "$_hb" >> "$W/main.log"   # #369: the table check's finding, read by vs_ctl_caught under node-shift
     [ -f "$FRAMEDATA_OUT/guard_cancels.tsv" ] && diff "$FRAMEDATA_OUT/guard_cancels.tsv" "$W/table.tsv" | head -8 | sed 's/^/        /'; fi
 
-if [ -n "$MODE" ] && [ "$MODE" != drift-clock ] && [ "$MODE" != first-frame-skip ] && [ "$MODE" != table-absent ]; then
-    if _ev="$(ctl_judge "$MODE" "$W/identity.txt" "$W/table.tsv")"; then vs_ctl_fired "$MODE" "$_ev (mode)"; echo "FAIL"; exit 1; fi
-    case "$_ev" in "NOT JUDGED: "*) echo "$_ev"; echo "FAIL"; exit 1 ;; esac   # #332: the mode measured nothing
-    echo "REFUSED: mode $MODE — its perturbation did not make its own clause fail ($_ev): a dead mode, not a verdict"; exit 3
+if [ -n "$MODE" ] && [ "$MODE" != drift-clock ] && [ "$MODE" != first-frame-skip ]; then
+    # #369: honoured only on the mode's own clause — the identity clause's lines (identity.txt), or the table check's own
+    # hash line (main.log) for node-shift (table-absent: the node-shift judgement with no frozen table, which must read NOT JUDGED);
+    # ctl_judge still holds each count. CWANT, not WANT: WANT is the frozen hash above.
+    case "$MODE" in
+    noblock|commit-stripped|foreign-pc) CF="$W/identity.txt"; CWANT='^IDENTITY gc_[A-Z]+_[A-Z]+: commits=False, GC_BUTTONS says True$' ;;
+    rows-absent) CF="$W/identity.txt"; CWANT='^MISSING gc_[A-Z]+_[A-Z]+: no row \(its legs were not read\)$' ;;
+    node-shift) CF="$W/main.log"; CWANT='^  FAIL  the table.s hash [0-9a-f]{64} is not the frozen [0-9a-f]{64}$' ;;   # the table check's own line; ctl_judge (below) still holds that the shifted table differs from the frozen one
+    table-absent) CF="$W/judge.txt"; CWANT='^NOT JUDGED: the frozen table .*/guard_cancels\.tsv is not on this host ' ;;
+    *) CF="$W/judge.txt"; CWANT='' ;;
+    esac
+    JM="$MODE"; [ "$MODE" = table-absent ] && JM=node-shift   # table-absent judges node-shift's clause with FRAMEDATA_OUT empty
+    ctl_judge "$JM" "$W/identity.txt" "$W/table.tsv" > "$W/judge.txt"; _jr=$?
+    sed 's/^/  mode  /' "$W/judge.txt"   # indented: the judgement's own NOT JUDGED is evidence here, not this run's marker
+    if [ "$MODE" = table-absent ]; then
+        [ "$_jr" = 3 ] || vs_ctl_left_green "$MODE" "FAIL — control mode $MODE: the judgement with no frozen table read a verdict"
+        vs_ctl_caught "$CF" "$CWANT" || :; echo "FAIL"; exit 1
+    fi
+    if [ "$_jr" = 0 ]; then vs_ctl_caught "$CF" "$CWANT" || :; echo "FAIL"; exit 1; fi
+    if [ "$_jr" = 3 ]; then vs_ctl_nj "the node-shift judgement had no frozen table to read (#332)"; echo "FAIL"; exit 1; fi
+    echo "REFUSED: mode $MODE — its perturbation did not make its own clause fail ($(head -1 "$W/judge.txt")): a dead mode, not a verdict"; exit 3
 fi
 
 echo "== 4. the instrument's alignment (#228 step 4, option A)"
@@ -330,9 +361,15 @@ fi
 if ia_check_manifest "$CLOCKS" "$W/manifest_t.tsv" > "$W/align_bad.txt" && ia_check_manifest "$CLOCKS" "$W/manifest_g.tsv" >> "$W/align_bad.txt"
 then ok "every leg on emulated time, at its frozen game clock"
 else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
-ia_stage audit_guard_cancels "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$W/manifest_t.tsv" 1 "$W/st" "$MODE" || fail=1
+ia_stage audit_guard_cancels "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$W/manifest_t.tsv" 1 "$W/st" "$MODE" > "$W/stage.txt" || fail=1
+cat "$W/stage.txt"
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL (control mode: $MODE)"; exit 1; }
+    # #369: drift-clock on the frozen game-clock comparison, first-frame-skip on the staging leg against replay.lua
+    case "$MODE" in
+    drift-clock) CF="$W/align_bad.txt"; WANT='game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+    *) CF="$W/stage.txt"; WANT='FAIL: the staging reference leg \([^)]*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+    esac
+    [ "$fail" = 1 ] && { vs_ctl_caught "$CF" "$WANT" || :; echo "FAIL (control mode: $MODE)"; exit 1; }
     vs_ctl_left_green "$MODE" "FAIL — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

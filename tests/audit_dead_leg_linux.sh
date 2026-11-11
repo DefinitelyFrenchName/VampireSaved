@@ -69,7 +69,7 @@ vs_shares_claim audit_dead_leg_linux release-assets   # SHARES-CLAIM (#370, 14z-
 leftovers() { vs_desktop_procs; }
 leftovers > "$W/procs.before"
 DLU_TABLE="$REPO/tests/expected/dead_leg_unjudged_linux.tsv" JOBS=1 /bin/sh "$REPO/tests/test_dead_leg_unjudged.sh" > "$W/inner.log" 2>&1; rc=$?
-grep -av '^CONTROL \(FIRED\|DEAD\): ' "$W/inner.log"
+grep -av '^CONTROL \(FIRED\|DEAD\|CAUGHT\): ' "$W/inner.log"   # the inner gate's control lines are re-judged below, never relayed
 sleep 2; leftovers > "$W/procs.after"
 new="$(comm -13 "$W/procs.before" "$W/procs.after" | tr '\n' ' ')"
 if [ -n "${new% }" ]; then
@@ -79,12 +79,28 @@ if [ -n "${new% }" ]; then
 else
     echo "  ok    the dead-leg runs left no release emulator or sink recorder running"
 fi
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on its own finding in the inner check's output
+    # the inner gate's DEAD line for this mode (its vs_ctl_left_green: the mode left IT green) is relayed, so a dead
+    # control reads LIES here too, never UNJUDGED (the filter above drops it)
+    _dl="$(grep -a "^CONTROL DEAD: $VS_CTL — " "$W/inner.log")"
+    if [ -n "$_dl" ]; then printf '%s\n' "$_dl"; echo "FAIL: audit_dead_leg_linux (control mode $VS_CTL: the inner gate's CONTROL DEAD line, relayed above)"; exit 1; fi
+    [ "$rc" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: audit_dead_leg_linux (control mode $VS_CTL)"
+    case "$VS_CTL" in
+    # UNJUDGED-CAUGHT: a migrated row gate's neutered leg (#369 piece 5) — the inner gate prints it too (its line 207);
+    # missed by r6, which fixed the twin in audit_crash_sweep_emu (rule-checker run 2026-11-10-1765 Q4)
+    nj-stripped) WANT='^  FAIL  [a-z0-9_]+@[a-z0-9-]+ reads (HONOURED|LIES|UNJUDGED-CAUGHT) under a dead emulator, frozen UNJUDGED ' ;;
+    plain-loud) WANT='^  FAIL  [a-z0-9_]+: its plain run prints NOT JUDGED \(the helper is not silent without a mode\)$' ;;
+    *) WANT='' ;;
+    esac
+    vs_ctl_caught "$W/inner.log" "$WANT" || :
+    echo "FAIL: audit_dead_leg_linux (control mode $VS_CTL)"; exit 1
+fi
 for c in nj-stripped plain-loud; do
     l="$(grep -am1 "^CONTROL FIRED: $c — " "$W/inner.log")"
     if [ -n "$l" ]; then vs_ctl_fired "$c" "${l#CONTROL FIRED: $c — }"
-    elif [ -z "$VS_CTL" ] || [ "$VS_CTL" = "$c" ]; then
+    else
         vs_ctl_dead "$c" "the inner gate printed no firing for it: $(grep -am1 "^CONTROL DEAD: $c — " "$W/inner.log" | cut -c1-160)" || rc=1
-    fi   # under the other mode the inner gate need not fire this one; its exit is the verdict
+    fi
 done
 if [ "$rc" = 0 ]; then echo "PASS: audit_dead_leg_linux"; else echo "FAIL: audit_dead_leg_linux"; fi
 exit "$rc"

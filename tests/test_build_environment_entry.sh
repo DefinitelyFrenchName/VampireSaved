@@ -107,6 +107,11 @@ if [ "$rc" = 0 ] \
     echo "  1 ok: a passing pair composes the entry — host, system, packages, pins, tree, the PASS line"
 else
     echo "FAIL: section 1 — exit $rc, entry:"; sed 's/^/        /' "$W/s1.txt"; fail=1
+    case "${VS_CTL:-}" in   # #369: section 1's own refusal of the copy the mode hands it
+        gate-not-passed)   WANT='^REFUSED: .*/mode[.]log has no `PASS: test_release_binaries [(]windows-x86_64[)]` line' ;;
+        env-lines-dropped) WANT='^REFUSED: .*/mode_fb[.]txt: no `env` line' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/s1.txt" "$WANT" || :
 fi
 # ---- 2. a record for another os-arch REFUSES
 record "$W/other.txt" fbneo linux-x86_64
@@ -117,7 +122,8 @@ else
     echo "FAIL: section 2 — exit $rc:"; sed 's/^/        /' "$W/s2.txt"; fail=1
 fi
 
-# ---- 3. must-fire controls
+# ---- 3. must-fire controls (a plain run only: under a mode the verdict is section 1's, #369)
+if [ -z "${VS_CTL:-}" ]; then
 perturb_gate "$W/gate.log" "$W/c1.log"
 rc=0; python3 "$TOOL" windows-x86_64 "$W/c1.log" "$W/fb.txt" > "$W/c1.txt" 2>&1 || rc=$?
 if [ "$rc" = 2 ] && grep -q '^REFUSED: .*has no `PASS: test_release_binaries' "$W/c1.txt"; then
@@ -131,6 +137,7 @@ if [ "$rc" = 2 ] && grep -q '^REFUSED: .*no `env` line' "$W/c2.txt"; then
     vs_ctl_fired env-lines-dropped "$(head -1 "$W/c2.txt")"
 else
     vs_ctl_dead env-lines-dropped "exit $rc: $(head -1 "$W/c2.txt")" || true; fail=1
+fi
 fi
 
 [ "$fail" = 0 ] && echo "PASS: test_build_environment_entry" || { echo "FAIL: test_build_environment_entry"; exit 1; }

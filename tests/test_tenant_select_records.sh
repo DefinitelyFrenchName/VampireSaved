@@ -395,9 +395,16 @@ if [ "${SKIP_RUNTIME:-0}" != 1 ]; then
     # THE DRIFT CONTROL RUNS ON THE THIRD TAP RUN (highlight), not the staging leg's first (measured 14z-197): under the
     # old clock big_portrait and name_banner each lose EXACTLY 256 frames (1,144 emulated of 1,400), so their one-byte
     # game clock wraps back to the frozen value and only frames == emulated sees them; highlight loses 341 (1,059).
-    ia_stage test_tenant_select_records "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" 3 || fail=1
+    ia_stage test_tenant_select_records "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" 3 > "$WORK/stage.txt" || fail=1; cat "$WORK/stage.txt"   # #369: the mode reads its finding from here
     if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-        [ "$fail" = 1 ] && { echo "FAIL: tenant select-records gate (control mode: $MODE)"; exit 1; }
+        if [ "$fail" = 1 ]; then   # #369: the mode is honoured only on its own finding in the alignment check's output
+            case "$MODE" in
+            drift-clock) WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+            first-frame-skip) WANT='FAIL: the staging reference leg \(.*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+            esac
+            cat "$WORK/align_bad.txt" "$WORK/stage.txt" > "$WORK/main.log" 2>/dev/null || :
+            vs_ctl_caught "$WORK/main.log" "$WANT" || :; echo "FAIL: tenant select-records gate (control mode: $MODE)"; exit 1
+        fi
         vs_ctl_left_green "$MODE" "FAIL: tenant select-records gate — control mode $MODE left the gate green"
     fi
     if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

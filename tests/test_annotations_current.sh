@@ -75,11 +75,15 @@ if python3 tools/gen_annotations.py --root "$ROOT" --check >"$LOG" 2>&1; then
 else
     bad "gen_annotations.py --check FAILS (regenerate: python3 tools/gen_annotations.py):"
     sed 's/^/        /' "$LOG" | head -20
-    # a mode run judges its OWN perturbation, the planted address (#310, 14z-210)
-    if [ -n "$VS_CTL" ] && ! grep -q 'PRG:0x0FFFFE\|0FFFFE' "$LOG"; then
-        echo "NOT JUDGED: the copy failed --check without the planted PRG:0x0FFFFE in the difference"
-    fi
+    # a mode run judges its OWN perturbation, the planted address in the difference (#310, 14z-210; #369)
+    case "${VS_CTL:-}" in
+    new-carrier-address) WANT='^ *[+][|] `PRG:0x0FFFFE` [|] .*docs/game/atlas/ram[.]md' ;;   # the regeneration gains it
+    hand-edited-index)   WANT='^ *-[|] `PRG:0x0FFFFE` [|] hand-written [|]$' ;;                # the regeneration drops it
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$LOG" "$WANT" || :
 fi
+# THE CONTROLS ON A SYNTHETIC ROOT run in a plain run only: under a mode the verdict is the main check's (#369)
+if [ -z "$VS_CTL" ]; then
 mkdir -p "$W/docs/game/atlas" "$W/build/manifest"
 printf '# doc_shape\n' > "$W/docs/doc_shape.tsv"
 printf '# atlas\n\n## A section\n\nthe routine at `PRG:0x012345` reads it\n' > "$W/docs/game/atlas/ram.md"
@@ -123,6 +127,7 @@ if awk '/^## Code-only/{g=1} g && /PRG:0x034567/{found=1} END{exit !found}' "$W/
     ok "control d: a code-only address is listed in the gap section"
 else
     bad "control d: a code-only address is not in the gap section"
+fi
 fi
 
 [ "$fail" -eq 0 ] && echo "PASS test_annotations_current" || echo "FAIL test_annotations_current"

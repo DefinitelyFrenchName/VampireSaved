@@ -243,7 +243,15 @@ if [ "${FREEZE:-0}" = 1 ]; then cp "$W/got.txt" "$EXP"; echo "  FROZE  $EXP from
 if diff -u "$EXP" "$W/got.txt" > "$W/diff.txt"; then
     echo "  ok    matches $EXP"
 else
-    echo "FAIL: differs from $EXP:"; cat "$W/diff.txt"; echo "FAIL test_ladder_tenant_vs_palette"; exit 1
+    echo "FAIL: differs from $EXP:"; cat "$W/diff.txt"
+    # #369: under drift-clock every leg runs the old clock and the expectation's probe lines move frame (measured on ERIS,
+    # build/agent225/s225a/eris/runA: frame=2415 -> 2416, hits, A0 and A1 unchanged) before the alignment check is reached;
+    # the finding is a probe line of the expectation changed in its frame alone (the same leg, hits, A0 and A1)
+    if [ "$MODE" = drift-clock ]; then
+        WANT="^\\+probe ($(sed -n -E 's/^probe ([a-z0-9_]+ hits=[0-9]+) frame=[0-9]+ (A0=[0-9a-f]+ A1=[0-9a-f]+)$/\1 frame=[0-9]+ \2/p' "$EXP" | paste -sd'|' -))\$"
+        vs_ctl_caught "$W/diff.txt" "$WANT"
+    fi
+    echo "FAIL test_ladder_tenant_vs_palette"; exit 1
 fi
 # verdict-logic control ([VSP-19]): a perturbed expectation must not match
 sed 's/px_inside=[0-9]*/px_inside=0/' "$EXP" > "$W/perturbed.txt"
@@ -267,9 +275,16 @@ afail=0
 if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then
     echo "  ok    every leg on emulated time, at its frozen game clock"
 else echo "FAIL: $(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; afail=1; fi
-ia_stage test_ladder_tenant_vs_palette "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || afail=1
+ia_stage test_ladder_tenant_vs_palette "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" > "$W/stage.txt" || afail=1; cat "$W/stage.txt"   # #369: the mode reads its finding from here
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$afail" = 1 ] && { echo "FAIL test_ladder_tenant_vs_palette (control mode: $MODE)"; exit 1; }
+    if [ "$afail" = 1 ]; then   # #369: the mode is honoured only on its own finding in the alignment check's output
+        case "$MODE" in
+        drift-clock) WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+        first-frame-skip) WANT='FAIL: the staging reference leg \(.*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+        esac
+        cat "$W/align_bad.txt" "$W/stage.txt" > "$W/main.log" 2>/dev/null
+        vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL test_ladder_tenant_vs_palette (control mode: $MODE)"; exit 1
+    fi
     vs_ctl_left_green "$MODE" "FAIL test_ladder_tenant_vs_palette — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || afail=1; fi

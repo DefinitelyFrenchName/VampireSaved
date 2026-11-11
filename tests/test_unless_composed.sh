@@ -42,8 +42,9 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
+W="$(mktemp -d)" || { echo "FAIL: test_unless_composed — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT   # #369: the checks' output, for vs_ctl_caught
 rc=0
-python3 - "$MODE" <<'PY' || rc=$?
+python3 - "$MODE" <<'PY' > "$W/main.log" 2>&1 || rc=$?
 import sys
 sys.path.insert(0, "tools")
 from pathlib import Path
@@ -125,5 +126,8 @@ chk(all(composition_allows(r, ["huitzil"], real) and not composition_allows(r, A
     "each applies to the solo Phobos composition and not to the merged one")
 sys.exit(1 if bad else 0)
 PY
-[ "$rc" = 0 ] && echo "PASS: test_unless_composed — the key drops a row where a named tenant is composed, refuses an unknown name, and sits on exactly the two trap remaps" && exit 0
+cat "$W/main.log"
+# #369: the mode is honoured only on its own finding in section 3: the misspelt name no longer refused
+[ "$rc" = 0 ] || vs_ctl_caught "$W/main.log" '^ *FAIL  an unknown name \(.donavan.\) raises$' || :
+[ "$rc" = 0 ] && { [ -z "$MODE" ] || vs_ctl_left_green "$MODE" "FAIL: test_unless_composed"; } && echo "PASS: test_unless_composed — the key drops a row where a named tenant is composed, refuses an unknown name, and sits on exactly the two trap remaps" && exit 0
 echo "FAIL: test_unless_composed"; exit 1

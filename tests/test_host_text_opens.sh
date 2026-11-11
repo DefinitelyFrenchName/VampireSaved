@@ -88,12 +88,19 @@ vs_ctl_is unencoded-open && EXTRA="$W/unencoded.py"
 vs_ctl_is newline-dropped && EXTRA="$W/nonewline.py"
 vs_ctl_is write-text && EXTRA="$W/writetext.py"
 vs_ctl_is applier-no-newline && EXTRA="$W/applier.py"
+case "$VS_CTL" in   # #369: the finding each perturbed copy must produce in section 1's own output, naming that copy
+unencoded-open)     WANT="OPEN [^ ]*/unencoded\.py:[0-9]+: text open\('[^']*'\) with no encoding=\$" ;;
+newline-dropped)    WANT="OPEN [^ ]*/nonewline\.py:[0-9]+: text write open\('[^']*'\) with no newline=\$" ;;
+applier-no-newline) WANT="OPEN [^ ]*/applier\.py:[0-9]+: text write open\('[^']*'\) with no newline=\$" ;;
+write-text)         WANT="OPEN [^ ]*/writetext\.py:[0-9]+: \.write_text\(\) " ;;
+esac
 echo "== 1. the release generator's text opens"
 # shellcheck disable=SC2086
-if check $FILES $EXTRA; then fail=0; echo "  ok    every text open names its encoding, every write its newline"
+check $FILES $EXTRA > "$W/main.log" 2>&1; rc=$?; cat "$W/main.log"   # #369: the main check's findings kept
+if [ "$rc" = 0 ]; then fail=0; echo "  ok    every text open names its encoding, every write its newline"
 else fail=1; echo "  FAIL  a text open without its keyword (above)"; fi
 if [ -n "$EXTRA" ]; then
-    [ "$fail" = 1 ] && { echo "FAIL: test_host_text_opens (control mode: the perturbed copy was named)"; exit 1; }
+    [ "$fail" = 1 ] && { vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL: test_host_text_opens (control mode)"; exit 1; }
     vs_ctl_left_green "$VS_CTL" "FAIL: test_host_text_opens — the perturbed copy passed"
 fi
 echo "== 2. controls"

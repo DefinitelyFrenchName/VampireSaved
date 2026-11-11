@@ -86,15 +86,21 @@ for pair in "$DON_EX:donovan" "$HUI/extract:huitzil" "$PYR/extract:pyron"; do
     else
         bad "$n.md DRIFTED from $b — regenerate: python3 tools/tables_char_md.py $b docs/project/tables/$n.md"
         diff "docs/project/tables/$n.md" "$W/$n.md" | head -8 | sed 's/^/        /'
+        diff "docs/project/tables/$n.md" "$W/$n.md" | sed "s/^/$n: /" >> "$W/main.log"   # #369: the main check's finding
     fi
 done
 
 # --- must-fire control: one value byte changed -> a different page --------
+if [ -z "${VS_CTL:-}" ]; then   # #369: the in-gate control runs in a plain run only
 python3 tools/tables_char_md.py "$W/ctl" "$W/ctl.md" >/dev/null 2>&1 || bad "control: generator failed on the perturbed copy"
 if cmp -s "$W/ctl.md" "docs/project/tables/donovan.md"; then
     vs_ctl_dead perturbed-word132 "a perturbed word132 regenerated IDENTICAL — the diff is not checking"; bad "control"
 else
     vs_ctl_fired perturbed-word132 "a perturbed word132 regenerates differently"; ok "control: the check fires"
 fi
+fi
 
-if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL"; echo "PASS"; else
+    # #369: the mode is honoured only on its own finding: donovan's regenerated page carries the perturbed word132 row
+    vs_ctl_caught "$W/main.log" '^donovan: > \| .word132. \| .PRG:0x[0-9a-f]+. \| value16 \| ' || :
+    echo "FAIL"; exit 1; fi

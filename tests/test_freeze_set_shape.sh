@@ -90,5 +90,20 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: honoured only on the selftest's own case for this perturbation failing
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_freeze_set_shape"
+    MAINLOG="$W/s.txt"   # the shape rule's selftest; the driver's for the driver controls
+    case "$VS_CTL" in
+        lost-ignored) WANT='^ +FAIL: case a lost \.skip: 0 failure\(s\), expected at least one$' ;;
+        mask-ignored) WANT='^ +FAIL: case the mask changed: 0 failure\(s\), expected at least one$' ;;
+        merged-ignored) WANT='^ +FAIL: case a merged set with a \.sha1: 0 failure\(s\), expected at least one$' ;;
+        stale-ignored) WANT='^ +FAIL: case a stale exception: 0 failure\(s\), expected at least one$' ;;
+        carry-skipped) MAINLOG="$W/d.txt"; WANT='^ +FAIL: the authored files are CARRIED verbatim before the freeze$' ;;
+        unpinned) MAINLOG="$W/d.txt"; WANT="^ +FAIL: the suite ran with MAME_BIN pinned to the tree's pin\$" ;;
+        cleanup-first) MAINLOG="$W/d.txt"; WANT='^ +FAIL: both sets freeze, verify and pass the shape gate \(.*FAILED at verify' ;;
+    esac
+    vs_ctl_caught "$MAINLOG" "$WANT" || :
+    echo "FAIL: test_freeze_set_shape"; exit 1
+fi
 if [ "$fail" = 0 ]; then echo "PASS: every set keeps what its predecessor held, and the driver carries, pins, verifies and cleans up in order"
 else echo "FAIL: test_freeze_set_shape"; exit 1; fi

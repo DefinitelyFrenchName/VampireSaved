@@ -80,6 +80,7 @@ fi
 echo "== the definitions under $target"
 out="$($CHECK "$target" 2>&1)" && rc=0 || rc=$?
 echo "$out" | sed 's/^/  /'
+printf '%s\n' "$out" > "$W/main.log"
 if [ "$rc" -ne 0 ]; then echo "FAIL: a definition breaks the caps"; fail=1; fi
 for n in measurer reader rule-checker; do
     echo "$out" | grep >/dev/null "^OK  $n.md$" || { echo "FAIL: $n.md is not an OK definition"; fail=1; }
@@ -98,6 +99,15 @@ if [ -z "$VS_CTL" ]; then
     done
 fi
 
+if [ -n "$VS_CTL" ] && [ "$fail" -ne 0 ]; then   # #369: the mode's own refusal, on the copy's own file
+    case "$VS_CTL" in
+        fable-model|missing-effort|max-effort) f=measurer ;;
+        frontmatter-hooks|write-tool) f=reader ;;
+        alias-model|context-leak) f=rule-checker ;;
+    esac
+    WANT="^BAD $f\\.md: .*$(printf '%s' "$want" | sed 's/[][\\.*^$()+?{}|]/\\&/g')"
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+fi
 if [ "$fail" -eq 0 ]; then echo "PASS: every worker definition states its caps (model at most Opus-class, effort at most xhigh, an allowed tool list) and carries no unapproved key; the rule-checker launches without CLAUDE.md"
 else echo "FAIL: test_agent_defs"; fi
 exit "$fail"

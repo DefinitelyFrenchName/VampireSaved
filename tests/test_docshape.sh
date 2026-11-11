@@ -116,28 +116,38 @@ mkcopy() {  # mkcopy <dir>
 applied() { grep -q "$1" "$2" || bad "$3: the perturbation did not apply"; }
 absent()  { grep -q "$1" "$2" && bad "$3: the perturbation did not apply"; }
 # THE PERTURBATIONS, one per declared control; the control section and the
-# CONTROL=<name> mode call the same function. EXPECT = the failure's substring.
+# CONTROL=<name> mode call the same function. EXPECT = the failure's substring; CW (where set) = the mode's
+# own finding as an ERE naming the planted file and line, which a mode run's vs_ctl_caught reads (#369).
 # ROUTING (14z-140, living-docs slice L1): dropped-from-contents .. entry-point-off-map
 # — every declared document is listed in README's `## Contents` with its shape,
 # and a history twin names its live document AND is named by it; the last two
 # exist because two MECHANISMS could otherwise wave a document through silently.
 perturb() {  # perturb <name> <dir>
+    CW=""
     case "$1" in
-    chronology-header) printf '\n### 14z-999: an appended discovery note\n' >> "$2/docs/game/atlas/id_space.md"; EXPECT="SESSION-SHAPED HEADER" ;;
-    anchor-in-hist)    printf '\nold analysis **[VSE-1]** moved here\n' >> "$2/docs/project/mister_scope.md"; EXPECT="ANCHOR IN HISTORY-class doc" ;;
+    chronology-header) printf '\n### 14z-999: an appended discovery note\n' >> "$2/docs/game/atlas/id_space.md"; EXPECT="SESSION-SHAPED HEADER"
+                       CW='docs/game/atlas/id_space\.md:[0-9]+ SESSION-SHAPED HEADER .*: ### 14z-999: an appended discovery note$' ;;
+    anchor-in-hist)    printf '\nold analysis **[VSE-1]** moved here\n' >> "$2/docs/project/mister_scope.md"; EXPECT="ANCHOR IN HISTORY-class doc"
+                       CW='docs/project/mister_scope\.md:[0-9]+ ANCHOR IN HISTORY-class doc: old analysis \*\*\[VSE-1\]\*\* moved here$' ;;
     undeclared-doc)    printf '# stray\n' > "$2/docs/stray_note.md"; EXPECT="UNDECLARED docs/stray_note.md" ;;
-    dead-allow-row)    printf 'docs/game/atlas/id_space.md\tnever-ever-matches\tstale reason\n' >> "$2/docs/doc_shape_allow.tsv"; EXPECT="dead allow row" ;;
+    dead-allow-row)    printf 'docs/game/atlas/id_space.md\tnever-ever-matches\tstale reason\n' >> "$2/docs/doc_shape_allow.tsv"; EXPECT="dead allow row"
+                       CW='docs/doc_shape_allow\.tsv:[0-9]+ dead allow row for docs/game/atlas/id_space\.md .*: never-ever-matches$' ;;
     banner-absent)     # perturb the TSV, not the doc
         sed -i.bak 's|^docs/game/atlas/id_space.md\tREFERENCE\t-\t-$|docs/game/atlas/id_space.md\tREFERENCE\t-\tbanner|' "$2/docs/doc_shape.tsv"
-        applied 'id_space.md	REFERENCE	-	banner' "$2/docs/doc_shape.tsv" "$1"; EXPECT="NO STATUS BANNER" ;;
-    dangling-link)     printf '\nsee also [a ghost](game/atlas/ghost_file.md)\n' >> "$2/docs/README.md"; EXPECT="DANGLING LINK" ;;
-    nonexistent-section) printf '# per docs/game/atlas/id_space.md %sA Section Nobody Wrote%s\n' '"' '"' > "$2/tools/synthetic_control.py"; EXPECT="SECTION THAT DOES NOT EXIST" ;;
+        applied 'id_space.md	REFERENCE	-	banner' "$2/docs/doc_shape.tsv" "$1"; EXPECT="NO STATUS BANNER"
+                       CW='docs/game/atlas/id_space\.md: NO STATUS BANNER ' ;;
+    dangling-link)     printf '\nsee also [a ghost](game/atlas/ghost_file.md)\n' >> "$2/docs/README.md"; EXPECT="DANGLING LINK"
+                       CW='docs/README\.md:[0-9]+ DANGLING LINK: game/atlas/ghost_file\.md$' ;;
+    nonexistent-section) printf '# per docs/game/atlas/id_space.md %sA Section Nobody Wrote%s\n' '"' '"' > "$2/tools/synthetic_control.py"; EXPECT="SECTION THAT DOES NOT EXIST"
+                       CW='tools/synthetic_control\.py:[0-9]+ CITES A SECTION THAT DOES NOT EXIST: docs/game/atlas/id_space\.md "A Section Nobody Wrote"$' ;;
     pending-row)       # fails the end-state mode the gate runs (since 14z-124)
         sed -i.bak 's|^docs/game/atlas/id_space.md\tREFERENCE\t-\t-$|docs/game/atlas/id_space.md\tPENDING\t-\t-|' "$2/docs/doc_shape.tsv"
-        applied 'id_space.md	PENDING' "$2/docs/doc_shape.tsv" "$1"; EXPECT="still PENDING" ;;
+        applied 'id_space.md	PENDING' "$2/docs/doc_shape.tsv" "$1"; EXPECT="still PENDING"
+                       CW='docs/game/atlas/id_space\.md: still PENDING$' ;;
     bold-chronology)   # 14z-126b: barred from headers, the log came back as bold paragraphs —
                        # HANDOFF carried eight `**Previous batch (14z-N…)**` blocks, unseen through eight freezes
-        printf '\n**Previous batch (14z-999, ruled): don-m9 / merged-m4.**\n' >> "$2/docs/game/atlas/id_space.md"; EXPECT="BOLD CHRONOLOGY PARAGRAPH" ;;
+        printf '\n**Previous batch (14z-999, ruled): don-m9 / merged-m4.**\n' >> "$2/docs/game/atlas/id_space.md"; EXPECT="BOLD CHRONOLOGY PARAGRAPH"
+                       CW='docs/game/atlas/id_space\.md:[0-9]+ BOLD CHRONOLOGY PARAGRAPH .*: \*\*Previous batch \(14z-999, ruled\): don-m9 / merged-m4\.\*\*$' ;;
     dropped-from-contents) sed -i.bak '/defense_rows.md/d' "$2/docs/README.md"
         absent 'defense_rows.md' "$2/docs/README.md" "$1"; EXPECT="README CONTENTS MISSING: docs/project/tables/defense_rows.md" ;;
     shape-tag-flipped) sed -i.bak 's|(project/coverage_matrix.md) — \*\*REFERENCE\*\*|(project/coverage_matrix.md) — **INDEX**|' "$2/docs/README.md"
@@ -164,11 +174,9 @@ if python3 tools/checkdocshape.py --root "$ROOT" --no-pending $SELFTEST >"$W/tre
     ok "checkdocshape.py PASS on the tree ($(grep -o '[0-9]* still PENDING' "$W/tree.log" | head -1))"
 else
     bad "checkdocshape.py FAILS on the tree:"; sed 's/^/        /' "$W/tree.log" | head -30
-    # a mode run judges its OWN perturbation: a failure without its finding measured something else (#310, 14z-210)
-    if [ -n "$VS_CTL" ] && ! grep -q "$EXPECT" "$W/tree.log"; then
-        echo "NOT JUDGED: the perturbed copy failed without '$EXPECT' — the mode's own finding is absent"
-    fi
 fi
+# a mode run judges its OWN perturbation: a failure without its finding measured something else (#310, 14z-210);
+# since #369 vs_ctl_caught at the end reads it from the tree check's output, on a FAIL line naming EXPECT
 
 # --- must-fire controls on a perturbed copy -------------------------------
 control() {  # control <name>
@@ -183,6 +191,13 @@ control() {  # control <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log" | head -12
     fi
 }
-for n in $(vs_ctl_declared "$0"); do control "$n"; done
+[ -n "${VS_CTL:-}" ] || for n in $(vs_ctl_declared "$0"); do control "$n"; done   # a plain run only (#369)
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on its own finding in the tree check's output
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL"
+    WANT="^ +FAIL  .*$(printf '%s' "$EXPECT" | sed 's/[][\.*^$+?(){}|]/\\&/g')"
+    [ -n "$CW" ] && WANT="^ +FAIL  $CW"   # the planted file and line, where the tool names them
+    vs_ctl_caught "$W/tree.log" "$WANT"
+    echo "FAIL"; exit 1
+fi
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

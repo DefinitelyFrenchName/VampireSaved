@@ -96,12 +96,23 @@ check() {
     && grep -qx '  count: 1  total_seconds: 30  max_seconds: 30' "$2.sh"
 }
 
+# want_of <control> — the line the reader must print on the .py pass for that control's one perturbation: the in-gate
+# control and the mode (#369) read the same ERE
+want_of() {
+    case "$1" in
+    no-python)       printf '%s\n' '^  count: 0  total_seconds: 0  max_seconds: -$' ;;
+    verb-ignored)    printf '%s\n' '^  count: 3  total_seconds: 191  max_seconds: 120$' ;;
+    prepare-by-line) printf '%s\n' '^  NOT FOUND \(prepare -9001: 0, record -9002: 1\)$' ;;
+    esac
+}
+
 echo "== test_close_loop_cost: #187 — the close-loop cost reader =="
 fail=0
 T="$TOOL"
 if vs_ctl_is no-python || vs_ctl_is verb-ignored || vs_ctl_is prepare-by-line; then T="$(shadow "$VS_CTL")"; fi
 if check "$T" "$W/real"; then echo "  ok    every line as expected (2 python3 passes / 190 s, 1 sh pass / 30 s, span 0.67 h, figure 1,234)"
-else echo "  FAIL  the reader's lines on the synthetic transcript:"; sed 's/^/        /' "$W/real.py" "$W/real.sh"; fail=1; fi
+else echo "  FAIL  the reader's lines on the synthetic transcript:"; sed 's/^/        /' "$W/real.py" "$W/real.sh"; fail=1
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/real.py" "$(want_of "$VS_CTL")" || :; fi   # #369: the reader's own line for the copy
 
 if [ -z "${VS_CTL:-}" ]; then
     python3 "$TOOL" "$W/t.jsonl" --script tools/close_checks.py --verb run --first-run 9001 --last-run 9002 --plant > "$W/plant.txt" 2>&1 || true
@@ -109,11 +120,7 @@ if [ -z "${VS_CTL:-}" ]; then
     else echo "  FAIL  the reader's own plant: $(grep '^PLANT:' "$W/plant.txt" || tail -1 "$W/plant.txt")"; fail=1; fi
     # each control must fail for ITS reason (a copy that crashes, or misreads something else, is DEAD)
     for c in no-python verb-ignored prepare-by-line; do
-        case "$c" in
-        no-python)       want='^  count: 0  total_seconds: 0  max_seconds: -$' ;;
-        verb-ignored)    want='^  count: 3  total_seconds: 191  max_seconds: 120$' ;;
-        prepare-by-line) want='^  NOT FOUND \(prepare -9001: 0, record -9002: 1\)$' ;;
-        esac
+        want="$(want_of "$c")"
         if check "$(shadow "$c")" "$W/ctl_$c"; then vs_ctl_dead "$c" "the perturbed copy still read every line as expected" || fail=1
         elif grep -qE "$want" "$W/ctl_$c.py"; then vs_ctl_fired "$c" "$(grep -m1 -E "$want" "$W/ctl_$c.py" | sed 's/^ *//')"
         else vs_ctl_dead "$c" "the copy failed, but not for its reason: $(tail -1 "$W/ctl_$c.py")" || fail=1; fi

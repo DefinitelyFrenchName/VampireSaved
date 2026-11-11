@@ -51,16 +51,21 @@ if vs_ctl_is closing-subject; then
     # flagged shape (assembled from pieces so this gate's own text never has it),
     # and must fail exactly as it would on such a commit.
     printf '%s\n' "14z-N $(printf 'CLOSE'): $(printf '#')999 the mode message" > "$W/msg"
-    python3 tools/check_commit_subject.py --file "$W/msg" || fail=1
+    python3 tools/check_commit_subject.py --file "$W/msg" > "$W/main.log" 2>&1 || fail=1
+    cat "$W/main.log"
+    # #369: the check's own flag on the planted message (its keyword matched as a class: this text never carries it)
+    [ "$fail" = 0 ] || vs_ctl_caught "$W/main.log" '^CLOSING KEYWORD: line 1: `[A-Z]+: #999` in: 14z-N ' || :
 else
     python3 tools/check_commit_subject.py --range origin/main..HEAD || fail=1
 fi
 
+if [ -z "${VS_CTL:-}" ]; then   # the in-gate control: a plain run only (#369)
 echo "== 2. MUST-FIRE CONTROL: the tool flags a message carrying the closing shape =="
 if python3 tools/check_commit_subject.py --selftest >/dev/null; then
     vs_ctl_fired closing-subject "the selftest fixtures classify exactly — the flagged shape is caught, adjacency-broken forms pass"
 else
     vs_ctl_dead closing-subject "the tool's selftest fixtures did not all classify as frozen"; fail=1
+fi
 fi
 
 if [ "$fail" -eq 0 ]; then

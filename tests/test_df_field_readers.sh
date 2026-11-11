@@ -52,6 +52,7 @@ for f in verify_op.bin patch/placements.json patch/patch.json; do
 done
 python3 -c "import capstone" 2>/dev/null || { echo "SKIP: python capstone not installed"; exit 0; }
 case "$CONTROL" in ""|planted) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_caught / vs_ctl_left_green (#369); the mode is $CONTROL, parsed above
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -122,8 +123,10 @@ else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt"; fi
 
 echo "== 3. must-fire control"
 if [ "$CONTROL" = planted ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: planted — the re-addressed row leaves the census"; echo "FAIL: test_df_field_readers (control mode)"; exit 1
-    else echo "CONTROL DEAD: planted — the census did not change"; echo "FAIL: test_df_field_readers"; exit 1; fi
+    # #369: honoured only on the frozen compare losing a +0x1C3 row (the diff is the main check's output)
+    [ "$fail" = 1 ] || vs_ctl_left_green planted "FAIL: test_df_field_readers (control mode: the census did not change)"
+    _t="$(printf '\t')"; vs_ctl_caught "$W/diff.txt" "^< [a-z]+$_t\\+0x1c3$_t" || :
+    echo "FAIL: test_df_field_readers (control mode)"; exit 1
 fi
 python3 "$TOOL" "$BUILD/verify_op.bin" "$BUILD/patch/placements.json" "$BUILD/patch/patch.json" --plant-first 1c3 --plant-out "$W/ctl.bin" 2>/dev/null \
     && python3 "$TOOL" "$W/ctl.bin" "$BUILD/patch/placements.json" "$BUILD/patch/patch.json" --tsv > "$W/ctl.tsv" 2>/dev/null || true

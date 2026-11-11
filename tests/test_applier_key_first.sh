@@ -92,7 +92,8 @@ section2 "$APPLY" "$W/s2" > "$W/s2.txt" 2>&1
     || ok "wrong key: non-zero exit naming it; the empty output still empty; the earlier output byte-identical"
 
 if vs_ctl_is write-first; then
-    [ "$rc" = 1 ] && { echo "FAIL: test_applier_key_first (control mode: write-first)"; exit 1; }
+    [ "$rc" = 1 ] && { vs_ctl_caught "$W/s2.txt" '^    empty output: left behind: vsavj[.]zip' || :   # #369: section 2's own finding
+        echo "FAIL: test_applier_key_first (control mode: write-first)"; exit 1; }
     vs_ctl_left_green "write-first" "FAIL: test_applier_key_first — control mode write-first left the gate green"
 fi
 

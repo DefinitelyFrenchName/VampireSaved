@@ -107,7 +107,7 @@ for leg in solo merged native; do
 done
 
 rc=0
-python3 - "$W" "$MODE" <<'PY' || rc=$?
+python3 - "$W" "$MODE" > "$W/main.log" <<'PY' || rc=$?   # #369: its findings, for vs_ctl_caught
 import glob, sys, struct
 W, MODE = sys.argv[1], sys.argv[2]
 # leg -> (the class the victim must show, whether the attacker freeze must be PRESENT)
@@ -211,6 +211,12 @@ if os.environ.get("SHEET_OUT") and MODE == "":
 for e in errs: print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
+cat "$W/main.log"
+if [ -n "$MODE" ]; then
+    [ "$rc" = 0 ] || { vs_ctl_caught "$W/main.log" "FAIL: merged: attacker freeze PRESENT \\(0xb at f[0-9]+\\) — vs2's class-0x52 rule exempts Phobos\$" || :
+                       echo "audit_trap_shock: FAILURES (control mode $MODE)"; exit 1; }
+    vs_ctl_left_green "$MODE" "audit_trap_shock: FAIL — control mode $MODE left the gate green"
+fi
 # THE SHEET (#291): the three legs, each proven on its own checksum log, and the rows the verdict's python wrote.
 . "$REPO/tests/lib/sheet.sh"
 if sheet_on && [ -z "$MODE" ] && [ -s "$W/sheet_rows.tsv" ]; then

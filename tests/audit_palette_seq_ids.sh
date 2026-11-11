@@ -277,9 +277,14 @@ if [ "$CORPUS" = 0 ]; then
     afail=0
     if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then echo "  ok: every probe run on emulated time, at its frozen game clock"
     else echo "  FAIL: $(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; afail=1; fi
-    ia_stage audit_palette_seq_ids "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || afail=1
+    ia_stage audit_palette_seq_ids "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" > "$W/stage.txt" || afail=1
+    cat "$W/stage.txt"; cat "$W/align_bad.txt" "$W/stage.txt" > "$W/main.log"   # the alignment check's findings (#369)
     if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-        [ "$afail" = 1 ] && { echo "FAIL: audit_palette_seq_ids (control mode: $MODE)"; exit 1; }
+        case "$MODE" in   # #369: the finding each perturbation must produce
+            drift-clock) WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+            first-frame-skip) WANT='FAIL: the staging reference leg \([^)]*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+        esac
+        [ "$afail" = 1 ] && { vs_ctl_caught "$W/main.log" "$WANT" || :; echo "FAIL: audit_palette_seq_ids (control mode: $MODE)"; exit 1; }
         vs_ctl_left_green "$MODE" "FAIL: audit_palette_seq_ids — control mode $MODE left the gate green"
     fi
     if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || afail=1; fi

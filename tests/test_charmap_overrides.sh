@@ -79,7 +79,14 @@ for n in donovan huitzil pyron; do
 done
 
 m="docs/project/tables/chars/donovan.json"; ex="build/don_m30/extract"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-if [ -f "$m" ] && [ -d "$ex" ]; then
+if [ -n "$VS_CTL" ]; then   # the in-gate controls run in a plain run only: under a mode the verdict is the main check's (#369)
+    case "$VS_CTL" in   # the compiler's own refusal of donovan's override file, in the main check's log
+    wrong-expect)    WANT='^override x: vs2 bytes at hitbox[+]0x100 are [0-9a-f]{2}, expect [0-9a-f]{2}$' ;;
+    length-mismatch) WANT='^override y: expect/value must be the same non-zero length$' ;;
+    stale-block)     WANT='^FAIL: build/manifest/donovan[.]toml charmap block differs from a fresh compile of .*/ok[.]toml ' ;;
+    esac
+    [ "$fail" = 0 ] || vs_ctl_caught "$W/donovan.log" "$WANT" || :
+elif [ -f "$m" ] && [ -d "$ex" ]; then
     cp build/manifest/donovan.toml "$W/don.toml"
     # (a) wrong expect
     if python3 tools/charmap_compile.py "$m" "$W/bad_expect.toml" "$W/don.toml" --check >"$W/a.log" 2>&1; then vs_ctl_dead wrong-expect "a wrong expect was ACCEPTED"; bad "control (a)"

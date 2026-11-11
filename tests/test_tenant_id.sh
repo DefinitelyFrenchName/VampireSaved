@@ -93,7 +93,7 @@ check() {  # check <desc> <expected> <profile> <override>
     got="$(run "$3" "$4")"
     case "$got" in
     $2) echo "  ok: $1 -> $got" ;;
-    *)  echo "  FAIL: $1 -> '$got' (expected '$2')"; fail=1 ;;
+    *)  echo "  FAIL: $1 -> '$got' (expected '$2')" | tee -a "$W/main.log"; fail=1 ;;
     esac
 }
 
@@ -116,6 +116,7 @@ fi
 
 # THE MUST-FIRE CONTROL (14z-147): the same perturbation, on a copy, must
 # move the WIDE resolution off 0x13 — or check 2 is not reading the declaration.
+if [ -z "${VS_CTL:-}" ]; then   # #369: the in-gate control runs in a plain run only
 echo "== must-fire control =="
 perturb_no_id_by_profile "$W/ctl.toml"
 ctl="$(MANIFEST="$W/ctl.toml" run cps2-wide-v1 -)"
@@ -123,6 +124,7 @@ case "$ctl" in
 "0x13 False") vs_ctl_dead no-id-by-profile "without id_by_profile the WIDE default still resolved to 0x13"; fail=1 ;;
 *)            vs_ctl_fired no-id-by-profile "without id_by_profile the WIDE default resolves to '$ctl', not 0x13" ;;
 esac
+fi
 
 
 # ── row ownership (M3b slice C) ─────────────────────────────────────────
@@ -233,6 +235,11 @@ else
     fail=1
 fi
 
-[ "$fail" = 0 ] || { echo "FAIL: tenant id gate"; exit 1; }
+if [ "$fail" != 0 ]; then
+    # #369: the mode is honoured only on its own finding in check 2: the WIDE default resolved off 0x13
+    vs_ctl_caught "$W/main.log" '^ *FAIL: WIDE profile, no override -> .0x0f True. \(expected .0x13 False.\)$' || :
+    echo "FAIL: tenant id gate"; exit 1
+fi
+[ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: tenant id gate"
 echo "PASS: tenant id gate (resolution, the variant-id refusal, the"
 echo "      frozen-reference reproducibility guard, and row ownership)"

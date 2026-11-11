@@ -62,5 +62,14 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: every planted change to a recorded field is named; a build/ product and a self-comparison are not differences"
-else echo "FAIL: test_run_record"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_run_record"; echo "PASS: every planted change to a recorded field is named; a build/ product and a self-comparison are not differences"
+else
+    # #369: a mode is honoured only on its own finding in the selftest's output (the case its perturbation breaks)
+    case "${VS_CTL:-}" in
+        blind-untracked) WANT='^ *FAIL: plant untracked: compare names it \(\)$' ;;
+        blind-reach) WANT='^ *FAIL: plant reach: compare names it \([^)]*\)$' ;;
+        secret-leak) WANT='^ *FAIL: a secret-looking variable is neither named nor valued$' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/self.txt" "$WANT" || :
+    echo "FAIL: test_run_record"; exit 1; fi

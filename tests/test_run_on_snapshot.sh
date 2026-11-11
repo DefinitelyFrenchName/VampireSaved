@@ -302,8 +302,14 @@ RUNNER="$REPO/tests/run_on_snapshot.sh"
 CONTROLS="link-build in-place no-self-copy shared-home shared-scratch checkout-mtime no-copy-back no-runs-copy-back no-instrument-check inherited-self copy-all-build no-arg-copy same-name"
 for c in $CONTROLS; do if vs_ctl_is "$c"; then RUNNER="$(make_copy "$VS_CTL")"; fi; done
 
+main() {  # main <section and its args>: its output to stdout and to $W/main.log, the main check's findings (#369)
+    _mr=0; "$@" > "$W/main.part" 2>&1 || _mr=$?
+    cat "$W/main.part"; cat "$W/main.part" >> "$W/main.log"; return $_mr
+}
+: > "$W/main.log"
+
 echo "== 1. the positive leg: the perturbation reaches an IN-PLACE run"
-if leg inplace -; then
+if main leg inplace -; then
     c="$(changed "$W/inplace")"
     n=$(echo "$c" | wc -w | tr -d ' ')
     if [ "$n" = 8 ]; then echo "  ok: all eight readings changed in place ($c)"
@@ -311,7 +317,7 @@ if leg inplace -; then
 else fail=1; fi
 
 echo "== 2. the snapshot leg: nothing reaches a run on a snapshot"
-if ! immune "$RUNNER" snap; then fail=1; fi
+if ! main immune "$RUNNER" snap; then fail=1; fi
 
 # nested <runner> <label> — section 2b: the run is started with an OUTER run's RUN_ON_SNAPSHOT_SELF
 # and RUN_ON_SNAPSHOT_HOME in its environment (a tier on a snapshot running this gate); it must
@@ -325,7 +331,7 @@ nested() {
 }
 
 echo "== 2b. a run started inside another run's snapshot copies itself and leaves the outer run's copy"
-if ! nested "$RUNNER" nested; then fail=1; fi
+if ! main nested "$RUNNER" nested; then fail=1; fi
 
 # instrument <runner> <label> — section 4: an instrument binary changed in the LIVE cache mid-run
 # reads unchanged inside the run, and the runner reports it and exits 2
@@ -348,13 +354,13 @@ instrument() {
 }
 
 echo "== 3. an instrument changed in the live cache mid-run is detected"
-if ! instrument "$RUNNER" inst; then fail=1; fi
+if ! main instrument "$RUNNER" inst; then fail=1; fi
 
 echo "== 5. build/'s scratch classes are left out of the snapshot, a relative argument under one is copied in (#304 item 2)"
-if ! scratch_leg "$RUNNER" scr; then fail=1; fi
+if ! main scratch_leg "$RUNNER" scr; then fail=1; fi
 
 echo "== 6. two runs of one commit started in one second each get their own snapshot (#325)"
-if ! together "$RUNNER" two; then fail=1; fi
+if ! main together "$RUNNER" two; then fail=1; fi
 
 echo "== 4. controls"
 if [ -z "${VS_CTL:-}" ]; then
@@ -384,5 +390,24 @@ if [ -z "${VS_CTL:-}" ]; then
 fi
 [ -z "$(ls -A "$SROOT" 2>/dev/null)" ] || { echo "  FAIL: a snapshot was left under $SROOT"; fail=1; }
 
-if [ "$fail" = 0 ]; then echo "PASS: a run on a snapshot reads its commit's files and its snapshotted inputs, and nothing the working tree does during the run reaches it"
-else echo "FAIL: test_run_on_snapshot"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_run_on_snapshot"; echo "PASS: a run on a snapshot reads its commit's files and its snapshotted inputs, and nothing the working tree does during the run reaches it"
+else
+    # #369: a mode is honoured only on its own finding in sections 1-6's output (the leg its perturbed runner breaks)
+    case "${VS_CTL:-}" in
+        link-build) WANT='^ *snap: the perturbation REACHED the run: build$' ;;
+        in-place) WANT='^ *snap: the perturbation REACHED the run: tracked build manifest sub community head cache jtsim$' ;;
+        no-self-copy) WANT='^ *snap: the perturbation REACHED the run: the runner file, truncated mid-run, cut the record short$' ;;
+        shared-home) WANT='^ *snap: the perturbation REACHED the run: cache$' ;;
+        shared-scratch) WANT='^ *snap: the perturbation REACHED the run: jtsim$' ;;
+        checkout-mtime) WANT="^ *snap: MTIME: t\\.txt read [0-9]+ inside the run, not its commit's time 1609459200 " ;;
+        no-copy-back) WANT="^ *snap: the run's build/emu_probe was NOT COPIED BACK to the working tree" ;;
+        no-runs-copy-back) WANT="^ *snap: the run's static RUN RECORD was NOT COPIED back to the working tree" ;;
+        no-instrument-check) WANT='^ *inst: NOT DETECTED: the run completed \(record whole, exit 0\)' ;;
+        copy-all-build) WANT='^ *scr: SCRATCH COPIED: build/[^ ]+/plant\.txt reached the snapshot$' ;;
+        no-arg-copy) WANT='^ *scr: BASE MISSING: the relative argument build/[^ ]+ did not reach the run$' ;;
+        inherited-self) WANT='^ *nested: the perturbation REACHED the run: the runner file, truncated mid-run, cut the record short$' ;;
+        same-name) WANT='^ *two: COLLIDED: two runs of one commit in one second exited (0 and [1-9][0-9]*|[1-9][0-9]* and 0): run_on_snapshot: REFUSED — [^ ]*-20260101T' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: test_run_on_snapshot"; exit 1; fi

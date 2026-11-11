@@ -55,6 +55,11 @@ if [ -n "$VS_CTL" ]; then
     hand-edited-index) printf '| `tests/hand.sh` | test | x | x | x | x |\n' >> "$W/mode/docs/project/gate_index.md" ;;
     esac
     ROOT="$W/mode"
+    case "$VS_CTL" in   # #369: the finding each perturbation must produce in the main check's own output ($LOG)
+    no-family-row)     WANT='^PROBLEM NO FAMILY ROW in tests/gate_index\.tsv: tests/audit_zz_synthetic\.sh$' ;;
+    dead-tsv-row)      WANT='^PROBLEM DEAD ROW in tests/gate_index\.tsv: tests/test_gone\.sh ' ;;
+    hand-edited-index) WANT='^ *-\| `tests/hand\.sh` \| test \| x \|' ;;
+    esac
 fi
 
 echo "== test_gate_index_current: the gate index follows the tree =="
@@ -65,6 +70,7 @@ else
     bad "gen_gate_index.py --check FAILS (regenerate: python3 tools/gen_gate_index.py; add rows to tests/gate_index.tsv):"
     sed 's/^/        /' "$LOG" | head -20
 fi
+if [ -z "$VS_CTL" ]; then   # #369: the synthetic-root controls run in a plain run only; a mode is judged on $LOG
 mkdir -p "$W/tests" "$W/docs/project"
 printf '#!/bin/sh\n# test_alpha.sh — a synthetic gate that locks the alpha law (14z-999).\n#\necho PASS\n' > "$W/tests/test_alpha.sh"
 printf 'test_alpha\n' > "$W/tests/ci_portable.txt"; : > "$W/tests/ci_static.txt"
@@ -106,6 +112,8 @@ if python3 tools/gen_gate_index.py --root "$W" --check >/dev/null 2>&1; then
 else
     vs_ctl_fired hand-edited-index "a hand-edited index fails --check"; ok "control d: a hand-edited index fails --check"
 fi
+fi
+if [ -n "$VS_CTL" ] && [ "$fail" -ne 0 ]; then vs_ctl_caught "$LOG" "$WANT"; fi   # #369: the mode's own finding
 
 [ "$fail" -eq 0 ] && echo "PASS test_gate_index_current" || echo "FAIL test_gate_index_current"
 exit "$fail"

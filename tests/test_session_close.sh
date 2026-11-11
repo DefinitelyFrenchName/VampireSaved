@@ -93,6 +93,19 @@ control() {  # control <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d.log" | head -6
     fi
 }
-for n in $(vs_ctl_declared "$0"); do control "$n"; done
+[ -n "$VS_CTL" ] || for n in $(vs_ctl_declared "$0"); do control "$n"; done   # #369: the in-gate controls, plain run only
 
-if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL"; echo "PASS"; else
+    # #369: a mode is honoured only on its own finding in the main check's output (the tree check or the self-test)
+    case "$VS_CTL" in
+        unknown-placeholder) WANT='FAIL  step indexes: UNKNOWN placeholder \{NOPE\}$' ;;
+        missing-tool) WANT='FAIL  step indexes: names tools/no_such_tool\.py, which does not exist$' ;;
+        pointer-lost) WANT='FAIL  STATE\.md does not point to docs/project/session_close\.md$' ;;
+        verdict-ignored) WANT='FAIL: a step whose log lacks its verdict line is RED although it exited 0' ;;
+        red-base-ignored) WANT="FAIL: a re-run after a red confirms on the red run's results, kept aside" ;;
+        header-only-base) WANT='FAIL: a red run refused at its plan \(a header-only results file' ;;
+        *) WANT='' ;;
+    esac
+    cat "$W/tree.log" "$W/self.log" > "$W/main.log" 2>/dev/null
+    [ -z "$VS_CTL" ] || vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL"; exit 1; fi

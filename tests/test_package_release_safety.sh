@@ -123,8 +123,14 @@ else
 fi
 
 if vs_ctl_is name-unchecked || vs_ctl_is delete-first; then
-    [ "$rc" = 1 ] && { echo "FAIL: test_package_release_safety (control mode: $VS_CTL)"; exit 1; }
-    vs_ctl_left_green "$VS_CTL" "FAIL: test_package_release_safety — control mode $VS_CTL left the gate green"
+    [ "$rc" = 1 ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_package_release_safety — control mode $VS_CTL left the gate green"
+    cat "$W/s1.txt" "$W/s2.txt" > "$W/main.log"   # #369: sections 1 and 2's breach lines are the main check's findings
+    case "$VS_CTL" in
+        name-unchecked) WANT="^    --name '\\.\\./victim': victim/sentinel is GONE\$" ;;
+        delete-first)   WANT="^    early failure: the previous package's sentinel is GONE\$" ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT"
+    echo "FAIL: test_package_release_safety (control mode: $VS_CTL)"; exit 1
 fi
 
 echo "== 4. controls"

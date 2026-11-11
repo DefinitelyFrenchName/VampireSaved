@@ -22,12 +22,12 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; echo "  FAIL  $*" >> "$SH/main.log"; fail=1; }   # main.log: the check's findings (#369)
 for t in freeze/merged-m16 freeze/merged-m19 freeze/merged-m20 freeze/merged-m21 freeze/merged-m22; do
     git rev-parse --verify -q "refs/tags/$t" >/dev/null || { echo "FAIL: tag $t is missing — the fixture rests on it"; exit 1; }
 done
 SH="$REPO/build/.release_prune_$$"; trap 'rm -rf "$SH"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
-mkdir -p "$SH/tools" "$SH/tests/lib"
+mkdir -p "$SH/tools" "$SH/tests/lib"; : > "$SH/main.log"
 printf '#!/bin/sh\ncase "$1" in freeze/merged-m19|freeze/merged-m16) exit 0;; *) exit 1;; esac\n' > "$SH/probe_some.sh"
 printf '#!/bin/sh\nexit 1\n' > "$SH/probe_none.sh"
 chmod +x "$SH/probe_some.sh" "$SH/probe_none.sh"
@@ -59,8 +59,9 @@ got="$(plan "$SH/probe_none.sh" "$UP")"
 [ "$got" = "none" ] && ok "plan: none" || bad "plan: '$got', want 'none'"
 
 if vs_ctl_is previous-only; then
-    [ "$fail" = 1 ] && { echo "FAIL: test_release_prune (control mode: the one-tag walk was caught)"; exit 1; }
-    vs_ctl_left_green "previous-only" "FAIL: test_release_prune — the one-tag walk passed section 1"
+    [ "$fail" = 1 ] || vs_ctl_left_green "previous-only" "FAIL: test_release_prune — the one-tag walk passed section 1"
+    vs_ctl_caught "$SH/main.log" "^  FAIL  plan: 'none', want 'freeze/merged-m19 freeze/merged-m16'\$"   # #369: section 1 planned nothing
+    echo "FAIL: test_release_prune (control mode: the one-tag walk was caught)"; exit 1
 fi
 echo "== 3. controls"
 if previous_only; then

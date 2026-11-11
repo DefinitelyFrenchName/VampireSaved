@@ -152,10 +152,13 @@ else
 fi
 # THE EXECUTABLE MODE: the compare baseline becomes the SWAPPED table, so the
 # measured map no longer equals it and the gate reaches its own FAIL.
-if [ "$MODE" = swapped-rows ]; then swap_table "$W/exp.txt" "$W/exp.txt.sw" && mv "$W/exp.txt.sw" "$W/exp.txt"; fi
+if [ "$MODE" = swapped-rows ]; then swap_table "$W/exp.txt" "$W/exp.txt.sw"
+    # #369: the finding is the swapped character's rows of the baseline, refused by section 3's compare
+    CTL_WANT="^< $(awk 'NR == FNR { a[FNR] = $0; next } $0 != a[FNR] { split($0, f, "\t"); print f[1]; exit }' "$W/exp.txt" "$W/exp.txt.sw")	(far|near)	"
+    mv "$W/exp.txt.sw" "$W/exp.txt"; fi
 echo "MEASURED: slot-map-rows = $(grep -c . "$W/g.txt")"   # the MEASURES contract (#171 Q2)
 if cmp -s "$W/exp.txt" "$W/g.txt"; then ok "the measured slot map equals $EXP ($(grep -c . "$W/g.txt") rows)"
-else nope "the slot map moved"; diff "$W/exp.txt" "$W/g.txt" | head -20; fi
+else nope "the slot map moved"; diff "$W/exp.txt" "$W/g.txt" > "$W/s3.diff"; head -20 "$W/s3.diff"; fi
 
 echo "== 4. the HIT set: what the moves actually do to a victim"
 HEXP=tests/expected/vanilla_hit_damage.sha256   # the HASH of the measured body — the values stay out of the tree
@@ -207,6 +210,10 @@ else
     else nope "the hit measurement moved (sha256 $HSHA != frozen) — review $FRAMEDATA_OUT/vanilla_hit_damage.tsv, then FREEZE=1"; fi
 fi
 
+if [ -n "$MODE" ]; then   # #369: the mode is honoured only on its own finding in section 3's diff; section 5 is a plain run's
+    [ "$bad" -eq 0 ] && vs_ctl_left_green "$MODE" "FAIL — control mode $MODE left the gate green"
+    vs_ctl_caught "$W/s3.diff" "$CTL_WANT" || :; echo "FAIL ($bad)"; exit 1
+fi
 echo "== 5. must-fire control"
 # Build the swapped copy from the FROZEN file directly (not $W/exp.txt, which the
 # mode above may already have swapped) and prove it differs from the frozen map.

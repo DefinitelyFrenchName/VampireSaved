@@ -170,25 +170,37 @@ carries_profile() {  # carries_profile <binary> — the driver title string is c
 mkdir -p "$WORK/blind"
 printf '#!/bin/sh\nexit 127\n' > "$WORK/blind/strings"
 chmod +x "$WORK/blind/strings"
-if ( PATH="$WORK/blind:$PATH"; carries_profile "$WIDE_BIN" ); then
+# #369: the in-gate control runs in a plain run only; a mode reads its finding from the guard's own FAIL below
+case "${VS_CTL:-}" in
+blind-predicate) WANT='FAIL: the profile check cannot see the CPS-2 WIDE profile in the WIDE$' ;;
+contaminated-ref) WANT='FAIL: FBNEO_REF carries the CPS-2 WIDE profile — it is NOT a$' ;;
+esac
+if [ -n "${VS_CTL:-}" ]; then :
+elif ( PATH="$WORK/blind:$PATH"; carries_profile "$WIDE_BIN" ); then
     vs_ctl_dead blind-predicate "a strings that finds nothing still reported the profile — the stub is not the one being run" || true
     fail=1
 else
     vs_ctl_fired blind-predicate "with a strings that finds nothing, carries_profile reads the WIDE binary under test as clean — the blindness the proof below refuses"
 fi
+# #369: the mode's finding is the guard NOT seeing the profile, which a missing WIDE binary or one without the profile
+# gives too: the real strings must see it first, or the run judged nothing
+if vs_ctl_is blind-predicate && ! { [ -x "$WIDE_BIN" ] && carries_profile "$WIDE_BIN"; }; then
+    vs_ctl_nj "the real strings does not see the profile in the WIDE binary under test ($WIDE_BIN) either, so the blind stub's FAIL would judge nothing"
+    echo "FAIL: CPS-2 WIDE profile gate"; exit 1
+fi
 vs_ctl_is blind-predicate && PATH="$WORK/blind:$PATH"
 _guard_proven=0
 if [ -x "$WIDE_BIN" ] && carries_profile "$WIDE_BIN"; then
     _guard_proven=1
-    vs_ctl_fired contaminated-ref "the reference guard refuses the WIDE binary under test ($WIDE_BIN), so its negative on FBNEO_REF is evidence"
+    [ -n "${VS_CTL:-}" ] || vs_ctl_fired contaminated-ref "the reference guard refuses the WIDE binary under test ($WIDE_BIN), so its negative on FBNEO_REF is evidence"
     echo "  ok: the reference guard sees the profile in the WIDE binary under test"
 else
     vs_ctl_dead contaminated-ref "the reference guard does not see the profile in the WIDE binary under test ($WIDE_BIN) — it would clear any reference" || true
-    echo "  FAIL: the profile check cannot see the CPS-2 WIDE profile in the WIDE"
+    echo "  FAIL: the profile check cannot see the CPS-2 WIDE profile in the WIDE" | tee -a "$WORK/main.log"
     echo "        binary under test ($WIDE_BIN), so it cannot tell a contaminated"
     echo "        reference from a clean one. Section 1 is NOT run on an unproven guard."
     fail=1
-    vs_ctl_is blind-predicate && { echo "FAIL: CPS-2 WIDE profile gate"; exit 1; }
+    vs_ctl_is blind-predicate && { vs_ctl_caught "$WORK/main.log" "$WANT" || :; echo "FAIL: CPS-2 WIDE profile gate"; exit 1; }
 fi
 # THE MODE: the real reference is replaced by the WIDE binary under test.
 vs_ctl_is contaminated-ref && FBNEO_REF="$WIDE_BIN"
@@ -201,11 +213,11 @@ elif [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ] && carries_profile "${FBNE
     # then compared WIDE against WIDE and passed trivially — the invariant
     # that justifies allowing emulator changes at all was measuring nothing.
     # The driver title string is compiled in, so this catches it statically.
-    echo "  FAIL: FBNEO_REF carries the CPS-2 WIDE profile — it is NOT a"
+    echo "  FAIL: FBNEO_REF carries the CPS-2 WIDE profile — it is NOT a" | tee -a "$WORK/main.log"
     echo "        pre-patch reference, and this comparison would be vacuous."
     echo "        Rebuild it: WIDE=0 tools/setup_fbneo.sh (now reverts properly)"
     fail=1
-    vs_ctl_is contaminated-ref && { echo "FAIL: CPS-2 WIDE profile gate"; exit 1; }
+    vs_ctl_is contaminated-ref && { vs_ctl_caught "$WORK/main.log" "$WANT" || :; echo "FAIL: CPS-2 WIDE profile gate"; exit 1; }
 elif [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ]; then
     vs_pool_start "$JOBS"
     for rp in $CORPUS; do

@@ -222,6 +222,7 @@ fi
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
+: > "$WORK/main.log"   # #369: the findings a control mode's own check must produce, for vs_ctl_caught
 FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 . "$REPO/tests/lib/instr_align.sh"
@@ -576,7 +577,7 @@ for _pair in $EXPECT_ATTR; do
     fi
     _is="$(attr_class "$_n" "$_f" "$_o")"
     if [ "$_is" = "$_want" ]; then echo "  ok: $_r diverges as '$_want' ($_n map entries, first at $_f, onset $_o), as frozen"
-    else echo "  FAIL: $_r now diverges as '$_is' ($_n map entries, first at ${_f:-none}, onset ${_o:-none}), frozen as '$_want'"; fail=1; fi
+    else echo "  FAIL: $_r now diverges as '$_is' ($_n map entries, first at ${_f:-none}, onset ${_o:-none}), frozen as '$_want'" | tee -a "$WORK/main.log"; fail=1; fi
 done
 # the in-gate control: the same members with a FAR onset must not read as transit
 _far_ok=1
@@ -587,7 +588,9 @@ for _pair in $EXPECT_ATTR; do
     [ -n "$_n" ] && [ -n "$_f" ] || { _far_ok=0; continue; }
     [ "$(attr_class "$_n" "$_f" $((_f + 500)))" = far ] || _far_ok=0
 done
-if [ "$_far_ok" = 1 ]; then
+if [ -n "$MODE" ]; then
+    :   # #369: the in-gate control runs in a plain run only
+elif [ "$_far_ok" = 1 ]; then
     vs_ctl_fired far-onset "every frozen transit member, its onset moved to first entry + 500, reads 'far'"
 else
     vs_ctl_dead far-onset "a frozen transit member with a far onset did not read 'far' (or had no census row)" || fail=1
@@ -1061,9 +1064,15 @@ if [ "$FREEZE_CLOCK" = 1 ]; then
 fi
 if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then echo "  ok: every guarded run on emulated time, at its frozen game clock"
 else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
-ia_stage audit_hitclass_map_cost "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" || fail=1
-if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL: audit_hitclass_map_cost (control mode: $MODE)"; exit 1; }
+ia_stage audit_hitclass_map_cost "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" > "$WORK/stage.txt" || fail=1
+cat "$WORK/stage.txt"; cat "$WORK/align_bad.txt" "$WORK/stage.txt" >> "$WORK/main.log"   # the alignment check's findings (#369)
+if [ -n "$MODE" ]; then
+    case "$MODE" in   # #369: the finding each perturbation must produce
+        drift-clock) WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+        first-frame-skip) WANT='FAIL: the staging reference leg \([^)]*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+        far-onset) WANT="FAIL: [0-9a-z_]+ now diverges as 'far' \\([0-9]+ map entries, first at [0-9]+, onset [0-9]+\\), frozen as 'transit'\$" ;;
+    esac
+    [ "$fail" = 1 ] && { vs_ctl_caught "$WORK/main.log" "$WANT" || :; echo "FAIL: audit_hitclass_map_cost (control mode: $MODE)"; exit 1; }
     vs_ctl_left_green "$MODE" "FAIL: audit_hitclass_map_cost — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

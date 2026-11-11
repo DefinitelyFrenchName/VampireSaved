@@ -111,7 +111,7 @@ wait
 [ -z "${KEEP:-}" ] || { mkdir -p "$KEEP"; cp "$W/native/st" "$KEEP/native.st" 2>/dev/null || true; cp "$W/ours/st" "$KEEP/ours.st" 2>/dev/null || true; }
 
 prc=0; echo "== 2. the checks"
-W="$W" MODE="$MODE" PK="$PK" python3 - <<'PY' || prc=$?
+W="$W" MODE="$MODE" PK="$PK" python3 - > "$W/main.log" <<'PY' || prc=$?
 import os, sys
 W, MODE = os.environ["W"], os.environ["MODE"]
 # the rig's own P2 HP pins (the part's `ff8850` pokes, given to BOTH legs): an HP compare after one inside a window would
@@ -183,6 +183,7 @@ if not MODE:
         else: print(f"CONTROL DEAD: {c} — the gate passes on the perturbed copy"); fail = 1
 sys.exit(fail)
 PY
+cat "$W/main.log"
 # a dead leg (exit 4) judged nothing: NOT JUDGED under a mode, never a fired control (14z-221c, rule-checker run 2026-11-05-1653)
 if [ "${prc:-0}" = 4 ]; then
     vs_ctl_nj "the native or ours leg never reached its END line with every frame 2560-3040"
@@ -191,7 +192,14 @@ fi
 [ "${prc:-0}" = 0 ] || fail=1
 if [ -n "$MODE" ]; then
     [ "$fail" = 1 ] || vs_ctl_left_green "$MODE" "FAIL: audit_beam_slide (control mode)"
-    echo "CONTROL FIRED: $MODE — the gate failed with the control applied"
+    # #369: honoured only on the mode's own finding in step 2's output
+    case "$MODE" in
+    slid) WANT='field-frames differ, first f[0-9]+ x native [0-9]+, ours [0-9]+;' ;;
+    timer-dropped) WANT='field-frames differ, first f[0-9]+ h5c native [0-9]+, ours 0;' ;;
+    class-cleared) WANT='first \+0x54 = 0x4F frame native \[\], ours \[[0-9]+\]' ;;
+    *) WANT='' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
     echo "FAIL: audit_beam_slide (control mode)"; exit 1
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_beam_slide"; else echo "FAIL: audit_beam_slide"; exit 1; fi

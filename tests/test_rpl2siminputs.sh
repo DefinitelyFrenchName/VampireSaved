@@ -74,7 +74,7 @@
 # SHARES: none — its 3 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:413e9b92) and its plain run always pooled (#370 A1, 14z-225)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; T="$(mktemp -d)" || { echo "FAIL: test_rpl2siminputs — mktemp -d failed (T)"; exit 2; }; fail=0
-ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
+ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1" | tee -a "$T/main.log"; fail=1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 P="python3 $REPO/tools/rpl2siminputs.py"
 # THE SHADOW TOOL: the PRE-14z-108 reversed map
@@ -134,7 +134,8 @@ fi
 # A check that has never failed is a check nobody has proven can fail (THE
 # INSTRUMENT PROTOCOL, docs/project/gotchas.md). The reversed map is built at
 # the top; require check 5 to catch it.
-if check_dirs "$T/reversed.py" "control" >/dev/null 2>&1; then
+if [ -n "${VS_CTL:-}" ]; then :   # #369: the in-gate controls 5b, 6b and 7d run in a plain run only
+elif check_dirs "$T/reversed.py" "control" >/dev/null 2>&1; then
     vs_ctl_dead reversed-map "check 5 passes the pre-14z-108 REVERSED map"; bad "5b"
 else
     vs_ctl_fired reversed-map "the reversed map is rejected by check 5"; ok "5b control fired"
@@ -157,10 +158,12 @@ n="$(dirbits_in "$T/e.hex")"
                 || bad "6 05_timeout_idle sets a direction bit on $n lines — check 3's sha1 is not direction-independent"
 
 # 6b POSITIVE CONTROL for check 6's counter: it must COUNT a direction bit.
+if [ -z "${VS_CTL:-}" ]; then
 printf '080\n000\n010\n' > "$T/f.hex"
 n="$(dirbits_in "$T/f.hex")"
 [ "$n" = "2" ] && { vs_ctl_fired direction-counter "the direction-bit counter counts (2 of 3)"; ok "6b control fired"; } \
                 || { vs_ctl_dead direction-counter "counter returned $n on a file with 2 direction lines"; bad "6b"; }
+fi
 
 # 7 PLAYER 2 IS SCRIPTABLE (14z-109), AND IT DID NOT MOVE PLAYER 1.
 # The COVERAGE half deferred since 14z-107 (8). P2 went into file bits 12+
@@ -196,9 +199,20 @@ n2="$(p2bits_in "$T/nop2.hex")"
 [ "$n2" = "0" ] && ok "7c a replay scripting no p2 sets ZERO P2 bits — old files are byte-identical" \
                 || bad "7c 05_timeout_idle sets a P2 bit on $n2 lines — backward compatibility is broken"
 # 7d MUST-FIRE CONTROL: 7c has to be able to fail.
+if [ -z "${VS_CTL:-}" ]; then
 n3="$(p2bits_in "$T/p2.hex")"
 [ "$n3" = "0" ] && { vs_ctl_dead p2-counter "the P2-bit counter reads 0 on a replay that scripts P2"; bad "7d"; } \
                 || { vs_ctl_fired p2-counter "the P2-bit counter counts ($n3 of 7)"; ok "7d control fired"; }
+fi
 
+if [ "$fail" != 0 ] && [ -n "${VS_CTL:-}" ]; then   # #369: honoured only on the mode's own finding in the main checks
+    case "$VS_CTL" in
+        reversed-map) WANT='^ *FAIL 1 bit mapping: 111 6ee 000 000 080 $' ;;
+        direction-counter) WANT='^ *FAIL 6 05_timeout_idle sets a direction bit on 2 lines ' ;;
+        p2-counter) WANT='^ *FAIL 7c 05_timeout_idle sets a P2 bit on 1 lines ' ;;
+    esac
+    vs_ctl_caught "$T/main.log" "$WANT" || :
+fi
 rm -rf "$T"
-[ $fail = 0 ] && echo "PASS test_rpl2siminputs" || { echo "FAIL test_rpl2siminputs"; exit 1; }
+if [ $fail = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL test_rpl2siminputs"; echo "PASS test_rpl2siminputs"
+else echo "FAIL test_rpl2siminputs"; exit 1; fi

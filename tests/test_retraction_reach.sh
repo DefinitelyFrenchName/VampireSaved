@@ -105,5 +105,15 @@ if [ -z "${VS_CTL:-}" ]; then
         esac
     done
 fi
+if [ -n "${VS_CTL:-}" ]; then   # #369: the scan's own verdict line for the planted copy, naming the plant
+    [ "$fail" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL (control mode $VS_CTL changed no verdict)"
+    MF="$(printf '%s' "$W/mode.tsv" | sed 's/[.[\*^$]/\\&/g')"   # '/' needs no escape in an ERE (GNU grep 3.8 warns on '\/')
+    case "$VS_CTL" in
+        unreachable-control) WANT="^FILE $MF: FAIL: reach control.* zq-no-such-wording-anywhere-$$ \\(0 < 1\\)" ;;
+        reach-threshold)     WANT="^FILE $MF: FAIL: reach control\\(s\\) read fewer hits than demanded .*\\([0-8] < 9\\)" ;;
+        gone-reintroduced)   WANT="^FILE $MF: FAIL: a wording marked GONE is back in the tree: " ;;
+    esac
+    vs_ctl_caught "$W/each.out" "$WANT"; echo "FAIL"; exit 1
+fi
 [ "$fail" -eq 0 ] && echo "PASS" || echo "FAIL"
 exit "$fail"

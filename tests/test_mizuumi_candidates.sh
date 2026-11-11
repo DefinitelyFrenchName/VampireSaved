@@ -41,7 +41,16 @@ table-verdict-edited) python3 -c "import sys; p=sys.argv[1]; s=open(p).read(); o
 esac
 python3 "$T" check --table "$W/tab.tsv" --ram "$W/ram.md" > "$W/tree.out" 2>&1; rc=$?
 [ "$rc" = 0 ] && ok "$(tail -1 "$W/tree.out")" || bad "$(grep DIFFERS "$W/tree.out" | head -3 | tr '\n' ' ') $(tail -1 "$W/tree.out")"
-[ -n "${VS_CTL:-}" ] && { [ "$fail" = 0 ] && echo "PASS: test_mizuumi_candidates" || echo "FAIL: test_mizuumi_candidates (control mode ${VS_CTL})"; exit "$fail"; }
+if [ -n "${VS_CTL:-}" ]; then   # #369: the mode's own finding — check names the perturbed offset DIFFERS, its verdict moved as planted
+    case "$VS_CTL" in   # the offset each perturbation picks, by the same rule (the first matching row of the real table)
+    ram-drops-not-adopted) off="$(awk 'index($0, "\tNOT ADOPTED\t") { split($0, f, "\t"); print f[1]; exit }' "$TAB")"
+                           WANT="^DIFFERS	\\$off	table: NOT ADOPTED \\|.*	ram\\.md: [A-Z]" ;;
+    table-verdict-edited)  off="$(awk 'index($0, "\tCONSISTENT\t") { split($0, f, "\t"); print f[1]; exit }' "$TAB")"
+                           WANT="^DIFFERS	\\$off	table: REFUTED \\|.*	ram\\.md: CONSISTENT \\|" ;;
+    esac
+    [ "$fail" = 0 ] || vs_ctl_caught "$W/tree.out" "$WANT"
+    [ "$fail" = 0 ] && echo "PASS: test_mizuumi_candidates" || echo "FAIL: test_mizuumi_candidates (control mode ${VS_CTL})"; exit "$fail"
+fi
 
 echo "== 2. known answers: one ram.md row per rule"
 cat > "$W/kram.md" <<'MD'

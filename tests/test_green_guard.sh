@@ -35,7 +35,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 GUARD="$REPO/tools/git-hooks/green_guard.py"
 W="$(mktemp -d "${TMPDIR:-/tmp}/gguard.XXXXXX")" || { echo "FAIL: test_green_guard — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # #369: the main check's findings
 G="git -c user.name=t -c user.email=t@t -c commit.gpgsign=false"
 
 # THE SHADOW GUARDS, each built from the real guard by one substitution; a substitution that no longer applies is a
@@ -58,6 +58,13 @@ guard-ignores-strict) USE="$W/shadow/strict.py" ;;
 guard-page-any-ref)    USE="$W/shadow/page-ref.py" ;;
 guard-page-any-shape)  USE="$W/shadow/page-shape.py" ;;
 guard-page-any-parent) USE="$W/shadow/page-parent.py" ;;
+esac
+case "${VS_CTL:-}" in   # #369: the finding each shadow guard must produce in its own section
+guard-ignores-tree)    WANT="^  FAIL  another tree: the commit LANDED\$" ;;
+guard-ignores-strict)  WANT="^  FAIL  not strict: the commit LANDED\$" ;;
+guard-page-any-ref)    WANT="^  FAIL  the page to another branch: pushed, expected refused\$" ;;
+guard-page-any-shape)  WANT="^  FAIL  the page with a file more: pushed, expected refused\$" ;;
+guard-page-any-parent) WANT="^  FAIL  the page with a parent: pushed, expected refused\$" ;;
 esac
 
 # THE SCRATCH REPOSITORY: the real hooks, the guard under test, a bare remote
@@ -222,5 +229,6 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
+if [ -n "${VS_CTL:-}" ] && [ "$fail" -ne 0 ]; then vs_ctl_caught "$W/main.log" "$WANT"; fi   # #369: the mode's own finding
 [ "$fail" -eq 0 ] && echo "PASS: the green guard refuses every non-counting run and lets the counting ones through" || echo "FAIL: green guard"
 exit "$fail"

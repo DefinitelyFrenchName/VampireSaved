@@ -130,7 +130,7 @@ done
 echo "  ok    thirteen legs complete"
 
 echo "== 2. the checks"
-python3 - "$W" "$MODE" $TAPS <<'PY'
+python3 - "$W" "$MODE" $TAPS > "$W/main.log" <<'PY'   # #369: the checks' findings, for vs_ctl_caught
 import sys
 W, mode, taps = sys.argv[1], sys.argv[2], [int(t) for t in sys.argv[3:]]
 def fields(n):
@@ -256,5 +256,19 @@ if not mode:
 sys.exit(1 if bad else 0)
 PY
 rc=$?
+cat "$W/main.log"
+if [ -n "$MODE" ]; then
+    case "$MODE" in   # #369: the finding each perturbation must produce
+        hold-as-toss) WANT='^  FAIL  (S1 toss: decrements |S7 toss: removals before the end ).*$' ;;
+        taps-shifted) WANT='^  FAIL  S1 toss: decrements .*$' ;;
+        p2-side) WANT='^  FAIL  S1 toss: first in-match write \[\] is not 8 from 0x047F14$' ;;
+        readback-unpoked) WANT='^  FAIL  R1 readback: 0x5A poked at f3500 reads back on every later frame, 0 before$' ;;
+        layout-reversed) WANT='^  FAIL  S9 the row at f3300: .*$' ;;
+        release-off-by-one) WANT='^  FAIL  S10 the penguins leave the pool, .*$' ;;
+        strength-swapped) WANT='^  FAIL  S8 one punch LP/MP/HP: .*$' ;;
+    esac
+    [ "$rc" = 0 ] && vs_ctl_left_green "$MODE" "FAIL: audit_sas_penguin_count — control mode $MODE left the gate green"
+    vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL: audit_sas_penguin_count (control mode $MODE)"; exit 1
+fi
 [ "$rc" = 0 ] || { echo "FAIL: audit_sas_penguin_count"; exit 1; }
 echo "PASS: audit_sas_penguin_count — +0x36C counts the penguins still to throw (8 -> 0, 0xFF ends the mode), +0x14B those on screen; the travel grows with the punch"

@@ -40,7 +40,8 @@ python3 -c "import capstone" 2>/dev/null || { echo "SKIP: python3 capstone not a
 . "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69: never re-decrypt directly
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
-note() { printf '%s\n' "$*"; }
+: > "$W/main.log"   # #369: the main check's findings, read by vs_ctl_caught under a mode
+note() { printf '%s\n' "$*" | tee -a "$W/main.log"; }
 chk() { # label expected actual
     if [ "$2" = "$3" ]; then note "  ok   $1"; else note "  FAIL $1: expected [$2] got [$3]"; fail=1; fi
 }
@@ -100,4 +101,14 @@ if [ -z "${VS_CTL:-}" ]; then
     fi
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on its own finding in the main check's output
+    [ "$fail" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL test_copy_flags (control mode $VS_CTL)"
+    case "$VS_CTL" in
+        plant-3c3) WANT='^  FAIL vsavj: expected .* got \[SITES vsavj \$3bc 18;SITES vsavj \$3c3 1;' ;;
+        plant-alt-form) WANT='^  FAIL vsavj: expected .* got \[.*ALTFORMS vsavj 009bb2:tst\.b\$7c3\(a5\)' ;;
+        plant-wide) WANT='^  FAIL vsavj: expected .* got \[.*WIDE vsavj 009bb2:tst\.w\$3c2\(a0\)->3c3' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    note "FAIL test_copy_flags"; exit 1
+fi
 if [ "$fail" -eq 0 ]; then note "PASS test_copy_flags"; else note "FAIL test_copy_flags"; exit 1; fi

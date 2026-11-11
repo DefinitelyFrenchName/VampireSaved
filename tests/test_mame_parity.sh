@@ -286,7 +286,8 @@ echo "== 1b. frozen reference reproduction ($(wc -l < "$WORK/abfrozen" | tr -d '
 while IFS="$(printf '\t')" read -r name s exp; do
     vs_ctl_is wrong-hash && exp="$(perturb "$exp")"
     twice_verdict "$name" a "$exp"
-done < "$WORK/abfrozen"
+done < "$WORK/abfrozen" > "$WORK/s1b.txt"   # #369: section 1b's verdicts land in a file, so the mode reads its finding there
+cat "$WORK/s1b.txt"
 if [ -z "$MODE" ] && [ -s "$WORK/abfrozen" ]; then
     IFS="$(printf '\t')" read -r cn _ cexp < "$WORK/abfrozen"
     cgot="$(shasum "$WORK/a1_$cn.log" 2>/dev/null | cut -d' ' -f1)"
@@ -335,6 +336,14 @@ ab_section vsav2 "$WORK/set_vsav2" "3. A/B extension on vsav2"
 
 echo
 if [ "$fail" != 0 ]; then
+    if [ -n "$MODE" ]; then   # #369: wrong-hash is honoured only on the first 1b row's real log refused against its
+        # perturbed hash while it hashes to the TRUE frozen value: `FAIL expected <perturbed> got <frozen>`
+        if [ -s "$WORK/abfrozen" ]; then
+            IFS="$(printf '\t')" read -r cn _ cexp < "$WORK/abfrozen" || :
+            WANT="^  $cn +FAIL expected $(perturb "$cexp") got $cexp\$"
+            vs_ctl_caught "$WORK/s1b.txt" "$WANT" || :
+        else vs_ctl_nj "the A/B table has no frozen row, so the wrong-hash mode had no row to perturb"; fi
+    fi
     echo "FAIL: the source build is NOT equivalent to the reference."
     echo "      Do not proceed to the WIDE patch. Either the build differs in a"
     echo "      way that touches emulation, or an expectation is stale —"

@@ -112,7 +112,7 @@ done < "$JOBLIST"
 wait
 
 echo "== 2. the checks"
-W="$W" MODE="$MODE" SITE="$SITE" python3 - <<'PY' || fail=1
+W="$W" MODE="$MODE" SITE="$SITE" python3 - > "$W/main.log" <<'PY' || fail=1
 import collections, os, sys
 W, MODE, SITE = os.environ["W"], os.environ["MODE"], os.environ["SITE"]
 FROZEN = {"d1": 97, "d2": 242}        # native's speed-line records, 14z-219 (build/agent219/t356/rig/runs/census_mg1.txt)
@@ -220,9 +220,15 @@ n_l = sum(1 for f, k in sa if k["hdr"][4:6] == "0f")
     f"[legacy] Lilith's dashes: {n_l} type-0x0F records on vsavj; S lines identical {sa == sb}, pool (T) lines identical {a[2] == b[2]}")
 sys.exit(fail)
 PY
-if [ -n "$MODE" ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: $MODE — the gate failed with the control applied"
-    else echo "CONTROL DEAD: $MODE — every check passed with the control applied"; fi
+cat "$W/main.log"
+if [ -n "$MODE" ]; then   # #369: a mode is honoured only on its own finding in section 2's output
+    [ "$fail" = 1 ] || vs_ctl_left_green "$MODE" "FAIL: audit_don_speed_lines (control mode: every check passed with the control applied)"
+    case "$MODE" in
+    reverted) WANT='^  FAIL  \[d[12]\] group f[0-9]+: native [1-9][0-9]* records, bad [0-9]+, equal 0$' ;;
+    shifted) WANT='^  FAIL  \[d[12]\] group f[0-9]+: native [1-9][0-9]* records, ours [1-9][0-9]*, equal 0$' ;;
+    *) WANT='' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
     echo "FAIL: audit_don_speed_lines (control mode)"; exit 1
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_don_speed_lines"; else echo "FAIL: audit_don_speed_lines"; exit 1; fi

@@ -44,6 +44,13 @@ case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] && [ -f "$BUILD/verify_op.bin" ] && [ -f "$BUILD/verify_data.bin" ] || {
     echo "SKIP: no WIDE build with verify_op.bin/verify_data.bin at $BUILD"; exit 0; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+# #369: each mode is honoured only on its own finding — copy-ptr on the static check's output, operand-reverted on
+# section 2's format check of the BAD leg (a sub-0 format other than 10)
+case "$MODE" in
+copy-ptr) WANT='^BAD ([^;]*; )?[1-9][0-9]* of 403 pointer fields do not point into the copy ' ;;
+operand-reverted) WANT="^  FAIL  \\[d(2|11)\\] bad sub-0 piece-frames [1-9][0-9]* \\(floor [0-9]+\\), formats \\{([^}]*, )?'([^1'][^']*|1[^0'][^']*|1|10[^']+)': " ;;
+*) WANT='' ;;
+esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 143' INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -99,8 +106,13 @@ da[t + o:t + o + 4] = (U(da, t + o) + 2).to_bytes(4, "big"); open(sys.argv[3], "
 PY
 )"
 CPR="$(static "$W/cp.bin")"
-if [ "$MODE" = copy-ptr ]; then
-    case "$CPR" in OK*) ok "(mode copy-ptr) the perturbed image passes the static check";; *) bad "(mode copy-ptr) ${CPR#BAD }";; esac
+if [ "$MODE" = copy-ptr ]; then   # the mode judges the static check alone: the legs are not what it perturbs
+    printf '%s\n' "$CPR" > "$W/static_cp.out"
+    case "$CPR" in OK*) ok "(mode copy-ptr) the perturbed image passes the static check"
+        vs_ctl_left_green "$MODE" "FAIL: audit_don_trail_nodraw (control mode: the perturbed image passed the static check)";;
+        *) bad "(mode copy-ptr) ${CPR#BAD }";; esac
+    vs_ctl_caught "$W/static_cp.out" "$WANT" || :
+    echo "FAIL: audit_don_trail_nodraw (control mode)"; exit 1
 elif [ -z "$MODE" ]; then
     case "$CPR" in
         BAD*) echo "CONTROL FIRED: copy-ptr — with the copy's pointer field $CPF moved by 2 the static check reads: ${CPR#BAD }" ;;
@@ -138,7 +150,7 @@ done < "$JL"
 wait
 
 echo "== 2. the checks"
-W="$W" MODE="$MODE" COPY="$COPY" python3 - <<'PY' || fail=1
+W="$W" MODE="$MODE" COPY="$COPY" python3 - > "$W/main.log" <<'PY' || fail=1
 import collections, os, sys
 W, MODE, COPY = os.environ["W"], os.environ["MODE"], int(os.environ["COPY"], 16)
 FLOOR = {"d2": 2000, "d11": 700}    # ours' sub-0 piece-frames, a floor under the 14z-219 measurement (2,324 and 824 on build/agent219/t345a/mg)
@@ -192,9 +204,10 @@ if not MODE:
     else: print("CONTROL DEAD: operand-reverted — " + "; ".join(ev)); fail = 1
 sys.exit(fail)
 PY
+cat "$W/main.log"
 if [ -n "$MODE" ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: $MODE — the gate failed with the control applied"
-    else echo "CONTROL DEAD: $MODE — every check passed with the control applied"; fi
+    [ "$fail" = 1 ] || vs_ctl_left_green "$MODE" "FAIL: audit_don_trail_nodraw (control mode: every check passed with the control applied)"
+    vs_ctl_caught "$W/main.log" "$WANT" || :
     echo "FAIL: audit_don_trail_nodraw (control mode)"; exit 1
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_don_trail_nodraw"; else echo "FAIL: audit_don_trail_nodraw"; exit 1; fi

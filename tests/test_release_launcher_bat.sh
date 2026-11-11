@@ -62,7 +62,8 @@ NAME="$(basename "$REL")"
 W="$(mktemp -d)" || { echo "FAIL: test_release_launcher_bat — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail=0
 ok()  { echo "  ok: $*"; }
-bad() { echo "FAIL: $*"; fail=1; }
+bad() { echo "FAIL: $*" | tee -a "$W/main.log"; fail=1; }   # main.log: the check's findings (#369)
+: > "$W/main.log"
 case "$VS_CTL" in ""|lf-endings|launch-line-changed|readme-names-absent-launcher|emu-text-in-mister|megaman-note-in-fbneo|quarantine-name-wrong|first-found) ;;
 *) echo "REFUSED: CONTROL=$VS_CTL is not a mode of this gate"; exit 3 ;; esac
 sha1() { python3 -c "import hashlib,sys;print(hashlib.sha1(open(sys.argv[1],'rb').read()).hexdigest()[:12])" "$1"; }
@@ -189,7 +190,7 @@ for p in fbneo mame; do
     rc=0; check "$src" "$p" > "$W/check_$p.txt" 2>&1 || rc=$?
     case "$rc" in
     0) ok "$p: PLAY.bat is CRLF + ASCII, plain cmd, every goto lands, no block, the ruled launch line" ;;
-    3) bad "$p: PLAY.bat:"; cat "$W/check_$p.txt" ;;
+    3) bad "$p: PLAY.bat:"; tee -a "$W/main.log" < "$W/check_$p.txt" ;;
     *) bad "$p: the checker itself failed (rc=$rc):"; sed 's/^/      /' "$W/check_$p.txt" ;;
     esac
     shipped="$REL/$p/PLAY.bat"
@@ -210,7 +211,7 @@ fi
 rc=0; texts "$TREL" > "$W/texts.txt" 2>&1 || rc=$?
 case "$rc" in
 0) ok "$(ls -d "$TREL"/*/ | wc -l | tr -d ' ') package(s): every README/MISTER.md/EMULATOR.md/apply_release.html names only launchers its package ships; no marker left" ;;
-*) bad "package texts:"; cat "$W/texts.txt" ;;
+*) bad "package texts:"; tee -a "$W/main.log" < "$W/texts.txt" ;;
 esac
 
 # THE GENERATOR'S EMULATOR CLAIMS (14z-190, GitHub #214): the README the packager writes NOW, rendered
@@ -258,7 +259,7 @@ _fsel=fbneo; [ "$VS_CTL" = megaman-note-in-fbneo ] && _fsel=mame
 rc=0; gen_claims "$_sel" "$_fsel" > "$W/gen_claims.txt" 2>&1 || rc=$?
 case "$rc" in
 0) ok "generator: the MiSTer README makes none of the emulator claims; the fbneo and mame READMEs keep all three; only the mame README carries the notes on MAME's four validation lines and its red bad-ROM box" ;;
-3) bad "generator README claims:"; cat "$W/gen_claims.txt" ;;
+3) bad "generator README claims:"; tee -a "$W/main.log" < "$W/gen_claims.txt" ;;
 *) bad "the generator check itself failed (rc=$rc):"; sed 's/^/      /' "$W/gen_claims.txt" ;;
 esac
 
@@ -293,11 +294,12 @@ _lsel=""; [ "$VS_CTL" = quarantine-name-wrong ] && _lsel=quarantine-name-wrong
 rc=0; launcher_names "$_lsel" > "$W/lnames.txt" 2>&1 || rc=$?
 case "$rc" in
 0) ok "generator: the fbneo launcher's quarantine message names fbneo, the mame launcher's names cps2" ;;
-3) bad "generator launcher names:"; cat "$W/lnames.txt" ;;
+3) bad "generator launcher names:"; tee -a "$W/main.log" < "$W/lnames.txt" ;;
 *) bad "the launcher-name check itself failed (rc=$rc):"; sed 's/^/      /' "$W/lnames.txt" ;;
 esac
 
-# the must-fire controls, in-gate: each perturbation must be caught on EVERY launcher it touches
+# the must-fire controls, in-gate: each perturbation must be caught on EVERY launcher it touches (a plain run only, #369)
+if [ -z "$VS_CTL" ]; then
 for c in lf-endings launch-line-changed first-found; do
     got=""; dead=""
     for p in fbneo mame; do
@@ -324,6 +326,7 @@ else vs_ctl_dead megaman-note-in-fbneo "the FBNeo README rendered with the MAME 
 rc=0; launcher_names quarantine-name-wrong > "$W/lnames_ctl.txt" 2>&1 || rc=$?
 if [ "$rc" = 3 ] && grep -q '^ *mame:' "$W/lnames_ctl.txt"; then vs_ctl_fired quarantine-name-wrong "$(head -1 "$W/lnames_ctl.txt" | sed 's/^ *//')"
 else vs_ctl_dead quarantine-name-wrong "the MAME launcher naming fbneo passed (rc=$rc)"; fail=1; fi
+fi
 
 # ── ON WINDOWS: both .bat files driven by cmd, dry run (nothing is launched past the checks) ──
 case "$(uname -s)" in
@@ -465,4 +468,21 @@ CEOF
     fi
 fi
 
+if [ -n "$VS_CTL" ]; then   # #369: the mode's own finding in the checks' output
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_release_launcher_bat (control mode $VS_CTL changed no verdict)"
+    case "$VS_CTL" in
+    lf-endings)          WANT='^      line endings: [0-9]+ bare LF of [0-9]+ lines \(cmd needs CRLF\)$' ;;
+    launch-line-changed) WANT='^      missing the line: "%BIN%" vsavjw (%\*|-rompath "%ZIPDIR%" -skip_gameinfo %\*)$' ;;
+    first-found)         WANT='^      the candidate loop does not send every candidate through :consider \(#248: the newest set wins\)$' ;;
+    readme-names-absent-launcher) WANT='^      mame/README\.md names PLAY\.bat, which the mame package does not ship ' ;;
+    emu-text-in-mister)  WANT="^      the generator's MiSTer README claims an emulator it does not ship: " ;;
+    megaman-note-in-fbneo) WANT="^      the generator's fbneo README carries the MAME-only note on the four validation lines \\(#227\\)\$"
+        # the header asks for BOTH MAME-only notes: the second one missing is not this mode's finding
+        grep -q "^      the generator's fbneo README carries the MAME-only note on the red bad-ROM box (#234)\$" "$W/main.log" \
+            || vs_ctl_nj "the FBNeo README rendered with the MAME selection was caught on the #227 note but not on the #234 one" ;;
+    quarantine-name-wrong) WANT='^      mame: the quarantine message does not name cps2: ' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT"
+    echo "FAIL: test_release_launcher_bat (control mode $VS_CTL)"; exit 1
+fi
 [ "$fail" = 0 ] && echo "PASS: test_release_launcher_bat" || { echo "FAIL: test_release_launcher_bat"; exit 1; }

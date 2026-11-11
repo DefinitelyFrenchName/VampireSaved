@@ -36,6 +36,7 @@ W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/pooldrop.XXXXXX")}"
 [ -n "$W" ] && mkdir -p "$W" && W="$(cd "$W" && pwd)" && [ -n "$W" ] || { echo "FAIL: audit_pool_drop — no work directory (mktemp or OUT failed)"; exit 2; }
 [ -n "${OUT:-}" ] || trap 'rm -rf "$W"' EXIT
 fail=0
+: > "$W/main.log"   # #369: the subjects' findings, for vs_ctl_caught
 MERGED="${MERGED:-build/m3b_merged34}"; DON="${DON:-build/don_m30}"; HUI="${HUI:-build/hui64}"
 PYR="${PYR:-build/pyron49}"; STOCK="${STOCK:-build/m5_stock25}"
 expand() {  # expand <string> — tests/run_all_emulator.sh's %PLACEHOLDER% vocabulary, the same defaults
@@ -58,6 +59,7 @@ leg() {  # leg <gate> <log> [VAR=value ...] — the gate as the runner invokes i
 }
 
 echo "== 1. the hook (in-gate control hook-off's ground truth)"
+if [ -z "${VS_CTL:-}" ]; then   # #369: the in-gate control runs in a plain run only
 mkdir -p "$W/hook"
 ( . "$REPO/tests/lib/jobs.sh"; VS_POOL_DROP_FIRST=1 VS_POOL_DROP_LOG="$W/hook/on.log"
   vs_pool_start 2; vs_pool_run touch "$W/hook/on_a"; vs_pool_run touch "$W/hook/on_b"; vs_pool_wait )
@@ -69,6 +71,7 @@ if [ "$_on" = 1 ] && [ -f "$W/hook/on_b" ] && [ "$_off" = 2 ] && grep -q 'POOL-D
 else
     vs_ctl_dead hook-off "the hook did not drop exactly the first run (on: $_on run, off: $_off run)" || fail=1
 fi
+fi
 
 if [ -n "${POOL_DROP_GATES:-}" ]; then GATES="$POOL_DROP_GATES"
 else GATES="$(grep -l 'vs_pool_run' tests/*.sh | sed 's|^tests/||; s|\.sh$||' | grep -vx audit_pool_drop)"; fi
@@ -77,12 +80,13 @@ echo "== 2. each pooled gate, BASE then DROP ($(printf '%s\n' $GATES | wc -l | t
 n_sep=0; n_bad=0
 for g in $GATES; do
     row="$(awk -F'\t' -v g="$g" '$1 == g && $0 !~ /^#/ {print; exit}' tests/ci_emulator.tsv)"
-    [ -n "$row" ] || { echo "  FAIL  $g: no tests/ci_emulator.tsv row"; fail=1; n_bad=$((n_bad + 1)); continue; }
+    [ -n "$row" ] || { echo "  FAIL  $g: no tests/ci_emulator.tsv row" | tee -a "$W/main.log"; fail=1; n_bad=$((n_bad + 1)); continue; }
     _args="$(printf '%s' "$row" | cut -f5)"; _tmo="$(printf '%s' "$row" | cut -f7)"
     case "$_tmo" in ""|-) _tmo=5400 ;; esac
     : > "$W/$g.dropped"
     rb="$(leg "$g" "$W/base_$g.log")"
-    if vs_ctl_is hook-off; then rd="$(leg "$g" "$W/drop_$g.log")"
+    # hook-off keeps the drop log live and turns only the drop switch off: nothing in it is then the pool's own decision
+    if vs_ctl_is hook-off; then rd="$(leg "$g" "$W/drop_$g.log" VS_POOL_DROP_LOG="$W/$g.dropped")"
     else rd="$(leg "$g" "$W/drop_$g.log" VS_POOL_DROP_FIRST=1 VS_POOL_DROP_LOG="$W/$g.dropped")"; fi
     nd="$(grep -c 'POOL-DROP' "$W/$g.dropped" 2>/dev/null)"; [ -n "$nd" ] || nd=0
     if [ "$rb" != 0 ]; then r="BASE exit $rb: cannot separate ($(tail -1 "$W/base_$g.log" | cut -c1-100))"
@@ -90,12 +94,13 @@ for g in $GATES; do
     elif [ "$rd" = 0 ]; then r="DROP PASSES with $nd run(s) lost"
     else r=separates; fi
     if [ "$r" = separates ]; then echo "  ok    $g: BASE exit 0, DROP exit $rd ($nd dropped)"; n_sep=$((n_sep + 1))
-    else echo "  FAIL  $g: $r"; n_bad=$((n_bad + 1)); fail=1; fi
+    else echo "  FAIL  $g: $r" | tee -a "$W/main.log"; n_bad=$((n_bad + 1)); fail=1; fi
 done
 echo "  $n_sep separate, $n_bad do not"
 if vs_ctl_is hook-off; then
     [ "$n_sep" = 0 ] || vs_ctl_dead hook-off "a subject separated with the hook off" || fail=1
-    exit 1
+    vs_ctl_caught "$W/main.log" 'FAIL  [A-Za-z0-9_]+: NOT-DROPPED \(DROP exit 0\)$'
+    echo "FAIL: audit_pool_drop (control mode hook-off)"; exit 1
 fi
 if [ "$fail" = 0 ]; then echo "PASS: every pooled gate FAILs when the pool loses a run ($n_sep)"; else echo "FAIL: audit_pool_drop"; fi
 exit $fail

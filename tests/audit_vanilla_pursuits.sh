@@ -97,7 +97,18 @@ fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 || { echo "SKIP: the vsavj data view could not be made"; exit 0; }
 # WHICH ROM AND WHICH IMAGE (14z-209, rule-checker run 2026-10-25-1294 Q1/Q4): tests/lib/pristine_vsavj.sh.
 . "$REPO/tests/lib/pristine_vsavj.sh"
-vs_pristine_vsavj "$W/pv" "$W/vsavj_data.bin" || { echo "FAIL: audit_vanilla_pursuits (the ROM or the analysed image is not pristine vsavj)"; exit 1; }
+# #369: the check's lines land in a file, so a provenance mode reads its own finding there (the four checks of
+# tests/lib/pristine_vsavj.sh, each mode's FAIL line as _pv_check prints it)
+case "$MODE" in
+foreign-image) CTL_WANT="^FAIL: the analysed image .*/ctl/foreign_data\.bin \(sha1 [0-9a-f]+\) is not vsavj's data view decrypted afresh from ROMDIR" ;;
+foreign-romset) CTL_WANT='^FAIL: ROMDIR is not the pristine reference set \(tools/audit_roms.py against docs/checksums.txt\):$' ;;
+foreign-rompath) CTL_WANT="^FAIL: MAME_ROMPATH is set \('.*/ctl/romdir_foreign'\), so the MAME legs would not load the audited ROMDIR" ;;
+foreign-mame) CTL_WANT="^FAIL: the MAME the legs run is not the pin's release:\$" ;;
+esac
+vs_pristine_vsavj "$W/pv" "$W/vsavj_data.bin" > "$W/pv.txt" || { cat "$W/pv.txt"
+    case "$MODE" in foreign-*) vs_ctl_caught "$W/pv.txt" "$CTL_WANT" ;; esac
+    echo "FAIL: audit_vanilla_pursuits (the ROM or the analysed image is not pristine vsavj)"; exit 1; }
+cat "$W/pv.txt"
 if [ -z "$MODE" ]; then vs_pristine_vsavj_controls "$W/pv" || { echo "FAIL: audit_vanilla_pursuits (a provenance control is dead)"; exit 1; }; fi
 
 # THE PERTURBATIONS, one function each, called by the control section and by the mode alike.
@@ -319,15 +330,28 @@ if [ -z "$MODE" ] || [ "$MODE" = band-moved ]; then
     BX="$BEXP"; vs_ctl_is band-moved && { move_band "$BEXP" "$W/bands_moved.tsv" || exit 1; BX="$W/bands_moved.tsv"; }
     if python3 "$T" bandexpect "$W/bands_got.tsv" "$BX" > "$W/bands_expect.txt" 2>&1; then ok "$(tail -1 "$W/bands_expect.txt")"
     else bad "$(tail -1 "$W/bands_expect.txt")"; grep '^BAD' "$W/bands_expect.txt" | head -8 | sed 's/^/        /'; fi
-    vs_ctl_is band-moved && { if _ev="$(ctl_judge band-moved "$W/bands_expect.txt" -)"; then vs_ctl_fired band-moved "$_ev (mode)"; echo "FAIL"; exit 1; fi
+    # #369: honoured only on the band compare's own finding — a moved 8P low edge read `yes` where the moved file says `no`
+    vs_ctl_is band-moved && { if _ev="$(ctl_judge band-moved "$W/bands_expect.txt" -)"; then
+            CTL_WANT="^BAD \('[^']+', 'P', '-?[0-9]+'\): got '[^']*\\\\tyes' want '[^']*\\\\tno'\$"
+            vs_ctl_caught "$W/bands_expect.txt" "$CTL_WANT"; echo "  ($_ev)"; echo "FAIL"; exit 1; fi
         echo "REFUSED: mode band-moved — its perturbation did not make its own clause fail ($_ev): a dead mode, not a verdict"; exit 3; }
 else
     echo "  NOTE  skipped in control mode $MODE (the band legs are not its clause)"
 fi
 
 if [ -n "${VS_CTL:-}" ] && [ "$MODE" != drift-clock ] && [ "$MODE" != first-frame-skip ]; then
+    # #369: ctl_judge holds the perturbation to its full count; the mode is honoured only on its own finding in the
+    # section-3 compare's output (tools/vanilla_pursuit_rigs.py expect: one `BAD (<sheet>, <event>): <why>` per event)
+    case "$VS_CTL" in
+    es-no-stock) CTL_WANT="^BAD \('DE', 'ES[^']*'\): NO PURSUIT started after the knockdown\$" ;;
+    control-as-pursuit) CTL_WANT="^BAD \('[^']+', 'P'\): NO PURSUIT started after the knockdown\$" ;;
+    foreign-record) CTL_WANT="^BAD \('[^']+', '[^']+'\): record\(s\) \[.*\] outside the attacker's own attack table\$" ;;
+    class-raw) CTL_WANT="^BAD \('ZA', '[^']+'\): got  ZA	" ;;
+    tick-dropped) CTL_WANT="^BAD \('[^']+', '[^']+'\): got  " ;;
+    phantom-record) CTL_WANT="^BAD \('[^']+', '[^']+'\): staged record\(s\) at \[[0-9, ]+\] with no fall of P2's HP within [0-9]+ frames — damage the victim never took\$" ;;
+    esac
     if _ev="$(ctl_judge "$VS_CTL" "$W/expect.txt" "$W/rows.jsonl")"; then
-        vs_ctl_fired "$VS_CTL" "$_ev (mode)"; echo "FAIL"; exit 1
+        vs_ctl_caught "$W/expect.txt" "$CTL_WANT"; echo "  ($_ev)"; echo "FAIL"; exit 1
     fi
     echo "REFUSED: mode $VS_CTL — its perturbation did not make its own clause fail ($_ev): a dead mode, not a verdict"
     exit 3
@@ -349,9 +373,16 @@ if [ "$FREEZE_CLOCK" = 1 ]; then
 fi
 if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "every guarded leg on emulated time, at its frozen game clock"
 else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
-ia_stage audit_vanilla_pursuits "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 2 "$W/st" "$MODE" || fail=1
+ia_stage audit_vanilla_pursuits "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 2 "$W/st" "$MODE" > "$W/stage.txt" || fail=1; cat "$W/stage.txt"   # #369: the mode reads its finding from here
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL (control mode: $MODE)"; exit 1; }
+    if [ "$fail" = 1 ]; then   # #369: the mode is honoured only on its own finding in the alignment check's output
+        case "$MODE" in
+        drift-clock) WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+        first-frame-skip) WANT='FAIL: the staging reference leg \(.*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+        esac
+        cat "$W/align_bad.txt" "$W/stage.txt" > "$W/main.log" 2>/dev/null
+        vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL (control mode: $MODE)"; exit 1
+    fi
     vs_ctl_left_green "$MODE" "FAIL — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

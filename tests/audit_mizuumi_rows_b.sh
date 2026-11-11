@@ -122,7 +122,7 @@ done
 echo "  ok    twelve legs complete"
 
 echo "== 2. the checks"
-python3 - "$W" "$MODE" <<'PY'
+python3 - "$W" "$MODE" > "$W/main.log" <<'PY'   # #369: the checks' findings, for vs_ctl_caught
 import sys
 W, mode = sys.argv[1], sys.argv[2]
 LEGS = ("02", "03", "26", "37", "105", "128")
@@ -282,5 +282,21 @@ if not mode:
 sys.exit(1 if bad else 0)
 PY
 rc=$?
+cat "$W/main.log"
+if [ -n "$MODE" ]; then
+    case "$MODE" in   # #369: the finding each perturbation must produce
+        sides-swapped) WANT='^  FAIL  (T2 \+0x3A8 values P1 |T4 \+0x384 byte sequences per side ).*$' ;;
+        offset-swapped) WANT='^  FAIL  T2 \+0x3A8 values P1 .*$' ;;
+        lowbits-shifted) WANT='^  FAIL  (T6 every 0x05E2DC raise of \+0x3BE comes in the frame of a set whose low bits are in \[0, 1\]: \[\(|T7 no raise follows a set whose low bits are not in \[0, 1\]).*$' ;;
+        bit7-kept) WANT='^  FAIL  T9 0x05DD0E rewrites each set without bit 7 in its frame: .*$' ;;
+        loser-side) WANT='^  FAIL  T12 each 0x009A2C set lands on the KO winner .*$' ;;
+        raises-forgotten) WANT='^  FAIL  T7b no other PC writes \+0x3BE non-zero in game \(\[\]\); no frame reads it non-zero before a raise on that side \([1-9][0-9]*\)$' ;;
+        byte-shifted) WANT='^  FAIL  T4b \+0x385 values .*$' ;;
+        word-only) WANT='^  FAIL  T1 \+0x3A8 value writes .* in one frame: [1-9][0-9]* not; .*$' ;;
+        writer-unseen) WANT="^  FAIL  T1 \\+0x3A8 value writes .* in one frame: 0 not; stores per writer \\{.*'0x1bee4': 0[,}].*\$" ;;
+    esac
+    [ "$rc" = 0 ] && vs_ctl_left_green "$MODE" "FAIL: audit_mizuumi_rows_b — control mode $MODE left the gate green"
+    vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL: audit_mizuumi_rows_b (control mode $MODE)"; exit 1
+fi
 [ "$rc" = 0 ] || { echo "FAIL: audit_mizuumi_rows_b"; exit 1; }
 echo "PASS: audit_mizuumi_rows_b — +0x3A8 a long (0x0090C140 / 0x0090C200), +0x384 a per-player state index, +0x3BE raised after finish type 3, never after 0 or 1, on the KO winner"

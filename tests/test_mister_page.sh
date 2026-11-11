@@ -196,12 +196,21 @@ control() {  # control <name> <expected substring in output> — the shadow copy
         vs_ctl_fired "$1" "$(grep -m1 "$2" "$W/ctl.log" | cut -c1-72)"
     fi
 }
+if [ -z "$VS_CTL" ]; then   # #369: the shadow copies' controls in a plain run only
 # A. a placement constant moves (the QSound high window, 1 MB -> 1.5 MB)
 control placement-constant "QSound PCM high"
 # B. a frozen content extent moves (obj bank 4's declared top code)
 control frozen-extent "frozen extent"
 # C. an ASCII figure changes, so the committed markdown is stale
 control ascii-figure "ASCII figure"
+elif [ "$rc" != 0 ]; then   # #369: a mode is judged on section 1's own finding (the --check log of its copy)
+    case "$VS_CTL" in
+    placement-constant) WANT="^  FAIL: 'QSound PCM high': this page draws bank 0 0x[0-9A-F]+ \\+ 1,572,864 B" ;;
+    frozen-extent)      WANT="^  FAIL: frozen extent 'obj bank 4 declared ceiling \\(effect_map\\)': this page draws 0xee74, the gate freezes 0xee73\$" ;;
+    ascii-figure)       WANT="^  FAIL: the bank map ASCII figure in mister_core\\.md is not what this generator emits" ;;
+    esac
+    vs_ctl_caught "$W/check.log" "$WANT" || :
+fi
 
 if [ "$rc" = 0 ]; then
     echo

@@ -110,9 +110,10 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' 
 decrypt_view vsavj "$W/vj_op.bin" "$W/vj_dat.bin" \
     || { echo "FAIL: vsavj decrypt view"; exit 1; }
 
+rc=0
 VAN_DATA="$W/vj_dat.bin" \
 DON="$DON" HUI="$HUI" PYR="$PYR" STOCK="$STOCK" MERGED="$MERGED" \
-python3 - <<'PY'
+python3 - > "$W/main.log" 2>&1 <<'PY' || rc=$?
 import os, re, struct, sys
 from pathlib import Path
 
@@ -289,49 +290,51 @@ if base is not None:
                      f"tracks disagree, so the gating is measurably live")
 
 # ── 4. MUST-FIRE CONTROLS ────────────────────────────────────────────────────
-images = REAL                                   # the REAL images, whatever the mode swapped in
-ctl_name = next(iter(images))
-ctl = bytearray(images[ctl_name])
-unclaimed = sorted(set(range(NROWS)) - FROZEN[ctl_name])
-if not unclaimed:
-    fails.append("4: no unclaimed row available for the control")
-else:
-    r = unclaimed[0]
-    struct.pack_into(">I", ctl, BASE + r * 4, VAN[r] ^ 0x10)
-    got = {i for i in range(NROWS)
-           if struct.unpack_from(">I", ctl, BASE + i * 4)[0] != VAN[i]}
-    if got == FROZEN[ctl_name]:
-        print(f"CONTROL DEAD: perturbed-unclaimed-row — perturbing unclaimed row {r:#04x} on {ctl_name} left the inventory unchanged")
-        fails.append("4: CONTROL DID NOT FIRE — perturbed-unclaimed-row")
+# (a plain run only: under a mode the verdict is sections 2/3's, #369)
+if not MODE:
+    images = REAL                                   # the REAL images, whatever the mode swapped in
+    ctl_name = next(iter(images))
+    ctl = bytearray(images[ctl_name])
+    unclaimed = sorted(set(range(NROWS)) - FROZEN[ctl_name])
+    if not unclaimed:
+        fails.append("4: no unclaimed row available for the control")
     else:
-        print(f"CONTROL FIRED: perturbed-unclaimed-row — perturbing unclaimed row {r:#04x} on {ctl_name} is caught by section 2")
+        r = unclaimed[0]
+        struct.pack_into(">I", ctl, BASE + r * 4, VAN[r] ^ 0x10)
+        got = {i for i in range(NROWS)
+               if struct.unpack_from(">I", ctl, BASE + i * 4)[0] != VAN[i]}
+        if got == FROZEN[ctl_name]:
+            print(f"CONTROL DEAD: perturbed-unclaimed-row — perturbing unclaimed row {r:#04x} on {ctl_name} left the inventory unchanged")
+            fails.append("4: CONTROL DID NOT FIRE — perturbed-unclaimed-row")
+        else:
+            print(f"CONTROL FIRED: perturbed-unclaimed-row — perturbing unclaimed row {r:#04x} on {ctl_name} is caught by section 2")
 
-# REWRITTEN 14z-144 with the invariant. The old control wrote FIX_OLD into a
-# copy and then asserted the word was not FIX_NEW — trivially true, because it
-# had just written it, and it never exercised section 3's predicate at all. It
-# is now TWO controls that run the REAL comparison on a perturbed image, one
-# per side of the track-dependent invariant.
-if "donovan" in images:
-    ctl2 = bytearray(images["donovan"])
-    t = rows(images["donovan"])[0x13]
-    struct.pack_into(">H", ctl2, t + FIX_OFF, FIX_NEW)     # the 14z-143 defect
-    w = struct.unpack_from(">H", ctl2, t + FIX_OFF)[0]
-    if w != FIX_OLD:
-        print(f"CONTROL FIRED: fix-on-variant-track — planting the base-slot fix {FIX_NEW:#06x} on the VARIANT track is caught by section 3 (the 14z-143 defect)")
-    else:
-        print("CONTROL DEAD: fix-on-variant-track — the variant-track check does not reject the base-slot word")
-        fails.append("4: CONTROL DID NOT FIRE — fix-on-variant-track")
+    # REWRITTEN 14z-144 with the invariant. The old control wrote FIX_OLD into a
+    # copy and then asserted the word was not FIX_NEW — trivially true, because it
+    # had just written it, and it never exercised section 3's predicate at all. It
+    # is now TWO controls that run the REAL comparison on a perturbed image, one
+    # per side of the track-dependent invariant.
+    if "donovan" in images:
+        ctl2 = bytearray(images["donovan"])
+        t = rows(images["donovan"])[0x13]
+        struct.pack_into(">H", ctl2, t + FIX_OFF, FIX_NEW)     # the 14z-143 defect
+        w = struct.unpack_from(">H", ctl2, t + FIX_OFF)[0]
+        if w != FIX_OLD:
+            print(f"CONTROL FIRED: fix-on-variant-track — planting the base-slot fix {FIX_NEW:#06x} on the VARIANT track is caught by section 3 (the 14z-143 defect)")
+        else:
+            print("CONTROL DEAD: fix-on-variant-track — the variant-track check does not reject the base-slot word")
+            fails.append("4: CONTROL DID NOT FIRE — fix-on-variant-track")
 
-if "stock" in images:
-    ctl3 = bytearray(images["stock"])
-    t = rows(images["stock"])[0x0F]
-    struct.pack_into(">H", ctl3, t + FIX_OFF, FIX_OLD)     # the fix gone
-    w = struct.unpack_from(">H", ctl3, t + FIX_OFF)[0]
-    if w != FIX_NEW:
-        print("CONTROL FIRED: fix-gone-on-stock — removing the 14z-64 fix from the BASE-SLOT track is caught by section 3 (the scoping must not disarm both tracks)")
-    else:
-        print("CONTROL DEAD: fix-gone-on-stock — the base-slot check does not reject the unfixed word")
-        fails.append("4: CONTROL DID NOT FIRE — fix-gone-on-stock")
+    if "stock" in images:
+        ctl3 = bytearray(images["stock"])
+        t = rows(images["stock"])[0x0F]
+        struct.pack_into(">H", ctl3, t + FIX_OFF, FIX_OLD)     # the fix gone
+        w = struct.unpack_from(">H", ctl3, t + FIX_OFF)[0]
+        if w != FIX_NEW:
+            print("CONTROL FIRED: fix-gone-on-stock — removing the 14z-64 fix from the BASE-SLOT track is caught by section 3 (the scoping must not disarm both tracks)")
+        else:
+            print("CONTROL DEAD: fix-gone-on-stock — the base-slot check does not reject the unfixed word")
+            fails.append("4: CONTROL DID NOT FIRE — fix-gone-on-stock")
 
 for n in notes:
     print("  " + n)
@@ -343,3 +346,21 @@ if fails:
     sys.exit(1)
 print(f"\nPASS: test_capture_kf_ownership ({seen} build(s) checked)")
 PY
+cat "$W/main.log"
+if [ -n "${VS_CTL:-}" ]; then
+    [ "$rc" != 0 ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_capture_kf_ownership (control mode $VS_CTL left the gate green)"
+    case "$VS_CTL" in   # #369: the finding each perturbation must produce in section 2 or 3
+        perturbed-unclaimed-row)   # the image the mode perturbs — the FIRST present, in the python's BUILDS order — and its first row outside FROZEN
+            if   [ -f "$DON/verify_data.bin" ];   then KFO_R="donovan 0x10"
+            elif [ -f "$HUI/verify_data.bin" ];   then KFO_R="huitzil 0x11"
+            elif [ -f "$PYR/verify_data.bin" ];   then KFO_R="pyron 0x10"
+            elif [ -f "$STOCK/verify_data.bin" ]; then KFO_R="stock 0x0"
+            else                                      KFO_R="merged 0x12"; fi
+            WANT="^FAIL: 2: ${KFO_R% *} [(][^)]*[)]: repointed rows differ from frozen — UNEXPECTED \\['${KFO_R#* }'\\] MISSING \\[\\]\$" ;;
+        fix-on-variant-track)    WANT="^FAIL: 3: donovan: row 0x13 -> 0x[0-9a-f]+ carries 0x0d88 at [+]0x1e, expected vs2's OWN 0x0b30" ;;
+        fix-gone-on-stock)       WANT="^FAIL: 3: stock: row 0x0f -> 0x[0-9a-f]+ carries 0x0b30 at [+]0x1e, expected the 14z-64 fix 0x0d88" ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    exit 1
+fi
+exit "$rc"

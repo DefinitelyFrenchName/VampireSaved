@@ -43,7 +43,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"; export ROMDIR
 W="$(mktemp -d)" || { echo "FAIL: test_emu_clock — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
-rc=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; rc=1; }
+rc=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; rc=1; }   # #369: the findings a mode reads
 
 BASIS=tests/expected/vsavj/masked-v2
 MASK="$(cat "$BASIS/MASK")"
@@ -88,7 +88,13 @@ bf="$(field bp frames)"; be="$(field bp emulated)"; bu="$(field bp uiframes)"; b
     || echo "  note  the breakpoint leg's checksum $(anchor bp) is not the basis's ([MFI-2]: a stop can move the game; printed, not asserted)"
 
 if vs_ctl_is first-frame-skip || vs_ctl_is drift-clock; then
-    [ "$rc" = 1 ] && { echo "FAIL: test_emu_clock (control mode: $VS_CTL)"; exit 1; }
+    if [ "$rc" = 1 ]; then   # #369: honoured only on the mode's own finding in sections 1-2's output
+        case "$VS_CTL" in
+        first-frame-skip) CTL_ERE="FAIL  anchor [0-9a-f]+, the frozen basis reads $WANT: the clock or the staging is off replay.lua's\$" ;;
+        drift-clock) CTL_ERE="FAIL  counted $N frames over [0-9]+ emulated\$" ;;
+        esac
+        vs_ctl_caught "$W/main.log" "$CTL_ERE"; echo "FAIL: test_emu_clock (control mode: $VS_CTL)"; exit 1
+    fi
     vs_ctl_left_green "$VS_CTL" "FAIL: test_emu_clock — control mode $VS_CTL left the gate green"
 fi
 

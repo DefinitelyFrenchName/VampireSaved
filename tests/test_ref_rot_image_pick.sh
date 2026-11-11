@@ -97,6 +97,7 @@ mkzip "$FR/build/plainx/rompath/a_other.zip" $STOCK_SHAPE
 
 echo "== 1. the real gate judges each rompath by the NAMED preference =="
 o1="$(cd "$FR" && sh "$RUN" 2>&1)" && s1=0 || s1=$?
+printf '%s\n' "$o1" > "$T/main.log"   # #369: section 1's gate output is the main check's findings
 for d in build/stockx build/widex build/plainx; do
     printf '%s' "$o1" | grep -E >/dev/null "^  ok +$d " \
         && echo "  ok: $d judged by its image, not the adversary" \
@@ -106,6 +107,7 @@ printf '%s' "$o1" | grep -E >/dev/null '^  ROTTED ' && fail "an adversary was ju
 [ "$s1" = 0 ] && echo "  ok: exit 0" || fail "the gate exited $s1 on a tree whose every image is current"
 
 echo "== 2. MUST-FIRE — prefer the adversary and both rompaths read ROTTED =="
+if [ -n "${VS_CTL:-}" ]; then echo "  (control mode: the in-gate control runs only in a plain run; section 1 ran the adversarial copy)"; else
 o2="$(cd "$FR" && sh tests/ref_rot_adv.sh 2>&1)" && s2=0 || s2=$?
 flipped=0
 for d in build/stockx build/widex; do
@@ -116,6 +118,7 @@ done
 [ "$s2" != 0 ] && echo "  ok: and the copy exited $s2" || fail "the adversarial copy exited 0"
 [ "$flipped" = 2 ] && [ "$s2" != 0 ] && vs_ctl_fired adversary-preference "both rompaths read ROTTED under the adversary preference (exit $s2)" \
                                      || vs_ctl_dead adversary-preference "the adversarial copy did not flip both rompaths to ROTTED"
+fi
 
 echo "== 3. the fallback is NAME order, not creation order =="
 # build/plainx has no preferred name; b_other.zip (rotted) was created before
@@ -125,6 +128,11 @@ printf '%s' "$o1" | grep -E >/dev/null "^  ok +build/plainx " \
     || fail "the fallback did not pick the first image by name"
 
 echo
+if [ -n "${VS_CTL:-}" ]; then   # #369: the adversary judged in place of the stock build's image, in section 1's output
+    [ "$rc" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: control mode $VS_CTL changed no verdict."
+    vs_ctl_caught "$T/main.log" '^  ROTTED +build/stockx +g_stock\.sh ' || :
+    echo "FAIL: see above (control mode $VS_CTL)."; exit 1
+fi
 [ "$rc" = 0 ] && echo "PASS: test_build_ref_rot.sh judges a rompath by the named image preference." \
              || echo "FAIL: see above."
 exit $rc

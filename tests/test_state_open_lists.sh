@@ -136,6 +136,19 @@ control() {  # control <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log" | head -20
     fi
 }
-for n in $(vs_ctl_declared "$0"); do control "$n"; done
+[ -n "$VS_CTL" ] || for n in $(vs_ctl_declared "$0"); do control "$n"; done   # #369: the in-gate controls, plain run only
 
-if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL"; echo "PASS"; else
+    # #369: a mode is honoured only on its own finding in the main check's output (tools/check_state_lists.py on the copy)
+    case "$VS_CTL" in
+        closed-pending-entry) WANT='FAIL  pending:A SYNTHETIC ITEM ADDED BY THE CONTROL .* carries the closed marker' ;;
+        closed-start-here) WANT='FAIL  start-here:9\. A SYNTHETIC START-HERE ITEM ADDED BY THE CONTROL IS DONE .* carries the closed marker' ;;
+        ticket-section) WANT='FAIL  section:Open bugs \(synthetic, added by the control\) — .* is not a standing section' ;;
+        fourth-group) WANT='FAIL  groups — [0-9]+ session groups above # STANDING SECTIONS, at most ' ;;
+        over-budget) WANT='FAIL  size — STATE\.md is [0-9,]+ bytes, over the [0-9,]+-byte budget' ;;
+        unresolved-ledger-key) WANT='FAIL  ledger:14z-999 — the ledger key 14z-999 resolves to no record' ;;
+        unresolved-ledger-key-bold) WANT='FAIL  ledger:14z-998 — the ledger key 14z-998 resolves to no record' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "$VS_CTL" ] || vs_ctl_caught "$W/tree.log" "$WANT" || :
+    echo "FAIL"; exit 1; fi

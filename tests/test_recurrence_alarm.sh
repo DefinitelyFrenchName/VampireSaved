@@ -31,12 +31,13 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d "${TMPDIR:-/tmp}/recur.XXXXXX")" || { echo "FAIL: test_recurrence_alarm — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
-: > "$W/empty.tsv"
+: > "$W/empty.tsv"; : > "$W/main.log"
 
 if [ -z "${VS_CTL:-}" ] || vs_ctl_is through-ignored; then
 echo "== 1. the alarm's verdict logic on a synthetic ledger (--selftest)"
 v=""; vs_ctl_is through-ignored && { v="--through-ignored"; echo "MODE: control through-ignored — the self-test runs the variant whose acknowledgements cover future runs too"; }
 out="$(python3 tools/recurrence_alarm.py --selftest $v 2>&1)"
+printf '%s\n' "$out" >> "$W/main.log"   # #369: the tool's own output is the main check's findings
 if printf '%s\n' "$out" | grep >/dev/null '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
 elif printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL'; then
     bad "$(printf '%s\n' "$out" | grep 'WRONG\|^SELFTEST' | tr '\n' ' ' | cut -c1-200)"
@@ -50,6 +51,7 @@ echo "== 2. the real ledger: every recurring finding acknowledged by a ticket"
 a=""; vs_ctl_is ack-dropped && { a="--ack $W/empty.tsv"; echo "MODE: control ack-dropped — the real ledger judged with an empty acknowledgement file"; }
 # shellcheck disable=SC2086
 out="$(python3 tools/recurrence_alarm.py $a 2>&1)"; rc=$?
+printf '%s\n' "$out" >> "$W/main.log"
 if [ "$rc" = 0 ] && printf '%s\n' "$out" | grep >/dev/null '^recurrence: .* 0 not$'; then ok "$(printf '%s\n' "$out" | head -1)"
 elif [ "$rc" = 1 ] && printf '%s\n' "$out" | grep >/dev/null '^RECURRING: '; then
     bad "$(printf '%s\n' "$out" | head -1)"; printf '%s\n' "$out" | grep '^RECURRING: ' | head -10 | cut -c1-200 | sed 's/^/        /'
@@ -66,6 +68,14 @@ if [ -z "${VS_CTL:-}" ]; then
     python3 tools/recurrence_alarm.py --ack "$W/empty.tsv" > "$W/c2.out" 2>&1; rc=$?
     if [ "$rc" = 1 ] && grep -q '^RECURRING: QP3 2550 + 2560 ' "$W/c2.out"; then vs_ctl_fired ack-dropped "with no acknowledgements the real ledger FAILS: $(grep -m1 '^RECURRING: QP3 2550 + 2560 ' "$W/c2.out" | cut -c12-120)"
     else vs_ctl_dead ack-dropped "with no acknowledgements the real ledger exited $rc without naming QP3 2550 + 2560"; fail=1; fi
+fi
+if [ -n "${VS_CTL:-}" ]; then   # #369: the mode's own finding in the tool's output
+    [ "$fail" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL (control mode $VS_CTL changed no verdict)"
+    case "$VS_CTL" in
+        through-ignored) WANT='WRONG: occurrences after the acknowledged run recur afresh$' ;;
+        ack-dropped)     WANT='^RECURRING: QP3 2550 \+ 2560 — ' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL"; exit 1
 fi
 [ "$fail" -eq 0 ] && echo "PASS" || echo "FAIL"
 exit "$fail"

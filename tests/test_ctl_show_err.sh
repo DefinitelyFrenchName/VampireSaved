@@ -18,13 +18,15 @@
 #   raising it reads HONOURED and one raising KeyError, or exiting 1 with no exception, reads UNJUDGED; the near misses —
 #   a Python and a shell copy exiting 1 on a FOUND line — read HONOURED and their twin fires; (e) this gate's own mode run
 #   whose controls.sh line moved (tb-hidden, expected-blind) is REFUSED and reads UNJUDGED. Each control's disabled branch
-#   misreads its case HONOURED (or the twin FIRED); refusal-reverted's pre-fix copy makes (e) read HONOURED.
+#   misreads its case HONOURED (or the twin FIRED); refusal-reverted's pre-fix copy makes (e) read UNJUDGED-CAUGHT (#369
+#   piece 5, maintainer-ruled 2026-11-09 "Name the speaker": tests/lib/classify.sh vs_ctl_class_word — UNJUDGED made so
+#   only by #369's backstop, the gate's own REFUSED line gone).
 # FOLLOWS: tests/lib/classify.sh tests/lib/controls.sh
 #
 # MUST-FIRE: shadow-tool: tb-hidden — a copy of tests/lib/controls.sh whose vs_ctl_show_err traceback branch (VSE-TB) is disabled must let the copy raising on its main path read HONOURED and its twin print CONTROL FIRED, and the gate must FAIL (mode: the cases run on that copy)
 # MUST-FIRE: shadow-tool: sh-hidden — a copy whose shell-error branch (VSE-SH) is disabled must let the shell copy with a syntax error read HONOURED, and the gate must FAIL (mode: as above)
 # MUST-FIRE: shadow-tool: expected-blind — a copy whose expected-exception test (VSE-EXPECTED) accepts any end must let a copy raising KeyError where FileNotFoundError is expected read HONOURED, and the gate must FAIL (mode: as above)
-# MUST-FIRE: known-bad: refusal-reverted — this gate's copy with its mode-run refusal reverted to the pre-fix form (a plant that cannot be planted a plain FAIL exit 1) must let case (e)'s moved-line runs read HONOURED, and the gate must FAIL (mode: case (e) runs on that copy)
+# MUST-FIRE: known-bad: refusal-reverted — this gate's copy with its mode-run refusal reverted to the pre-fix form (a plant that cannot be planted a plain FAIL exit 1) must let case (e)'s moved-line runs read UNJUDGED-CAUGHT (#369's backstop alone, not the gate's REFUSED, refusing them), and the gate must FAIL (mode: case (e) runs on that copy)
 #
 # WHY: #310 (the 14z-215 re-census, group 5): 21 gates ran a perturbed copy under a control mode and printed only `tail
 #   -N`, an indented or joined excerpt, or nothing of its output, so a copy that CRASHED read as its perturbation caught —
@@ -36,7 +38,8 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d)" || { echo "FAIL: test_ctl_show_err — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }
+: > "$W/main.log"   # #369: the cases' findings, read by vs_ctl_caught under a mode
 
 CTLS="$REPO/tests/lib/controls.sh"; CLS="$REPO/tests/lib/classify.sh"
 shadow_for() {  # shadow_for <control> <dir>: sets CTLS to that control's copy of controls.sh under <dir>; returns 1
@@ -117,6 +120,9 @@ _n=0
 # #369 (14z-224): the stubs stand for gates on the shrink-only debt list tests/expected/ctl_caught_debt.tsv, the
 # pre-#369 fall-through these cases were written for; a scratch copy of the list naming them reaches the stub run and
 # the classifier through REPO (the tracked list is never written). tests/test_control_classifier.sh holds the strict path.
+# Case (e)'s copies of THIS gate are NOT listed (#369 piece 5, maintainer-ruled 2026-11-09 "Name the speaker"): this
+# gate is migrated, so case (e) and refusal-reverted read the class word (tests/lib/classify.sh vs_ctl_class_word): the
+# gate's own REFUSED reads UNJUDGED, its reverted copy's plain FAIL UNJUDGED-CAUGHT (#369's backstop alone refuses it).
 mkdir -p "$W/debt/tests/expected"; { cat "$REPO/tests/expected/ctl_caught_debt.tsv"; echo g_copy.sh; } > "$W/debt/tests/expected/ctl_caught_debt.tsv"
 run_stub() {  # run_stub <mode or -> <copy> [expected exception]: runs the stub gate; sets LOG, ST, CLASS
     _n=$((_n + 1)); _m="$1"; [ "$_m" = - ] && _m=""
@@ -169,12 +175,12 @@ if vs_ctl_is refusal-reverted; then   # the copy (e) runs: the mode-run refusal 
     revert_refusal "$MVSRC" || { echo "REFUSED: refusal-reverted — the refusal line was not found to revert, so the plant did not apply and the mode judged nothing"; exit 3; }
 fi
 echo "== (e) a mode whose plant cannot be planted (its controls.sh line moved) is REFUSED, read UNJUDGED, never HONOURED"
-moved_run() {  # moved_run <gate copy> <control> <sed on controls.sh>: the copy run with a controls.sh whose line moved; sets _got, _st, _mv
+moved_run() {  # moved_run <gate copy> <control> <sed on controls.sh>: the copy run with a controls.sh whose line moved; sets _got (the class word), _st, _mv
     _mv="$W/mv_$2_$(basename "$1" .sh)"; mkdir -p "$_mv/tests/lib"; cp "$1" "$_mv/tests/test_ctl_show_err.sh"
     cp "$REPO/tests/lib/classify.sh" "$_mv/tests/lib/"; sed "$3" "$REPO/tests/lib/controls.sh" > "$_mv/tests/lib/controls.sh"
-    mkdir -p "$_mv/tests/expected"; cp "$W/debt/tests/expected/ctl_caught_debt.tsv" "$_mv/tests/expected/"   # the copy is listed, as this gate is (#369)
+    mkdir -p "$_mv/tests/expected"; cp "$W/debt/tests/expected/ctl_caught_debt.tsv" "$_mv/tests/expected/"   # the copy is listed in the scratch list (#369; see the debt list above)
     env CONTROL="$2" sh "$_mv/tests/test_ctl_show_err.sh" > "$_mv.log" 2>&1 </dev/null && _st=0 || _st=$?
-    _got="$(REPO="$W/debt" sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" "$5"; echo "$VS_CTL_EXEC"' _ "$CLS" "$_st" "$_mv.log" "$_mv/tests/test_ctl_show_err.sh" "$2")"
+    _got="$(REPO="$W/debt" sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" "$5"; vs_ctl_class_word' _ "$CLS" "$_st" "$_mv.log" "$_mv/tests/test_ctl_show_err.sh" "$2")"
 }
 moved() {  # moved <label> <control> <class> <sed on controls.sh>: this gate (or the mode's reverted copy) with a moved line
     moved_run "$MVSRC" "$2" "$4"
@@ -183,8 +189,16 @@ moved() {  # moved <label> <control> <class> <sed on controls.sh>: this gate (or
 moved "tb-hidden with its VSE-TB marker gone"                    tb-hidden      UNJUDGED 's/   # VSE-TB$//'
 moved "expected-blind with its VSE-EXPECTED marker gone"         expected-blind UNJUDGED 's/   # VSE-EXPECTED$//'
 
-if [ -n "${VS_CTL:-}" ]; then
-    [ "$fail" = 0 ] && echo "PASS: test_ctl_show_err" || echo "FAIL: test_ctl_show_err (control mode $VS_CTL)"; exit "$fail"
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on its own case misread in the cases above
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_ctl_show_err (control mode $VS_CTL)"
+    case "$VS_CTL" in
+        tb-hidden) WANT='^  FAIL  a KeyError after a FOUND line -> HONOURED ' ;;
+        sh-hidden) WANT='^  FAIL  a shell copy with a syntax error -> HONOURED ' ;;
+        expected-blind) WANT='^  FAIL  a copy raising KeyError instead -> HONOURED ' ;;
+        refusal-reverted) WANT='^  FAIL  (tb-hidden|expected-blind) with its VSE-[A-Z]+ marker gone -> UNJUDGED-CAUGHT ' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: test_ctl_show_err (control mode $VS_CTL)"; exit 1
 fi
 echo "== controls: each branch disabled must misread its case"
 fire() {  # fire <control> <label> <expected misread: class | FIRED> <copy> [expected exception]
@@ -200,11 +214,12 @@ fire tb-hidden      "the copy raising on its main path"            HONOURED cras
 fire tb-hidden      "its twin"                                     FIRED    crash_main.py
 fire sh-hidden      "the shell copy with a syntax error"           HONOURED copy_syntax.sh
 fire expected-blind "a KeyError where FileNotFoundError is expected" HONOURED crash_main.py FileNotFoundError
-# refusal-reverted's twin: case (e)'s moved-line run on this gate's copy with the pre-fix FAIL exit 1 must read HONOURED
+# refusal-reverted's twin: case (e)'s moved-line run on this gate's copy with the pre-fix FAIL exit 1 must read
+# UNJUDGED-CAUGHT (#369 piece 5): the plain UNJUDGED (the REFUSED line still speaking) or HONOURED is the control dead
 if revert_refusal "$W/reverted_twin.sh" 2> "$W/reverted_twin.err"; then
     moved_run "$W/reverted_twin.sh" tb-hidden 's/   # VSE-TB$//'
-    if [ "$_got" = HONOURED ]; then vs_ctl_fired refusal-reverted "with the refusal reverted a moved-line mode run reads HONOURED"
-    else vs_ctl_dead refusal-reverted "with the refusal reverted a moved-line mode run read '$_got', not HONOURED"; fail=1; fi
+    if [ "$_got" = UNJUDGED-CAUGHT ]; then vs_ctl_fired refusal-reverted "with the refusal reverted a moved-line mode run reads UNJUDGED-CAUGHT (#369's backstop alone refuses it)"
+    else vs_ctl_dead refusal-reverted "with the refusal reverted a moved-line mode run read '$_got', not UNJUDGED-CAUGHT"; fail=1; fi
 else vs_ctl_dead refusal-reverted "the refusal line was not found to revert: $(tail -1 "$W/reverted_twin.err")"; fail=1; fi
 
 [ "$fail" = 0 ] && echo "PASS: test_ctl_show_err — a crashed perturbed copy reads DIED or UNJUDGED and its twin DEAD; a finding stays HONOURED; an expected exception passes only as itself" || echo "FAIL: test_ctl_show_err"

@@ -66,7 +66,8 @@ for s in vsavj vsav2 vhunt2; do decrypt_view "$s" "$W/${s}_op.bin" "$W/${s}_data
 MERGED_OP=""
 [ -f "$BUILD/verify_op.bin" ] && MERGED_OP="$BUILD/verify_op.bin"
 
-python3 - "$W" "$MERGED_OP" <<'PY' || { echo "FAIL: DF startup provenance"; exit 1; }
+# the check's output lands in $W/main.log too (#369: a mode is honoured only on its own finding there)
+python3 - "$W" "$MERGED_OP" <<'PY' > "$W/main.log" 2>&1 && rc=0 || rc=$?
 import sys, struct
 W, MERGED = sys.argv[1], sys.argv[2]
 ORIG = {"vsavj": 0x0BD0FA, "vsav2": 0x0D7298, "vhunt2": 0x0D6B2A}   # bank_map.toml [origins]
@@ -148,4 +149,11 @@ if not os.environ.get("CONTROL"):
 for e in errs: print("  FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
+cat "$W/main.log"
+if [ -n "${VS_CTL:-}" ]; then
+    [ "$rc" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: DF startup provenance (control mode $VS_CTL)"
+    vs_ctl_caught "$W/main.log" '^  FAIL: row 13 on (vsav2|vhunt2): arm [^ ]+ != expected 0x41$' || :
+    echo "FAIL: DF startup provenance"; exit 1
+fi
+[ "$rc" = 0 ] || { echo "FAIL: DF startup provenance"; exit 1; }
 echo "PASS test_df_startup_provenance"

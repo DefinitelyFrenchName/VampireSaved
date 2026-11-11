@@ -161,7 +161,7 @@ if [ "$SECTION" = contact ] || [ "$SECTION" = all ]; then
 fi
 wait
 
-if python3 - "$W" "$EXP" "$SECTION" "$FREEZE" "$REPO" "$MODE" <<'PY'
+if python3 - "$W" "$EXP" "$SECTION" "$FREEZE" "$REPO" "$MODE" > "$W/main.log" <<'PY'
 import sys, os
 from pathlib import Path
 W, EXP, SECTION, FREEZE, REPO = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] == "1", sys.argv[5]
@@ -264,7 +264,8 @@ def check_trace():
         want[mk] = want[mk][:2] + ["0x7e"] + want[mk][3:]
     if compare(want, got, errs):
         print(f"  trace: {len(got)} legs match the frozen table")
-    # must-fire control: a perturbed frozen value is caught
+    # must-fire control: a perturbed frozen value is caught (a plain run only: under a mode its line is not the mode's evidence, #369)
+    if MODE: return
     bad = dict(want); k = sorted(k for k in bad if k in got)[0]
     bad[k] = bad[k][:2] + ["0x7e"] + bad[k][3:]
     ctl = []
@@ -332,6 +333,7 @@ for e in errs: print("  FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
 then _pyfail=0; else _pyfail=1; fi
+cat "$W/main.log"
 
 # THE SHEET (#291): with SHEET_OUT set, every leg as this run played it at the moments its verdict reads, proven on the
 # fields this run traced there (the frames re-derived from the same traces by the verdict's own definitions). Nothing
@@ -434,6 +436,10 @@ if SECTION in ("contact", "all"):
         for l in legs: at("contact", "in" if t == 3260 else "out", l, frames[l], rs[l], F2, *wins[l])
 PYS
     sheet_rows "$W/sheet_rows.tsv"
+fi
+if [ -n "$MODE" ]; then   # #369: honoured only on the trace compare's own finding against the perturbed frozen arm
+    [ "$_pyfail" = 1 ] || vs_ctl_left_green "$MODE" "FAIL: DF startup invulnerability audit (control mode $MODE)"
+    vs_ctl_caught "$W/main.log" "^  FAIL: [mnv]_[0-9a-f]{2}: frozen arm/peak/zero/thr \\['0x7e', " || :
 fi
 [ "$_pyfail" = 0 ] || { echo "FAIL: DF startup invulnerability audit"; exit 1; }
 echo "PASS: DF startup invulnerability audit"

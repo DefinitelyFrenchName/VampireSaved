@@ -84,7 +84,7 @@ MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
 tools/run_mame.sh vsavjw -autoboot_script "$REPO/tests/lua/obj_records_dump.lua" \
     > "$W/run.log" 2>&1 || { echo "FAIL: rig did not run"; tail -5 "$W/run.log"; exit 1; }
 
-python3 - "$W/obj.txt" "$EXPECT_LINES" "$MIN_LINES" <<'PYEOF'
+python3 - "$W/obj.txt" "$EXPECT_LINES" "$MIN_LINES" > "$W/main.log" <<'PYEOF' && rc=0 || rc=$?
 import sys
 objtxt, expect, min_lines = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
 burst = 0
@@ -123,3 +123,12 @@ else:
     print("CONTROL FIRED: expect-lines-flip — beam lines are present, so EXPECT_LINES=0 (the mode) fails the defect-signature check and the gate FAILs")
     print("PASS: beam lines present at pal 05 (fix verified; burst control fired)")
 PYEOF
+cat "$W/main.log"
+if [ "$rc" != 0 ]; then
+    # #369: the mode is honoured only on its own finding in the check's output (the defect-signature refusal)
+    if [ -n "$MODE" ]; then
+        vs_ctl_caught "$W/main.log" '^FAIL: 16x1 line entries present but EXPECT_LINES=0 ' || :
+        echo "FAIL: audit_clone_beam_lines (control mode $MODE)"
+    fi
+    exit 1
+fi

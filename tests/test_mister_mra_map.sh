@@ -162,7 +162,8 @@ else
     echo "note: no $BUILD/rompath/vsavjw.zip — the .rom checks are skipped"
 fi
 
-python3 - "$WORK" "$REPO" "$BUILD" "$ROMRUNS" <<'PY'
+# #369: the checks' findings land in $WORK/main.log, which a mode's CONTROL CAUGHT line is read from
+python3 - "$WORK" "$REPO" "$BUILD" "$ROMRUNS" > "$WORK/main.log" 2>&1 <<'PY'
 import hashlib, os, re, subprocess, sys, zipfile
 
 WORK, REPO, BUILD, ROMRUNS = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] == "1"
@@ -297,60 +298,62 @@ for label, path, want in (("stock vsavj (from cps2)",  a, 0xFF),
         ok("%-26s header byte %d = 0x%02X (profile %s)"
            % (label, PROFILE_BYTE, want, "OFF" if want == 0xFF else "ON"))
 
-# ── 3. control A: the untrimmed mapping must be refused ────────────────────
-u = find(WORK + "/untrimmed", WIDE)
-if not u:
-    bad("control A produced no MRA")
-else:
-    starts, total = region_table(u)
-    size = 44 + total
-    fw = starts["firmware"] - KEY_LEN
-    words = header_words(u)
-    if size <= (1 << 26):
-        print("CONTROL DEAD: untrimmed-mapping — the untrimmed image is %d B, inside the 26-bit ioctl_addr ceiling" % size)
-        bad("control A did not fire")
-    elif (fw >> 10) < (1 << 16):
-        print("CONTROL DEAD: untrimmed-mapping — half-fired: firmware start %d KiB still fits 16 bits" % (fw >> 10))
-        bad("control A half-fired")
+# #369: sections 3 and 4 are the in-gate controls (their own MRAs): a plain run only; a mode is judged on section 2
+if not MODE:
+    # ── 3. control A: the untrimmed mapping must be refused ────────────────────
+    u = find(WORK + "/untrimmed", WIDE)
+    if not u:
+        bad("control A produced no MRA")
     else:
-        print("CONTROL FIRED: untrimmed-mapping — untrimmed = %.3f MB (> 64 MB) and needs "
-              "qsnd_start %d KiB (> 65535)" % (size / 2 ** 20, fw >> 10))
-        if words["firmware"] == (fw >> 10) & 0xFFFF and words["firmware"] != fw >> 10:
-            ok("...and the generator SILENTLY WRITES THE WRAPPED WORD %d — "
-               "which is why the trim is a gate, not a preference"
-               % words["firmware"])
-    # control A also un-matches the setname="vsavjw" HEADER row, so the
-    # profile bit must revert to the fill. That makes it the profile check's
-    # own control: if byte 41 were 0xFE here, the row would not be gated by
-    # setname at all and every stock MRA would be carrying it.
-    hb = header_bytes(u)
-    if hb is None or len(hb) <= PROFILE_BYTE:
-        bad("control A: no readable header")
-    elif hb[PROFILE_BYTE] != 0xFF:
-        bad("control A: header byte %d is 0x%02X with setname un-matched — "
-            "the profile row is NOT setname-gated" % (PROFILE_BYTE, hb[PROFILE_BYTE]))
-    else:
-        ok("control A doubles as the profile control: un-match the setname and "
-           "byte %d returns to the 0xFF fill" % PROFILE_BYTE)
-    # mister_map.md §3 "Mapped verbatim": firmware at bulk_addr 73,662,464
-    # and 70.26 MB total. Derived on paper there; reproduced here.
-    if fw != 73662464 or size != 73670720:
-        bad("the untrimmed image is %d B with firmware at %d — mister_map.md "
-            "§3 derives 73670720 B and 73662464. One of the two is wrong."
-            % (size, fw))
-    else:
-        ok("untrimmed layout reproduces mister_map.md §3 exactly "
-           "(73,670,720 B; firmware at 73,662,464 = 71,936 KiB)")
+        starts, total = region_table(u)
+        size = 44 + total
+        fw = starts["firmware"] - KEY_LEN
+        words = header_words(u)
+        if size <= (1 << 26):
+            print("CONTROL DEAD: untrimmed-mapping — the untrimmed image is %d B, inside the 26-bit ioctl_addr ceiling" % size)
+            bad("control A did not fire")
+        elif (fw >> 10) < (1 << 16):
+            print("CONTROL DEAD: untrimmed-mapping — half-fired: firmware start %d KiB still fits 16 bits" % (fw >> 10))
+            bad("control A half-fired")
+        else:
+            print("CONTROL FIRED: untrimmed-mapping — untrimmed = %.3f MB (> 64 MB) and needs "
+                  "qsnd_start %d KiB (> 65535)" % (size / 2 ** 20, fw >> 10))
+            if words["firmware"] == (fw >> 10) & 0xFFFF and words["firmware"] != fw >> 10:
+                ok("...and the generator SILENTLY WRITES THE WRAPPED WORD %d — "
+                   "which is why the trim is a gate, not a preference"
+                   % words["firmware"])
+        # control A also un-matches the setname="vsavjw" HEADER row, so the
+        # profile bit must revert to the fill. That makes it the profile check's
+        # own control: if byte 41 were 0xFE here, the row would not be gated by
+        # setname at all and every stock MRA would be carrying it.
+        hb = header_bytes(u)
+        if hb is None or len(hb) <= PROFILE_BYTE:
+            bad("control A: no readable header")
+        elif hb[PROFILE_BYTE] != 0xFF:
+            bad("control A: header byte %d is 0x%02X with setname un-matched — "
+                "the profile row is NOT setname-gated" % (PROFILE_BYTE, hb[PROFILE_BYTE]))
+        else:
+            ok("control A doubles as the profile control: un-match the setname and "
+               "byte %d returns to the 0xFF fill" % PROFILE_BYTE)
+        # mister_map.md §3 "Mapped verbatim": firmware at bulk_addr 73,662,464
+        # and 70.26 MB total. Derived on paper there; reproduced here.
+        if fw != 73662464 or size != 73670720:
+            bad("the untrimmed image is %d B with firmware at %d — mister_map.md "
+                "§3 derives 73670720 B and 73662464. One of the two is wrong."
+                % (size, fw))
+        else:
+            ok("untrimmed layout reproduces mister_map.md §3 exactly "
+               "(73,670,720 B; firmware at 73,662,464 = 71,936 KiB)")
 
-# ── 4. control B: 1 KiB of perturbation must break the frozen table ────────
-pert = find(WORK + "/perturbed", WIDE)
-if not pert:
-    bad("control B produced no MRA")
-elif not check_table(pert):
-    print("CONTROL DEAD: trim-perturbed — the region table still matched after the trim length moved by 1 KiB")
-    bad("control B did not fire")
-else:
-    print("CONTROL FIRED: trim-perturbed — +0x400 on the trim breaks the frozen table")
+    # ── 4. control B: 1 KiB of perturbation must break the frozen table ────────
+    pert = find(WORK + "/perturbed", WIDE)
+    if not pert:
+        bad("control B produced no MRA")
+    elif not check_table(pert):
+        print("CONTROL DEAD: trim-perturbed — the region table still matched after the trim length moved by 1 KiB")
+        bad("control B did not fire")
+    else:
+        print("CONTROL FIRED: trim-perturbed — +0x400 on the trim breaks the frozen table")
 
 # ── 5. the real .rom, byte for byte ────────────────────────────────────────
 if ROMRUNS:
@@ -498,3 +501,12 @@ if errs:
 print("\nPASS: the MiSTer MRA produces exactly the placement map's image, the "
       "trim is mandatory and the stock leg is untouched")
 PY
+st=$?; cat "$WORK/main.log"
+if [ -n "$VS_CTL" ] && [ "$st" != 0 ]; then   # #369: the mode's own finding in section 2, against the frozen table
+    case "$VS_CTL" in
+    untrimmed-mapping) WANT="^FAIL: WIDE MRA: firmware starts at 0x4640014, map says 0x3f30014\$" ;;
+    trim-perturbed)    WANT="^FAIL: WIDE MRA: gfx starts at 0xf30414, map says 0xf30014\$" ;;
+    esac
+    vs_ctl_caught "$WORK/main.log" "$WANT"
+fi
+exit "$st"

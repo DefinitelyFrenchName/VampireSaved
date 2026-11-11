@@ -115,8 +115,11 @@ for pair in "0x0f JE" "0x0e LI" "0x01 DE"; do
     python3 tools/vanilla_frames.py "$DATA" --char "$ch" --json "$W/${ch}_d.json" >/dev/null
     python3 tools/tick_durations.py "$W/$ch.tap" "$W/${ch}_d.json" "$ch" --prefix 2 > "$W/$ch.txt"
     # THE EXECUTABLE MODE: bump JE's first crouch total so section 1's compare fails.
-    if [ "$MODE" = perturbed-total ] && [ "$ch" = JE ]; then perturb_total "$W/$ch.txt"; fi
-    python3 - "$W/$ch.txt" "$ch" <<'PY' || fail=1
+    if [ "$MODE" = perturbed-total ] && [ "$ch" = JE ]; then perturb_total "$W/$ch.txt"
+        # #369: the finding is the bumped row itself — its derived total against its measured ticks, as section 1 prints it
+        CTL_WANT="^  FAIL JE: ($(awk '/^  2/ { if (match($0, /\[[0-9]+\]/)) print $1 ": derived " $3 " vs measured " substr($0, RSTART + 1, RLENGTH - 2); exit }' "$W/$ch.txt"))(;|\$)"
+    fi
+    python3 - "$W/$ch.txt" "$ch" > "$W/s1_$ch.txt" <<'PY' || fail=1
 import sys, re
 rows = [l for l in open(sys.argv[1]) if l.startswith("  2")]
 if len(rows) != 6:
@@ -131,6 +134,7 @@ if bad:
     print(f"  FAIL {sys.argv[2]}: " + "; ".join(bad)); sys.exit(1)
 print(f"  ok {sys.argv[2]}: 6/6 crouching normals -- derived total == measured engine ticks")
 PY
+    cat "$W/s1_$ch.txt"; cat "$W/s1_$ch.txt" >> "$W/main.log"   # #369: section 1's verdicts, the file the mode reads
 done
 
 # ---- BISHAMON'S STANDING NORMALS, PER NODE (14z-145): the community cross-check's
@@ -206,8 +210,9 @@ print("  ok AU: 6/6 startups equal in ticks (5HP = 9; the sheet's 11 is one high
 print(f"  ok LE: 6/6 startups equal in ticks; J.HP is LEFT inside its window by the landing after {hp[2]} of the data's {hp[3]} attack ticks (the sheet's 11 is a landing-cut figure, ours the chain's)")
 PY
 
-# ---- CONTROL: a perturbed total must FAIL the same comparison --------------
-if python3 - "$W" <<'PY'
+# ---- CONTROL: a perturbed total must FAIL the same comparison (a plain run's; #369) ----
+if [ -n "$MODE" ]; then :
+elif python3 - "$W" <<'PY'
 import re, sys
 W = sys.argv[1]
 lines = [l for l in open(f"{W}/JE.txt") if l.startswith("  2")]
@@ -218,5 +223,6 @@ PY
 then vs_ctl_fired perturbed-total "a total off by one does not match the measured ticks (section 1 compares the perturbed JE table under the mode)"
 else vs_ctl_dead perturbed-total "a perturbed total was accepted — the derived-vs-measured compare cannot fail"; fail=1; fi
 
-[ "$fail" -eq 0 ] || { echo "FAIL test_tick_durations"; exit 1; }
+[ "$fail" -eq 0 ] || { [ -z "$MODE" ] || vs_ctl_caught "$W/main.log" "$CTL_WANT" || :; echo "FAIL test_tick_durations"; exit 1; }
+[ -z "$MODE" ] || vs_ctl_left_green "$MODE" "FAIL test_tick_durations — control mode $MODE left the gate green"
 echo "PASS: 18/18 derived totals equal the engine's measured tick counts (JE, LI, DE); BI's and AU's standing startups and LE's jumping startups equal in ticks; AU 5MP span 9, LE J.HP landing-cut"

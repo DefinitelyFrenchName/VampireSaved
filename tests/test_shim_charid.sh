@@ -206,9 +206,16 @@ fi
 if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then
     echo "  ok: every probe run on emulated time, at its frozen game clock"
 else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
-ia_stage test_shim_charid "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" || fail=1
+ia_stage test_shim_charid "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" > "$WORK/stage.txt" || fail=1; cat "$WORK/stage.txt"   # #369: the mode reads its finding from here
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL: init-shim char-id gate (control mode: $MODE)"; exit 1; }
+    if [ "$fail" = 1 ]; then   # #369: the mode is honoured only on its own finding in the alignment check's output
+        case "$MODE" in
+        drift-clock) WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+        first-frame-skip) WANT='FAIL: the staging reference leg \(.*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+        esac
+        cat "$WORK/align_bad.txt" "$WORK/stage.txt" > "$WORK/main.log" 2>/dev/null || :
+        vs_ctl_caught "$WORK/main.log" "$WANT" || :; echo "FAIL: init-shim char-id gate (control mode: $MODE)"; exit 1
+    fi
     vs_ctl_left_green "$MODE" "FAIL: init-shim char-id gate — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

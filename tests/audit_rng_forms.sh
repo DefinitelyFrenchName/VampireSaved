@@ -71,10 +71,16 @@ done
 
 fail=0
 _fz=""; [ -n "${FREEZE:-}" ] && [ -z "${VS_CTL:-}" ] && _fz=--freeze
-python3 tools/rng_forms.py "$W" "$EXPECT" --control "${VS_CTL:-}" $_fz || fail=1
+python3 tools/rng_forms.py "$W" "$EXPECT" --control "${VS_CTL:-}" $_fz > "$W/main.log" || fail=1   # #369: its findings, for vs_ctl_caught
+cat "$W/main.log"
 
 if [ -n "${VS_CTL:-}" ]; then
-    if [ "$fail" = 1 ]; then vs_ctl_fired "$VS_CTL" "the perturbed real input fails the audit"; echo "FAIL: audit_rng_forms (control mode)"; exit 1
-    else vs_ctl_dead "$VS_CTL" "the perturbed real input still passed" || true; echo "FAIL: audit_rng_forms"; exit 1; fi
+    case "$VS_CTL" in   # #369: the finding each perturbation must produce
+        ident-flipped) WANT='FAIL  under B \(a non-zero word every frame\) no IDENT row of move_parity or chains174 turns DIFF: \[.+\]$' ;;
+        baseline-moved) WANT='FAIL  move_parity under A equals tests/expected/move_parity_events.tsv \([0-9]+ rows\) — [0-9]+ rows differ$' ;;
+        form-inert) WANT='FAIL  under B the pin reaches the game: 0 move_parity rows move$' ;;
+    esac
+    if [ "$fail" = 1 ]; then vs_ctl_caught "$W/main.log" "$WANT" || :; echo "FAIL: audit_rng_forms (control mode)"; exit 1; fi
+    vs_ctl_left_green "$VS_CTL" "FAIL: audit_rng_forms"
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_rng_forms"; else echo "FAIL: audit_rng_forms"; exit 1; fi

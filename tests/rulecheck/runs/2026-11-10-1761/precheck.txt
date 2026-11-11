@@ -1,0 +1,13 @@
+  FLAG FIGURE: 831
+  FLAG FIGURE: 829
+  FLAG D-FIGURE: 8776  [build/agent225/m369/rc/M369_scope.md]
+  FLAG D-FIGURE: 555  [build/agent225/m369/rc/M369_scope.md]
+  FLAG D-FIGURE: 552  [build/agent225/m369/rc/M369_scope.md]
+  FLAG D-FIGURE: 7321  [build/agent225/m369/rc/M369_scope.md]
+  FLAG D-ABSOLUTE: # #369 migration, batch 1 (14z-225) — what lands, how each mode was checked, and the limits known at landing  [build/agent225/m369/rc/M369_scope.md]
+  FLAG D-ABSOLUTE: No row carries it yet: every dead-leg and known-bad gate is among the 100 still listed.  [build/agent225/m369/rc/M369_scope.md]
+  FLAG D-ABSOLUTE: Workers did not run emulator modes; they matched each ERE against the discovery log of the old fall-through, and the hosts below ran them.  [build/agent225/m369/rc/M369_scope.md]
+  FLAG D-ABSOLUTE: - **Gates whose plain run did not pass on ERIS,** so the runner queued none of their modes (it queues a gate's controls only after its own job is green):  [build/agent225/m369/rc/M369_scope.md]
+  FLAG D-ABSOLUTE: This tier runs the plain runs, and controls only for gates whose code reads a changed file (#286): it is the green guard, not the per-mode evidence above.  [build/agent225/m369/rc/M369_scope.md]
+  FLAG D-ABSOLUTE: - **The UNJUDGED-when-the-finding-is-absent property is review, not run, for most gates:** each mode was shown to read HONOURED on its CAUGHT line; that the ...  [build/agent225/m369/rc/M369_scope.md]
+packet_check: 12 flag(s): D-ABSOLUTE 6, D-FIGURE 4, FIGURE 2

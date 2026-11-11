@@ -43,7 +43,9 @@ W="$(mktemp -d)" || { echo "FAIL: test_crash_sweep — mktemp -d failed"; exit 2
 case "$(cd "$W" && pwd -P)/" in "$REPO"/tests/*) echo "REFUSED: the scratch directory $W is inside tests/ — the copies must live outside it (#362)"; exit 3 ;; esac
 trap 'rm -rf "$W"' EXIT
 trap 'exit 143' INT TERM   # a TERM must END the run (the EXIT trap then cleans up): a trap on TERM alone returns to the script
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }
+: > "$W/main.log"   # #369: the main check's findings, read by vs_ctl_caught under a mode
+ere_q() { printf '%s' "$1" | sed 's/[][\.*^$+?(){}|]/\\&/g'; }
 CS_PY="$(command -v python3)"; CS_REPO="$REPO"; export CS_PY CS_REPO
 
 LIB="$REPO/tests/lib/crash_sweep.sh"
@@ -65,19 +67,22 @@ cs_mkshim "$W/shim"
 # --- (1) the table is complete and well-formed
 TBL="$T"
 if [ "$VS_CTL" = row-dropped ]; then
-    awk -F'\t' 'BEGIN{d=0} !/^#/ && NF>=10 && $1!="gate" && $7!="-" && !d {d=1; next} {print}' "$T" > "$W/dropped.tsv"; TBL="$W/dropped.tsv"
+    awk -F'\t' 'BEGIN{d=0} !/^#/ && NF>=10 && $1!="gate" && $7!="-" && !d {d=1; print $1 " " $7 > "/dev/stderr"; next} {print}' "$T" > "$W/dropped.tsv" 2> "$W/dropped.which"; TBL="$W/dropped.tsv"
 fi
 if python3 tools/crash_sweep.py check "$TBL" > "$W/check.out" 2>&1; then ok "$(tail -1 "$W/check.out")"
-else sed 's/^/  /' "$W/check.out"; bad "tools/crash_sweep.py check"; fi
-# the in-gate row-dropped control
+else sed 's/^/  /' "$W/check.out"; cat "$W/check.out" >> "$W/main.log"; bad "tools/crash_sweep.py check"; fi
+# the in-gate row-dropped control (a plain run only: under a mode its line is not the mode's evidence, #369)
+if [ -z "${VS_CTL:-}" ]; then
 awk -F'\t' 'BEGIN{d=0} !/^#/ && NF>=10 && $1!="gate" && $7!="-" && !d {d=1; print $1 " " $7 > "/dev/stderr"; next} {print}' "$T" > "$W/drop_ctl.tsv" 2> "$W/drop_ctl.which"
 if python3 tools/crash_sweep.py check "$W/drop_ctl.tsv" 2>&1 | grep -qF "UNCOVERED $(cat "$W/drop_ctl.which"):"; then
     vs_ctl_fired row-dropped "the table without its first site row leaves $(cat "$W/drop_ctl.which") UNCOVERED"
 else vs_ctl_dead row-dropped "dropping the first site row ($(cat "$W/drop_ctl.which")) left check silent"; fi
+fi
 
 if [ "$VS_CTL" = row-dropped ]; then   # the mode judges the check alone: the rows are not what it perturbs
-    [ "$fail" = 1 ] && { echo "FAIL: test_crash_sweep (CONTROL=row-dropped: the check)"; exit 1; }
-    echo "NOT JUDGED: CONTROL=row-dropped — the table without its first site row passed the check"; exit 1
+    [ "$fail" = 1 ] || vs_ctl_left_green row-dropped "FAIL: test_crash_sweep (CONTROL=row-dropped: the table without its first site row passed the check)"
+    vs_ctl_caught "$W/main.log" "UNCOVERED $(ere_q "$(cat "$W/dropped.which")"):" || :
+    echo "FAIL: test_crash_sweep (CONTROL=row-dropped: the check)"; exit 1
 fi
 
 # --- (2) the rows
@@ -117,12 +122,15 @@ while IFS="$(printf '\t')" read -r G TR M K RE NTH SITE FX KB NOTE; do
     done
 done < "$W/rows.tsv"
 echo "  rows: $nrun run (tier $TIER), $nskip NOT RUN (another tier, or no podman for linux)"
-if [ "$nkb" -gt 0 ] && [ "$nkb" = "$nkbok" ]; then vs_ctl_fired helper-neutered "$nkbok of $nkb site rows with a known-bad leg read HONOURED (PASS for PLAIN) with the helper neutered"
+[ "$nrun" -gt 0 ] || { vs_ctl_nj "no row of tier $TIER ran, so the rows judged nothing"   # under a mode: NOT JUDGED, never the left-green DEAD (review r5)
+    [ -z "${VS_CTL:-}" ] || { echo "FAIL: test_crash_sweep (tier $TIER, control mode $VS_CTL)"; exit 1; }; }
+if [ -n "${VS_CTL:-}" ]; then :   # #369: the known-bad tally is the plain run's control line, never a mode's evidence
+elif [ "$nkb" -gt 0 ] && [ "$nkb" = "$nkbok" ]; then vs_ctl_fired helper-neutered "$nkbok of $nkb site rows with a known-bad leg read their frozen known-bad class (HONOURED; PASS for PLAIN; UNJUDGED-CAUGHT once the gate is off #369's debt list) with the helper neutered"
 elif [ "$nkb" = 0 ]; then vs_ctl_dead helper-neutered "no site row ran a known-bad leg in tier $TIER"
 else vs_ctl_dead helper-neutered "$((nkb - nkbok)) of $nkb known-bad legs did not read honoured"; fi
 
 # the in-gate shim-inert control: the first row of this tier, its fx leg on a never-planting library copy
-if [ "$VS_CTL" != shim-inert ] && [ "$nrun" -gt 0 ] && shim_inert_copy "$W/lib_inert_ctl.sh"; then
+if [ -z "${VS_CTL:-}" ] && [ "$nrun" -gt 0 ] && shim_inert_copy "$W/lib_inert_ctl.sh"; then
     first="$(awk -F'\t' -v t="$TIER" '$2==t' "$W/rows.tsv" | head -1)"
     G="$(printf '%s' "$first" | cut -f1)"; M="$(printf '%s' "$first" | cut -f3)"; K="$(printf '%s' "$first" | cut -f4)"
     RE="$(printf '%s' "$first" | cut -f5)"; NTH="$(printf '%s' "$first" | cut -f6)"
@@ -135,7 +143,17 @@ if [ "$VS_CTL" != shim-inert ] && [ "$nrun" -gt 0 ] && shim_inert_copy "$W/lib_i
         "HONOURED 0"|"PASS 0") vs_ctl_fired shim-inert "$G $M with a never-planting shim reads $(cut -d' ' -f1 "$W/inert.res"), no planted call" ;;
         *) vs_ctl_dead shim-inert "$G $M with a never-planting shim read $(cat "$W/inert.res" 2>/dev/null)" ;;
     esac
-elif [ "$VS_CTL" != shim-inert ]; then vs_ctl_dead shim-inert "no row of tier $TIER to run it on"; fi
+elif [ -z "${VS_CTL:-}" ]; then vs_ctl_dead shim-inert "no row of tier $TIER to run it on"; fi
+
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on its own finding in the main check's output
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_crash_sweep (tier $TIER, control mode $VS_CTL)"
+    case "$VS_CTL" in   # helper-neutered: a fx leg read honoured WITH its plant applied; shim-inert: a fx leg with NO planted call
+        helper-neutered) WANT='^  FAIL  row [0-9]+ \(.*\) fx: want [^;]*; got (HONOURED|PASS|UNJUDGED-CAUGHT) h[1-9]' ;;   # UNJUDGED-CAUGHT: a migrated gate's neutered leg (#369 piece 5)
+        shim-inert) WANT='^  FAIL  row [0-9]+ \(.*\) fx: want [^;]*; got (HONOURED|PASS) h0 ' ;;   # a live leg with no planted call, never a dead one (review r5)
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: test_crash_sweep (tier $TIER, control mode $VS_CTL)"; exit 1
+fi
 
 [ "$fail" = 0 ] && { echo "PASS: test_crash_sweep (tier $TIER)"; exit 0; }
 echo "FAIL: test_crash_sweep (tier $TIER)"; exit 1

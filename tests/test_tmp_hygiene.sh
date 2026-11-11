@@ -309,9 +309,23 @@ out="$(python3 tools/tmp_hygiene.py 2>&1)"; rc=$?
 [ -z "$EXTRA" ] || out="$out
 $(python3 tools/tmp_hygiene.py --root "$W/t" $EXTRA 2>&1)"   # the mode: the planted file read with the tree
 echo "$out" | sed 's/^/  /' | tail -12
+printf '%s\n' "$out" > "$W/main.log"   # #369: section 1's census output, the main check's findings
 if [ -z "$EXTRA" ]; then [ "$rc" = 0 ] && ok "no uncleaned temporary in the tree" || bad "an uncleaned temporary (above)"
 else
-    echo "$out" | grep >/dev/null '^UNCLEANED\|^UNSANDBOXED\|^UNGUARDED\|^TRAPPED\|^UNREADTRAP' && { echo "FAIL: test_tmp_hygiene (control mode: the planted site was named)"; exit 1; }
+    if echo "$out" | grep >/dev/null '^UNCLEANED\|^UNSANDBOXED\|^UNGUARDED\|^TRAPPED\|^UNREADTRAP'; then
+        # #369: honoured only on the mode's own finding: its planted site named by the census, with its class
+        S='[[:space:]]'
+        case "$VS_CTL" in
+            planted-mkdtemp) WANT="^UNCLEANED${S}tools/planted\\.py:3${S}f${S}mkdtemp${S}d$" ;;
+            planted-mktemp) WANT="^UNCLEANED${S}tests/planted\\.sh:2${S}shell${S}mktemp${S}W$" ;;
+            planted-unsandboxed) WANT="^UNSANDBOXED${S}tests/unsandboxed\\.sh:3${S}run_replay_mame\\.sh${S}" ;;
+            planted-trapped) WANT="^TRAPPED${S}tests/trap_forms\\.sh:3${S}shell${S}mktemp -d${S}A${S}" ;;
+            planted-unread-trap) WANT="^UNREADTRAP${S}tests/trap_unread\\.sh:3${S}" ;;
+            planted-unguarded) WANT="^UNGUARDED${S}tests/unguarded\\.sh:2${S}shell${S}mktemp -d${S}W${S}" ;;
+        esac
+        vs_ctl_caught "$W/main.log" "$WANT"
+        echo "FAIL: test_tmp_hygiene (control mode: the planted site was named)"; exit 1
+    fi
     vs_ctl_left_green "$VS_CTL" "FAIL: test_tmp_hygiene — the planted site was not named"
 fi
 
@@ -341,6 +355,7 @@ got="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/trap_unread.sh 2>&1 | aw
 [ "$got" = "tests/trap_unread.sh:3 tests/trap_unread.sh:5" ] && ok "two traps the reader cannot read are named UNREADTRAP (an action that is only a variable, an unbalanced quote)" \
     || bad "the unreadable traps named: [$got], want [tests/trap_unread.sh:3 tests/trap_unread.sh:5]"
 
+if [ -z "${VS_CTL:-}" ]; then   # #369: the in-gate controls run in a plain run only
 echo "== 3. controls"
 out="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/trap_forms.sh 2>&1)"
 if echo "$out" | grep >/dev/null '^TRAPPED	tests/trap_forms.sh:3	shell	mktemp -d	A	'; then vs_ctl_fired planted-trapped "$(echo "$out" | grep -m1 TRAPPED | cut -f1-5)"
@@ -362,6 +377,7 @@ out="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/unguarded.sh tests/ungua
 _nf="$(echo "$out" | grep -c '^UNGUARDED	tests/unguarded_forms.sh:\|^UNGUARDED	tests/setetoggle.sh:\|^UNGUARDED	tests/unguarded_forms2.sh:\|^UNGUARDED	tests/unguarded_forms3.sh:\|^UNGUARDED	tests/unguarded_forms4.sh:')"
 if echo "$out" | grep >/dev/null '^UNGUARDED	tests/unguarded.sh:2	shell	mktemp -d	W	' && [ "$_nf" = 38 ]; then vs_ctl_fired planted-unguarded "$(echo "$out" | grep -m1 UNGUARDED | cut -f1-5); and $_nf of the 38 unguarded forms"
 else vs_ctl_dead planted-unguarded "the planted unguarded mktemp -d sites were not all named ($_nf of the 38 forms)"; fail=1; fi
+fi
 
 echo "== 4. the dynamic check: a mktemp that fails, first on PATH (#333)"
 mkdir -p "$W/shim"; printf '#!/bin/sh\necho "mktemp: test_tmp_hygiene shim: failing on purpose" >&2\nexit 1\n' > "$W/shim/mktemp"; chmod +x "$W/shim/mktemp"
@@ -369,7 +385,11 @@ SHIM="$W/shim:"; vs_ctl_is shim-blind && SHIM=""
 under() { env -u CONTROL PATH="$SHIM$PATH" timeout 60 sh "$@" 2>&1; }   # CONTROL unset: a child refusing a mode is no stop
 if vs_ctl_is shim-blind; then   # the mode: no shim, so the guarded gates must run past their mktemp and the gate FAILs
     o="$(under tests/test_live_budget.sh)"; rc=$?
-    [ "$rc" = 0 ] && { echo "FAIL: test_tmp_hygiene (control mode: without the shim test_live_budget ran past its mktemp -d)"; exit 1; }
+    printf '%s\n' "$o" > "$W/shim.log"   # #369: the guarded gate's own output, section 4's finding
+    if [ "$rc" = 0 ]; then   # honoured only on its own finding: the guarded gate ran to its own PASS without the shim
+        vs_ctl_caught "$W/shim.log" '^PASS$'
+        echo "FAIL: test_tmp_hygiene (control mode: without the shim test_live_budget ran past its mktemp -d)"; exit 1
+    fi
     vs_ctl_left_green "shim-blind" "FAIL: test_tmp_hygiene — control mode shim-blind: test_live_budget stopped without the shim (exit $rc)"
 fi
 o="$(under "$W/t/tests/unguarded.sh")"

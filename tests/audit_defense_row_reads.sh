@@ -13,7 +13,7 @@
 # EXPECTS: every tenant hit reads the tenant's own row, the legacy control reads vanilla's
 #   rows, the frozen table equal; a dead window or a foreign row fails. NOT covered: a table
 #   base computed at run time or reached through a data pointer.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/defense_row_reads.tsv
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/defense_row_reads.tsv tests/lib/controls.sh
 #   tests/expected/roster_pairings/bases.tsv tests/lua/read_tap.lua tests/replays/
 #   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
@@ -80,10 +80,18 @@ CONTROL="${CONTROL:-}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 case "$CONTROL" in ""|planted-flavor|range-silent) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_caught / vs_ctl_left_green (#369); the mode is CONTROL, parsed above
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+: > "$W/main.log"   # #369: the main check's findings, read by vs_ctl_caught under a mode
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
-bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
+bad() { printf '  FAIL  %s\n' "$1" | tee -a "$W/main.log"; fail=1; }
+# #369: each mode is honoured only on its own finding — planted-flavor on the own-row check, range-silent on liveness
+case "$CONTROL" in
+planted-flavor) WANT="^  FAIL  a hit read a defense row that is not the victim's own:\$" ;;
+range-silent) WANT='^  FAIL  [a-z]+/[^:]+: P2\(end-probe\) — that window is dead$' ;;
+*) WANT='' ;;
+esac
 RTAP="ff8782,2;ff8b82,2;ff8460,4;ff8860,4"
 RPCS="018c10,018c78,018c40"
 PLANT_POKE="2680:ff8b82:01"
@@ -165,13 +173,14 @@ for d in "$W"/*/*/; do
     [ -z "$_dw" ] || bad "$run: ${_dw}— that window is dead"
 done
 if [ "$CONTROL" = range-silent ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: range-silent — every run reads P2's window dead"; echo "FAIL: audit_defense_row_reads (control mode)"; exit 1
-    else echo "CONTROL DEAD: range-silent — the silenced window still read live"; echo "FAIL: audit_defense_row_reads"; exit 1; fi
+    [ "$fail" = 1 ] || vs_ctl_left_green range-silent "FAIL: audit_defense_row_reads (the silenced window still read live)"
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: audit_defense_row_reads (control mode)"; exit 1
 fi
 [ "$fail" = 0 ] || { echo "FAIL: audit_defense_row_reads"; exit 1; }
 ok "every run ends with both END-probe writes logged"
 _first="$(ls -d "$W"/victim/*/ "$W"/suite/*/ 2>/dev/null | head -1)"
-if [ -n "$_first" ]; then
+if [ -n "$_first" ] && [ -z "$CONTROL" ]; then   # the in-gate control: a plain run only (#369)
     silence_p2 "$_first/t.tap" "$W/ctl_range.tap"
     _dr="$(dead_windows "$W/ctl_range.tap" "$(awk '$1=="END" { print $2 }' "$_first/t.tap")")"
     if [ "$_dr" = "P2(end-probe) " ]; then echo "CONTROL FIRED: range-silent — $(basename "$_first") without P2's accesses reads ${_dr}dead"
@@ -272,7 +281,8 @@ else
 fi
 
 if [ "$CONTROL" = planted-flavor ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: planted-flavor — every victim part reports the planted index"; echo "FAIL: audit_defense_row_reads (control mode)"; exit 1
-    else echo "CONTROL DEAD: planted-flavor — the planted runs passed"; echo "FAIL: audit_defense_row_reads"; exit 1; fi
+    [ "$fail" = 1 ] || vs_ctl_left_green planted-flavor "FAIL: audit_defense_row_reads (the planted runs passed)"
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: audit_defense_row_reads (control mode)"; exit 1
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_defense_row_reads"; else echo "FAIL: audit_defense_row_reads"; exit 1; fi

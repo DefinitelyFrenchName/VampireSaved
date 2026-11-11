@@ -32,10 +32,11 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 [ -f "$ROMDIR/vsav.zip" ] && [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav.zip/vsav2.zip in ROMDIR"; exit 0; }
 . "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69: never re-decrypt directly
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+: > "$W/main.log"
 fail=0
 note() { printf '%s\n' "$*"; }
 chk() { # label expected actual
-    if [ "$2" = "$3" ]; then note "  ok   $1"; else note "  FAIL $1: expected [$2] got [$3]"; fail=1; fi
+    if [ "$2" = "$3" ]; then note "  ok   $1"; else note "  FAIL $1: expected [$2] got [$3]" | tee -a "$W/main.log"; fail=1; fi   # main.log: the findings (#369)
 }
 decrypt_view vsavj "$W/vj_op.bin" "$W/vj_data.bin"
 decrypt_view vsav2 "$W/v2_op.bin" "$W/v2_data.bin"
@@ -86,4 +87,9 @@ if [ -z "${VS_CTL:-}" ]; then
     fi
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: the census moved with vs2's base immediate, in the main check's own output
+    [ "$fail" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL test_quote_font_window (control mode $VS_CTL changed no verdict)"
+    vs_ctl_caught "$W/main.log" '^  FAIL census: expected \[CENSUS codes 331 SAME 289 [^]]*\] got \[CENSUS codes [0-9]+ SAME ' || :
+    note "FAIL test_quote_font_window (control mode $VS_CTL)"; exit 1
+fi
 if [ "$fail" -eq 0 ]; then note "PASS test_quote_font_window"; else note "FAIL test_quote_font_window"; exit 1; fi

@@ -16,7 +16,12 @@
 #   tests/rulecheck a real copy too: its probes write there); audit_latch_reads runs with a stub MAME (exit 0), empty
 #   zips and LEGS=phobos-real, so it refuses or fails before any emulator could start; the rule-checker plant is an
 #   assert placed after the line each shadow rewrites, false only once that line is rewritten.
-# EXPECTS: each plant its class above; the four controls fire.
+# EXPECTS: each plant its class above; the four controls fire. #369 PIECE 5 (maintainer-ruled 2026-11-09, "Name the
+#   speaker"): "must read HONOURED" below holds while the copied gate is on tests/expected/ctl_caught_debt.tsv; once it is
+#   migrated its reverted copy must read UNJUDGED-CAUGHT on every plant instead (tests/lib/classify.sh vs_ctl_class_word:
+#   UNJUDGED by #369's backstop alone, the 14z-215 line gone) — the plain UNJUDGED (that line still speaking) or a
+#   HONOURED (a pattern that also matches the plant's crash: test_rule_checker's unfiltered-plants, 14z-225) is the
+#   control dead. rw() reads the list, so the expectation follows each gate as it migrates.
 # FOLLOWS: tests/audit_latch_reads.sh tests/test_gate_follows.sh tests/test_poke_readback.sh tests/lib/classify.sh
 #   tests/lib/controls.sh tests/lib/jobs.sh tools/tap_latch_reads.sh tools/gate_follows.py tools/audit_poke_readback.py
 #   tools/name_moves.py tests/ci_emulator.tsv tests/test_killshread_es.sh tests/expected/gate_follows.tsv
@@ -45,8 +50,13 @@ fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 run_cl() {
     _lab="$1"; _g="$2"; _c="$3"; shift 3
     env "$@" CONTROL="$_c" sh "$_g" > "$W/$_lab.log" 2>&1 </dev/null && _s=0 || _s=$?
-    CL="$(sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" "$5"; echo "$VS_CTL_EXEC"' _ "$REPO/tests/lib/classify.sh" "$_s" "$W/$_lab.log" "$_g" "$_c")"
+    CL="$(sh -c '. "$1"; vs_classify_control "$2" "$3" "$4" "$5"; vs_ctl_class_word' _ "$REPO/tests/lib/classify.sh" "$_s" "$W/$_lab.log" "$_g" "$_c")"
 }
+# rw <gate> <n> — what each of a reverted copy's <n> plants must read (#369 piece 5, maintainer-ruled 2026-11-09 "Name the
+# speaker"): HONOURED while <gate> is on tests/expected/ctl_caught_debt.tsv (the pre-#369 fall-through gives the false
+# honour back); UNJUDGED-CAUGHT once it is migrated — #369's backstop, not the 14z-215 line, is then what refuses it, and
+# a reverted copy still reading the plain UNJUDGED (its 14z-215 line still speaking) or HONOURED is the control dead.
+rw() { _rw=UNJUDGED-CAUGHT; vs_ctl_debt_listed "$1.sh" && _rw=HONOURED; _rwo="$_rw"; _i=1; while [ "$_i" -lt "$2" ]; do _rwo="$_rwo $_rw"; _i=$((_i + 1)); done; echo "$_rwo"; }
 # mirror <dir> — a tree of links to this one whose tests/ is a real directory of links, so a plant replaces one file
 mirror() {
     mkdir -p "$1/tests"
@@ -154,12 +164,14 @@ if [ -n "$VS_CTL" ]; then   # THE MODE: the plants run on the reverted copy; the
                       pokerb-fix-reverted) k=pokerb; src=tests/test_poke_readback.sh ;;
                       rulecheck-fix-reverted) k=rulecheck; src=tests/test_rule_checker.sh ;; esac
     revert "$k" "$src" "$W/reverted.sh" || { echo "REFUSED: $VS_CTL — the 14z-215 lines were not found to revert: the mode judged nothing"; exit 3; }
-    case "$k" in latch) prove_latch "$W/reverted.sh"; got="$LA1 $LA2 $LA3"; want="HONOURED HONOURED HONOURED" ;;
-                 follows) prove_follows "$W/reverted.sh"; got="$GF1 $GF2"; want="HONOURED HONOURED" ;;
-                 pokerb) prove_pokerb "$W/reverted.sh"; got="$PR1 $PR2"; want="HONOURED HONOURED" ;;
-                 rulecheck) prove_rulecheck "$W/reverted.sh"; got="$RC1 $RC2"; want="HONOURED HONOURED" ;; esac
-    echo "MODE: control $VS_CTL — the plants on the reverted copy read: $got"
-    if [ "$got" = "$want" ]; then vs_ctl_fired "$VS_CTL" "the reverted copy reads $got (mode)"; echo "FAIL: test_plants_not_applied (control mode $VS_CTL)"; exit 1; fi
+    case "$k" in latch) prove_latch "$W/reverted.sh"; got="$LA1 $LA2 $LA3"; want="$(rw audit_latch_reads 3)" ;;
+                 follows) prove_follows "$W/reverted.sh"; got="$GF1 $GF2"; want="$(rw test_gate_follows 2)" ;;
+                 pokerb) prove_pokerb "$W/reverted.sh"; got="$PR1 $PR2"; want="$(rw test_poke_readback 2)" ;;
+                 rulecheck) prove_rulecheck "$W/reverted.sh"; got="$RC1 $RC2"; want="$(rw test_rule_checker 2)" ;; esac
+    echo "MODE: control $VS_CTL — the plants on the reverted copy read: $got" | tee "$W/main.log"
+    if [ "$got" = "$want" ]; then   # #369: the mode's finding is the reverted copy reading exactly what the revert must give
+        vs_ctl_caught "$W/main.log" "^MODE: control $VS_CTL — the plants on the reverted copy read: $want\$" || :
+        echo "FAIL: test_plants_not_applied (control mode $VS_CTL)"; exit 1; fi
     case "$got" in *UNJUDGED*|*DIED*) vs_ctl_left_green "$VS_CTL" "FAIL: test_plants_not_applied — control mode $VS_CTL: the reverted copy still reads $got" ;; esac
     echo "NOT JUDGED: $VS_CTL — the reverted copy read $got, neither the fix's classes nor the false honour"; echo "FAIL: test_plants_not_applied"; exit 1
 fi
@@ -198,10 +210,10 @@ echo "== 5. controls: each gate with its 14z-215 lines reverted reads HONOURED o
 for c in latch-fix-reverted:latch:tests/audit_latch_reads.sh follows-fix-reverted:follows:tests/test_gate_follows.sh pokerb-fix-reverted:pokerb:tests/test_poke_readback.sh rulecheck-fix-reverted:rulecheck:tests/test_rule_checker.sh; do
     n="${c%%:*}"; r="${c#*:}"; k="${r%%:*}"; src="${r#*:}"
     if ! revert "$k" "$src" "$W/rev_$k.sh" > "$W/rev_$k.err" 2>&1; then vs_ctl_dead "$n" "the 14z-215 lines were not found to revert: $(tail -1 "$W/rev_$k.err")" || fail=1; continue; fi
-    case "$k" in latch) prove_latch "$W/rev_$k.sh"; got="$LA1 $LA2 $LA3"; want="HONOURED HONOURED HONOURED" ;;
-                 follows) prove_follows "$W/rev_$k.sh"; got="$GF1 $GF2"; want="HONOURED HONOURED" ;;
-                 pokerb) prove_pokerb "$W/rev_$k.sh"; got="$PR1 $PR2"; want="HONOURED HONOURED" ;;
-                 rulecheck) prove_rulecheck "$W/rev_$k.sh"; got="$RC1 $RC2"; want="HONOURED HONOURED" ;; esac
+    case "$k" in latch) prove_latch "$W/rev_$k.sh"; got="$LA1 $LA2 $LA3"; want="$(rw audit_latch_reads 3)" ;;
+                 follows) prove_follows "$W/rev_$k.sh"; got="$GF1 $GF2"; want="$(rw test_gate_follows 2)" ;;
+                 pokerb) prove_pokerb "$W/rev_$k.sh"; got="$PR1 $PR2"; want="$(rw test_poke_readback 2)" ;;
+                 rulecheck) prove_rulecheck "$W/rev_$k.sh"; got="$RC1 $RC2"; want="$(rw test_rule_checker 2)" ;; esac
     if [ "$got" = "$want" ]; then vs_ctl_fired "$n" "the reverted copy reads $got on its plants"
     else vs_ctl_dead "$n" "the reverted copy reads $got (want $want)" || fail=1; fi
 done

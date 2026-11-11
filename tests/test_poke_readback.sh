@@ -38,7 +38,8 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 EXP=tests/expected/poke_readback.tsv
 W="$(mktemp -d "${TMPDIR:-/tmp}/pokerb.XXXXXX")" || { echo "FAIL: test_poke_readback — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # main.log: the check's findings (#369)
+: > "$W/main.log"
 
 census() {  # census ROOT -> gate<TAB>addr<TAB>sample (sorted), frames dropped
     python3 tools/audit_poke_readback.py --root "$1" 2>"$W/census.err" | awk -F'\t' 'NF==5 {print $1"\t"$2"\t"$4}' | sort -u
@@ -123,9 +124,12 @@ for c in UNCLASSIFIED OBSERVES READS-BACK CONTROL-PLANT CROSS-LEG RETIRED; do pr
 if [ -n "$VS_CTL" ]; then
     grep -q 'Traceback' "$W/census.err" && cat "$W/census.err"
     case "$VS_CTL" in
-        known-case-blind) want_new=""; want_stale="test_killshread_es	ff8509	FIELDS:stock" ;;
-        rig-poke-width)   want_new="$g	ff8850	FIELDS:p2white"; want_stale="" ;;
-        *)                want_new="$g	ff8782	FIELDS:id"; want_stale="" ;;
+        known-case-blind) want_new=""; want_stale="test_killshread_es	ff8509	FIELDS:stock"
+                          WANT='^  FAIL  the known case did NOT derive — the census is blind to its positive control$' ;;
+        rig-poke-width)   want_new="$g	ff8850	FIELDS:p2white"; want_stale=""
+                          WANT="^  FAIL  finding\\(s\\) with no row .*: $g:ff8850:FIELDS:p2white \$" ;;
+        *)                want_new="$g	ff8782	FIELDS:id"; want_stale=""
+                          WANT="^  FAIL  finding\\(s\\) with no row .*: $g:ff8782:FIELDS:id \$" ;;
     esac
     other=""
     [ "$n" -gt 0 ] || other="; the census on the copy derived nothing"
@@ -144,7 +148,8 @@ if [ -n "$VS_CTL" ]; then
         echo "NOT JUDGED: $VS_CTL — the copy is red on something that is not this mode's own finding ($other), so its FAIL is not the perturbation caught"
         echo "FAIL"; exit 1
     elif [ -n "$own" ]; then
-        vs_ctl_fired "$VS_CTL" "$own, and nothing else on the copy is red (mode)"; echo "FAIL"; exit 1
+        echo "  the mode's own finding: $own, and nothing else on the copy is red"
+        vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL"; exit 1
     elif [ "$fail" = 0 ]; then
         vs_ctl_left_green "$VS_CTL" "FAIL: test_poke_readback — control mode $VS_CTL: the perturbed copy derived no finding of $g"
     else

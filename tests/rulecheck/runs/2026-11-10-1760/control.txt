@@ -1,0 +1,2 @@
+fixture	inferred-decision-14z162
+slot	b

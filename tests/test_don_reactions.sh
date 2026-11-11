@@ -5,7 +5,7 @@
 #   (the maintainer's gameplay lock), the sworded deity's fatal hit runs the complete death
 #   chain, and the total damage stays within the measured native bound.
 # HOW: replays on MAME against a stock build reading the victim's node family, hits and
-#   damage from dumps; the control forces the victim node into the knockdown family.
+#   damage from dumps; the control plants a knockdown-family node in a copy of the victim dumps.
 # EXPECTS: multi-hit, no knockdown, the death chain complete, damage within bound; the
 #   knockdown control fails. The two-sided native comparison is test_don_immortal_native's;
 #   this gate keeps the one-sided locks honest.
@@ -14,7 +14,7 @@
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
 #
-# MUST-FIRE: known-bad: knockdown-forbidden — 421P must not knock down a standing opponent, so a knockdown-family node reading must fail section 1 (mode: the victim node is forced into the knockdown family so the no-knockdown assertion fails and the gate FAILs)
+# MUST-FIRE: known-bad: knockdown-forbidden — 421P must not knock down a standing opponent, so a knockdown-family node reading must fail section 1 (mode: a knockdown-family node is planted in a copy of section 1's victim dumps, which section 1 reads, so the no-knockdown assertion fails and the gate FAILs)
 #
 # GAMEPLAY LOCK (round-41, maintainer): 421P is a standing up-to-8-hit
 # multi — it must MULTI-HIT and must NOT knock down a standing
@@ -133,7 +133,24 @@ vs_pool_run run_replay hc2 60_don_grapple_hcb "" "2780:ff8400-ff8430;2800:ff8400
 vs_pool_wait
 
 run_status hp
-python3 - "$WORK/hp" "$MODE" <<'EOF2'
+# THE EXECUTABLE MODE (#369): a knockdown-family node (0x158000) is PLANTED in a COPY of section 1's dumps — the victim's
+# node longword at +0x1C of the first sampled frame's ff8800 dump — and section 1 reads the copy, so its FAIL comes out of
+# the same node read and family range test that judge the real run.
+S1DIR="$WORK/hp"
+if [ "$MODE" = knockdown-forbidden ]; then
+    rm -rf "$WORK/hp_kd"; cp -R "$WORK/hp" "$WORK/hp_kd"; S1DIR="$WORK/hp_kd"
+    python3 - "$S1DIR" <<'EOF2' || :
+import sys, os, glob
+work = sys.argv[1]
+frames = sorted(int(os.path.basename(p).split('_')[1])
+                for p in glob.glob(os.path.join(work, 'dump_*_ff8850.bin')))
+p = os.path.join(work, f'dump_{frames[0]}_ff8800.bin') if frames else ''
+if p and os.path.isfile(p):
+    b = bytearray(open(p, 'rb').read()); b[0x1c:0x20] = (0x158000).to_bytes(4, 'big'); open(p, 'wb').write(bytes(b))
+EOF2
+fi
+s1=0   # #369: section 1's verdict lands in a file, so its mode reads its own finding there
+python3 - "$S1DIR" "$MODE" > "$WORK/s1.txt" <<'EOF2' || s1=$?
 import sys, os, glob
 work = sys.argv[1]
 MODE = sys.argv[2] if len(sys.argv) > 2 else ""
@@ -147,13 +164,9 @@ for f in frames:
     ob = open(os.path.join(work, f'dump_{f}_ff8800.bin'),'rb').read()
     node = int.from_bytes(ob[0x1c:0x20],'big')
     kd = 0x157F00 <= node <= 0x1586FF
-    # THE EXECUTABLE MODE: force a knockdown reading on the first frame, so the
-    # no-knockdown assertion fails and the gate FAILs (a clean exit, not a crash).
-    if MODE == "knockdown-forbidden" and f == frames[0]: kd = True
     if kd:
         print(f"FAIL: victim in knockdown-family node {node:#x} at f{f} — 421P must "
-              f"not knock down a standing opponent (the 14z-27 regression)"
-              + (f" [MODE={MODE}: forced]" if MODE == "knockdown-forbidden" else ""))
+              f"not knock down a standing opponent (the 14z-27 regression)")
         sys.exit(1)
     if hp_first is None: hp_first = hp
     if prev is not None and hp < prev:
@@ -176,10 +189,15 @@ assert last_hit_frame is not None and 2670 <= last_hit_frame <= 2700, (
     f"last damage step at f{last_hit_frame} — native-class window is f2670-2700 "
     f"(native f2685, ours f2690). Above: running slow (hit-freeze regression). "
     f"Below: ending early")
-print("CONTROL FIRED: knockdown-forbidden — no knockdown-family node was seen through the multi-hit; the mode forces one and the gate FAILs")
+if not MODE: print("CONTROL FIRED: knockdown-forbidden — no knockdown-family node was seen through the multi-hit; the mode plants one and the gate FAILs")
 print(f"  ok: 421P multi-hits ({hits} steps, {total} total, last at "
       f"f{last_hit_frame}) native-class, no knockdown on a standing opponent")
 EOF2
+cat "$WORK/s1.txt"
+if [ "$s1" != 0 ]; then
+    [ -z "$MODE" ] || vs_ctl_caught "$WORK/s1.txt" 'FAIL: victim in knockdown-family node 0x158000 at f[0-9]+ — 421P must not knock down a standing opponent \(the 14z-27 regression\)$' || :
+    exit "$s1"
+fi
 # ── 2. fatal: the full native electric death chain ───────────────────
 run_status ko
 
@@ -311,4 +329,5 @@ assert any(0x0D0000 <= n <= 0x0DF000 and not (0x0D3000 <= n <= 0x0D3800) for n i
     f"63214 accept broken (check the 0x2915C/0x29164 farm_port rows)")
 print("  ok: half-circle commands accept (Blizzard 41236 + Grapple 63214)")
 EOF2
+[ -z "$MODE" ] || vs_ctl_left_green "$MODE" "FAIL: Donovan hit-class reaction gate — control mode $MODE left the gate green"
 echo "PASS: Donovan hit-class reaction gate"

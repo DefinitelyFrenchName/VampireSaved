@@ -113,7 +113,8 @@ if vs_ctl_is flipped-patch-byte; then
         vs_ctl_dead flipped-patch-byte "a patch with a flipped byte still decoded to the manifest's sha1" || true
         echo "FAIL: test_applier_vcdiff"; exit 1
     fi
-    vs_ctl_fired flipped-patch-byte "a flipped patch byte is caught: $(grep -m1 -E '^  (WRONG|REFUSED)' "$W/out.txt" | cut -c3-72)"
+    # #369: the decoder's own finding for the flipped patch (the first vsavjw patch, d_vm3_13m.xdelta's member)
+    vs_ctl_caught "$W/out.txt" '^  (WRONG|REFUSED) vm3[.]13m: ' || :
     echo "FAIL: test_applier_vcdiff (control mode: the perturbed patch was correctly rejected)"
     exit 1
 fi

@@ -207,6 +207,8 @@ else
 fi
 
 # ---- must-fire controls: each perturbation of a REAL recorded input must FAIL, for the stated reason
+# (a plain run only: under a mode its firing line is never the mode's evidence, #369)
+if [ -z "${VS_CTL:-}" ]; then
 perturb_member "$W/windows.log" "$W/c1.log"
 if check "$W/c1.log" windows "$PATCH" "$W/c1.txt"; then
     vs_ctl_dead wide-member-dropped "the Windows boot with vsw.41 never loaded still passed" || true; fail=1
@@ -230,6 +232,18 @@ elif grep -q 'REFUSING' "$W/c3.txt"; then
     vs_ctl_fired descriptor-unreadable "$(grep -m1 'REFUSING' "$W/c3.txt")"
 else
     vs_ctl_dead descriptor-unreadable "failed for another reason: $(grep -m1 '^FAIL' "$W/c3.txt")" || true; fail=1
+fi
+fi
+
+if [ -n "${VS_CTL:-}" ]; then   # #369: honoured only on the finding in the section that read the perturbed input
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_fbneo_boot_log"
+    case "$VS_CTL" in
+        wide-member-dropped) MAINLOG="$W/s1.txt"; WANT='never loaded \(OK\): vsw\.41$' ;;
+        profile-line-dropped) MAINLOG="$W/s2.txt"; WANT='but `CPS-2 WIDE v1 profile active` does not — vsavjw booted without the WIDE init' ;;
+        descriptor-unreadable) MAINLOG="$W/s1.txt"; WANT='could not read the vsavjw descriptor .*REFUSING' ;;
+    esac
+    vs_ctl_caught "$MAINLOG" "$WANT" || :
+    echo "FAIL: test_fbneo_boot_log"; exit 1
 fi
 
 [ "$fail" = 0 ] && echo "PASS: test_fbneo_boot_log" || { echo "FAIL: test_fbneo_boot_log"; exit 1; }

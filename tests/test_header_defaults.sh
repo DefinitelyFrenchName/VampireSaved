@@ -66,14 +66,23 @@ fi
 
 echo "== 1. the tree"
 if out="$(python3 tools/audit_header_defaults.py $ROOT_ARGS 2>&1)"; then
+    printf '%s\n' "$out" > "$T/main.log"
     echo "  ok: $out"
 else
+    printf '%s\n' "$out" > "$T/main.log"   # #369: the main check's findings
     printf '%s\n' "$out" | sed 's/^/  /'
     echo "  FAIL: fix the header, or re-point the code default — then re-run."
     echo "        tools/audit_header_defaults.py --fix rewrites the mechanical ones."
     rc=1
 fi
 
+if [ -n "$VS_CTL" ]; then   # #369: a mode is judged on the main check's own finding; the stub controls run in a plain run only
+    if [ "$rc" != 0 ]; then
+        vs_ctl_caught "$T/main.log" '^ *tests/g_a\.sh +code defaults: build/new_dir$' || :
+        echo; echo "FAIL: see above"
+    else echo; echo "PASS: every header states the default its code uses"; fi
+    exit $rc
+fi
 echo "== 2. must-fire controls (each MUST be caught)"
 # A: a Usage line naming a dir the code does not default to -> CAUGHT
 mk_stale "$T/tests"

@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3914 |
+| distinct program-space addresses named | 3918 |
 | named by a document or manifest only | 2372 |
 | named by both a document/manifest and code | 1030 |
-| named by CODE ONLY (the gap list below) | 512 |
+| named by CODE ONLY (the gap list below) | 516 |
 | carried by atlas | 821 |
 | carried by engine_internals | 933 |
 | carried by other docs | 1111 |
 | carried by manifests | 1932 |
-| carried by code | 1542 |
+| carried by code | 1546 |
 
 ## Addresses
 
@@ -3642,6 +3642,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x02AE12` | tests/audit_don_row0c.sh; tests/test_m3a_reproducible.sh |
 | `PRG:0x02AE13` | tests/audit_don_row0c.sh |
 | `PRG:0x02AE14` | tests/audit_don_row0c.sh |
+| `PRG:0x02AE2C` | tests/test_perframe_hook.sh |
 | `PRG:0x02B674` | tests/test_variant_dispatch.sh |
 | `PRG:0x02CB7A` | tests/audit_tenant_cpu_ai.sh |
 | `PRG:0x02CB7C` | tests/audit_tenant_cpu_ai.sh |
@@ -3860,6 +3861,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x151B5C` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x157A50` | tests/audit_don_grab_pose.sh |
 | `PRG:0x157F00` | tests/test_don_reactions.sh |
+| `PRG:0x158000` | tests/test_don_reactions.sh |
 | `PRG:0x1586FF` | tests/test_don_reactions.sh |
 | `PRG:0x167146` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x167398` | tests/test_anim_signed_offsets.sh |
@@ -3958,3 +3960,5 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x3FB882` | tests/lua/fsm_census.lua; tools/audit_fsm_census.py |
 | `PRG:0x3FCD60` | tests/test_effect_placeholders.sh |
 | `PRG:0x3FEE04` | tests/test_effect_placeholders.sh |
+| `PRG:0x3FEE18` | tests/test_effect_placeholders.sh |
+| `PRG:0x3FFFFE` | tests/audit_dead_span_exec.sh |

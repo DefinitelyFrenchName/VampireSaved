@@ -213,7 +213,8 @@ mkroot() {  # mkroot <dir> <README body> <a.md body>
     printf '%b' "$2" > "$1/docs/README.md"
     printf '%b' "$3" > "$1/docs/a.md"
 }
-control() {  # control <name> <root> <expected substring>
+control() {  # control <name> <root> <expected substring>; a plain run only (#369: never a mode's evidence)
+    [ -z "${VS_CTL:-}" ] || return 0
     if python3 "$TOOL" --root "$2" --check > "$2/log" 2>&1; then
         vs_ctl_dead "$1" "the generator ACCEPTED it — the check is not checking"; bad "$1"
     elif grep -q "$3" "$2/log"; then
@@ -263,7 +264,8 @@ printf '# idx\n\nsee [a](project/a.md)\n' > "$W/r4/docs/README.md"
 printf '# A file\n\nrun `bbh one\n## Topic one\ntwo` and stop\n\nfacts about `PRG:0x0F1234`\n' \
     > "$W/r4/docs/project/a.md"
 # the control's own liveness: the address must actually be collected
-if [ "$(python3 -c "import sys;sys.path.insert(0,'tools');import gen_annotations as g;from pathlib import Path;print(len(g.collect(Path('$W/r4'))))")" = "0" ]; then
+if [ -n "${VS_CTL:-}" ]; then :   # the in-gate controls run in a plain run only (#369)
+elif [ "$(python3 -c "import sys;sys.path.insert(0,'tools');import gen_annotations as g;from pathlib import Path;print(len(g.collect(Path('$W/r4'))))")" = "0" ]; then
     vs_ctl_dead address-index-no-heading "the fixture collects NO address — the control is dead"; bad "address-index-no-heading"
 else
     control address-index-no-heading "$W/r4" "address index"
@@ -345,7 +347,8 @@ if balance "$SITE" > "$W/bal.log" 2>&1; then
 else
     bad "malformed page(s):"; sed 's/^/        /' "$W/bal.log" | head -8
 fi
-if balance "$W/site_bad" > "$W/bal_bad.log" 2>&1; then
+if [ -n "${VS_CTL:-}" ]; then :   # the in-gate control runs in a plain run only (#369)
+elif balance "$W/site_bad" > "$W/bal_bad.log" 2>&1; then
     vs_ctl_dead unclosed-header "an unclosed <header> was ACCEPTED — the structure check is dead"; bad "unclosed-header"
 elif grep -q "header" "$W/bal_bad.log"; then
     vs_ctl_fired unclosed-header "an unclosed <header> is caught ($(head -1 "$W/bal_bad.log"))"
@@ -354,4 +357,17 @@ else
     sed 's/^/        /' "$W/bal_bad.log" | head -4
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on its own finding in the check it perturbs
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL"
+    MAINLOG="$W/check.log"   # section 1's --check on the perturbed corpus copy
+    case "$VS_CTL" in
+        unsupported-construct) WANT='docs/game/atlas/id_space\.md:[0-9]+: unsupported construct: h4 heading' ;;
+        unresolved-link) WANT='docs/README\.md: unresolved link -> game/atlas/nope_file\.md' ;;
+        dangling-anchor) WANT='docs/README\.md: dangling anchor -> game/atlas/id_space\.md#no-such-heading-anywhere ' ;;
+        address-index-no-heading) WANT="address index: PRG:0x0F1234 names section 'Topic none' in docs/project/mister_fit\\.md" ;;
+        unclosed-header) MAINLOG="$W/bal.log"; WANT='^index\.html: <header> is never closed' ;;   # section 9 on the perturbed site
+    esac
+    vs_ctl_caught "$MAINLOG" "$WANT"
+    echo "FAIL"; exit 1
+fi
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

@@ -68,7 +68,7 @@ if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; tra
 W="$(cd "$W" && pwd)"
 echo "  host $(uname -sm); MAME_BIN $MAME_BIN"
 echo "build under test: $BUILD ($(shasum "$BUILD/prg/vm3j.04d" | cut -c1-8) vm3j.04d), FRAMES=$FRAMES"
-fail=0
+fail=0; deadleg=0
 PL="$BUILD/patch/placements.json"
 
 # tenant : venue : mask : CPU class : anim region : ours P1 route : vs2 P1 route : P1 class
@@ -116,7 +116,7 @@ wait   # a teardown segfault (MFI-12) is not a verdict: the traces decide
 echo "== 2. liveness and the pins"
 for t in phobos pyron donovan; do for c in passive active; do for s in ours native; do
     _d="$W/${t}_${c}_$s"
-    if python3 - "$_d/trace.txt" "$(field "$t" 8)" "$(field "$t" 4)" "$FRAMES" "${t}_${c}_$s" <<'PY'; then :; else fail=1; fi
+    if python3 - "$_d/trace.txt" "$(field "$t" 8)" "$(field "$t" 4)" "$FRAMES" "${t}_${c}_$s" <<'PY'; then :; else fail=1; deadleg=1; fi
 import sys
 path, p1, p2, frames, name = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), sys.argv[5]
 rows = {}
@@ -161,6 +161,7 @@ done; done
 grep -E "^== |^(FRAMES|DIST|AIR|NODE|SEQ|CMD|SCRIPT) " "$GOT" | sed 's/^/    /'
 
 echo "== 4. the must-fire controls (in-gate)"
+if [ -z "${VS_CTL:-}" ]; then   # #369: the in-gate controls run in a plain run only
 python3 tools/cpu_soak_dist.py "$W/phobos_passive_ours/trace.txt" "$W/phobos_passive_native/trace.txt" "$PL" anim@huitzil --from 2900 > "$W/ctl_right.txt" || fail=1
 python3 tools/cpu_soak_dist.py "$W/phobos_passive_ours/trace.txt" "$W/phobos_passive_native/trace.txt" "$PL" anim@huitzil --from 2900 --raw > "$W/ctl_raw.txt" || fail=1
 python3 tools/cpu_soak_dist.py "$W/phobos_passive_ours/trace.txt" "$W/pyron_passive_native/trace.txt" "$PL" anim@huitzil --from 2900 > "$W/ctl_wrong.txt" || fail=1
@@ -178,6 +179,7 @@ if python3 -c "import sys; sys.exit(0 if float('$w_tv') > float('$r_tv') else 1)
     vs_ctl_fired wrong-character "ours Phobos vs native Pyron: NODE tvd $w_tv (same character $r_tv); SEQ $(tv_of "$W/ctl_right.txt" SEQ) -> $(tv_of "$W/ctl_wrong.txt" SEQ), CMD $(tv_of "$W/ctl_right.txt" CMD) -> $(tv_of "$W/ctl_wrong.txt" CMD)"
 else
     vs_ctl_dead wrong-character "another character's CPU read NODE tvd [$w_tv] against [$r_tv] — the instrument cannot tell them apart" || fail=1
+fi
 fi
 
 echo "== 5. the frozen figures"
@@ -254,12 +256,19 @@ PYS
 fi
 
 if [ -n "${VS_CTL:-}" ]; then   # the mode's verdict is the gate's own: it must FAIL; a PASS here is a dead control
-    if [ "$fail" = 1 ]; then
-        vs_ctl_fired "$VS_CTL" "the gate ran with $VS_CTL applied to every pair and failed"
+    case "$VS_CTL" in   # #369: the finding each perturbation must produce, in the frozen-figure diff
+        no-translation) WANT='^> NODE tvd [0-9.]+ events ours [1-9][0-9]* native [1-9][0-9]* keys ours [1-9][0-9]* native [1-9][0-9]* shared 0$' ;;
+        wrong-character) WANT='^> (DIST|AIR|SEQ|CMD) .*$' ;;
+    esac
+    if [ "$deadleg" = 1 ]; then   # a dead leg moves the figures by itself: not the mode's finding
+        vs_ctl_nj "a leg was DEAD in section 2 (no trace, the pins or the pairing), so its moved figures are not this mode's finding"
         echo "FAIL: audit_tenant_cpu_soak (control mode)"; exit 1
     fi
-    vs_ctl_dead "$VS_CTL" "the gate PASSED with the control applied" || true
-    echo "PASS: audit_tenant_cpu_soak (control mode — the control is DEAD)"; exit 0
+    if [ "$fail" = 1 ]; then
+        vs_ctl_caught "$W/diff.txt" "$WANT" || :
+        echo "FAIL: audit_tenant_cpu_soak (control mode)"; exit 1
+    fi
+    vs_ctl_left_green "$VS_CTL" "FAIL: audit_tenant_cpu_soak (control mode)"
 fi
 [ "$fail" = 0 ] && { echo "PASS: audit_tenant_cpu_soak"; exit 0; }
 echo "FAIL: audit_tenant_cpu_soak"; exit 1

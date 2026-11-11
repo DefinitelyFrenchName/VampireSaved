@@ -55,7 +55,7 @@ W="$(mktemp -d)" || { echo "FAIL: audit_vanilla_specials_b — mktemp -d failed 
 if [ -n "${KEEP:-}" ]; then mkdir -p "$KEEP"; trap 'cp -R "$W"/. "$KEEP"/ 2>/dev/null; rm -rf "$W"' EXIT; else trap 'rm -rf "$W"' EXIT; fi
 bad=0
 ok()  { echo "  ok    $1"; }
-nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
+nope() { echo "  FAIL  $1"; echo "  FAIL  $1" >> "$W/main.log"; bad=$((bad + 1)); }   # #369: the findings a mode reads
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 . "$REPO/tests/lib/instr_align.sh"
 [ "$MODE" = unsigned-offsets ] && export SPECIALS_UNSIGNED=1
@@ -81,7 +81,18 @@ if [ ! -f "$IMG" ]; then
 fi
 # WHICH ROM AND WHICH IMAGE (14z-209, rule-checker run 2026-10-25-1294 Q1/Q4): tests/lib/pristine_vsavj.sh.
 . "$REPO/tests/lib/pristine_vsavj.sh"
-vs_pristine_vsavj "$W/pv" "$IMG" || { echo "FAIL: audit_vanilla_specials_b (the ROM or the analysed image is not pristine vsavj)"; exit 1; }
+# #369: the check's lines land in a file, so a provenance mode reads its own finding there (the four checks of
+# tests/lib/pristine_vsavj.sh, each mode's FAIL line as _pv_check prints it)
+case "$MODE" in
+foreign-image) CTL_WANT="^FAIL: the analysed image .*/ctl/foreign_data\.bin \(sha1 [0-9a-f]+\) is not vsavj's data view decrypted afresh from ROMDIR" ;;
+foreign-romset) CTL_WANT='^FAIL: ROMDIR is not the pristine reference set \(tools/audit_roms.py against docs/checksums.txt\):$' ;;
+foreign-rompath) CTL_WANT="^FAIL: MAME_ROMPATH is set \('.*/ctl/romdir_foreign'\), so the MAME legs would not load the audited ROMDIR" ;;
+foreign-mame) CTL_WANT="^FAIL: the MAME the legs run is not the pin's release:\$" ;;
+esac
+vs_pristine_vsavj "$W/pv" "$IMG" > "$W/pv.txt" || { cat "$W/pv.txt"
+    case "$MODE" in foreign-*) vs_ctl_caught "$W/pv.txt" "$CTL_WANT" ;; esac
+    echo "FAIL: audit_vanilla_specials_b (the ROM or the analysed image is not pristine vsavj)"; exit 1; }
+cat "$W/pv.txt"
 if [ -z "$MODE" ]; then vs_pristine_vsavj_controls "$W/pv" || { echo "FAIL: audit_vanilla_specials_b (a provenance control is dead)"; exit 1; }; fi
 ALL="LE LI MO QB SA VI ZA"
 FIELDS="$(python3 tools/specials_b_rigs.py fields)"
@@ -138,7 +149,7 @@ if [ "${FREEZE:-0}" = 1 ]; then
 fi
 if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "every tap leg on emulated time, at its frozen game clock"
 else nope "the alignment:"; sed 's/^/        /' "$W/align_bad.txt"; fi
-ia_stage audit_vanilla_specials_b "$CLOCKS" "$INSTR" "$W/manifest.tsv" 1 "$W/st" "$MODE" || bad=$((bad + 1))
+ia_stage audit_vanilla_specials_b "$CLOCKS" "$INSTR" "$W/manifest.tsv" 1 "$W/st" "$MODE" > "$W/stage.txt" || bad=$((bad + 1)); cat "$W/stage.txt"   # #369: first-frame-skip reads its finding here
 : > "$W/idalign_bad.txt"
 for t in $ALL; do ia_check "$CLOCKS" tap "${t}_whiff" "$W/legs/$t/id/align" >> "$W/idalign_bad.txt" || true; done
 if [ -s "$W/idalign_bad.txt" ]; then nope "the identity legs' alignment:"; sed 's/^/        /' "$W/idalign_bad.txt"
@@ -158,8 +169,9 @@ for r in json.load(open(sys.argv[1])):
     print("\t".join([sys.argv[2], r["name"], r["input"], r.get("special") or r["entered"], r["entered"], st]))
 PY
 done
-if awk -F'\t' '$6 != "FIRED"' "$W/got.txt" | grep -q .; then
-    nope "rows that did not fire a special chain:"; awk -F'\t' '$6 != "FIRED"' "$W/got.txt" | sed 's/^/        /'
+awk -F'\t' '$6 != "FIRED"' "$W/got.txt" > "$W/s4_unfired.txt"   # #369: unsigned-offsets reads its finding here
+if [ -s "$W/s4_unfired.txt" ]; then
+    nope "rows that did not fire a special chain:"; sed 's/^/        /' "$W/s4_unfired.txt"
 else ok "every row fired a special chain ($(grep -c . "$W/got.txt") rows; none UNFIRED, none DEGRADED)"; fi
 if [ "${FREEZE:-0}" = 1 ]; then
     { echo "# tests/expected/vanilla_specials_b.tsv — tests/audit_vanilla_specials_b.sh's frozen identity map (#229 F2,"
@@ -170,7 +182,7 @@ fi
 grep -v '^#' "$EXP" > "$W/exp.txt" 2>/dev/null || : > "$W/exp.txt"
 if [ "$MODE" = swapped-strengths ]; then swap_strengths "$W/exp.txt" "$W/exp.sw" && mv "$W/exp.sw" "$W/exp.txt"; fi
 if [ -s "$W/exp.txt" ] && cmp -s "$W/exp.txt" "$W/got.txt"; then ok "the measured map equals $EXP ($(grep -c . "$W/got.txt") rows)"
-else nope "the identity map moved"; diff "$W/exp.txt" "$W/got.txt" | head -20; fi
+else nope "the identity map moved"; diff "$W/exp.txt" "$W/got.txt" > "$W/s4.diff"; head -20 "$W/s4.diff"; fi
 
 echo "== 5. the timing, in engine passes (the tap)"
 ticks_table() {   # ticks_table <out.tsv>: one row per event of every leg, from its own tap
@@ -219,5 +231,18 @@ else
     echo "  (control mode $MODE: the in-gate controls do not run; the gate must FAIL)"
 fi
 
+if [ -n "$MODE" ]; then   # #369: a mode is honoured only on its own finding in the main checks' output
+    [ "$bad" = 0 ] && vs_ctl_left_green "$MODE" "FAIL: audit_vanilla_specials_b — control mode $MODE left the gate green"
+    cat "$W/align_bad.txt" "$W/idalign_bad.txt" "$W/stage.txt" "$W/s4_unfired.txt" "$W/s4.diff" >> "$W/main.log" 2>/dev/null
+    case "$MODE" in
+    swapped-strengths) CTL_WANT='^< LE	(LP|HP) ANKIHOU	' ;;
+    unsigned-offsets) CTL_WANT='^SA	[^	]*BIG (BREATH|BLOW)	.*	(UNFIRED|DEGRADED)$' ;;
+    window-at-event) CTL_WANT='^> ZA	[LMH]K DEATH HURRICANE	[^	]*	a:0x29' ;;
+    p1-clock) CTL_WANT='FAIL  the timing table moved \(hash [0-9a-f]{64}\)$' ;;
+    drift-clock) CTL_WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+    first-frame-skip) CTL_WANT='FAIL: the staging reference leg \(.*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$CTL_WANT"; echo "FAIL: audit_vanilla_specials_b ($bad)"; exit 1
+fi
 [ "$bad" = 0 ] && { echo "PASS: audit_vanilla_specials_b"; exit 0; }
 echo "FAIL: audit_vanilla_specials_b ($bad)"; exit 1

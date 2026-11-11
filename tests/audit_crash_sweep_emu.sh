@@ -29,12 +29,30 @@ W="$(mktemp -d)" || { echo "FAIL: audit_crash_sweep_emu — mktemp -d failed"; e
 trap 'rm -rf "$W"' EXIT
 trap 'exit 143' INT TERM
 /bin/sh "$REPO/tests/test_crash_sweep.sh" --tier emulator > "$W/inner.log" 2>&1; rc=$?
-grep -av '^CONTROL \(FIRED\|DEAD\): ' "$W/inner.log"
+# the inner gate's own control lines are re-judged below, never relayed (under a mode, this gate's evidence is its own call)
+grep -av '^CONTROL \(FIRED\|DEAD\|CAUGHT\): ' "$W/inner.log"
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on its own finding in the inner check's output
+    # the inner gate's DEAD line for this mode (its vs_ctl_left_green: the mode left IT green) is relayed, so a dead
+    # control reads LIES here too, never UNJUDGED (the filter above drops it)
+    _dl="$(grep -a "^CONTROL DEAD: $VS_CTL — " "$W/inner.log")"
+    if [ -n "$_dl" ]; then printf '%s\n' "$_dl"; echo "FAIL: audit_crash_sweep_emu (control mode $VS_CTL: the inner gate's CONTROL DEAD line, relayed above)"; exit 1; fi
+    [ "$rc" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: audit_crash_sweep_emu (control mode $VS_CTL)"
+    case "$VS_CTL" in   # the same findings test_crash_sweep.sh's own modes are honoured on
+    helper-neutered) WANT='^  FAIL  row [0-9]+ \(.*\) fx: want [^;]*; got (HONOURED|PASS|UNJUDGED-CAUGHT) h[1-9]' ;;
+    shim-inert) WANT='^  FAIL  row [0-9]+ \(.*\) fx: want [^;]*; got (HONOURED|PASS) h0 ' ;;
+    row-dropped)   # the first site row of the table, as the inner gate drops it (the same awk): ITS site UNCOVERED
+        _dw="$(awk -F'\t' '!/^#/ && NF>=10 && $1!="gate" && $7!="-" {print $1 " " $7; exit}' "$REPO/tests/expected/crash_sweep.tsv" | sed 's/[][\.*^$+?(){}|]/\\&/g')"
+        WANT="^  PROBLEM: UNCOVERED ${_dw:-<no site row>}: no row proves this call site" ;;
+    *) WANT='' ;;
+    esac
+    vs_ctl_caught "$W/inner.log" "$WANT" || :
+    echo "FAIL: audit_crash_sweep_emu (control mode $VS_CTL)"; exit 1
+fi
 for c in helper-neutered row-dropped shim-inert; do
     l="$(grep -am1 "^CONTROL FIRED: $c — " "$W/inner.log")"
     if [ -n "$l" ]; then vs_ctl_fired "$c" "${l#CONTROL FIRED: $c — }"
-    elif [ -z "$VS_CTL" ]; then
+    else
         vs_ctl_dead "$c" "the emulator tier printed no firing for it: $(grep -am1 "^CONTROL DEAD: $c — " "$W/inner.log" | cut -c1-160)" || rc=1
-    fi   # under a mode the inner gate's in-gate controls may legitimately not run; its exit is the verdict
+    fi
 done
 exit "$rc"

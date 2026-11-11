@@ -111,9 +111,11 @@ control() {  # control <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$W/c.log" | head -4
     fi
 }
+if [ -z "${VS_CTL:-}" ]; then   # #369: the in-gate controls run in a plain run only
 control new-kind-key
 control aux-poke-no-band
 control new-baked-value
+fi
 
 # a probe_*.toml is UNTRACKED and must never reach the census
 mkcopy "$W/c"; printf '[[data_port]]\ndamage = 99\n' > "$W/c/build/manifest/probe_zz.toml"
@@ -144,6 +146,7 @@ else
 fi
 
 # --- 6. the frozen file is not hand-editable -------------------------------
+if [ -z "${VS_CTL:-}" ]; then
 cp "$FROZEN" "$W/drift.tsv"
 sed -i '' '$d' "$W/drift.tsv" 2>/dev/null || sed -i '$d' "$W/drift.tsv"
 if python3 "$TOOL" --check "$W/drift.tsv" > "$W/drift.log" 2>&1; then
@@ -151,5 +154,16 @@ if python3 "$TOOL" --check "$W/drift.tsv" > "$W/drift.log" 2>&1; then
 else
     vs_ctl_fired edited-inventory "an edited inventory is caught ($(head -1 "$W/drift.log" | cut -c1-56))"; ok "edited-inventory: fires"
 fi
+fi
 
-if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL"; echo "PASS"; else
+    # #369: a mode is honoured only on its own finding in the main census check's output ($W/check.log)
+    case "${VS_CTL:-}" in
+        new-kind-key) WANT='\[\[data_port\]\]\.damage is a NEW \(kind, key\) pair' ;;
+        aux-poke-no-band) WANT='\[\[aux_poke\]\]\.val writes PRG:0x123456 - address in no declared band$' ;;
+        new-baked-value) WANT='donovan\.toml.site_thunk.only_variant_slot.true.BAKED' ;;
+        edited-inventory) WANT='^ *FAIL: 1 NEW baked value\(s\) - ' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/check.log" "$WANT" || :
+    echo "FAIL"; exit 1; fi

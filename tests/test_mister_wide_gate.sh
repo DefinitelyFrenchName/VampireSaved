@@ -140,7 +140,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 SRC="$REPO/emu/jtcores"
-fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
+fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1" | tee -a "$W/main.log"; fail=1; }   # #369: the main checks' findings ($W is made before the first bad)
 note(){ echo "  note: $1"; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
@@ -201,12 +201,13 @@ if cmp -s "$W/delta.txt" "$REPO/tests/expect/cps2w_rtl_delta.txt"; then
     ok "1 the RTL override delta is the frozen one ($(grep -c '^[+-]' "$W/delta.txt") changed lines)"
 else
     bad "1 the RTL override delta MOVED:"
-    diff "$REPO/tests/expect/cps2w_rtl_delta.txt" "$W/delta.txt" | head -30 | sed 's/^/       /'
+    diff "$REPO/tests/expect/cps2w_rtl_delta.txt" "$W/delta.txt" | head -30 | sed 's/^/       /' | tee -a "$W/main.log"
 fi
 # control D: rebuild the SAME frozen-delta document with one override file
 # perturbed by a single width, and it must stop matching. Without this, check 1
 # could be comparing a document to itself in every way that matters.
-if cmp -s "$HDL/jtcps2_game.v" "$W/perturbed.v"; then
+if [ -n "$VS_CTL" ]; then :   # #369: control D (and 6's control benches, and 9G) run in a plain run only
+elif cmp -s "$HDL/jtcps2_game.v" "$W/perturbed.v"; then
     bad "1D control could not perturb the file"
 else
     {
@@ -383,7 +384,7 @@ if command -v verilator >/dev/null 2>&1; then
         else
             [ -n "$_ctl" ] && vs_ctl_dead "$_ctl" "expected $_want, got $_got"
             bad "6 $_n: expected $_want, got $_got"
-            grep -m4 '^FAIL' "$W/$_n.out" | sed 's/^/       /'
+            grep -m4 '^FAIL' "$W/$_n.out" | sed 's/^/       /' | tee -a "$W/main.log"
         fi
     }
     # THE PERTURBED DUTs, built first: under CONTROL=<name> the named one is
@@ -415,11 +416,13 @@ if command -v verilator >/dev/null 2>&1; then
     run_tb bank    "$REPO/tests/rtl/tb_qsnd_bank.v" "$QSND_V"    pass
     run_tb profile "$REPO/tests/rtl/tb_profile.v"   "$PROFILE_V" pass
     run_tb objbank "$REPO/tests/rtl/tb_obj_bank.v"  "$OBJBANK_V" pass
+    [ -n "$VS_CTL" ] || {
     run_tb ctlA "$REPO/tests/rtl/tb_qsnd_bank.v" "$W/ctlA.v" fail bank-gate-bypassed
     run_tb ctlB "$REPO/tests/rtl/tb_profile.v"   "$W/ctlB.v" fail profile-byte-40
     run_tb ctlC "$REPO/tests/rtl/tb_profile.v"   "$W/ctlC.v" fail polarity-flipped
     run_tb ctlE "$REPO/tests/rtl/tb_obj_bank.v"  "$W/ctlE.v" fail promote-gate-bypassed
     run_tb ctlF "$REPO/tests/rtl/tb_obj_bank.v"  "$W/ctlF.v" fail promote-bit-15
+    }
 else
     case "$VS_CTL" in
     bank-gate-bypassed|profile-byte-40|polarity-flipped|promote-gate-bypassed|promote-bit-15)
@@ -589,7 +592,8 @@ else
       && ok "9f the reference comparison is still the UNcomplemented one D5 corrects for" \
       || bad "9f cores/cps2/hdl/jtcps2_dec_ctrl.v changed — re-derive D5 before trusting it"
     # 9G MUST-FIRE: strip wide_en from the range fix and the frozen delta must move.
-    if cmp -s "$DEC" "$W/dec_ungated.v"; then
+    if [ -n "$VS_CTL" ]; then :
+    elif cmp -s "$DEC" "$W/dec_ungated.v"; then
         vs_ctl_dead range-fix-ungated "could not perturb the gated expression"; bad "9G"
     else
         delta "$SRC/cores/cps2/hdl/jtcps2_decrypt.v" "$W/dec_ungated.v" > "$W/dec_ungated.delta"
@@ -600,5 +604,17 @@ else
     fi
 fi
 
+if [ -n "$VS_CTL" ] && [ $fail != 0 ]; then   # #369: the mode's own finding, where its perturbed copy was read
+    case "$VS_CTL" in
+    override-perturbed)    WANT="^ *> \\+wire \\[22:0\\] qsnd_addr;" ;;
+    bank-gate-bypassed)    WANT="^ *FAIL wide=0 ab=8080: bank=80 want 00\$" ;;
+    profile-byte-40)       WANT="^ *FAIL 4: FE at header byte 40 raised wide_en\$" ;;
+    polarity-flipped)      WANT="^ *FAIL 1: a 0xFF-filled header turned the profile ON\$" ;;
+    promote-gate-bypassed) WANT="^ *FAIL wide=0 y=1000: bank=100 want 000\$" ;;
+    promote-bit-15)        WANT="^ *FAIL wide=1 y=1000: bank=000 want 100\$" ;;
+    range-fix-ungated)     WANT="^  FAIL 9a jtcps2_decrypt's gated range expression is not the frozen one\$" ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT"
+fi
 [ $fail = 0 ] && echo "PASS test_mister_wide_gate" \
               || { echo "FAIL test_mister_wide_gate"; exit 1; }

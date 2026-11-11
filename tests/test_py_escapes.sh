@@ -36,10 +36,11 @@ FILES="$(git ls-files 'tools/*.py' 'tests/*.py' | sort -u)"
 EXTRA=""; vs_ctl_is planted-escape && EXTRA="$W/planted.py"
 echo "== 1. every tracked Python file under tools/ and tests/"
 # shellcheck disable=SC2086
-if check $FILES $EXTRA; then fail=0; echo "  ok    no invalid escape"; else fail=1; echo "  FAIL  an invalid escape (above)"; fi
+if check $FILES $EXTRA > "$W/main.log" 2>&1; then fail=0; cat "$W/main.log"; echo "  ok    no invalid escape"; else fail=1; cat "$W/main.log"; echo "  FAIL  an invalid escape (above)"; fi
 if vs_ctl_is planted-escape; then
-    [ "$fail" = 1 ] && { echo "FAIL: test_py_escapes (control mode: the planted escape was named)"; exit 1; }
-    vs_ctl_left_green "planted-escape" "FAIL: test_py_escapes — the planted escape passed"
+    [ "$fail" = 1 ] || vs_ctl_left_green "planted-escape" "FAIL: test_py_escapes — the planted escape passed"
+    vs_ctl_caught "$W/main.log" "^  ESCAPE $W/planted\\.py: invalid escape sequence "   # #369: the check named the planted file
+    echo "FAIL: test_py_escapes (control mode: the planted escape was named)"; exit 1
 fi
 echo "== 2. control"
 if check "$W/planted.py" > "$W/c.txt" 2>&1; then vs_ctl_dead planted-escape "the planted escape compiled clean"; fail=1

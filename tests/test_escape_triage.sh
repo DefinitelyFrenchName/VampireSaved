@@ -46,7 +46,8 @@ fail=0
 
 echo "== section 0: must-fire control (covered regions' raw escapes)"
 N="$(python3 tools/triage_pcrel_escapes.py --all-regions 2>/dev/null | grep -c "LIVE RISK" || true)"
-if [ "$N" -ge 100 ]; then
+if [ -n "${VS_CTL:-}" ]; then echo "   (control mode $VS_CTL: the in-gate control runs in a plain run only, #369)"
+elif [ "$N" -ge 100 ]; then
     vs_ctl_fired covered-regions-raw "classifier discriminates ($N raw LIVE-RISK verdicts on covered regions)"
 else
     vs_ctl_dead covered-regions-raw "only $N raw verdicts — the classifier stopped discriminating"; fail=1
@@ -67,5 +68,10 @@ else
     fail=1
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: honoured only on a raw LIVE-RISK verdict added to the frozen set's diff
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL"
+    vs_ctl_caught "$W/diff.txt" '^\+[a-z0-9_]+/[a-z0-9_]+\+0x[0-9a-f]+: .*\*\*LIVE RISK\*\*' || :
+    echo "FAIL"; exit 1
+fi
 [ "$fail" = 0 ] && echo "PASS: the uncovered-escape class is closed and frozen" \
     || { echo "FAIL"; exit 1; }

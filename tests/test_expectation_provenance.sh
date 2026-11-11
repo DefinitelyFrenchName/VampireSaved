@@ -53,7 +53,8 @@ perturb() {  # perturb <name> <out>
 if [ -n "$VS_CTL" ]; then perturb "$VS_CTL" "$T/mode.md"; PAGE="$T/mode.md"; fi
 
 echo "== 1. every expectation file has a row, every row an existing file"
-python3 - "$PAGE" <<'PY' || rc=1
+# its output lands in $T/s1.log too (#369: a mode is honoured only on its own finding there)
+python3 - "$PAGE" <<'PY' > "$T/s1.log" 2>&1 || rc=1
 import os, re, sys
 page = open(sys.argv[1], encoding="utf-8").read()
 # a row is a table line whose first cell is a `backticked` filename
@@ -86,6 +87,7 @@ if ok:
     print(f"  ok: {len(files)} expectation files, {len(rows)} rows, complete both ways")
 sys.exit(0 if ok else 1)
 PY
+cat "$T/s1.log"
 
 echo "== 2. every row names an evidence class the page defines"
 python3 - "$PAGE" <<'PY' || rc=1
@@ -117,6 +119,7 @@ print("  ok: every row's evidence class is one the page defines")
 PY
 
 echo "== 3. must-fire controls"
+if [ -z "${VS_CTL:-}" ]; then   # a plain run only (#369: a firing line is never a mode's evidence)
 # A: a row removed -> the file must be reported as unprovenanced
 perturb deleted-row "$T/page_a.md"
 if python3 - "$T/page_a.md" >/dev/null 2>&1 <<'PY'
@@ -158,6 +161,17 @@ then
     vs_ctl_dead dead-row "a dead row was NOT caught"; rc=1
 else
     vs_ctl_fired dead-row "a row naming a missing file is caught"
+fi
+fi
+
+if [ -n "${VS_CTL:-}" ]; then   # #369: honoured only on section 1 naming the perturbed row's file
+    [ "$rc" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: see above"
+    case "$VS_CTL" in
+        deleted-row) WANT='^      registry\.tsv$' ;;   # listed under "expectation file(s) with NO provenance row"
+        dead-row) WANT='^      no_such_file\.txt$' ;;   # listed under "provenance row(s) naming a file that is gone"
+    esac
+    vs_ctl_caught "$T/s1.log" "$WANT" || :
+    echo "FAIL: see above"; exit 1
 fi
 
 echo

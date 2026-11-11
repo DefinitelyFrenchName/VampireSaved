@@ -257,13 +257,13 @@ PY
     if [ -n "$RL" ] && [ "$ra" = "$RL" ]; then
         echo "  ok: the reference leg reproduces replay.lua at frame $T ($ra)"
     else
-        echo "  FAIL: the reference leg reads ${ra:-nothing} at frame $T, replay.lua ${RL:-nothing}: the instrument's input staging is off replay.lua's"
+        echo "  FAIL: the reference leg reads ${ra:-nothing} at frame $T, replay.lua ${RL:-nothing}: the instrument's input staging is off replay.lua's" | tee -a "$WORK/main.log"   # #369: first-frame-skip's finding
         fail=1
     fi
     if [ "$tf" = "$T" ] && [ "$te" = "$T" ] && [ -n "$tg" ] && [ "$tg" = "$rg" ]; then
         echo "  ok: the trace leg covered $te emulated frames of $tf counted; game clock $tg = the reference leg's"
     else
-        echo "  FAIL: the trace leg counted ${tf:-?} frames over ${te:-?} emulated, game clock ${tg:-?} (reference ${rg:-?}): its input drifted from the replay"
+        echo "  FAIL: the trace leg counted ${tf:-?} frames over ${te:-?} emulated, game clock ${tg:-?} (reference ${rg:-?}): its input drifted from the replay" | tee -a "$WORK/main.log"   # #369: drift-clock's finding
         fail=1
     fi
     # the fmt-2 handler's A0 is record+2 (past the format word)
@@ -276,7 +276,13 @@ PY
         fail=1
     fi
     if vs_ctl_is drift-clock || vs_ctl_is first-frame-skip; then
-        [ "$fail" -ne 0 ] && { echo "FAIL: wheel bank-5 gate (control mode: $VS_CTL)"; exit 1; }
+        if [ "$fail" -ne 0 ]; then   # #369: honoured only on the mode's own finding in the two leg checks' output
+            case "$VS_CTL" in
+            first-frame-skip) WANT="FAIL: the reference leg reads [0-9a-f]+ at frame $T, replay\.lua [0-9a-f]+: the instrument's input staging is off replay\.lua's\$" ;;
+            drift-clock) WANT="FAIL: the trace leg counted $T frames over [0-9]+ emulated, game clock [0-9a-f]+ \(reference [0-9a-f]+\): its input drifted from the replay\$" ;;
+            esac
+            vs_ctl_caught "$WORK/main.log" "$WANT" || :; echo "FAIL: wheel bank-5 gate (control mode: $VS_CTL)"; exit 1
+        fi
         vs_ctl_left_green "$VS_CTL" "FAIL: wheel bank-5 gate — control mode $VS_CTL left it green"
     fi
     # (ctl_drift ran in the pool above)

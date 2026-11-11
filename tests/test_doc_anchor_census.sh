@@ -130,6 +130,18 @@ control() {  # control <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log" | head -20
     fi
 }
-for n in $(vs_ctl_declared "$0"); do control "$n"; done
+[ -n "${VS_CTL:-}" ] || for n in $(vs_ctl_declared "$0"); do control "$n"; done   # a plain run only (#369)
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on its own finding in the tree check's output
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL"
+    T="$(printf '\t')"
+    case "$VS_CTL" in
+        anchor-moved-between-files) WANT="^ *\\+$MOVE_ID${T}docs/platform/mister\\.md$T" ;;
+        section-moved) WANT="^ *\\+VSE-[0-9]+${T}docs/game/engine_internals\\.md${T}A synthetic section inserted by control B$T" ;;
+        rule-in-history) WANT='FAIL  VSE-1 anchored in HISTORY file docs/game/engine_internals_history\.md:2 ' ;;
+        stray-archive-token) WANT="^ *\\+CPE-999${T}DECISIONS_HISTORY\\.md$T" ;;
+    esac
+    vs_ctl_caught "$W/tree.log" "$WANT"
+    echo "FAIL"; exit 1
+fi
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

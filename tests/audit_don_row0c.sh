@@ -102,7 +102,7 @@ fi
 echo "  donovan_6: native's +0x1C3 window ${DFW:-NONE}; ours and BAD re-run with +0x1C3 poked to 1 over it"
 
 echo "== 2. the checks"
-W="$W" MODE="$MODE" HOOKED="$HOOKED" python3 - <<'PY' || fail=1
+W="$W" MODE="$MODE" HOOKED="$HOOKED" python3 - > "$W/main.log" <<'PY' || fail=1
 import os, sys
 W, MODE, HOOKED = os.environ["W"], os.environ["MODE"], os.environ["HOOKED"]
 def load(path):
@@ -199,9 +199,15 @@ else:
     print(f"CONTROL DEAD: row-reverted — R1 {b1}; census parts blind {blind}, frozen {BLIND}"); fail = 1
 sys.exit(fail)
 PY
-if [ -n "$MODE" ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: $MODE — the gate failed with the control applied"
-    else echo "CONTROL DEAD: $MODE — every check passed with the control applied"; fi
+cat "$W/main.log"
+if [ -n "$MODE" ]; then   # #369: a mode is honoured only on its own finding in section 2's output
+    [ "$fail" = 1 ] || vs_ctl_left_green "$MODE" "FAIL: audit_don_row0c (control mode: every check passed with the control applied)"
+    case "$MODE" in
+    row-reverted) WANT='^  FAIL  \[R[13] [^]]*\] row 0x0C, bad vs native from 2500[^:]*: [1-9][0-9]* differing frames' ;;
+    opatch-readback) WANT="^  FAIL  \\(mode\\) BAD legs read back \\['[0-9a-f]{4}0040'\\], not [0-9a-f]{8}\$" ;;
+    *) WANT='' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
     echo "FAIL: audit_don_row0c (control mode)"; exit 1
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_don_row0c"; else echo "FAIL: audit_don_row0c"; exit 1; fi

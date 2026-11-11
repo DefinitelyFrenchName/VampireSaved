@@ -430,9 +430,15 @@ fi
 if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then
     echo "  ok: every section 1-3 run${BUILD:+ and section 4 run} on emulated time, at its frozen game clock"
 else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
-ia_stage audit_effect_class_rows "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" || fail=1
+ia_stage audit_effect_class_rows "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" > "$WORK/stage.txt" || fail=1
+cat "$WORK/stage.txt"
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL audit_effect_class_rows.sh (control mode: $MODE)"; exit 1; }
+    # #369: drift-clock on the frozen game-clock comparison, first-frame-skip on the staging leg against replay.lua
+    case "$MODE" in
+    drift-clock) CF="$WORK/align_bad.txt"; WANT='game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+    *) CF="$WORK/stage.txt"; WANT='FAIL: the staging reference leg \([^)]*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+    esac
+    [ "$fail" = 1 ] && { vs_ctl_caught "$CF" "$WANT" || :; echo "FAIL audit_effect_class_rows.sh (control mode: $MODE)"; exit 1; }
     vs_ctl_left_green "$MODE" "FAIL audit_effect_class_rows.sh — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

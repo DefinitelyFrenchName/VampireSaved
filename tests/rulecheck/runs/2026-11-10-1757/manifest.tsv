@@ -1,0 +1,26 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent225/m369/rc/M369_scope.md	d97e6c7066594698cf88d9813f8fda8dad53aaf7
+build/agent225/m369/rc/REVIEW_rules.md	6842c1e7ca4d89ef1e06b1e45e3d257e3ca4a05d
+build/agent225/m369/rc/RULING.txt	35ea7a5fa3821792c6d87973aa8ebf5766784914
+build/agent225/m369/rc/contract.diff.txt	20533da59d779f35d25e1ff2bc1480074368aab0
+build/agent225/m369/rc/debt_left_check.txt	ada24245fe47168cf36bf525f03e70c7e3ba6807
+build/agent225/m369/rc/debt_list.diff.txt	4bec4aa6eadcdb8bb208aa950e97119016ace3e0
+build/agent225/m369/rc/eris_guard_cancels_rest.tsv	3d71ffdc2583576362c66bf0b2dca4d420918250
+build/agent225/m369/rc/eris_mame_parity_rest.tsv	07b338df6137340dcf519c4bb5d75ef6cd282bfa
+build/agent225/m369/rc/eris_runA.out.txt	5105e32c42d1e7f3b638c049f8200c8824b0bdde
+build/agent225/m369/rc/eris_runB.out.txt	998ccf56217b08ccd83fe16cbad1df705067a320
+build/agent225/m369/rc/lib_tools.diff.txt	7a625b19cbcd2f283de7d6981c4d13be81a4d102
+build/agent225/m369/rc/mac_emulator_rest.txt	0990fbe480edd325756d6028b5abf2e7342e78c4
+build/agent225/m369/rc/mac_rerun_history.tsv	e148e7502794290d50f6dcbd5d70acd885b87c90
+build/agent225/m369/rc/mac_rerun_orch.tsv	718c48a47195d2da62164526f3ba579e3c8c493b
+build/agent225/m369/rc/pilot_merged_vec3.txt	a7e025e2b6428ea290731c166348153efed6c9e0
+build/agent225/m369/rc/reviews.tsv	7cbb55706e12ed90c4d36006f662473cd9b2a3af
+build/agent225/m369/rc/tier5_tail.txt	4f1b4e37ed1b13290097dbd93dce93e28cf09706
+build/agent225/m369/rc/ledger_compact.tsv.lines-1-270 (lines 1-270 of build/agent225/m369/rc/ledger_compact.tsv)	bb98c5ad62c5d7d26154e6a5867818848c459615
+build/agent225/m369/rc/ledger_compact.tsv.lines-271-540 (lines 271-540 of build/agent225/m369/rc/ledger_compact.tsv)	e99a1891051e7bfc88e83f4c9f11f593ab402a0c
+build/agent225/m369/rc/ledger_compact.tsv.lines-541-810 (lines 541-810 of build/agent225/m369/rc/ledger_compact.tsv)	99bafefe49f6d4d4369fa5187f99112bf41bb8a8
+build/agent225/m369/rc/ledger_compact.tsv.lines-811-1042 (lines 811-1042 of build/agent225/m369/rc/ledger_compact.tsv)	cf1da00208bb8e0a207ea932ed5cfcda792fef49
+build/agent225/m369/rc/caught_sites.txt.lines-1-300 (lines 1-300 of build/agent225/m369/rc/caught_sites.txt)	9b50ba8b7742ae1b9ded8078f641ff5a3bf57240
+build/agent225/m369/rc/caught_sites.txt.lines-301-600 (lines 301-600 of build/agent225/m369/rc/caught_sites.txt)	ac7dbeec64a33876310c39edc33b35f3e8f0f703
+build/agent225/m369/rc/caught_sites.txt.lines-601-900 (lines 601-900 of build/agent225/m369/rc/caught_sites.txt)	118814f2cc9bb06a2491b086bef16babad79e3b0
+build/agent225/m369/rc/caught_sites.txt.lines-901-1209 (lines 901-1209 of build/agent225/m369/rc/caught_sites.txt)	0f0b8affbc1e1ef2a4e0004e6aeb69b435f1fe80

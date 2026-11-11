@@ -188,8 +188,11 @@ review (rule-checker runs 2026-11-09-1746 and -1747; stated by the session and a
    can be built, a dead-instrument run (the leg that wrote nothing) and a starved run (a live instrument, zero judged
    items) both UNJUDGED. Where a starved input cannot be built, say so: review only.
 7. Delete the gate's debt row in the same commit. A gate with rows in `tests/expected/crash_sweep.tsv` (its `kb` leg) or
-   the dead-leg tables (their stripped class) changes those classes when it migrates; their new specification is open
-   (#369 piece 5) — migrate such a gate only with it.
+   the dead-leg tables (their stripped class) changes those classes when it migrates (#369 piece 5, maintainer-ruled
+   2026-11-09 "Name the speaker (Recommended)"): the real run must stay UNJUDGED on the gate's OWN line, and the
+   neutered leg's frozen class becomes UNJUDGED-CAUGHT — UNJUDGED by #369's backstop alone (`vs_ctl_caught`'s NOT
+   JUDGED, or a FAIL with no CAUGHT line), the class word `tests/lib/classify.sh` `vs_ctl_class_word` writes. Re-measure
+   those rows in the batch that migrates the gate.
 
 ## The pattern that makes the mode cheap to write
 

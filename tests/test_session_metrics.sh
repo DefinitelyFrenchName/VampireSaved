@@ -251,6 +251,7 @@ if [ -n "${VS_CTL:-}" ]; then T="$(shadow "$VS_CTL")"; fi
 if figures "$T" "$W/real" && compare "$W/real.txt" > "$W/real.cmp"; then
     echo "  ok    every expected figure, with its class ($(echo "$EXPECT" | wc -l | tr -d ' ') lines)"
 else echo "  FAIL  the collector's figures on the synthetic tree:"; cat "$W/real.cmp" "$W/real.log" 2>/dev/null | sed 's/^/        /'; fail=1; fi
+cat "$W/real.cmp" "$W/real.txt" >> "$W/main.log" 2>/dev/null || :   # #369: the main check's findings and figures
 
 # UNKEYED (#339, 14z-214): the '-' row and the unclaimed transcript-id row are keyed by their corrections; with a
 # correction gone the collector must STOP naming the row
@@ -277,7 +278,7 @@ import json, sys; sys.exit(0 if any(r['session'] == '14z-8' and r['metric'] == '
     cp "$W/corr.keep" "$R/tests/rulecheck/session_corrections.tsv"
 fi
 mv "$R/tests/rulecheck/session_corrections.tsv" "$W/corr.away"
-if k8 "$U" "$W/k8n"; then echo "  FAIL  UNKEYED: with the corrections gone the rows were collected silently (#339)"; fail=1
+if k8 "$U" "$W/k8n"; then echo "  FAIL  UNKEYED: with the corrections gone the rows were collected silently (#339)" | tee -a "$W/main.log"; fail=1
 elif grep -q "row(s) with no session that claims them (2026-01-01-07, 2026-01-01-08)" "$W/k8n.log"; then echo "  ok    UNKEYED: with the corrections gone the collector stops, naming the '-' row and the unclaimed transcript-id row"
 else echo "  FAIL  UNKEYED: stopped, but not for its reason: $(tail -1 "$W/k8n.log")"; fail=1; fi
 mv "$W/corr.away" "$R/tests/rulecheck/session_corrections.tsv"
@@ -328,5 +329,25 @@ rows.append(dict(rows[0], metric='planted', **{'class': 'GUESSED'})); json.dump(
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: the collector reads every source by its rule and labels every figure"
-else echo "FAIL: test_session_metrics"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_session_metrics"; echo "PASS: the collector reads every source by its rule and labels every figure"
+else
+    # #369: a mode is honoured only on its own finding in the main check's output: the figure its perturbed collector
+    # reads (the in-gate control's own `want`), or the expected figure it lost where the wrong one is also expected
+    case "${VS_CTL:-}" in
+        usage-per-record) WANT='^14z-9 out_tok 1000 MEASURED$' ;;
+        key-prefix) WANT='^14z-9 commits 2 MEASURED$' ;;
+        key-only-ledger) WANT='^14z-9 rc_runs 3 MEASURED$' ;;
+        unnamed-link) WANT='^14z-9 actions 4 ESTIMATED$' ;;
+        meta-ignored) WANT='^14z-10 actions_build 2 ESTIMATED$' ;;
+        void-first) WANT='^14z-10 first_ok_recommendation 0 ESTIMATED$' ;;
+        same-run-hours) WANT='^14z-10 pass_h_median 0\.0 DERIVED$' ;;
+        lowest-question) WANT='^missing: 14z-9 first_q_Q4 1 ESTIMATED$' ;;
+        later-run-questions) WANT='^missing: 14z-9 first_q_Q1 1 ESTIMATED$' ;;
+        calibration-counted) WANT='^14z-10 actions 4 ESTIMATED$' ;;
+        not-run-ignored) WANT='^missing: 14z-10 not_run 1 MEASURED$' ;;
+        unkeyed-dropped) WANT='^ *FAIL  UNKEYED: with the corrections gone the rows were collected silently' ;;
+        void-only-dropped) WANT='^missing: 14z-10 actions_void_only 1 MEASURED$' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: test_session_metrics"; exit 1; fi

@@ -338,10 +338,22 @@ print(f"VERDICT {'FAIL' if bad else 'PASS'} ({len(bad)} failing)")
 sys.exit(1 if bad else 0)
 PY
 echo "== 2. the checks"
-python3 "$W/judge354.py" "$W/354" "$MODE"; r1=$?
-python3 "$W/judge3a8.py" "$W/3a8" "$MODE"; r2=$?
+python3 "$W/judge354.py" "$W/354" "$MODE" > "$W/j354.out"; r1=$?; cat "$W/j354.out"
+python3 "$W/judge3a8.py" "$W/3a8" "$MODE" > "$W/j3a8.out"; r2=$?; cat "$W/j3a8.out"
+cat "$W/j354.out" "$W/j3a8.out" > "$W/main.log"   # #369: the checks' findings, for vs_ctl_caught
 if [ -n "$MODE" ]; then
-    [ "$r1" = 0 ] && [ "$r2" = 0 ] && { echo "PASS: audit_mizuumi_354_3a8 (CONTROL=$MODE did NOT fire)"; exit 0; }
+    [ "$r1" = 0 ] && [ "$r2" = 0 ] && vs_ctl_left_green "$MODE" "FAIL: audit_mizuumi_354_3a8 (CONTROL=$MODE)"
+    case "$MODE" in   # #369: the finding each perturbation must produce
+        slot-shifted) WANT='^  FAIL  J3 at each of [1-9][0-9]* Jedah pointer stores .* whose \+0x32 is the storing fighter.s block: [0-9]+/[0-9]+; failing \[\(.+\]$' ;;
+        owner-30) WANT='^  FAIL  J3 at each of [1-9][0-9]* Jedah pointer stores .* whose \+0x30 is the storing fighter.s block: [0-9]+/[0-9]+; failing \[\(.+\]$' ;;
+        sides-swapped) WANT='^  FAIL  (J3 at each of [1-9][0-9]* Jedah pointer stores .* whose \+0x32 is the storing fighter.s block: [0-9]+/[0-9]+; failing \[\(.+\]|J5 each of [0-9]+ Demitri history stores .*; unmatched \[\(.+\])$' ;;
+        offside-source) WANT='^  FAIL  A3 f[0-9]+: P1.s 32/128 bytes at \[\+0x3A8\] == its selected variant on [0-5]/6 buttons \(\+0x3E1 = \+0x3AE = K-1\), 6 distinct P1 blocks, [0-9]+ P2 block\(s\)$' ;;
+        one-button) WANT='^  FAIL  A3 f[0-9]+: P1.s 32/128 bytes at \[\+0x3A8\] == its selected variant on [0-5]/6 buttons \(\+0x3E1 = \+0x3AE = K-1\), 1 distinct P1 blocks, [0-9]+ P2 block\(s\)$' ;;
+        row-shifted) WANT='^  FAIL  A2 \+0x3A8 == 0x90C000 \+ \(\+0x18B\)\*0x20 on 0/[1-9][0-9]* side-frames \(.*\)$' ;;
+        poke-pattern) WANT='^  FAIL  A1 poke read-back at CPU:\$90C140 \(32-byte known pattern, not ROM data\): .+=.+$' ;;
+        reader-range) WANT='^  FAIL  A6 reads of \+0x3A8/\+0x3AA over f1000-5200 on b1: [1-9][0-9]* \(tap live: \+0x3A4 read [1-9][0-9]* times\)$' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT"
     echo "FAIL: audit_mizuumi_354_3a8 (CONTROL=$MODE)"; exit 1
 fi
 dead=0

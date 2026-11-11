@@ -95,9 +95,15 @@ PY
 }
 
 echo "== test_ledger_page: #267 — the public session ledger page =="
+case "$VS_CTL" in   # #369: the finding each perturbation must produce, and the main check's output file it lands in
+private-kept)      CF="$W/pc.txt";    WANT='^  private figures embedded: maint_msgs maint_answers reply_median_min$' ;;
+catch-unknown-run) CF="$W/build.log"; WANT='^ledger_page: catches row 2099-01-01-01: no ledger row' ;;
+inline-script)     CF="$W/csp.txt";   WANT='^  inline: (.* )?<script>( |$)' ;;
+external-fetch)    CF="$W/fc.txt";    WANT='^[0-9]+:<script src="https://example\.invalid/x\.js"></script>$' ;;
+esac
 CATCHES=tests/rulecheck/catches.tsv
 if vs_ctl_is catch-unknown-run; then cp "$CATCHES" "$W/catches.tsv"; printf '2099-01-01-01\theadline\twhy\n' >> "$W/catches.tsv"; CATCHES="$W/catches.tsv"; fi
-python3 "$T" "$W/data" --out "$W/page" --catches "$CATCHES" > "$W/build.log" 2>&1 || { echo "  FAIL  the page did not build: $(tail -1 "$W/build.log")"; echo "FAIL: test_ledger_page"; exit 1; }
+python3 "$T" "$W/data" --out "$W/page" --catches "$CATCHES" > "$W/build.log" 2>&1 || { echo "  FAIL  the page did not build: $(tail -1 "$W/build.log")"; [ -z "$VS_CTL" ] || vs_ctl_caught "$CF" "$WANT" || :; echo "FAIL: test_ledger_page"; exit 1; }
 n_cur="$(grep -c '^20' tests/rulecheck/catches.tsv)"
 n_emb="$(python3 "$T" --extract "$W/page/index.html" | python3 -c 'import json,sys; print(len(json.load(sys.stdin)["catches"]))')"
 if [ "$n_cur" = "$n_emb" ] && [ "$n_cur" -ge 1 ]; then echo "  ok    every curated worked example ($n_cur) is embedded, quoted from its run"
@@ -182,5 +188,6 @@ if [ -z "${VS_CTL:-}" ]; then
     else vs_ctl_fired external-fetch "the planted script is named: $(head -1 "$W/ext.txt" | cut -c1-80)"; fi
 fi
 
+if [ -n "$VS_CTL" ] && [ "$fail" != 0 ]; then vs_ctl_caught "$CF" "$WANT" || :; fi   # #369: the mode's own finding
 if [ "$fail" = 0 ]; then echo "PASS: the ledger page carries the data whole, withholds the maintainer's figures, fetches nothing, publishes as one commit"
 else echo "FAIL: test_ledger_page"; exit 1; fi

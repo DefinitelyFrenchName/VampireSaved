@@ -124,7 +124,7 @@ cs_run() {
     else
         env PATH="$6:$PATH" PYTHONPATH="$_cs_pp" CS_KIND="$3" CS_RE="$4" CS_NTH="$5" CS_CNT="$_cs_b.cnt" VS_SWEEP_SITES="$_cs_b.sites" CONTROL="$_cs_m" \
             timeout "${CS_TIMEOUT:-1800}" /bin/sh "$_cs_g" > "$_cs_b.log" 2>&1 < /dev/null; CS_EXIT=$?
-        vs_classify_control "$CS_EXIT" "$_cs_b.log" "$_cs_g" "$_cs_m"; CS_CLASS="$VS_CTL_EXEC"
+        vs_classify_control "$CS_EXIT" "$_cs_b.log" "$_cs_g" "$_cs_m"; CS_CLASS="$(vs_ctl_class_word)"   # #369 piece 5: UNJUDGED-CAUGHT when only vs_ctl_caught spoke
     fi
     CS_SECS=$(( $(date +%s) - _cs_t0 ))
     CS_HITS="$(grep -cv '^REFUSED\|^NOFILE' "$_cs_b.cnt.hits" 2>/dev/null)"; CS_HITS="${CS_HITS:-0}"

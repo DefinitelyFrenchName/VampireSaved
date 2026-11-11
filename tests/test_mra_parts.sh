@@ -92,6 +92,16 @@ else
     bad "1a should have passed"; sed 's/^/    /' "$WORK/o1"
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is judged on section 1's own output; the in-gate controls run only plainly
+    [ "$fail" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL test_mra_parts (control mode $VS_CTL changed no verdict)"
+    case "$VS_CTL" in
+        bogus-crc)   WANT='^ *crc=deadbeef  name=b\.bin$' ;;
+        missing-zip) WANT='^ *FAIL: 2 of 2 parts do not resolve$' ;;
+    esac
+    vs_ctl_caught "$WORK/o1" "$WANT" || :
+    echo "FAIL test_mra_parts (control mode $VS_CTL)"; exit 1
+fi
+
 echo "== 2 MUST-FIRE: one part does not resolve =="
 if python3 "$TOOL" "$WORK/bad1.mra" "$WORK/zips" > "$WORK/o2" 2>&1; then
     vs_ctl_dead bogus-crc "a bogus CRC was accepted — the checker is blind"; bad "2a"

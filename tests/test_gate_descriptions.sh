@@ -30,7 +30,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 EXP=tests/expected/gate_descriptions.tsv
 W="$(mktemp -d "${TMPDIR:-/tmp}/gdesc.XXXXXX")" || { echo "FAIL: test_gate_descriptions — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # #369: the main check's findings
 
 census() { python3 tools/gate_descriptions.py --root "$1" 2>/dev/null | cut -f1,2 | sort; }
 cls() { awk -F'\t' -v c="$1" '$1==c{print $2}' "$2" | sort; }
@@ -77,6 +77,7 @@ if [ -n "$VS_CTL" ]; then
         UNCHANGED) echo "REFUSED: CONTROL=$VS_CTL — the perturbation left the target unchanged (#362)"; exit 3 ;;
     esac
     echo "MODE: control $VS_CTL — the census runs on a copy where $g.sh is perturbed"
+    WANT="FAIL  a frozen declaring gate LOST its description: (.* )?$g( |\$)"   # both modes: the perturbed gate must be named lost
 fi
 
 echo "== 1. the census against $EXP"
@@ -85,6 +86,7 @@ if [ ! -f "$EXP" ]; then
     echo "  (no frozen file yet — FREEZE=1 writes the first census)"; : > "$W/empty.tsv"; EXP_READ="$W/empty.tsv"
 else EXP_READ="$EXP"; fi
 census "$root" > "$W/got.tsv"
+[ -s "$W/got.tsv" ] || vs_ctl_nj "the census read no gate in $root, so it judged nothing"
 nd="$(grep -c '^declares' "$W/got.tsv")"; nu="$(grep -c '^undeclared' "$W/got.tsv")"
 echo "  census: $nd declares, $nu undeclared"
 cls declares "$EXP_READ" > "$W/exp_d.txt"; cls declares "$W/got.tsv" > "$W/got_d.txt"
@@ -130,5 +132,6 @@ if [ -z "$VS_CTL" ]; then
     else bad "a no-op perturbation read '$g', not UNCHANGED: a mode could run on an unperturbed copy and pass"; fi
 fi
 
+if [ -n "$VS_CTL" ] && [ "$fail" -ne 0 ]; then vs_ctl_caught "$W/main.log" "$WANT"; fi   # #369: the mode's own finding
 [ "$fail" -eq 0 ] && echo "PASS" || echo "FAIL"
 exit "$fail"

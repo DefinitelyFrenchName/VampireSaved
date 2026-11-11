@@ -56,5 +56,13 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: a pin its remote does not serve fails the check, and a pin that could not be checked is never a pass"
-else echo "FAIL: test_submodule_pins"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_submodule_pins"; echo "PASS: a pin its remote does not serve fails the check, and a pin that could not be checked is never a pass"
+else
+    # #369: a mode is honoured only on its own finding in the selftest's output (the case its perturbation breaks)
+    case "${VS_CTL:-}" in
+        refused-blind) WANT='^ *FAIL: case a commit only the local clone holds: exit 2, expected 1$' ;;
+        error-passes) WANT='^ *FAIL: case an unreachable remote: exit 0, expected 2$' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/self.txt" "$WANT" || :
+    echo "FAIL: test_submodule_pins"; exit 1; fi

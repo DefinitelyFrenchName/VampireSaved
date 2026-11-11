@@ -121,7 +121,7 @@ done
 echo "  ok    eleven legs complete"
 
 echo "== 2. the checks"
-python3 - "$W" "$MODE" <<'PY'
+python3 - "$W" "$MODE" > "$W/main.log" <<'PY'   # #369: the checks' findings, for vs_ctl_caught
 import sys
 W, mode = sys.argv[1], sys.argv[2]
 def fields(n):
@@ -210,5 +210,17 @@ if not mode:
 sys.exit(1 if bad else 0)
 PY
 rc=$?
+cat "$W/main.log"
+if [ -n "$MODE" ]; then
+    case "$MODE" in   # #369: the finding each perturbation must produce
+        stk1-as-gps) WANT='^  FAIL  G1 stk1: in-match writes \[.*\]$' ;;
+        sf-as-gps) WANT='^  FAIL  G1 sf: in-match writes \[.*\]$' ;;
+        p2-side|class-shifted) WANT='^  FAIL  G1 gps: in-match writes \[.*\]$' ;;
+        window-shifted) WANT='^  FAIL  G2 gps: \+0x14C = 1 on f[0-9]+-[0-9]+ \([0-9]+ f\), exactly the frames a type-0x36 projectile is live \(frozen \([0-9]+, [0-9]+\)\)$' ;;
+        readback-unpoked) WANT='^  FAIL  R1 readback: 0x5A poked at f3500 reads back on every later frame, 0 before$' ;;
+    esac
+    [ "$rc" = 0 ] && vs_ctl_left_green "$MODE" "FAIL: audit_lilith_gps_counter — control mode $MODE left the gate green"
+    vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL: audit_lilith_gps_counter (control mode $MODE)"; exit 1
+fi
 [ "$rc" = 0 ] || { echo "FAIL: audit_lilith_gps_counter"; exit 1; }
 echo "PASS: audit_lilith_gps_counter — +0x14C is 1 exactly while Lilith's Gloomy Puppet Show hat (type 0x36) is live; the Soul Flash moves +0x14A, one stock spawns nothing"

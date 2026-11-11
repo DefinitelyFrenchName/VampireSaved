@@ -68,7 +68,8 @@ TOOL=tools/audit_emulator_staleness.py
 CAD="${VS_CADENCE:-session}"
 W="$(mktemp -d "${TMPDIR:-/tmp}/estale.XXXXXX")" || { echo "FAIL: test_emulator_staleness — mktemp -d failed (W)"; exit 2; }; trap 'vs_shares_release; rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 . "$REPO/tests/lib/shares.sh"; vs_shares_claim test_emulator_staleness git-modules-index   # SHARES-CLAIM (#370, 14z-225): the host claim on what its # SHARES: line names
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }
+: > "$W/main.log"   # #369: the checks' findings, read by vs_ctl_caught under a mode
 
 # THE SCRATCH REPOSITORY: two gates in the registry, one declaring, one not; a run that
 # PASSED both, recorded on the base commit; then the declared replay moves.
@@ -278,12 +279,16 @@ if [ -n "$VS_CTL" ] && [ "$VS_CTL" != newest-dir ] && [ "$VS_CTL" != keys-ignore
     esac
     echo "MODE: control $VS_CTL — the tool's verdict on the planted run is this gate's verdict"
     sed 's/^/  /' "$f"
+    [ "$rc" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL"
     # the plant also FAILs at freeze on g_undeclared, whatever the moved replay does: the mode judges its OWN finding
-    # (#310 census, measured 14z-210)
-    if [ "$VS_CTL" = moved-input ] && [ "$rc" != 0 ] && ! grep -q 'g_follows: tests/replays/x.rpl' "$f"; then
-        echo "NOT JUDGED: the planted run FAILed without naming g_follows's moved replay stale (g_undeclared alone fails it at freeze)"
-    fi
-    [ "$rc" = 0 ] && { echo "PASS"; exit 0; } || { echo "FAIL"; exit 1; }
+    # (#310 census, measured 14z-210), and since #369 vs_ctl_caught reads it from the tool's verdict $f
+    case "$VS_CTL" in
+        moved-input) WANT='^ +g_follows: tests/replays/x\.rpl' ;;
+        headroom-eaten) WANT='^ +g_follows: 300 s of 600 s \(0\.50\)' ;;
+        red-newest) WANT='^ +g_red: FAIL ' ;;
+    esac
+    vs_ctl_caught "$f" "$WANT"
+    echo "FAIL"; exit 1
 fi
 
 echo "== 1. the tree's run of record (each gate's newest row), cadence $CAD"
@@ -321,13 +326,17 @@ rc="$(pergate "$TOOL2" "$W/o_pergate.txt")"
 if [ "$rc" = 1 ] && grep -q 'g_follows: tests/replays/x.rpl' "$W/o_pergate.txt" && grep -q '3 recorded run' "$W/o_pergate.txt"; then
     ok "behind a newer partial run and a newer empty one, g_follows (newest row in the older run) is still named stale; freeze cadence FAILs"
 else
-    bad "per-gate run of record: exit $rc"; sed 's/^/        /' "$W/o_pergate.txt"
+    bad "per-gate run of record: exit $rc"; sed 's/^/        /' "$W/o_pergate.txt"; cat "$W/o_pergate.txt" >> "$W/main.log"
 fi
 grep -q 'g_still' "$W/o_pergate.txt" && grep 'g_still' "$W/o_pergate.txt" | grep -qv 'FOLLOWS' && bad "g_still named though nothing it follows moved" || ok "g_still (newest row in the partial run, nothing moved) is not named"
 
 echo "== 2c. a path the run already had is judged by content (14z-192)"
 rc="$(on3 "$TOOL3K" emu_rec freeze "$W/o_rec.txt")"
-grep -q 'g_key' "$W/o_rec.txt" && bad "g_key named stale though tools/k.py holds what the run measured" || ok "a file dirty at the run's start and unchanged since is not stale (g_key)"
+if grep -q 'g_key' "$W/o_rec.txt"; then
+    if grep -q '^== emulator staleness' "$W/o_rec.txt" && grep -q '^ *g_key: tools/k\.py' "$W/o_rec.txt"; then
+        bad "g_key named stale though tools/k.py holds what the run measured: the readout lists g_key: tools/k.py"
+    else bad "g_key named stale though tools/k.py holds what the run measured"; fi
+else ok "a file dirty at the run's start and unchanged since is not stale (g_key)"; fi
 grep -q 'g_sub' "$W/o_rec.txt" && bad "g_sub named stale though the submodule's content is what the run measured (a file then untracked, now staged)" \
     || ok "a submodule whose content is unchanged since the run is not stale, the index notwithstanding (g_sub)"
 [ "$rc" = 0 ] && ok "the record run is green at freeze cadence (exit 0)" || { bad "the record run exited $rc"; sed 's/^/        /' "$W/o_rec.txt"; }
@@ -340,6 +349,8 @@ echo "== 2d. a freeze judges what a freeze runs (14z-192)"
 rc="$(on3 "$TOOL3S" emu_red freeze "$W/o_scope.txt")"
 if grep -q 'NOTE: 1 stale gate(s).*outside what a freeze runs' "$W/o_scope.txt" && grep -A1 'outside what a freeze runs' "$W/o_scope.txt" | grep -q 'g_out: tools/o.py'; then
     ok "at freeze cadence the out-of-scope g_out is a NOTE, not a FAIL"
+elif grep -q '^== emulator staleness' "$W/o_scope.txt" && grep -A1 '^  FAIL: .*stale gate' "$W/o_scope.txt" | grep -q 'g_out: tools/o.py'; then
+    bad "g_out FAILed at freeze cadence, outside what a freeze runs (exit $rc)"; sed 's/^/        /' "$W/o_scope.txt"
 else
     bad "g_out at freeze cadence"; sed 's/^/        /' "$W/o_scope.txt"
 fi
@@ -353,6 +364,7 @@ grep -q "^g_out	mame	ondemand	" "$R3o/tests/ci_emulator.tsv" || bad "could not p
 python3 "$TOOL3O" --root "$R3o" --repo "$R3o" --run "$R3o/build/emu_red" --cadence release > "$W/o_ond.txt" 2>&1 || true
 if grep -A3 '^  NOTE: .*stale gate' "$W/o_ond.txt" | grep -q 'g_out: '; then
     if grep -A3 '^  FAIL: .*stale gate' "$W/o_ond.txt" | grep -q 'g_out: '; then bad "g_out (ondemand) FAILed at release"; else ok "at release cadence the ondemand g_out is a NOTE, never a FAIL"; fi
+elif grep -A3 '^  FAIL: .*stale gate' "$W/o_ond.txt" | grep -q 'g_out: '; then bad "the ondemand g_out was FAILed at release, not reported as a NOTE"; sed 's/^/        /' "$W/o_ond.txt"
 else bad "the ondemand g_out was not reported as a NOTE"; sed 's/^/        /' "$W/o_ond.txt"; fi
 
 echo "== 2e. a red newest row is judged (14z-192)"
@@ -368,8 +380,12 @@ echo "== 2f. the registry is judged per row (14z-195, #237)"
 rc="$(on4 "$TOOL4" emu_reg "$W/o_reg.txt")"
 grep -q 'g_own: tests/ci_emulator.tsv' "$W/o_reg.txt" && ok "a gate whose own row changed (its description) is stale on the registry (g_own)" \
     || { bad "g_own not named for its changed row"; sed 's/^/        /' "$W/o_reg.txt"; }
-grep -q 'g_other' "$W/o_reg.txt" && { bad "g_other named stale though only g_own's row and a comment moved"; sed 's/^/        /' "$W/o_reg.txt"; } \
-    || ok "a gate for which only another row and a comment moved is not stale (g_other)"
+if grep -q 'g_other' "$W/o_reg.txt"; then
+    if grep -q '^== emulator staleness' "$W/o_reg.txt" && grep -q '^ *g_other: tests/ci_emulator\.tsv' "$W/o_reg.txt"; then
+        bad "g_other named stale though only g_own's row and a comment moved: the readout lists g_other: tests/ci_emulator.tsv"
+    else bad "g_other named stale though only g_own's row and a comment moved"; fi
+    sed 's/^/        /' "$W/o_reg.txt"
+else ok "a gate for which only another row and a comment moved is not stale (g_other)"; fi
 grep -q 'g_reads: tests/ci_emulator.tsv' "$W/o_reg.txt" && ok "a gate whose code reads the registry is stale on any change (g_reads)" \
     || { bad "g_reads not named"; sed 's/^/        /' "$W/o_reg.txt"; }
 [ "$rc" = 1 ] && ok "release cadence FAILs on the two stale gates (exit 1)" || bad "the registry plant exited $rc at release cadence"
@@ -381,6 +397,8 @@ echo "== 2g. a newer SKIP row does not hide a moved input (14z-197, #252)"
 rc="$(on5 "$TOOL5" freeze "$W/o_skip.txt")"
 if [ "$rc" = 1 ] && grep -q 'g_follows: SKIP' "$W/o_skip.txt"; then
     ok "behind a newer SKIP, g_follows (its older PASS's input moved) is named and freeze cadence FAILs"
+elif grep -q '^== emulator staleness' "$W/o_skip.txt" && ! grep -q 'g_follows' "$W/o_skip.txt"; then
+    bad "the newer SKIP hid g_follows: the run's readout never names it (exit $rc)"; sed 's/^/        /' "$W/o_skip.txt"
 else
     bad "the newer SKIP hid g_follows (exit $rc)"; sed 's/^/        /' "$W/o_skip.txt"
 fi
@@ -447,8 +465,9 @@ fi
     && ok "--cadence session --names is byte-identical to the default" || bad "--cadence session --names differs from the default (exit $rcs)"
 
 echo "== 3. controls"
-if [ "$VS_CTL" = skip-ignored ] || [ "$VS_CTL" = dirt-ignored ]; then
-    vs_ctl_fired "$VS_CTL" "section 2g/2h ran the $VS_CTL copy (mode)"
+# the in-gate controls run in a plain run only (#369: a firing line is never a mode's evidence; the mode's own check
+# above ran the copy, and its finding is read at the end)
+if [ -n "${VS_CTL:-}" ]; then :
 else
     rc="$(on5 "$W/tool_skipignored.py" freeze "$W/o_skipignored.txt")"
     # (exit status is not the evidence: R5 inherits R's g_undeclared, a freeze-cadence FAIL of its own)
@@ -460,8 +479,7 @@ else
         && vs_ctl_fired dirt-ignored "the copy without the run's dirt passes the reverted-and-deleted run (exit 0)" \
         || { vs_ctl_dead dirt-ignored "exit $rc"; fail=1; }
 fi
-if [ "$VS_CTL" = names-unfiltered ]; then
-    vs_ctl_fired names-unfiltered "section 2i ran the copy whose --names ignores --cadence (mode)"
+if [ -n "${VS_CTL:-}" ]; then :
 else
     rc="$(on7 "$W/tool_namesunfiltered.py" "$W/o_cn_ctl" --cadence freeze --names)"
     # the copy must still answer (g_frz listed, no Traceback) before its extra names count: a crash is not a fired control
@@ -473,22 +491,19 @@ else
         vs_ctl_dead names-unfiltered "the cadence-blind copy printed '$(tr '\n' ' ' < "$W/o_cn_ctl.out")'"; fail=1
     fi
 fi
-if [ "$VS_CTL" = ondemand-judged ]; then
-    vs_ctl_fired ondemand-judged "section 2d2 ran the copy without the ondemand exemption (mode)"
+if [ -n "${VS_CTL:-}" ]; then :
 else
     python3 "$W/tool_ondjudged.py" --root "$R3o" --repo "$R3o" --run "$R3o/build/emu_red" --cadence release > "$W/o_ondjudged.txt" 2>&1 || true
     grep -A3 '^  FAIL: .*stale gate' "$W/o_ondjudged.txt" | grep -q 'g_out: ' \
         && vs_ctl_fired ondemand-judged "the copy without the exemption FAILs the ondemand g_out at release" || { vs_ctl_dead ondemand-judged "the exemption-free copy did not FAIL g_out"; fail=1; }
 fi
-if [ "$VS_CTL" = whole-registry ]; then
-    vs_ctl_fired whole-registry "section 2f ran the whole-registry copy (mode)"
+if [ -n "${VS_CTL:-}" ]; then :
 else
     on4 "$W/tool_wholereg.py" emu_reg "$W/o_wholereg.txt" > /dev/null
     grep -q '^== emulator staleness' "$W/o_wholereg.txt" && grep -q 'g_other: tests/ci_emulator.tsv' "$W/o_wholereg.txt" \
         && vs_ctl_fired whole-registry "the copy judging the registry as one file names g_other stale" || { vs_ctl_dead whole-registry "the whole-file copy did not name g_other"; fail=1; }
 fi
-if [ "$VS_CTL" = keys-ignored ] || [ "$VS_CTL" = scope-ignored ]; then
-    vs_ctl_fired "$VS_CTL" "section 2c/2d ran the $VS_CTL copy (mode)"
+if [ -n "${VS_CTL:-}" ]; then :
 else
     on3 "$W/tool_keysignored.py" emu_rec freeze "$W/o_keysignored.txt" > /dev/null
     grep -q '^== emulator staleness' "$W/o_keysignored.txt" && grep -q 'g_key' "$W/o_keysignored.txt" && grep -q 'g_sub' "$W/o_keysignored.txt" \
@@ -497,10 +512,12 @@ else
     grep -q '^== emulator staleness' "$W/o_scopeignored.txt" && grep -q 'FAIL: .*stale' "$W/o_scopeignored.txt" && grep -q 'g_out' "$W/o_scopeignored.txt" \
         && vs_ctl_fired scope-ignored "the copy judging every row FAILs g_out at freeze cadence (exit $rc)" || { vs_ctl_dead scope-ignored "exit $rc"; fail=1; }
 fi
+if [ -n "${VS_CTL:-}" ]; then :
+else
 rc="$(on3 "$TOOL" emu_red freeze "$W/o_red_c.txt")"
 [ "$rc" = 1 ] && grep -q 'g_red: FAIL' "$W/o_red_c.txt" && vs_ctl_fired red-newest "the red-newest plant FAILs at freeze cadence (exit 1)" || { vs_ctl_dead red-newest "exit $rc"; fail=1; }
-if [ "$VS_CTL" = newest-dir ]; then
-    vs_ctl_fired newest-dir "section 2b ran the newest-directory copy (mode)"
+fi
+if [ -n "${VS_CTL:-}" ]; then :
 else
     rc="$(pergate "$W/tool_newestdir.py" "$W/o_newestdir.txt")"
     if grep -q '^Traceback' "$W/o_newestdir.txt" || ! grep -qE '^(== emulator staleness|NO RUN OF RECORD)' "$W/o_newestdir.txt"; then
@@ -508,10 +525,27 @@ else
     elif grep -q 'g_follows' "$W/o_newestdir.txt"; then vs_ctl_dead newest-dir "the newest-directory copy still named g_follows"; fail=1
     else vs_ctl_fired newest-dir "the newest-directory copy reads only the empty run and misses g_follows (exit $rc)"; fi
 fi
+if [ -z "${VS_CTL:-}" ]; then
 rc="$(tool_on emu_plant freeze)"
 [ "$rc" = 1 ] && vs_ctl_fired moved-input "the moved plant FAILs at freeze cadence (exit 1)" || { vs_ctl_dead moved-input "exit $rc"; fail=1; }
 rc="$(tool_on emu_headroom session)"
 [ "$rc" = 1 ] && vs_ctl_fired headroom-eaten "the half-cap plant FAILs (exit 1)" || { vs_ctl_dead headroom-eaten "exit $rc"; fail=1; }
+fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on its own finding in the section its copy ran in
+    [ "$fail" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL"
+    case "$VS_CTL" in
+        keys-ignored) WANT='^  FAIL  g_key named stale though tools/k\.py holds what the run measured: the readout lists g_key: tools/k\.py$' ;;
+        scope-ignored) WANT='^  FAIL  g_out FAILed at freeze cadence, outside what a freeze runs \(exit [0-9]+\)$' ;;
+        ondemand-judged) WANT='^  FAIL  the ondemand g_out was FAILed at release, not reported as a NOTE$' ;;
+        whole-registry) WANT="^  FAIL  g_other named stale though only g_own's row and a comment moved: the readout lists g_other: tests/ci_emulator\\.tsv$" ;;
+        newest-dir) WANT='^NO RUN OF RECORD: ' ;;
+        skip-ignored) WANT="^  FAIL  the newer SKIP hid g_follows: the run's readout never names it \\(exit [0-9]+\\)$" ;;
+        dirt-ignored) WANT='^  FAIL  reverted/deleted dirt not named \(exit 0\)$' ;;
+        names-unfiltered) WANT="^  FAIL  --cadence freeze --names: exit 0, printed 'g_cad g_frz g_ond g_scp '$" ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT"
+    echo "FAIL"; exit 1
+fi
 [ "$fail" -eq 0 ] && echo "PASS" || echo "FAIL"
 exit "$fail"

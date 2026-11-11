@@ -1,0 +1,54 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent225/m369/rc/M369_scope.md	f370d0d807447345cf70acd3e5918af32c996948
+build/agent225/m369/rc/REVIEW_rules.md	6842c1e7ca4d89ef1e06b1e45e3d257e3ca4a05d
+build/agent225/m369/rc/RULING.txt	35ea7a5fa3821792c6d87973aa8ebf5766784914
+build/agent225/m369/rc/contract.diff.txt	20533da59d779f35d25e1ff2bc1480074368aab0
+build/agent225/m369/rc/debt_left_check.txt	ada24245fe47168cf36bf525f03e70c7e3ba6807
+build/agent225/m369/rc/debt_list.diff.txt	4bec4aa6eadcdb8bb208aa950e97119016ace3e0
+build/agent225/m369/rc/eris_guard_cancels_rest.tsv	3d71ffdc2583576362c66bf0b2dca4d420918250
+build/agent225/m369/rc/eris_mame_parity_rest.tsv	07b338df6137340dcf519c4bb5d75ef6cd282bfa
+build/agent225/m369/rc/eris_runA.out.txt	5105e32c42d1e7f3b638c049f8200c8824b0bdde
+build/agent225/m369/rc/eris_runB.out.txt	998ccf56217b08ccd83fe16cbad1df705067a320
+build/agent225/m369/rc/eris_runner_tree.txt	c71a1bfec081719ea79cee890a94a4956981c5d9
+build/agent225/m369/rc/lib_tools.diff.txt	97f2d8a66152190ebb58a76e2f3420fcb141a481
+build/agent225/m369/rc/mac_emu_staged.txt	78ff5e48cf66bceafdd73ad4355c9205518c6a86
+build/agent225/m369/rc/mac_rerun_history.tsv	e148e7502794290d50f6dcbd5d70acd885b87c90
+build/agent225/m369/rc/mac_rerun_orch.tsv	718c48a47195d2da62164526f3ba579e3c8c493b
+build/agent225/m369/rc/mac_pinned2.txt	f594f87b338b991830b13c2054e076171648b076
+build/agent225/m369/rc/pilot_merged_vec3.txt	a7e025e2b6428ea290731c166348153efed6c9e0
+build/agent225/m369/rc/review_coverage.tsv	693d198ee6f5797a7d4972bfe6aed0390700fed7
+build/agent225/m369/rc/run_trees.txt	8535708f5546fb42b3b9a79888df7a97d72448e4
+build/agent225/m369/rc/tier5_tail.txt	4f1b4e37ed1b13290097dbd93dce93e28cf09706
+build/agent225/m369/rc/reviews.tsv.lines-1-140 (lines 1-140 of build/agent225/m369/rc/reviews.tsv)	85d349816ce22e2a5497a6618046b45a30faccb5
+build/agent225/m369/rc/reviews.tsv.lines-141-289 (lines 141-289 of build/agent225/m369/rc/reviews.tsv)	f4e3eea96fdb24c550c7cbd751361c8141c095bc
+build/agent225/m369/rc/ledger_compact.tsv.lines-1-210 (lines 1-210 of build/agent225/m369/rc/ledger_compact.tsv)	39f5b2eead8b2bddfe2a5914e76d082498e1c662
+build/agent225/m369/rc/ledger_compact.tsv.lines-211-420 (lines 211-420 of build/agent225/m369/rc/ledger_compact.tsv)	ab4d811f50d91a53bb3919737bf6bf74e0d052e6
+build/agent225/m369/rc/ledger_compact.tsv.lines-421-630 (lines 421-630 of build/agent225/m369/rc/ledger_compact.tsv)	36760d3141ca690c88f81ec0ec7007d56b4ae318
+build/agent225/m369/rc/ledger_compact.tsv.lines-631-840 (lines 631-840 of build/agent225/m369/rc/ledger_compact.tsv)	7df72018f1ec220a8256a861a32bd23b4b0b622b
+build/agent225/m369/rc/ledger_compact.tsv.lines-841-1042 (lines 841-1042 of build/agent225/m369/rc/ledger_compact.tsv)	2731a60b4a56e582d2ba28bc08075975d6f816ca
+build/agent225/m369/rc/caught_sites.txt.lines-1-300 (lines 1-300 of build/agent225/m369/rc/caught_sites.txt)	490b4bcf4493b70b0a3978c40b64788cefa22769
+build/agent225/m369/rc/caught_sites.txt.lines-301-600 (lines 301-600 of build/agent225/m369/rc/caught_sites.txt)	e10a29e972bcc7a22d64452ffcc51bf5f1777033
+build/agent225/m369/rc/caught_sites.txt.lines-601-900 (lines 601-900 of build/agent225/m369/rc/caught_sites.txt)	118814f2cc9bb06a2491b086bef16babad79e3b0
+build/agent225/m369/rc/caught_sites.txt.lines-901-1209 (lines 901-1209 of build/agent225/m369/rc/caught_sites.txt)	eb0585f04187a9354273ff15f65d9e2c5c1e6233
+docs/project/must_fire_contract.md.lines-155-176 (lines 155-176 of docs/project/must_fire_contract.md)	c31298b0aa7e2df7f2e576288ae1587c282a7b49
+tests/audit_pool_drop.sh.lines-84-110 (lines 84-110 of tests/audit_pool_drop.sh)	f778d8c01b50609afede60ef41ad09c1be1e72e5
+build/agent225/m369/rc/acceptors_probe.txt	1c016ac923cd2f8a227aa58d97516744baf22c78
+tests/lib/crash_sweep.sh.lines-120-130 (lines 120-130 of tests/lib/crash_sweep.sh)	384fe63956c275b8db03d7ccb531b9d18b7d322a
+tests/test_dead_leg_unjudged.sh.lines-140-225 (lines 140-225 of tests/test_dead_leg_unjudged.sh)	78c77a79100bd78f0bce5fbd484135fc135caaa6
+tests/test_plants_not_applied.sh.lines-50-60 (lines 50-60 of tests/test_plants_not_applied.sh)	6944bc4c0d35b470e94ef91b1074a56dfd63cc71
+build/agent225/m369/rc/tree_diffs_full.txt	c6b38558289264ef8287689171bcedddc6641fac
+build/agent225/m369/rc/pilot_merged_vec3_classified.txt	fddc2275891d6bbb50f25b8b843dba5dc77284c7
+build/agent225/m369/vec3_pilot_logs/plain.log	e0284dcd462392bf638bcbbbc50c161ee8de0851
+build/agent225/m369/vec3_pilot_logs/drift-clock.log	e425b5b04ffe652cc0f7d5061f07a37fb886327c
+build/agent225/m369/vec3_pilot_logs/first-frame-skip.log	a415915f441d48d8859325421cc234db9507dbe7
+build/agent225/m369/rc/mac_pinned3.txt.lines-1-163 (lines 1-163 of build/agent225/m369/rc/mac_pinned3.txt)	6f61479a41fe26f22192c27dac62e1de8776dcf5
+build/agent225/m369/rc/mac_pinned3.txt.lines-164-325 (lines 164-325 of build/agent225/m369/rc/mac_pinned3.txt)	a3763aa30590c8e3d5e1c0bdf9ab2669c0545366
+build/agent225/m369/rc/pinned3_targets.txt	407d2c69357b1d54fadfb3429da3cbfc476b91f1
+build/agent225/m369/rc/tier6_controls.tsv	acf5c96245f7dd7db446046b9500b4ae0acaaa29
+build/agent225/m369/rc/rule_checker_after_resolve.txt	ed7dca9146c714cbeda39a3a371c488c3640addd
+build/agent225/m369/rc/tree_diff_final.txt	d301ac2b5665191c75f94af7d8f1319fe465eec1
+build/agent225/m369/rc/class_word_sweep.txt	d1f014a14181b7868b95a69597c7722c38b28c1d
+build/agent225/m369/rc/tier6_tail.txt	c3ddd569654f82e87cc5fc10174b58388e733433
+tests/audit_dead_leg_linux.sh.lines-60-100 (lines 60-100 of tests/audit_dead_leg_linux.sh)	4b64f1d68ef26a3ba08329662660ed2cb10a8753
+build/agent225/m369/rc/pilot_static_prep.txt	2bee8da51c9f91e58cf0970f9f3a477c28689c6b
+build/agent225/m369/pilot_m369.sh.lines-1-40 (lines 1-40 of build/agent225/m369/pilot_m369.sh)	f5d5d654baceabce60eb093d054b89992e4e6fe2

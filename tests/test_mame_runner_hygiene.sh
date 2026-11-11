@@ -86,7 +86,7 @@ e="$(run "$WRAP" good "$d")"
 [ "$e" = 0 ] && grep -qx '0 fresh' "$d/out.log" && ok "exit 0 on the run's own fresh log" || { bad "the good stub: exit $e"; sed 's/^/        /' "$d/wrapper.txt"; }
 
 if vs_ctl_is no-clear; then
-    [ "$rc" = 1 ] && { echo "FAIL: test_mame_runner_hygiene (control mode: no-clear)"; exit 1; }
+    [ "$rc" = 1 ] && { vs_ctl_caught "$W/s1.txt" '^    silent: exit 0 on the stale log$'; echo "FAIL: test_mame_runner_hygiene (control mode: no-clear)"; exit 1; }   # #369: section 1's own row
     vs_ctl_left_green "no-clear" "FAIL: test_mame_runner_hygiene — control mode no-clear left the gate green"
 fi
 

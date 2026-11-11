@@ -184,7 +184,7 @@ done
 echo "  ok    $nl legs complete"
 
 echo "== 2. the checks"
-python3 - "$W" "$MODE" $LEGS <<'PY'
+python3 - "$W" "$MODE" $LEGS > "$W/main.log" <<'PY'   # #369: the checks' findings, for vs_ctl_caught
 import sys
 W, mode, LEGS = sys.argv[1], sys.argv[2], sys.argv[3:]
 S16 = lambda x: x - 65536 if x >= 32768 else x
@@ -336,5 +336,19 @@ if not mode:
 sys.exit(1 if bad else 0)
 PY
 rc=$?
+cat "$W/main.log"
+if [ -n "$MODE" ]; then
+    case "$MODE" in   # #369: the finding each perturbation must produce
+        type-rotated) WANT='^  FAIL  E1 PRG:0x019152 writes the type once, on the KO winner only: .+$' ;;
+        loser-side) WANT='^  FAIL  (E1 PRG:0x019152 writes the type once, on the KO winner only: .*P[12] \[\]|E4 \+0x3BE raised \(0x05E2DC\) iff type in ).*$' ;;
+        counting-shifted|unique-as-ex) WANT='^  FAIL  E4 \+0x3BE raised \(0x05E2DC\) iff type in \{3,4,6\}, .+$' ;;
+        store-not-add) WANT='^  FAIL  E5 each raise adds 1 to the poked value \(before -> after\): .+$' ;;
+        override-ignored) WANT='^  FAIL  E2 at the type write .+$' ;;
+        noko-as-ko) WANT="^  FAIL  E7 no type, bit-7 or counter write on \\['k_pm', [^]]*\\] \\(\\[\\['0x[0-9a-f]+'.*\$" ;;
+        readback-unpoked) WANT='^  FAIL  R1 pm_noko: f3999 .+$' ;;
+    esac
+    [ "$rc" = 0 ] && vs_ctl_left_green "$MODE" "FAIL: audit_mizuumi_finishes — control mode $MODE left the gate green"
+    vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL: audit_mizuumi_finishes (control mode $MODE)"; exit 1
+fi
 [ "$rc" = 0 ] || { echo "FAIL: audit_mizuumi_finishes"; exit 1; }
 echo "PASS: audit_mizuumi_finishes — finish types 0-7 each on a measured KO kind, on the winner; +0x3BE counts 3/4/6 and +0x3BF 4, on either side, human winners, by adding"

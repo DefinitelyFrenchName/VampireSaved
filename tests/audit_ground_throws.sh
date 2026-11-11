@@ -223,6 +223,7 @@ for j in "$G"/gt_*.json; do b=$(basename "$j" .json)
         grep -qE '^(CRASH|PCWEEDS|SOFTRESET)' "$W/legs/$b/$pc/run.log" 2>/dev/null && { bad "leg $b/$pc CRASHED"; dead=1; }; done
 done
 [ "$dead" = 0 ] && ok "$((_n)) legs ended clean in $(( $(date +%s) - t0 )) s"
+[ "$dead" = 0 ] || vs_ctl_nj "a leg did not end or CRASHED: its missing dumps read as NO HOLD (a VOID leg), which is not a finding"
 for j in "$G"/gt_*.json; do b=$(basename "$j" .json)
     for pc in 0189ea 02979a nostop; do
         _e="$(sed 's/SNAP_FRAMES=$//; s/SNAP_FRAMES= / /' "$W/legs/$b/$pc/env")"
@@ -246,8 +247,18 @@ fi
 [ -n "${FREEZE:-}" ] && [ -z "${VS_CTL:-}" ] && { python3 tools/ground_throw_rigs.py freeze "$W/rows.jsonl" > "$EXP"; echo "  FROZE $EXP ($(grep -vc '^#' "$EXP") events)"; }
 
 if [ -n "${VS_CTL:-}" ] && [ "$MODE" != drift-clock ] && [ "$MODE" != first-frame-skip ]; then   # THE MODE: exit 1 only if ITS clause failed under ITS perturbation, else REFUSED (3)
+    # #369: honoured only on the mode's own clause in section 3's output (ctl_judge holds the count; the ERE names the line)
+    case "$VS_CTL" in
+    lp-no-throw) WANT="^BAD \\('BU', [^)]*\\): NO HOLD from the press on a leg " ;;
+    foreign-record) WANT="^BAD .*: damage record\\(s\\) .* outside the thrower's own attack table\$" ;;
+    class-raw) WANT="^BAD \\('QB', 'P', '6MP'\\): got  " ;;
+    leg-falls) WANT="^BAD .*: the two applier legs disagree \\(hold " ;;
+    hold-before-press) WANT="^BAD .*: the hold is already set on the frame BEFORE the press — the press did not start it\$" ;;
+    phantom-record) WANT="^BAD .*: staged record\\(s\\) .* — damage the victim never took\$" ;;
+    *) WANT='' ;;
+    esac
     if _ev="$(ctl_judge "$VS_CTL" "$W/expect.txt" "$W/rows.jsonl")"; then
-        vs_ctl_fired "$VS_CTL" "$_ev (mode)"; echo "FAIL"; exit 1
+        echo "  mode  $_ev"; vs_ctl_caught "$W/expect.txt" "$WANT" || :; echo "FAIL"; exit 1
     fi
     echo "REFUSED: mode $VS_CTL — its perturbation did not make its own clause fail ($_ev): a dead mode, not a verdict"
     exit 3
@@ -269,9 +280,15 @@ if [ "$FREEZE_CLOCK" = 1 ]; then
 fi
 if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "every leg on emulated time, at its frozen game clock"
 else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
-ia_stage audit_ground_throws "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || fail=1
+ia_stage audit_ground_throws "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" > "$W/stage.txt" || fail=1
+cat "$W/stage.txt"
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL (control mode: $MODE)"; exit 1; }
+    # #369: drift-clock on the frozen game-clock comparison, first-frame-skip on the staging leg against replay.lua
+    case "$MODE" in
+    drift-clock) CF="$W/align_bad.txt"; WANT='game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+    *) CF="$W/stage.txt"; WANT='FAIL: the staging reference leg \([^)]*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+    esac
+    [ "$fail" = 1 ] && { vs_ctl_caught "$CF" "$WANT" || :; echo "FAIL (control mode: $MODE)"; exit 1; }
     vs_ctl_left_green "$MODE" "FAIL — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

@@ -85,7 +85,7 @@ done
 wait
 
 echo "== 2. the checks"
-W="$W" MODE="$MODE" python3 - <<'PY' || fail=1
+W="$W" MODE="$MODE" python3 - > "$W/main.log" <<'PY' || fail=1
 import os, sys
 W, MODE = os.environ["W"], os.environ["MODE"]
 def load(path):
@@ -166,9 +166,15 @@ else:
     print(f"CONTROL DEAD: mask-reverted — R1 {b1}, R2 {b2}, R4 {b4}; census parts blind to the defect {blind}, frozen {BLIND}: a check the BAD leg cannot fail, or a moved blind set (re-measure)"); fail = 1
 sys.exit(fail)
 PY
-if [ -n "$MODE" ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: $MODE — the gate failed with the control applied"
-    else echo "CONTROL DEAD: $MODE — every check passed with the control applied"; fi
+cat "$W/main.log"
+if [ -n "$MODE" ]; then   # #369: a mode is honoured only on its own finding in section 2's output
+    [ "$fail" = 1 ] || vs_ctl_left_green "$MODE" "FAIL: audit_don_row0b (control mode: every check passed with the control applied)"
+    case "$MODE" in
+    mask-reverted) WANT='^  FAIL  \[R[123] [^]]*\] row 0x0B, bad vs native from 2500: [1-9][0-9]* differing frames' ;;
+    opatch-readback) WANT="^  FAIL  \\(mode\\) BAD legs read back \\['223cef92'\\], not 223cef9a\$" ;;
+    *) WANT='' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
     echo "FAIL: audit_don_row0b (control mode)"; exit 1
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_don_row0b"; else echo "FAIL: audit_don_row0b"; exit 1; fi

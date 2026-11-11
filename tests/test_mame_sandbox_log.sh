@@ -47,7 +47,8 @@ printf '#!/bin/sh\n[ "$*" = "-d" ] && exec "%s" -d "$TMPDIR/tmp.XXXXXXXXXX"\nexe
 chmod +x "$W/shim/mktemp"; PATH="$W/shim:$PATH"; export PATH
 fail=0
 ok() { echo "  ok    $*"; }
-bad() { echo "  FAIL  $*"; fail=1; }
+bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # #369: the main check's findings
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_caught only: this gate parses CONTROL itself
 
 mkstub() {  # mkstub <path>: a MAME stand-in that writes an nvram file where it is told to, as MAME does at exit
     cat > "$1" <<'STUB'
@@ -152,6 +153,15 @@ elif [ -n "${CONTROL:-}" ]; then echo "REFUSED: CONTROL=$CONTROL is not a mode o
 else mirror "$W/m"; fi
 check "$W/m/tools/run_mame.sh" "$W/t" || fail=1
 
+# #369: a mode is judged on the main check's own finding; the in-gate controls below run in a plain run only
+if [ -n "${CONTROL:-}" ]; then
+    case "$CONTROL" in
+    state-blind)     WANT="FAIL  one named sandbox, two runs: got 'fresh' then 'fresh'\$" ;;
+    refusal-removed) WANT="FAIL  refusal: the second run: exit 0, started, 'RAN'\$" ;;
+    esac
+    if [ "$fail" -ne 0 ]; then vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL: test_mame_sandbox_log"; exit 1; fi
+    echo "PASS: test_mame_sandbox_log (control mode $CONTROL changed no verdict)"; exit 0
+fi
 # the must-fire control: the state-blind copy must log the second run in one sandbox as fresh, and fail the checks
 mirror "$W/c" blind; mkdir -p "$W/cr/roms"; mkstub "$W/cr/stub"
 run "$W/c/tools/run_mame.sh" "$W/cr" "MAME_SANDBOX_LOG=$W/cr/l" "$W/cr/sb"; run "$W/c/tools/run_mame.sh" "$W/cr" "MAME_SANDBOX_LOG=$W/cr/l" "$W/cr/sb"

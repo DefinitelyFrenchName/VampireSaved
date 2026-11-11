@@ -54,7 +54,8 @@ RPL=tests/replays/26_don_arcade_mash.rpl
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
 W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/ranktenant.XXXXXX")}" || { echo "FAIL: audit_ranking_tenant — mktemp -d failed (W)"; exit 2; }; mkdir -p "$W"
 [ -n "${OUT:-}" ] || trap 'rm -rf "$W"' EXIT
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # #369: the findings, for vs_ctl_caught
+: > "$W/main.log"
 FORCE="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13"
 DON_POKES="$FORCE"; vs_ctl_is poke-dropped && DON_POKES=""
 
@@ -92,8 +93,8 @@ fi
 [ "$fn" = 0f ] && ok "leg none: the ranking's 1st entry is id 0x0F (Jedah, the real pick)" || bad "leg none: the ranking's first id is '${fn:-none}' (want 0f)"
 
 echo "== controls"
-if vs_ctl_is poke-dropped; then
-    vs_ctl_fired poke-dropped "the don13 leg ran without its pokes (mode)"
+if [ -n "$MODE" ]; then
+    echo "  (control mode $MODE: the in-gate control runs in a plain run only, #369)"
 elif [ -n "$fn" ] && [ "$fn" != 13 ]; then
     vs_ctl_fired poke-dropped "the unpoked leg's first ranking id is 0x$fn, not 0x13"
 else
@@ -115,9 +116,15 @@ if [ "$FREEZE_CLOCK" = 1 ]; then
 fi
 if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "both legs on emulated time, at their frozen game clocks"
 else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
-ia_stage audit_ranking_tenant "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 2 "$W/st" "$MODE" || fail=1
-if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL (control mode: $MODE)"; exit 1; }
+ia_stage audit_ranking_tenant "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 2 "$W/st" "$MODE" > "$W/stage.txt" || fail=1
+cat "$W/stage.txt"; cat "$W/align_bad.txt" "$W/stage.txt" >> "$W/main.log"   # the alignment check's findings (#369)
+if [ -n "$MODE" ]; then
+    case "$MODE" in   # #369: the finding each perturbation must produce
+        drift-clock) WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+        first-frame-skip) WANT='FAIL: the staging reference leg \([^)]*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+        poke-dropped) WANT="FAIL  leg don13: the ranking's first id is '[0-9a-f]{2}' \\(want 13\\)\$" ;;
+    esac
+    [ "$fail" = 1 ] && { vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL (control mode: $MODE)"; exit 1; }
     vs_ctl_left_green "$MODE" "FAIL — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

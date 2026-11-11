@@ -104,7 +104,7 @@ for b in $BUILDS; do
         bad "$b: the audit itself failed:"; sed 's/^/        /' "$W/$b.log" | head -8; continue
     fi
     sed 's/^/  /' "$W/$b.log"
-    python3 - "$W/$b.json" "$b" <<'PY' || fail=1
+    python3 - "$W/$b.json" "$b" <<'PY' > "$W/$b.verdict" || fail=1
 import json, sys
 d = json.load(open(sys.argv[1])); name = sys.argv[2]
 if d["in_source_range"]:
@@ -115,6 +115,7 @@ if d["outside_placed"]:
     print(f"  note  {name}: {len(d['outside_placed'])} pointer(s) outside the placed "
           f"region — WALK OVERRUN, not asserted (see the tool's header)")
 PY
+    cat "$W/$b.verdict"; cat "$W/$b.verdict" >> "$W/main.log"   # #369: section 1's verdict, the main check's finding
 done
 
 # --- must-fire control: plant ONE unrelocated pointer in a COPY ------------
@@ -123,7 +124,7 @@ done
 # build/ is written.
 CTL=""
 for b in $BUILDS; do [ -f "build/$b/verify_data.bin" ] && { CTL="$b"; break; }; done
-if [ -n "$CTL" ]; then
+if [ -n "$CTL" ] && [ -z "${VS_CTL:-}" ]; then   # #369: the in-gate control runs in a plain run only
     mkdir -p "$W/ctl/patch" "$W/ctl/extract"
     cp "build/$CTL/patch/placements.json" "$W/ctl/patch/"
     cp "build/$CTL/extract/regions.json"  "$W/ctl/extract/"
@@ -142,4 +143,7 @@ if [ -n "$CTL" ]; then
     fi
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL"; echo "PASS"; else
+    # #369: the mode is honoured only on its own finding: the planted copy's pointer named UNRELOCATED by section 1
+    [ -z "$MODE_B" ] || vs_ctl_caught "$W/main.log" "^ *FAIL  $MODE_B: [0-9]+ UNRELOCATED sprite pointer\\(s\\) in the vs2 source range"
+    echo "FAIL"; exit 1; fi

@@ -66,5 +66,13 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: no live line pins a superseded fingerprint, and the named exemption is still in use"
-else echo "FAIL: test_superseded_pins"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_superseded_pins"; echo "PASS: no live line pins a superseded fingerprint, and the named exemption is still in use"
+else
+    # #369: a mode is honoured only on its own finding in the main check's output (the tool on the planted root)
+    case "${VS_CTL:-}" in
+        planted-pin) WANT='^ *PIN +tests/test_planted\.sh:1 holds [0-9a-f]{8} — ' ;;
+        stale-exemption) WANT='^ *STALE exemption tools/rulecheck\.py [0-9a-f]{8}: no live pin matches it' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/tree.txt" "$WANT" || :
+    echo "FAIL: test_superseded_pins"; exit 1; fi

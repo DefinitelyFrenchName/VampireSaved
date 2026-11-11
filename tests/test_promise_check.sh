@@ -48,6 +48,14 @@ PY
     echo "$W/$1/promise_check.py"
 }
 
+want_of() {  # want_of <control> — the selftest case line that control's copy must fail (one ERE per control)
+    case "$1" in
+    no-boundary)        echo '^  FAIL  all classes hold: PASS$' ;;
+    no-timing)          echo '^  FAIL  PREDATES: PREDATES$' ;;
+    start-here-ignored) echo '^  FAIL  NOT CARRIED: NOT CARRIED$' ;;
+    esac
+}
+
 echo "== test_promise_check: #190 P3 — every listed promise classed, every class holding =="
 fail=0
 PC=tools/promise_check.py
@@ -59,16 +67,23 @@ grep -q '^SELFTEST PASS$' "$W/self.txt" || { echo "FAIL: the checker's selftest"
 if [ -z "${VS_CTL:-}" ]; then
     for c in no-boundary no-timing start-here-ignored; do
         python3 "$(make_copy "$c")" --selftest > "$W/ctl_$c.txt" 2>&1 || true
-        case "$c" in
-        no-boundary)        want='^  FAIL  all classes hold: PASS$' ;;
-        no-timing)          want='^  FAIL  PREDATES: PREDATES$' ;;
-        start-here-ignored) want='^  FAIL  NOT CARRIED: NOT CARRIED$' ;;
-        esac
+        want="$(want_of "$c")"
         if grep -q '^SELFTEST FAIL$' "$W/ctl_$c.txt" && grep -q "$want" "$W/ctl_$c.txt"; then
             vs_ctl_fired "$c" "$(grep -m1 "$want" "$W/ctl_$c.txt" | sed 's/^ *//')"
         else vs_ctl_dead "$c" "the copy's selftest did not fail on its own case: $(grep -c 'FAIL  ' "$W/ctl_$c.txt") case(s) failed" || fail=1; fi
     done
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: the mode's own case, failed in the main selftest's output
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_promise_check (control mode $VS_CTL changed no verdict)"
+    WANT="$(want_of "$VS_CTL")"
+    # its own case alone: the selftest judged all ten cases and failed exactly one (a copy that crashed, or broke
+    # another case too, is not this finding)
+    nc="$(grep -cE '^  (ok  |FAIL)  ' "$W/self.txt" || :)"; nf="$(grep -c '^  FAIL  ' "$W/self.txt" || :)"
+    if [ "$nc" != 10 ]; then vs_ctl_nj "the copy's selftest judged $nc of its ten cases"
+    elif [ "$nf" != 1 ]; then vs_ctl_nj "the copy's selftest failed $nf of its ten cases, not its own alone"
+    else vs_ctl_caught "$W/self.txt" "$WANT" || :; fi
+    echo "FAIL: test_promise_check (control mode $VS_CTL)"; exit 1
+fi
 if [ "$fail" = 0 ]; then echo "PASS: every listed promise is classed and each class holds (the selftest's ten cases)"
 else echo "FAIL: test_promise_check"; exit 1; fi

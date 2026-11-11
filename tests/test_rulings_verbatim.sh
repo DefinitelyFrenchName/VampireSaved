@@ -81,5 +81,19 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: each failure condition fails the check; the session's questions stay its own"
-else echo "FAIL: test_rulings_verbatim"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_rulings_verbatim"; echo "PASS: each failure condition fails the check; the session's questions stay its own"
+else
+    # #369: a mode is honoured only on its own finding in the selftest's output (the case its perturbation breaks)
+    case "${VS_CTL:-}" in
+        notfound-ignored) WANT='^ *FAIL: case question as maintainer: 0 failure\(s\), expected at least one$' ;;
+        questions-unseen) WANT='^ *FAIL: case question label naming the maintainer: 1 failure\(s\), expected none$' ;;
+        unhomed-ignored) WANT='^ *FAIL: case unhomed message: 0 failure\(s\), expected at least one$' ;;
+        stale-ignored) WANT='^ *FAIL: case stale exempt: 0 failure\(s\), expected at least one$' ;;
+        join-blind) WANT='^ *FAIL: case second quote after a sub-label: 0 failure\(s\), expected at least one$' ;;
+        elision-blind) WANT='^ *FAIL: case elided quote: 1 failure\(s\), expected none$' ;;
+        elision-unordered) WANT='^ *FAIL: case elided quote, parts reordered: 0 failure\(s\), expected at least one$' ;;
+        meta-counted) WANT='^ *ok +maintainer: Base directory for this skill: /x$' ;;   # the harness-text case: the skill load verified as the maintainer's
+        *) WANT='' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/self.txt" "$WANT" || :
+    echo "FAIL: test_rulings_verbatim"; exit 1; fi

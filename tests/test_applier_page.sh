@@ -90,7 +90,17 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 MOD="$REPO/tools/applier"
 SHELL_HTML="$MOD/page_shell.html"
 fails=0
-note() { echo "  $*"; }
+note() { echo "  $*" | tee -a "$W/main.log"; }   # the main check's findings land in main.log (#369)
+want_of() {   # want_of <mode>: the finding that mode's perturbation must produce in the main check (#369)
+    case "$1" in
+        no-member-check)  printf '%s\n' "^  a tampered manifest was not refused \\(apply_release[.]py rc=[1-9][0-9]*, the page's applier rc=0\\)\$" ;;
+        flipped-member)   printf '%s\n' '^  standalone: vsavjw[.]zip/[^:]+: member bytes differ' ;;
+        windows-host)     printf '%s\n' '^  the container depends on the host: create_system \[0\]' ;;
+        unencoded-page)   printf '%s\n' "^HOST-TEXT: .*/gen_applier_page[.]py:[0-9]+: open[(].*/page1[.]html', 'w'[)] names no encoding" ;;
+        page-with-fetch)  printf '%s\n' '^  line [0-9]+: fetch[(][)]$' ;;
+        page-without-csp) printf '%s\n' '^  no Content-Security-Policy meta tag — ' ;;
+    esac
+}
 
 # ── the shadow module directory the two shadow-tool controls perturb ──────────
 # Written as ONE function both the control section and the mode call, so what the
@@ -193,6 +203,7 @@ gen_rc=0
 gen_guarded "$GEN_TOOL" "$REL" --shell "$GEN_SHELL" -o "$W/page1.html" > "$W/gen1.txt" 2>&1 || gen_rc=$?
 if grep -q '^HOST-TEXT:' "$W/gen1.txt"; then
     sed 's/^/  /' "$W/gen1.txt"
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/gen1.txt" "$(want_of "$VS_CTL")" || :
     echo "FAIL: the page generator wrote host-dependent text (the host-text guard, #314)"; exit 1
 fi
 # #310 group 6 (14z-215): reached only when the guard printed no HOST-TEXT line above — this mode's control is dead (LIES)
@@ -203,7 +214,7 @@ for c in page-with-fetch page-without-csp; do
         vs_ctl_dead "$c" "the generator accepted a shell it must refuse" || true
         echo "FAIL: test_applier_page"; exit 1
     fi
-    vs_ctl_fired "$c" "the generator refused it: $(sed -n '2p' "$W/gen1.txt" | sed 's/^ *//' | cut -c1-90)"
+    vs_ctl_caught "$W/gen1.txt" "$(want_of "$c")" || :
     echo "FAIL: test_applier_page (control mode: the bad page was correctly refused)"
     exit 1
 done
@@ -292,7 +303,7 @@ for variant in standalone no-qsound-bios; do
     node "$NODE_APPLIER" --romdir "$ROMDIR" --out "$W/js_$variant" \
         --manifest "$REL/manifest.json" $extra > "$W/js_$variant.log" 2>&1 \
         || { sed 's/^/    /' "$W/js_$variant.log"; echo "  the page's applier failed ($variant)"; fails=$((fails + 1)); continue; }
-    python3 - "$W/py_$variant" "$W/js_$variant" "$REL/manifest.json" "$variant" <<'PY' || fails=1
+    python3 - "$W/py_$variant" "$W/js_$variant" "$REL/manifest.json" "$variant" <<'PY' > "$W/s3.txt" 2>&1 || fails=1
 import json, sys, zipfile
 py, js, mf, variant = sys.argv[1:5]
 m = json.load(open(mf))
@@ -338,6 +349,7 @@ if problems:
 print(f"  ok: {variant}: {nm} members identical, order and header fields identical, "
       f"set key {h.hexdigest()[:8]} as declared")
 PY
+    cat "$W/s3.txt"; cat "$W/s3.txt" >> "$W/main.log"
 done
 
 # ── 3b. the container does not depend on the host (#215) ─────────────────────
@@ -382,7 +394,7 @@ if [ -d "$W/py_standalone" ] && as_windows "$WINAPPLY" "$W/win_standalone" > "$W
     if hb="$(host_byte "$W/win_standalone" "$W/py_standalone")"; then
         echo "  ok: under sys.platform win32: $hb"
     else
-        echo "  the container depends on the host: $hb"; fails=$((fails + 1))
+        note "the container depends on the host: $hb"; fails=$((fails + 1))
     fi
 else
     sed 's/^/    /' "$W/win_standalone.log" 2>/dev/null | tail -5
@@ -587,7 +599,7 @@ if vs_ctl_is no-member-check; then
         vs_ctl_dead no-member-check "an applier with no rebuilt-member check still refused the corrupted patch" || true
         echo "FAIL: test_applier_page"; exit 1
     fi
-    vs_ctl_fired no-member-check "with the check removed, section 4's cases no longer all refuse — the gate went red as it must"
+    vs_ctl_caught "$W/main.log" "$(want_of "$VS_CTL")" || :
     echo "FAIL: test_applier_page (control mode: the unverified applier was correctly caught)"
     exit 1
 fi
@@ -596,7 +608,7 @@ if vs_ctl_is windows-host; then
         vs_ctl_dead windows-host "an applier without the create_system pin still wrote the host-independent container" || true
         echo "FAIL: test_applier_page"; exit 1
     fi
-    vs_ctl_fired windows-host "without the pin, section 3b's Windows run wrote a different container"
+    vs_ctl_caught "$W/main.log" "$(want_of "$VS_CTL")" || :
     echo "FAIL: test_applier_page (control mode: the unpinned applier was correctly caught)"
     exit 1
 fi
@@ -605,7 +617,7 @@ if vs_ctl_is flipped-member; then
         vs_ctl_dead flipped-member "a flipped output member was not caught by the comparison" || true
         echo "FAIL: test_applier_page"; exit 1
     fi
-    vs_ctl_fired flipped-member "the member-for-member comparison caught a single flipped byte"
+    vs_ctl_caught "$W/main.log" "$(want_of "$VS_CTL")" || :
     echo "FAIL: test_applier_page (control mode: the flipped member was correctly caught)"
     exit 1
 fi

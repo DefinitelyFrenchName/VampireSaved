@@ -44,6 +44,8 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+CTL_TARGETS="flipped-expectation:es red|whiff-for-hit:gc startup on the hit|record-for-dealt:gc dealt red|contact-counted:sb startup|landing-ignored:tr recovery|height-range-dropped:tr air recovery|active-gap-dropped:tr command whiff|victim-range-dropped:tr throw tech"
+target_of() { printf '%s\n' "$CTL_TARGETS" | tr '|' '\n' | sed -n "s/^$1:\(.*\)\$/\1/p"; }   # a control's target case
 
 cases() {  # cases <perturbation or ""> -> one line per case: OK|DIFF <case> got=<..> want=<..>; exit 0
     python3 - "$1" <<'PY'
@@ -243,18 +245,25 @@ if cases "$MODE_P" > "${TMPDIR:-/tmp}/cc229.$$" 2>&1; then :; else bad "the case
 n_ok=$(grep -c '^OK ' "${TMPDIR:-/tmp}/cc229.$$"); n_diff=$(grep -c '^DIFF ' "${TMPDIR:-/tmp}/cc229.$$")
 if [ "$n_diff" -eq 0 ] && [ "$n_ok" -gt 0 ]; then ok "$n_ok cases, every verdict as expected"
 else bad "$n_diff of $((n_ok + n_diff)) cases differ:"; grep '^DIFF ' "${TMPDIR:-/tmp}/cc229.$$" | sed 's/^/        /'; fi
-rm -f "${TMPDIR:-/tmp}/cc229.$$"
+[ "$((n_ok + n_diff))" -gt 0 ] || vs_ctl_nj "the case program judged no case"
+MAIN="${TMPDIR:-/tmp}/cc229.$$"   # #369: the case program's verdicts, read by vs_ctl_caught under a mode, removed at the end
 
 echo "== 2. must-fire controls"
 if [ -n "${VS_CTL:-}" ]; then
     echo "  (control mode $VS_CTL: section 1 ran with its perturbation; the gate must FAIL)"
 else
-    for c in "flipped-expectation:es red" "whiff-for-hit:gc startup on the hit" "record-for-dealt:gc dealt red" "contact-counted:sb startup" "landing-ignored:tr recovery" "height-range-dropped:tr air recovery" "active-gap-dropped:tr command whiff" "victim-range-dropped:tr throw tech"; do
-        name="${c%%:*}"; target="${c#*:}"
+    for name in flipped-expectation whiff-for-hit record-for-dealt contact-counted landing-ignored height-range-dropped active-gap-dropped victim-range-dropped; do
+        target="$(target_of "$name")"
         d="$(cases "$name" 2>&1 | grep '^DIFF ')"
         if echo "$d" | grep >/dev/null "^DIFF $target got="; then vs_ctl_fired "$name" "$(echo "$d" | grep "^DIFF $target got=" | head -1)"
         else vs_ctl_dead "$name" "its target case '$target' did not differ (differences: $(echo "$d" | wc -l | tr -d ' '))" || fail=1; fi
     done
 fi
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on its own target case differing in section 1
+    [ "$fail" -eq 0 ] && { rm -f "$MAIN"; vs_ctl_left_green "$VS_CTL" "FAIL"; }
+    vs_ctl_caught "$MAIN" "^DIFF $(target_of "$VS_CTL") got=" || :
+    rm -f "$MAIN"; echo "FAIL"; exit 1
+fi
+rm -f "$MAIN"
 [ "$fail" -eq 0 ] && echo "PASS" || echo "FAIL"
 exit "$fail"

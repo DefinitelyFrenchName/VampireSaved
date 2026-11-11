@@ -28,7 +28,8 @@ W="$(mktemp -d)" || { echo "FAIL: test_mame_default_bin — mktemp -d failed (W)
 # passes each run its own sandbox inside $W (TMPDIR alone does not: macOS's mktemp -d with no template ignores it)
 fail=0
 ok() { echo "  ok    $*"; }
-bad() { echo "  FAIL  $*"; fail=1; }
+bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # #369: the main check's findings
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_caught only: this gate parses CONTROL itself
 
 mkstub() {  # mkstub <path> <name>
     mkdir -p "$(dirname "$1")"
@@ -87,6 +88,11 @@ elif [ -n "${CONTROL:-}" ]; then echo "REFUSED: CONTROL=$CONTROL is not a mode o
 else mirror "$W/m"; fi
 check "$W/m/tools/run_mame.sh" "$W/t" || fail=1
 
+# #369: a mode is judged on the main check's own finding; the in-gate control below runs in a plain run only
+if [ -n "${CONTROL:-}" ]; then
+    if [ "$fail" -ne 0 ]; then vs_ctl_caught "$W/main.log" "FAIL  MAME_BIN unset, set vsavjw: got 'RAN path', want 'RAN wide'\$"; echo "FAIL: test_mame_default_bin"; exit 1; fi
+    echo "PASS: test_mame_default_bin — an unset MAME_BIN runs the pinned build for its set"; exit 0
+fi
 # the must-fire control: the old default must run the PATH stub for vsavjw (not die), and fail the checks
 mirror "$W/c" old; setup "$W/cr"
 ran="$(run "$W/c/tools/run_mame.sh" "$W/cr" vsavjw)"

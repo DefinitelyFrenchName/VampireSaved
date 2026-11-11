@@ -126,12 +126,18 @@ if [ "${FREEZE:-0}" = 1 ]; then cp "$W/got.txt" "$EXP"; echo "  FROZE  $EXP ($(w
 EXP_CMP="$EXP"
 if [ "$MODE" = perturbed-frozen-arm ]; then sed '$d' "$EXP" > "$W/exp.mode"; EXP_CMP="$W/exp.mode"; fi
 if diff "$EXP_CMP" "$W/got.txt" > "$W/diff.txt"; then
+    [ -z "$MODE" ] || vs_ctl_left_green "$MODE" "FAIL: audit_df_accumulator (control mode $MODE)"
     echo "  ok    $(wc -l < "$EXP" | tr -d ' ') frozen lines match"; sed 's/^/        /' "$W/got.txt"
     sed '$d' "$EXP" > "$W/exp_probe"
     if cmp -s "$EXP" "$W/exp_probe"; then echo "CONTROL DEAD: perturbed-frozen-arm — a perturbed copy of the frozen table is identical to it"
     else vs_ctl_fired perturbed-frozen-arm "a perturbed copy of the frozen table differs from it, so the diff catches it (the mode compares the measured output against such a copy)"; fi
 else
-    echo "  FAIL  frozen expectation differs:"; sed 's/^/        /' "$W/diff.txt"; exit 1
+    echo "  FAIL  frozen expectation differs:"; sed 's/^/        /' "$W/diff.txt"
+    # #369: the mode's own finding — the copy lacks the frozen table's last line, so the diff ADDS that line after the
+    # copy's last (N lines in the copy: the hunk `Na<N+1>`)
+    _nc="$(wc -l < "$EXP_CMP" | tr -d ' ')"
+    vs_ctl_caught "$W/diff.txt" "^${_nc}a$((_nc + 1))\$" || :
+    exit 1
 fi
 # THE SHEET (#291): with SHEET_OUT set, the armor leg on pristine vsavj and on the merged build as this run played
 # them, at every frame of the frozen per-contact shape, proven on the ten fields this run traced there. Nothing the

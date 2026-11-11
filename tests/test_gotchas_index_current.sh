@@ -49,10 +49,10 @@ W="$(mktemp -d)" || { echo "FAIL: test_gotchas_index_current — mktemp -d faile
 
 FILES="docs/GOTCHAS.md docs/game/gotchas.md docs/platform/gotchas.md docs/project/gotchas.md"
 mkcopy() { for f in $FILES; do mkdir -p "$1/$(dirname "$f")"; cp "$f" "$1/$f"; done; }
-perturb() {  # perturb <name> <dir>; EXPECT = the failure's substring
+perturb() {  # perturb <name> <dir>; EXPECT = the failure's substring; WANT = the mode's finding in the main check's diff (#369)
     case "$1" in
-    new-bucket-entry)  printf '\n## A synthetic trap for the control (paid: 14z-999)\nbody\n' >> "$2/docs/game/gotchas.md"; EXPECT="A synthetic trap for the control" ;;
-    hand-edited-index) printf -- '- a bullet somebody hand-added\n' >> "$2/docs/GOTCHAS.md"; EXPECT="" ;;
+    new-bucket-entry)  printf '\n## A synthetic trap for the control (paid: 14z-999)\nbody\n' >> "$2/docs/game/gotchas.md"; EXPECT="A synthetic trap for the control"; WANT='^ *\+- A synthetic trap for the control \(paid: 14z-999\)$' ;;
+    hand-edited-index) printf -- '- a bullet somebody hand-added\n' >> "$2/docs/GOTCHAS.md"; EXPECT=""; WANT='^ *-- a bullet somebody hand-added$' ;;
     *) echo "no such perturbation: $1"; exit 3 ;;
     esac
 }
@@ -79,6 +79,8 @@ control() {  # control <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log" | head -8
     fi
 }
-for n in $(vs_ctl_declared "$0"); do control "$n"; done
+if [ -z "$VS_CTL" ]; then for n in $(vs_ctl_declared "$0"); do control "$n"; done   # #369: the copies' controls in a plain run only
+elif [ "$fail" != 0 ]; then vs_ctl_caught "$W/tree.log" "$WANT"   # #369: the mode's own finding (WANT set by the mode's perturb above)
+fi
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

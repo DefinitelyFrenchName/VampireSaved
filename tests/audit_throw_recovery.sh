@@ -135,6 +135,7 @@ measure() {  # measure <family> <ticks source> <expected> <out dir> [gen options
 
 echo "== audit_throw_recovery: the vsavj ROM ($(python3 -c "import hashlib,sys;print(hashlib.sha1(open(sys.argv[1],'rb').read()).hexdigest()[:12])" "$ROMDIR/vsavj.zip")); tree $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo 'no git'); script blob $(git -C "$REPO" hash-object tests/audit_throw_recovery.sh 2>/dev/null || echo '?'); host $(hostname); JOBS=$JOBS; families: $FAMS${TR_VICTIM:+; victim $TR_VICTIM}${TR_HEIGHT:+; air height $TR_HEIGHT}"
 ran=0; mode_fired=0; mode_ev=""
+: > "$W/main.log"   # #369: each judged family's check output (expect.txt), for vs_ctl_caught
 for FAM in $FAMS; do
     EXP="$(tr_py "$FAM" 't.exp_path()')"; FULL="$(tr_py "$FAM" 't.full_path()')"
     NEV="$(tr_py "$FAM" 'sum(1 for _ in t.events())')"; CTL_RIG="$(tr_py "$FAM" 'next(r for r, *_ in t.events() if r.startswith("FE_"))')"
@@ -197,6 +198,7 @@ PY
         if [ "$MODE" = late-window ] && [ "$FAM" = command ]; then ran=$((ran - 1)); mode_ev="$mode_ev $FAM: no k = 8 slot (not applicable);"; continue; fi
         if { [ "$MODE" = gated-whiff ] || [ "$MODE" = es-exemption-dropped ] || [ "$MODE" = whiff-at-contact ]; } && [ "$FAM" != command ]; then ran=$((ran - 1)); mode_ev="$mode_ev $FAM: no command grabs (not applicable);"; continue; fi
         _want="$NT"; [ "$MODE" != tick-early ] && _want="$_tch"; [ "$MODE" = gated-whiff ] && _want="$NG"; [ "$MODE" = es-exemption-dropped ] && _want="$NE"; [ "$MODE" = whiff-at-contact ] && _want="$NT"
+        cat "$D/m/expect.txt" >> "$W/main.log"
         if _ev="$(ctl_judge "$MODE" "$D/m/expect.txt" "$_want" "$K")"; then mode_fired=$((mode_fired + 1)); fi
         mode_ev="$mode_ev $FAM: $_ev;"
         continue
@@ -223,7 +225,16 @@ print(next((r for r, tab, key, inp, *_ in t.events() if (tab, key if '$FAM' != '
 done
 
 if [ -n "$MODE" ]; then
-    if [ "$ran" -gt 0 ] && [ "$mode_fired" = "$ran" ]; then vs_ctl_fired "$MODE" "${mode_ev# } (mode)"; echo "FAIL"; exit 1; fi
+    case "$MODE" in   # #369: the finding each perturbation must produce, in the check's own expect output
+        tick-early) WANT='^BAD \(.*\): .*the LP on the frozen tick did not start the normal$' ;;
+        lp-tech) WANT='^BAD \(.*\): the tech window reads none, frozen 1-7$' ;;
+        late-window) WANT='^BAD \(.*\): the tech window: k = 8 TECHS \(the window is 1\.\.7\)$' ;;
+        gated-whiff) WANT='^BAD \(.*\): the whiff started no move: P1 shows only .* on the press frame and the five after$' ;;
+        whiff-at-contact) WANT='^BAD \(.*\): the whiff control HOLDS: the grab connected, so it is no whiff$' ;;
+        es-exemption-dropped) WANT="^BAD \\(.*\\): the whiff started seq 12, not the grab's own \\(.*\\)\$" ;;
+    esac
+    if [ "$ran" -gt 0 ] && [ "$mode_fired" = "$ran" ]; then
+        echo "  mode $MODE: ${mode_ev# }"; vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL"; exit 1; fi
     echo "REFUSED: mode $MODE — its perturbation did not make its own clause fail in every family run (${mode_ev# }): a dead mode, not a verdict"
     exit 3
 fi

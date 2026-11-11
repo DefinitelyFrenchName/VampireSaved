@@ -44,7 +44,8 @@ COLS = ["gate", "tier", "mode", "kind", "ere", "nth", "site", "fx", "kb", "note"
 TIERS = {"static", "emulator", "linux"}   # where the row runs: tests/test_crash_sweep.sh (static), its emulator
 #   scope (--tier emulator: the target gate needs MAME/FBNeo), or a Linux host with podman (audit_release_linux_cleanhost)
 FX_OK = {"DIED", "UNJUDGED", "DIED|UNJUDGED", "FAIL"}      # FAIL: a PLAIN row's verdict
-KB_OK = {"HONOURED", "PASS", "-"}                           # -: the row is a regression row with no known-bad leg
+KB_OK = {"HONOURED", "PASS", "UNJUDGED-CAUGHT", "-"}        # -: the row is a regression row with no known-bad leg;
+#   UNJUDGED-CAUGHT: the known-bad leg of a gate off #369's debt list, read on #369's own backstop (piece 5, 14z-225)
 
 
 def _calls(text):

@@ -135,9 +135,9 @@ rc=0; out=$(fpr "$WORK/rompath_gfx" --set vsavj --registry "$REG" 2>/dev/null) |
 want_rc=2
 [ "$MODE" = program-fallback-reaches-wholeset ] && want_rc=0
 if [ "$rc" = "$want_rc" ]; then
-    vs_ctl_fired program-fallback-reaches-wholeset "the program fallback CANNOT reach a whole-set-only row (exit 2)"
+    [ -n "$MODE" ] || vs_ctl_fired program-fallback-reaches-wholeset "the program fallback CANNOT reach a whole-set-only row (exit 2)"   # #369: a plain run's line only
 elif [ "$MODE" = program-fallback-reaches-wholeset ]; then
-    echo "FAIL (mode program-fallback-reaches-wholeset): the fallback refused (rc $rc), so the demanded hazard did not occur"; fail=1
+    echo "FAIL (mode program-fallback-reaches-wholeset): the fallback refused (rc $rc), so the demanded hazard did not occur" | tee -a "$WORK/main.log"; fail=1
 else
     vs_ctl_dead program-fallback-reaches-wholeset "sibling build resolved to '$out' rc=$rc — the fallback reached a whole-set-only row"; fail=1
 fi
@@ -165,9 +165,9 @@ rc=0; out=$(fpr "$WORK/front_empty;$ROMDIR" --set vsavj --fronted 2>/dev/null) |
 want_rc=3
 [ "$MODE" = fronted-fallthrough ] && want_rc=0
 if [ "$rc" = "$want_rc" ]; then
-    vs_ctl_fired fronted-fallthrough "--fronted REFUSES an empty fronted dir (exit 3) instead of dispatching to '$(printf vsavj)'"
+    [ -n "$MODE" ] || vs_ctl_fired fronted-fallthrough "--fronted REFUSES an empty fronted dir (exit 3) instead of dispatching to '$(printf vsavj)'"   # #369: a plain run's line only
 elif [ "$MODE" = fronted-fallthrough ]; then
-    echo "FAIL (mode fronted-fallthrough): --fronted refused (rc $rc), so the demanded fall-through did not occur"; fail=1
+    echo "FAIL (mode fronted-fallthrough): --fronted refused (rc $rc), so the demanded fall-through did not occur" | tee -a "$WORK/main.log"; fail=1
 else
     vs_ctl_dead fronted-fallthrough "an empty fronted dir resolved to '$out' rc=$rc — the fall-through reached the vanilla row"; fail=1
 fi
@@ -302,5 +302,11 @@ for c in $classes; do
     fi
 done
 
+# #369: a mode is honoured only on its own lookup's refusal, with the design's exit code (2: the program fallback
+# refuses a whole-set-only row; 3: --fronted refuses an empty fronted dir)
+case "$MODE" in
+program-fallback-reaches-wholeset) WANT='^FAIL \(mode program-fallback-reaches-wholeset\): the fallback refused \(rc 2\), so the demanded hazard did not occur$' ;;
+fronted-fallthrough) WANT='^FAIL \(mode fronted-fallthrough\): --fronted refused \(rc 3\), so the demanded fall-through did not occur$' ;;
+esac
 [ "$fail" = 0 ] && echo "PASS: suite dispatch verdicts validated" \
-    || { echo "SUITE RED"; exit 1; }
+    || { [ -z "$MODE" ] || vs_ctl_caught "$WORK/main.log" "$WANT" || :; echo "SUITE RED"; exit 1; }

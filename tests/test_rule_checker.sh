@@ -561,11 +561,15 @@ unbind() {  # unbind <out> — the shadow tool: rulecheck.py with the spawn bind
 
 # #310 group 6 (14z-215): a shadow whose target line moved did not apply — say REFUSED (exit 3, read UNJUDGED), never a bare exit 3
 shadow_refused() { echo "REFUSED: $VS_CTL — its shadow of tools/rulecheck.py could not be made (the line it replaces moved): the mode judged nothing"; exit 3; }
+# #369: a mode is honoured only on its own finding — the probe's answer on the shadow copy (the word the plain section
+# compares), kept in a file and matched against the mode's own ERE
+got_caught() { { printf '%s' "$got" | tr '\n' ' '; echo; } > "$W/main.log"; vs_ctl_caught "$W/main.log" "$1" || :; }   # || : under set -e: a NOT JUDGED still reaches the FAIL line
 if [ "${VS_CTL:-}" = unbound-record ]; then
     unbind "$W/unbound.py" || shadow_refused
     got="$(record_binding "$W/unbound.py" "$W/rbmode")"
     echo "MODE: control unbound-record — the unbound copy reads: $got"
     case "$got" in RECORDED-*) ;; *) echo "REFUSED: the unbound copy did not record the unchecked run ($got)"; exit 3;; esac
+    WANT='^RECORDED-'; got_caught "$WANT"
     echo "FAIL: rule-checker record (control mode unbound-record: a pinned-reader run could be recorded unchecked — $got)"; exit 1
 fi
 
@@ -574,6 +578,7 @@ if [ "${VS_CTL:-}" = keyless-prepare ]; then
     got="$(prepare_key "$W/keyless.py" "$W/pkmode")"
     echo "MODE: control keyless-prepare — the shadow copy reads: $got"
     case "$got" in PREPARED-WITHOUT-KEY*) ;; *) echo "REFUSED: the keyless copy did not prepare a keyless run ($got)"; exit 3;; esac
+    WANT='^PREPARED-WITHOUT-KEY'; got_caught "$WANT"
     echo "FAIL: rule-checker prepare session key (control mode keyless-prepare — $got)"; exit 1
 fi
 
@@ -582,6 +587,7 @@ if [ "${VS_CTL:-}" = unchecked-cite ]; then
     got="$(prepare_cites "$W/uncited.py" "$W/pcmode")"
     echo "MODE: control unchecked-cite — the shadow copy reads: $got"
     case "$got" in PREPARED-CITING-*) ;; *) echo "REFUSED: the shadow copy did not prepare a bad citation ($got)"; exit 3;; esac
+    WANT='^PREPARED-CITING-'; got_caught "$WANT"
     echo "FAIL: rule-checker prepare cites (control mode unchecked-cite — $got)"; exit 1
 fi
 
@@ -590,6 +596,7 @@ if [ "${VS_CTL:-}" = ok-redone ]; then
     got="$(prepare_redoes "$W/okredo.py" "$W/prmode")"
     echo "MODE: control ok-redone — the shadow copy reads: $got"
     case "$got" in PREPARED-REDOING-*) ;; *) echo "REFUSED: the shadow copy did not redo an OK run ($got)"; exit 3;; esac
+    WANT='^PREPARED-REDOING-'; got_caught "$WANT"
     echo "FAIL: rule-checker prepare redoes (control mode ok-redone — $got)"; exit 1
 fi
 
@@ -598,6 +605,7 @@ if [ "${VS_CTL:-}" = blame-unticketed ]; then
     got="$(resolve_blame "$W/unblamed.py" "$W/rbl_mode")"
     echo "MODE: control blame-unticketed — the shadow copy reads: $got"
     case "$got" in RESOLVED-BLAME-*) ;; *) echo "REFUSED: the shadow copy did not record an unticketed blame ($got)"; exit 3;; esac
+    WANT='^RESOLVED-BLAME-'; got_caught "$WANT"
     echo "FAIL: rule-checker resolve blame (control mode blame-unticketed — $got)"; exit 1
 fi
 
@@ -606,6 +614,7 @@ if [ "${VS_CTL:-}" = recheck-unpinned-base ]; then
     got="$(resolve_recheck "$W/unpinnedbase.py" "$W/rub_mode")"
     echo "MODE: control recheck-unpinned-base — the shadow copy reads: $got"
     case "$got" in *RESOLVED-ON-ANOTHER-BASE*) ;; *) echo "REFUSED: the shadow copy did not accept another BASE ($got)"; exit 3;; esac
+    WANT='^RESOLVED-ON-ANOTHER-BASE( |$)'; got_caught "$WANT"
     echo "FAIL: rule-checker resolve recheck (control mode recheck-unpinned-base — $got)"; exit 1
 fi
 
@@ -614,6 +623,7 @@ if [ "${VS_CTL:-}" = recheck-other-session ]; then
     got="$(resolve_recheck "$W/othersess.py" "$W/ros_mode")"
     echo "MODE: control recheck-other-session — the shadow copy reads: $got"
     case "$got" in *RESOLVED-ON-ANOTHER-SESSIONS-RENDER*) ;; *) echo "REFUSED: the shadow copy did not accept another session's render ($got)"; exit 3;; esac
+    WANT='^RESOLVED-ON-ANOTHER-SESSIONS-RENDER( |$)'; got_caught "$WANT"
     echo "FAIL: rule-checker resolve recheck (control mode recheck-other-session — $got)"; exit 1
 fi
 
@@ -622,6 +632,7 @@ if [ "${VS_CTL:-}" = recheck-pruned-render ]; then
     got="$(resolve_recheck "$W/pruned.py" "$W/rpr_mode")"
     echo "MODE: control recheck-pruned-render — the shadow copy reads: $got"
     case "$got" in *RESOLVED-ON-A-PRUNED-RENDER*) ;; *) echo "REFUSED: the shadow copy did not accept a pruned render ($got)"; exit 3;; esac
+    WANT='^RESOLVED-ON-A-PRUNED-RENDER( |$)'; got_caught "$WANT"
     echo "FAIL: rule-checker resolve recheck (control mode recheck-pruned-render — $got)"; exit 1
 fi
 
@@ -630,6 +641,7 @@ if [ "${VS_CTL:-}" = recheck-porous-fill ]; then
     got="$(resolve_recheck "$W/porous.py" "$W/rpf_mode")"
     echo "MODE: control recheck-porous-fill — the shadow copy reads: $got"
     case "$got" in *RESOLVED-ON-A-SHELL-FILLED-ROW*RESOLVED-ON-ANOTHER-SESSDIR*) ;; *) echo "REFUSED: the shadow copy did not accept a shell-filled row ($got)"; exit 3;; esac
+    WANT='^RESOLVED-ON-A-SHELL-FILLED-ROW .*RESOLVED-ON-ANOTHER-SESSDIR( |$)'; got_caught "$WANT"
     echo "FAIL: rule-checker resolve recheck (control mode recheck-porous-fill — $got)"; exit 1
 fi
 
@@ -638,6 +650,7 @@ if [ "${VS_CTL:-}" = recheck-own-checks ]; then
     got="$(resolve_recheck "$W/ownchecks.py" "$W/roc_mode")"
     echo "MODE: control recheck-own-checks — the shadow copy reads: $got"
     case "$got" in *RESOLVED-ON-THE-CLOSES-OWN-CHECK*) ;; *) echo "REFUSED: the shadow copy did not accept the close's own check ($got)"; exit 3;; esac
+    WANT='^RESOLVED-ON-THE-CLOSES-OWN-CHECK( |$)'; got_caught "$WANT"
     echo "FAIL: rule-checker resolve recheck (control mode recheck-own-checks — $got)"; exit 1
 fi
 
@@ -646,6 +659,7 @@ if [ "${VS_CTL:-}" = recheck-unchecked ]; then
     got="$(resolve_recheck "$W/unrechecked.py" "$W/rrc_mode")"
     echo "MODE: control recheck-unchecked — the shadow copy reads: $got"
     case "$got" in *RESOLVED-ON-A-RED-RECHECK*) ;; *) echo "REFUSED: the shadow copy did not accept a red re-check ($got)"; exit 3;; esac
+    WANT='^RESOLVED-ON-A-RED-RECHECK( |$)'; got_caught "$WANT"
     echo "FAIL: rule-checker resolve recheck (control mode recheck-unchecked — $got)"; exit 1
 fi
 
@@ -656,6 +670,7 @@ if [ "${VS_CTL:-}" = unfiltered-plants ]; then
     # #310 group 5 (14z-215): a CRASH of the shadow's prepare also reads REFUSED-AT-POSITION-* — its traceback at column 0 (DIED)
     for _l in "$W"/prot_mode/rot*.log; do if grep -q '^Traceback' "$_l" 2>/dev/null; then cat "$_l"; fi; done
     case "$got" in REFUSED-AT-POSITION-*) ;; *) echo "REFUSED: the shadow copy drew no over-limit plant ($got)"; exit 3;; esac
+    WANT='^REFUSED-AT-POSITION-[0-9]+: artifact tests/rulecheck/fixtures/forced-pick-14z159/files/big\.txt is [0-9,]+ bytes$'; got_caught "$WANT"   # the over-limit plant itself, never a crash's last line (caught by test_plants_not_applied's rulecheck-fix-reverted, #369 piece 5)
     echo "FAIL: rule-checker plant rotation (control mode unfiltered-plants — $got)"; exit 1
 fi
 
@@ -664,6 +679,7 @@ if [ "${VS_CTL:-}" = unlimited-read ]; then
     got="$(prepare_readlimit "$W/unlimited.py" "$W/prl_mode")"
     echo "MODE: control unlimited-read — the shadow copy reads: $got"
     case "$got" in PREPARED-AN-UNREADABLE-ARTIFACT*) ;; *) echo "REFUSED: the shadow copy did not prepare the unreadable artifact ($got)"; exit 3;; esac
+    WANT='^PREPARED-AN-UNREADABLE-ARTIFACT'; got_caught "$WANT"
     echo "FAIL: rule-checker prepare read limit (control mode unlimited-read — $got)"; exit 1
 fi
 
@@ -675,6 +691,8 @@ case "${VS_CTL:-}" in counted-id|late-validate)
     # line>) too — its traceback at column 0 (DIED)
     for _l in "$W/pimode/pa.log" "$W/pimode/pb.log"; do if grep -q '^Traceback' "$_l" 2>/dev/null; then cat "$_l"; fi; done
     [ "$got" != IDS-OK ] || { echo "REFUSED: the shadow copy still read IDS-OK"; exit 3; }
+    if [ "$VS_CTL" = counted-id ]; then WANT='^COLLIDED: FAIL: run [0-9-]+ exists$'; else WANT='^LEFT-A-RUN-DIRECTORY$'; fi
+    got_caught "$WANT"
     echo "FAIL: rule-checker prepare ids (control mode $VS_CTL — $got)"; exit 1;;
 esac
 
@@ -688,8 +706,10 @@ if [ -n "${VS_CTL:-}" ]; then
     cat "$W/mode.log"
     mrc=0; mode_judge "$crc" "$W/mode.log" "$(expect_msg "$VS_CTL")" > /dev/null || mrc=$?
     case "$mrc" in
-        0) echo "PASS: CONTROL=$VS_CTL left the check green — the perturbation is not caught (this mode LIES)"; exit 0 ;;
-        1) echo "FAIL: rule-checker record (control mode $VS_CTL reached the gate's own FAIL on its own finding)"; exit 1 ;;
+        0) vs_ctl_left_green "$VS_CTL" "FAIL: rule-checker record (control mode $VS_CTL left the check green — the perturbation is not caught)" ;;
+        1) WANT="$(expect_msg "$VS_CTL" | sed 's/[][\\.*^$(){}+?|]/\\&/g')"   # #369: its own finding, as an ERE
+           vs_ctl_caught "$W/mode.log" "$WANT" || :
+           echo "FAIL: rule-checker record (control mode $VS_CTL reached the gate's own FAIL on its own finding)"; exit 1 ;;
         *) echo "REFUSED: CONTROL=$VS_CTL failed the check, but not on its own finding ($(expect_msg "$VS_CTL"))"; exit 3 ;;
     esac
 fi

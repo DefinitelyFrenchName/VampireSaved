@@ -31,7 +31,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 MERGED="${MERGED:-build/m3b_merged34}"
 W="$(mktemp -d "${TMPDIR:-/tmp}/mapread.XXXXXX")" || { echo "FAIL: test_map_table_readers — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # #369: the main check's findings
 
 if [ -f build/out/vsavj_opcodes.bin ] && [ -f build/out/vsavj_data.bin ]; then
     OPJ=build/out/vsavj_opcodes.bin; DATJ=build/out/vsavj_data.bin
@@ -106,8 +106,12 @@ else
 fi
 
 echo "== 4. controls"
-if vs_ctl_is extra-reader || vs_ctl_is copy-widened; then
-    vs_ctl_fired "$VS_CTL" "the perturbed copy ran in its section (mode)"
+if [ -n "$VS_CTL" ]; then   # #369: a mode is judged on its own section's finding (CWANT: WANT is section 1's frozen sites)
+    case "$VS_CTL" in
+    extra-reader) CWANT="FAIL  operand sites '[^']* 0x0fff00:portraits' \(want " ;;
+    copy-widened) CWANT="FAIL  the fixed copy's count word reads 7e13 \(want 7e0f\)\$" ;;
+    esac
+    [ "$fail" -eq 0 ] || vs_ctl_caught "$W/main.log" "$CWANT"
 else
     perturb extra-reader "$OPJ" "$W/op_x.bin" && census "$W/op_x.bin" "$DATJ" > "$W/cx.txt"
     n7="$(sed -n 's/^OPERANDS //p' "$W/cx.txt" 2>/dev/null | tr ' ' '\n' | grep -c 'portraits')"

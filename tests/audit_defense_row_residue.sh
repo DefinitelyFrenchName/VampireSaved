@@ -136,7 +136,7 @@ done; done
 [ "$fail" = 0 ] || exit 1
 
 echo "== 2-3. the reads: same index both legs, bytes differ only for the residue victims"
-python3 - "$W" "$VICTIMS" "$MODE" "$MERGED/verify_data.bin" <<'PY' || fail=1
+python3 - "$W" "$VICTIMS" "$MODE" "$MERGED/verify_data.bin" > "$W/main.log" <<'PY' || fail=1
 import sys, collections
 w, victims = sys.argv[1], sys.argv[2].split()
 MODE = sys.argv[3] if len(sys.argv) > 3 else ""
@@ -226,12 +226,20 @@ fs, _, _ = reduce([], "ours"); chk(any("LIVENESS" in f for f in fs), "control: a
 fs, _, _ = reduce([(3200, 0x000926, 0x0B8940, 0x200)], "ours"); chk(any("reader other" in f for f in fs), "control: a foreign reader in play is caught")
 # 0x0A: Sasquatch's row is vanilla vsavj's own retune, which no port row touches — a residue on every build
 ok_, _ = verdict3(0x0A, [1, 1], [1, 1])
-if not ok_: print("CONTROL FIRED: residue-answers-equal — a residue victim (0x0a) answering EQUAL bytes on both legs fails section 3 (the mode forces this on the real native leg)")
+if MODE: pass   # the in-gate control: a plain run only (#369: under a mode its line is not the mode's evidence)
+elif not ok_: print("CONTROL FIRED: residue-answers-equal — a residue victim (0x0a) answering EQUAL bytes on both legs fails section 3 (the mode forces this on the real native leg)")
 else: print("CONTROL DEAD: residue-answers-equal — a residue victim answering EQUAL bytes was accepted"); bad = 1
 ok_, _ = verdict3(0x03, [2, 2], [0, 0]); chk(not ok_, "control: a control victim (0x03) answering DIFFERENT bytes FAILS section 3")
 ok_, _ = verdict3(0x03, [0x28], [0x30], "thr"); chk(not ok_, "control: a threshold whose bytes are identical in the build and vs2, answered DIFFERENT, FAILS")
 sys.exit(bad)
 PY
+cat "$W/main.log"
+if [ "$MODE" = residue-answers-equal ]; then   # #369: honoured only on section 3's own finding for a residue victim
+    [ "$fail" = 1 ] || vs_ctl_left_green "$MODE" "FAIL: audit_defense_row_residue — control mode $MODE left the gate green"
+    WANT="^  FAIL  [0-9a-f]{2}: residue victim 0x[0-9a-f]{2}: the build's row differs from vs2's but the legs answered the SAME bytes "
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: audit_defense_row_residue (control mode: $MODE)"; exit 1
+fi
 
 echo "== 5. the instrument's alignment (#228 step 4, option A)"
 if [ "$FREEZE_CLOCK" = 1 ]; then
@@ -249,9 +257,15 @@ if [ "$FREEZE_CLOCK" = 1 ]; then
 fi
 if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "every watch run on emulated time, at its frozen game clock"
 else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
-ia_stage audit_defense_row_residue "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || fail=1
+ia_stage audit_defense_row_residue "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" > "$W/stage.txt" || fail=1
+cat "$W/stage.txt"
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL: audit_defense_row_residue (control mode: $MODE)"; exit 1; }
+    # #369: drift-clock on the frozen game-clock comparison, first-frame-skip on the staging leg against replay.lua
+    case "$MODE" in
+    drift-clock) CF="$W/align_bad.txt"; WANT='game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+    *) CF="$W/stage.txt"; WANT='FAIL: the staging reference leg \([^)]*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+    esac
+    [ "$fail" = 1 ] && { vs_ctl_caught "$CF" "$WANT" || :; echo "FAIL: audit_defense_row_residue (control mode: $MODE)"; exit 1; }
     vs_ctl_left_green "$MODE" "FAIL: audit_defense_row_residue — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

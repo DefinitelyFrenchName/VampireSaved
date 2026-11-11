@@ -35,7 +35,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 rc=0
-fail() { echo "  FAIL: $*"; rc=1; }
+fail() { echo "  FAIL: $*"; [ -z "${T:-}" ] || echo "  FAIL: $*" >> "$T/main.log"; rc=1; }   # the findings land in main.log (#369)
 B="tests/run_battery_m2.sh"
 
 echo "== 1. every gate invocation goes through the accounting wrapper =="
@@ -169,6 +169,7 @@ else
         && echo "  ok: and it names the control" || { fail "the abort does not name the dead control:"; sed 's/^/        /' "$T/g.out"; }
 fi
 
+if [ -z "${VS_CTL:-}" ]; then   # the in-gate control: a plain run only (#369)
 echo "== 8. MUST-FIRE: the unplugged accounting lets the dead-control stub through =="
 if ( cd "$T" && REPO="$REPO" sh -c '. "$CLASSIFY"; . ./acct_unplugged.sh; bat ./g_ctl.sh; echo "REACHED-AFTER-DEAD"' \
         > "$T/u.out" 2>&1 ) && grep -q "REACHED-AFTER-DEAD" "$T/u.out"; then
@@ -176,6 +177,9 @@ if ( cd "$T" && REPO="$REPO" sh -c '. "$CLASSIFY"; . ./acct_unplugged.sh; bat ./
 else
     vs_ctl_dead reader-unplugged "the unplugged accounting still stopped at the stub"; fail "reader-unplugged"
 fi
+fi
+# #369: under the mode, section 7's own finding — the unplugged accounting let the dead control through
+[ "$rc" = 0 ] || [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$T/main.log" '^  FAIL: a declared-but-unfired control did not stop the battery$' || :
 
 echo
 [ "$rc" = 0 ] && echo "PASS: the battery cannot call itself green while skipping." \

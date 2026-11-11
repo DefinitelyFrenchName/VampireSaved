@@ -62,5 +62,16 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: honoured only on the selftest's own case for this perturbation failing
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_figure_check"
+    case "$VS_CTL" in
+        mismatch-ignored) WANT='^ +FAIL: case MISMATCH: 0 failure\(s\), expected at least one$' ;;
+        notfound-ignored) WANT='^ +FAIL: case NOT FOUND: 0 failure\(s\), expected at least one$' ;;
+        uncovered-ignored) WANT='^ +FAIL: case UNCOVERED: 0 failure\(s\), expected at least one$' ;;
+        stale-ignored) WANT='^ +FAIL: case STALE: 0 failure\(s\), expected at least one$' ;;
+    esac
+    vs_ctl_caught "$W/self.txt" "$WANT" || :
+    echo "FAIL: test_figure_check"; exit 1
+fi
 if [ "$fail" = 0 ]; then echo "PASS: each of the four failure conditions fails the check, and a clean spec passes"
 else echo "FAIL: test_figure_check"; exit 1; fi

@@ -48,7 +48,7 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 . "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69: never re-decrypt directly
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
-note() { printf '%s\n' "$*"; }
+note() { printf '%s\n' "$*" | tee -a "$W/main.log"; }   # the main check's findings land in main.log (#369)
 chk() { # label expected actual
     if [ "$2" = "$3" ]; then note "  ok   $1"; else note "  FAIL $1: expected [$2] got [$3]"; fail=1; fi
 }
@@ -160,4 +160,12 @@ if [ -z "${VS_CTL:-}" ]; then
     fi
 fi
 
+if [ -n "${VS_CTL:-}" ] && [ "$fail" -ne 0 ]; then   # #369: the compare each perturbation reaches
+    case "$VS_CTL" in
+        row-misread)    WANT='^  FAIL non-zero rows: expected \[.*\] got \[NONZERO 04:36 ' ;;
+        branch-flipped) WANT='^  FAIL the routine, decoded whole .* got \[ROUTINE .* 27bae bcc\.b ' ;;
+        index-changed)  WANT='^  FAIL the index: char id \+0x382 at word stride: expected \[.*\] got \[INDEX .* ext\.w d1 ; nop ; ' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+fi
 if [ "$fail" -eq 0 ]; then note "PASS test_air_attack_height"; else note "FAIL test_air_attack_height"; exit 1; fi

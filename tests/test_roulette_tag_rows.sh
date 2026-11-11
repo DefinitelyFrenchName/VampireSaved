@@ -34,7 +34,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 note() { printf '%s\n' "$*"; }
 chk() { # label expected actual
-    if [ "$2" = "$3" ]; then note "  ok   $1"; else note "  FAIL $1: expected [$2] got [$3]"; fail=1; fi
+    if [ "$2" = "$3" ]; then note "  ok   $1"; else note "  FAIL $1: expected [$2] got [$3]" | tee -a "$W/main.log"; fail=1; fi
 }
 decrypt_view vsavj "$W/vj_op.bin" "$W/vj_data.bin"
 decrypt_view vsav2 "$W/v2_op.bin" "$W/v2_data.bin"
@@ -76,4 +76,7 @@ if [ -z "${VS_CTL:-}" ]; then
     fi
 fi
 
-if [ "$fail" -eq 0 ]; then note "PASS test_roulette_tag_rows"; else note "FAIL test_roulette_tag_rows"; exit 1; fi
+if [ "$fail" -eq 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL test_roulette_tag_rows"; note "PASS test_roulette_tag_rows"; else
+    # #369: under the mode, honoured only on its own finding — row 0x10 of the vsavj ARRAY read OWN, not ALIAS
+    vs_ctl_caught "$W/main.log" '^ *FAIL vsavj array: expected .* got \[ARRAY vsavj .* 10:[0-9a-f]+:OWN ' || :
+    note "FAIL test_roulette_tag_rows"; exit 1; fi

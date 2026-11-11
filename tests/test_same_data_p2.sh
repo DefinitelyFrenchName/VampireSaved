@@ -61,7 +61,7 @@ EXPECT="$REPO/tests/expected/same_data_p2.tsv"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
-bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
+bad() { printf '  FAIL  %s\n' "$1" | tee -a "$W/main.log"; fail=1; }
 
 . "$REPO/tests/lib/decrypt_cache.sh"
 decrypt_view vsavj "$W/vj_op.bin" "$W/vj.bin" || { echo "SKIP: no vsavj decrypt view (set ROMDIR to build the cache)"; exit 0; }
@@ -109,10 +109,11 @@ fi
 echo "== 2. the table equals the frozen expectation (completeness both ways)"
 EXP_USE="$EXPECT"
 if [ "$CONTROL" = dropped-row ]; then command grep -v "^0x01	" "$EXPECT" > "$W/exp_dropped.tsv"; EXP_USE="$W/exp_dropped.tsv"; fi
-if command diff -u "$EXP_USE" "$W/got.tsv" > "$W/diff.txt"; then ok "12 rows identical to the frozen table"; else bad "the table moved:"; head -20 "$W/diff.txt"; fi
+if command diff -u "$EXP_USE" "$W/got.tsv" > "$W/diff.txt"; then ok "12 rows identical to the frozen table"; else bad "the table moved:"; head -20 "$W/diff.txt"; cat "$W/diff.txt" >> "$W/main.log"; fi
 same="$(awk -F'\t' '!/^#/ && $3=="SAME-DATA"' "$W/got.tsv" | command grep -c . || true)"
 [ "$same" = 0 ] && ok "0 of 12 SAME-DATA, as frozen" || bad "$same characters read SAME-DATA — a decoder that stopped seeing, or a moved image"
 
+if [ -z "${VS_CTL:-}" ]; then   # #369: the in-gate controls run in a plain run only
 echo "== 3. must-fire controls"
 # self-compare: the same view on both sides must read SAME-DATA everywhere and fail section 2
 run_audit "$W/vj.bin" "$W/vj.bin" "$W/self.tsv" --layout vsavj
@@ -123,5 +124,14 @@ else echo "CONTROL DEAD: self-compare — vsavj against itself read $s SAME-DATA
 command grep -v "^0x01	" "$W/got.tsv" > "$W/dropped.tsv"
 if command diff -q "$EXPECT" "$W/dropped.tsv" > /dev/null; then echo "CONTROL DEAD: dropped-row — a table without Demitri's row still equals the frozen one"; fail=1
 else echo "CONTROL FIRED: dropped-row — a table without Demitri's row differs from the frozen one"; fi
+fi
 
-if [ "$fail" = 0 ]; then echo "PASS: test_same_data_p2"; else echo "FAIL: test_same_data_p2"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_same_data_p2"; echo "PASS: test_same_data_p2"; else
+    # #369: a mode is honoured only on its own finding in sections 1-2's output
+    case "${VS_CTL:-}" in
+        self-compare) WANT='^ *FAIL  12 characters read SAME-DATA — ' ;;
+        dropped-row) WANT='^\+0x01.Demitri.DIFFERS.' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: test_same_data_p2"; exit 1; fi

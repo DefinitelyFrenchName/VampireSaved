@@ -97,12 +97,16 @@ vs_ctl_is runner-unpinned && RUN="$W/run_all_static.sh"
 vs_ctl_is pin-late && RUN="$W/run_all_emulator.sh"
 vs_ctl_is lib-untracked && LIBPATH=tests/lib/collation_untracked.sh
 
+main() {  # main <check and its args>: its output to stdout and to $W/main.log, the main check's findings (#369)
+    _mr=0; "$@" > "$W/main.part" 2>&1 || _mr=$?
+    cat "$W/main.part"; cat "$W/main.part" >> "$W/main.log"; return $_mr
+}
 echo "== 1. vs_pin_collation under three caller locales ($LIB)"
-env_check "$LIB" || fail=1
+main env_check "$LIB" || fail=1
 echo "== 2. the runners call it before their first gate"
-tracked_check "$LIBPATH" || fail=1
+main tracked_check "$LIBPATH" || fail=1
 # shellcheck disable=SC2086
-runner_check $RUN || fail=1
+main runner_check $RUN || fail=1
 echo "== 3. this run's own environment"
 if [ -n "${VS_COLLATION_PINNED:-}" ]; then
     if [ -z "${LC_ALL:-}" ] && [ "${LC_COLLATE:-}" = C ]; then echo "  ok    started by a runner: LC_ALL unset, LC_COLLATE=C"
@@ -111,7 +115,17 @@ else
     echo "  note  run by hand: the caller's locale (LC_ALL='${LC_ALL:-}' LC_COLLATE='${LC_COLLATE:-}') is kept, as designed"
 fi
 if [ -n "$VS_CTL" ]; then
-    [ "$fail" = 1 ] && { echo "FAIL: test_runner_collation (control mode: the perturbed copy was caught)"; exit 1; }
+    if [ "$fail" = 1 ]; then   # #369: honoured only on the mode's own finding in sections 1-2's output
+        case "$VS_CTL" in
+            collate-dropped) WANT='^ *FAIL  nothing set: LC_ALL,LC_COLLATE,LC_CTYPE,LANG = unset,unset,unset,unset, want unset,C,unset,unset$' ;;
+            lc-all-kept) WANT='^ *FAIL  LC_ALL=en_US\.UTF-8: LC_ALL,LC_COLLATE,LC_CTYPE,LANG = en_US\.UTF-8,C,' ;;
+            runner-unpinned) WANT='^ *FAIL  [^ ]*/run_all_static\.sh: 0 top-level pin line\(s\), pin at line none,' ;;
+            pin-late) WANT='^ *FAIL  [^ ]*/run_all_emulator\.sh: 1 top-level pin line\(s\), pin at line [0-9]+, first gate run at line [0-9]+$' ;;
+            lib-untracked) WANT='^ *FAIL  tests/lib/collation_untracked\.sh is not tracked' ;;
+        esac
+        vs_ctl_caught "$W/main.log" "$WANT"
+        echo "FAIL: test_runner_collation (control mode: the perturbed copy was caught)"; exit 1
+    fi
     vs_ctl_left_green "$VS_CTL" "FAIL: test_runner_collation — the perturbed copy passed"
 fi
 

@@ -24,21 +24,27 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 TOOL="python3 tools/audit_charid_names.py"
 FLOOR_FILE="tests/expected/charid_name_maps_floor.txt"
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+W="$(mktemp -d)" || { echo "FAIL: test_charid_names — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 
 floor="$(grep -v '^#' "$FLOOR_FILE" | tr -d ' \n')"
 case "$floor" in ''|*[!0-9]*) echo "FAIL: $FLOOR_FILE carries no integer floor"; exit 1;; esac
 
 if vs_ctl_is shifted-map; then
     echo "== MODE shifted-map: the census with #218's shift planted"
-    $TOOL --plant --floor "$floor"; rc=$?
+    $TOOL --plant --floor "$floor" > "$W/main.log" 2>&1; rc=$?; cat "$W/main.log"
     [ "$rc" -eq 0 ] && vs_ctl_left_green shifted-map "FAIL: the planted shift passed"
+    # #369: the census's own report of a planted row (0x0A named Q-Bee, which the atlas calls Sasquatch)
+    WANT="^MISMATCH <plant: the #218 shift>:1: id 0x0A named 'Q-Bee', the atlas says 'Sasquatch'"
+    vs_ctl_caught "$W/main.log" "$WANT" || :
     echo "FAIL (mode): as required — the planted shift was reported"; exit 1
 fi
 if vs_ctl_is blind-floor; then
     echo "== MODE blind-floor: the census held to one map more than it finds"
     n="$($TOOL --floor 0 | sed -n 's/.* \([0-9]*\) character maps,.*/\1/p')"
-    $TOOL --floor "$((n + 1))"; rc=$?
+    case "$n" in ''|0) vs_ctl_nj "the census found no character map to hold to a floor (n='$n')"; echo "FAIL (mode): nothing judged"; exit 1 ;; esac
+    $TOOL --floor "$((n + 1))" > "$W/main.log" 2>&1; rc=$?; cat "$W/main.log"
     [ "$rc" -eq 0 ] && vs_ctl_left_green blind-floor "FAIL: a census below its floor passed"
+    vs_ctl_caught "$W/main.log" "^FAIL: $n maps found, below the floor $((n + 1)) — the census stopped seeing maps\$" || :   # #369
     echo "FAIL (mode): as required — the census below its floor failed"; exit 1
 fi
 

@@ -49,9 +49,10 @@ EXPECT="$REPO/tests/expected/demitri_split.tsv"
     echo "SKIP: no data images (build/out/vsavj_data.bin, build/out/vsav2_data.bin: tools/cps2_decrypt.py --data-out)"; exit 0; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+: > "$W/main.log"   # #369: the main check's findings, read by vs_ctl_caught under a mode
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
-bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
+bad() { printf '  FAIL  %s\n' "$1" | tee -a "$W/main.log"; fail=1; }
 
 echo "== 1. Demitri's differing a2 and proj chains, per node (tools/audit_same_data_p2.py --chains)"
 python3 "$REPO/tools/audit_same_data_p2.py" "$REPO/build/out/vsavj_data.bin" "$REPO/build/out/vsav2_data.bin" --ids 01 --chains a2,proj \
@@ -89,7 +90,8 @@ for pair in sys.argv[2:]:
             if a != b: print(f"leg\t{g}\t{base}\thit\t+{f - base}\tred {a[0] - b[0]}\twhite {a[1] - b[1]}")
 PY
 python3 "$W/legs.py" "$W" "vsavj=$W/vsavj" "vsav2=$W/vsav2" > "$W/legs.tsv" 2> "$W/problems.txt" || true
-if [ -s "$W/problems.txt" ]; then bad "the legs: $(tr '\n' ' ' < "$W/problems.txt")"; else ok "both legs complete, Demitri P1 against Victor P2 as forced"; fi
+if [ -s "$W/problems.txt" ]; then bad "the legs: $(tr '\n' ' ' < "$W/problems.txt")"
+    vs_ctl_nj "a section-2 leg is incomplete or off its forced pick ($(head -1 "$W/problems.txt")): the rows it should give are absent, which is not a finding"; else ok "both legs complete, Demitri P1 against Victor P2 as forced"; fi
 sed 's/^/     /' "$W/legs.tsv"
 cat "$W/static.tsv" "$W/legs.tsv" > "$W/got.tsv"
 # the control's perturbed copy: every vsavj leg row takes its vsav2 twin's content
@@ -213,9 +215,21 @@ fi
 [ -f "$EXPECT" ] || { echo "FAIL: no frozen expectation at $EXPECT (FREEZE=1 to create it)"; exit 1; }
 grep -v '^#' "$EXPECT" > "$W/want.tsv"
 if cmp -s "$W/want.tsv" "$W/got.tsv"; then ok "every row as frozen"
-else bad "differs from the frozen rows"; diff "$W/want.tsv" "$W/got.tsv" | sed 's/^/        /' | head -20; fi
+else bad "differs from the frozen rows"; diff "$W/want.tsv" "$W/got.tsv" > "$W/frozen.diff" || :
+    sed 's/^/        /' "$W/frozen.diff" | head -20; cat "$W/frozen.diff" >> "$W/main.log"; fi
 if [ -z "$MODE" ]; then
     if cmp -s "$W/want.tsv" "$W/got_agree.tsv"; then vs_ctl_dead games-agree "the rows with vs2's legs in vsavj's place still match the frozen rows" || fail=1
     else vs_ctl_fired games-agree "the rows with vs2's legs in vsavj's place differ from the frozen rows ($(diff "$W/want.tsv" "$W/got_agree.tsv" | grep -c '^>') rows) — the split is what the rows hold"; fi
+fi
+if [ -n "$MODE" ]; then   # #369: a mode is honoured only on its own finding in the main check's output
+    [ "$fail" = 1 ] || vs_ctl_left_green "$MODE" "FAIL: audit_demitri_split (control mode $MODE left the gate green)"
+    TB="$(printf '\t')"
+    case "$MODE" in
+    games-agree) WANT="^> leg${TB}vsavj${TB}" ;;   # a vsavj leg row of the frozen compare, now its vsav2 twin's
+    cause-unswapped) WANT="^  FAIL  (vsavj given vs2's bytes does not read vs2's rows|vs2 given vsavj's bytes does not read vsavj's rows):\$" ;;
+    *) WANT='' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: audit_demitri_split (control mode $MODE)"; exit 1
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_demitri_split"; else echo "FAIL: audit_demitri_split"; exit 1; fi

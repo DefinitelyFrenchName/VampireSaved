@@ -33,7 +33,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
-bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
+bad() { printf '  FAIL  %s\n' "$1" | tee -a "$W/main.log"; fail=1; }   # #369: the findings the mode reads
 
 # Pins that BITE (a first draft pinned level 6 — vsavj's default — and the RNG, whose last frame is often undrawn: the
 # short control was DEAD): the level 8 (TURBO, a different tick cadence on vsavj), the RNG word 1234, and the frame
@@ -52,7 +52,8 @@ echo "== 1. three runs (per-frame pins ${#PER} bytes, as ranges ${#RNG} bytes)"
 leg per "$PER" & leg ranges "$RNG" & leg short "$SHORT" & wait
 for t in per ranges short; do
     n="$(grep -c . "$W/$t.ck" 2>/dev/null || echo 0)"
-    [ "$n" -gt 3400 ] && ok "$t: $n checksum lines" || bad "$t: the run is short or dead ($n lines, $W/$t/mame.log)"
+    [ "$n" -gt 3400 ] && ok "$t: $n checksum lines" || { bad "$t: the run is short or dead ($n lines, $W/$t/mame.log)"
+        vs_ctl_nj "the $t run is short or dead ($n checksum lines), so the comparison judged nothing"; }
 done
 echo "== 2. ranges against per-frame entries: byte-identical"
 if cmp -s "$W/per.ck" "$W/ranges.ck"; then ok "the RANGES run is the PER-FRAME run, every frame of whole work RAM"
@@ -65,4 +66,7 @@ if [ -z "$MODE" ]; then
     fi
 fi
 
+# #369: under range-short the RANGES run carries the SHORT pins (the counter released after 3048), so section 2's
+# comparison must first differ AT 3049, the frame the range dropped — a dead or short leg differs elsewhere
+if [ -n "$MODE" ] && [ "$fail" = 1 ]; then vs_ctl_caught "$W/main.log" 'FAIL  the runs differ, first at: < 3049 [0-9a-f]+$' || :; fi
 if [ "$fail" = 0 ]; then echo "PASS: test_pokes_ranges"; else echo "FAIL: test_pokes_ranges"; exit 1; fi

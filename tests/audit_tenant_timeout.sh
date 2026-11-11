@@ -140,7 +140,7 @@ leg p2full 01 ";3200:ff8450:0080;3210:ff8452:0080" "$W/nojab.rpl"
 leg p1hurt 01 ";3200:ff8450:011e;3210:ff8452:011e"
 wait
 
-python3 - "$W" "$MODE" <<'PY' || { echo "FAIL: tenant timeout audit"; exit 1; }
+rc=0; python3 - "$W" "$MODE" > "$W/main.log" <<'PY' || rc=$?   # #369: the checks' findings, for vs_ctl_caught (set -eu: the status kept, not fatal)
 import sys
 W, mode = sys.argv[1], sys.argv[2]
 # leg -> (side, perfect): side = $FF8105/$FF810C at the down (1 = P1 won, 2 = P2 won);
@@ -260,38 +260,50 @@ for leg, (side, perf) in WANT.items():
     print(f"  ok: {leg} — timeout judged to P{side} ($FF8105/$FF810C), "
           f"perfect {perf:#04x}, match end f{end}, next match live at f{refill} "
           f"(loser's slot {lid:#04x} -> {rr[lslot]:#04x}, timer 99)")
-# THE CONTROLS (in-gate): each perturbed reading must disagree on BOTH confound legs
-if all(l in seen for l in CONFOUND):
-    ev = ", ".join(f"{l} $FF8120={seen[l][1]:#04x} reads P{RETRACTED.get(seen[l][1])}, side P{WANT[l][0]}" for l in CONFOUND)
-    if all(RETRACTED.get(seen[l][1]) != WANT[l][0] for l in CONFOUND):
-        print(f"CONTROL FIRED: side-by-perfect — the retracted reading misjudges both confound legs ({ev})")
+if not mode:   # #369: the in-gate controls run in a plain run only
+    # THE CONTROLS (in-gate): each perturbed reading must disagree on BOTH confound legs
+    if all(l in seen for l in CONFOUND):
+        ev = ", ".join(f"{l} $FF8120={seen[l][1]:#04x} reads P{RETRACTED.get(seen[l][1])}, side P{WANT[l][0]}" for l in CONFOUND)
+        if all(RETRACTED.get(seen[l][1]) != WANT[l][0] for l in CONFOUND):
+            print(f"CONTROL FIRED: side-by-perfect — the retracted reading misjudges both confound legs ({ev})")
+        else:
+            print(f"CONTROL DEAD: side-by-perfect — the retracted reading agrees with a confound leg ({ev})"); errs.append("side-by-perfect dead")
+        ev = ", ".join(f"{l} side P{seen[l][0]} predicts {BY_SIDE.get(seen[l][0], 0):#04x}, $FF8120={seen[l][1]:#04x}" for l in CONFOUND)
+        if all(BY_SIDE.get(seen[l][0]) != seen[l][1] for l in CONFOUND):
+            print(f"CONTROL FIRED: perfect-by-side — the side-derived expectation misses both confound legs ({ev})")
+        else:
+            print(f"CONTROL DEAD: perfect-by-side — the side-derived expectation matches a confound leg ({ev})"); errs.append("perfect-by-side dead")
     else:
-        print(f"CONTROL DEAD: side-by-perfect — the retracted reading agrees with a confound leg ({ev})"); errs.append("side-by-perfect dead")
-    ev = ", ".join(f"{l} side P{seen[l][0]} predicts {BY_SIDE.get(seen[l][0], 0):#04x}, $FF8120={seen[l][1]:#04x}" for l in CONFOUND)
-    if all(BY_SIDE.get(seen[l][0]) != seen[l][1] for l in CONFOUND):
-        print(f"CONTROL FIRED: perfect-by-side — the side-derived expectation misses both confound legs ({ev})")
+        missing = [l for l in CONFOUND if l not in seen]
+        for c in ("side-by-perfect", "perfect-by-side"):
+            print(f"CONTROL DEAD: {c} — confound leg(s) {missing} not judged")
+        errs.append(f"the confound legs {missing} were not judged")
+    # round2-before-end (#343): the retracted predicate must place its refill AFTER the match end on every leg
+    if len(ends) == len(WANT):
+        ev = ", ".join(f"{l} f{o} > end f{e}" if o is not None else f"{l} none" for l, (d, e, o) in ends.items())
+        if all(o is not None and o > e for (d, e, o) in ends.values()):
+            print(f"CONTROL FIRED: round2-before-end — the retracted round-2 refill lands after the match end on every leg ({ev})")
+        else:
+            print(f"CONTROL DEAD: round2-before-end — the retracted round-2 refill does not land after the match end on every leg ({ev})"); errs.append("round2-before-end dead")
     else:
-        print(f"CONTROL DEAD: perfect-by-side — the side-derived expectation matches a confound leg ({ev})"); errs.append("perfect-by-side dead")
-else:
-    missing = [l for l in CONFOUND if l not in seen]
-    for c in ("side-by-perfect", "perfect-by-side"):
-        print(f"CONTROL DEAD: {c} — confound leg(s) {missing} not judged")
-    errs.append(f"the confound legs {missing} were not judged")
-# round2-before-end (#343): the retracted predicate must place its refill AFTER the match end on every leg
-if len(ends) == len(WANT):
-    ev = ", ".join(f"{l} f{o} > end f{e}" if o is not None else f"{l} none" for l, (d, e, o) in ends.items())
-    if all(o is not None and o > e for (d, e, o) in ends.values()):
-        print(f"CONTROL FIRED: round2-before-end — the retracted round-2 refill lands after the match end on every leg ({ev})")
-    else:
-        print(f"CONTROL DEAD: round2-before-end — the retracted round-2 refill does not land after the match end on every leg ({ev})"); errs.append("round2-before-end dead")
-else:
-    missing = [l for l in WANT if l not in ends]
-    print(f"CONTROL DEAD: round2-before-end — leg(s) {missing} reached no match end")
-    errs.append(f"round2-before-end: legs {missing} not judged")
+        missing = [l for l in WANT if l not in ends]
+        print(f"CONTROL DEAD: round2-before-end — leg(s) {missing} reached no match end")
+        errs.append(f"round2-before-end: legs {missing} not judged")
 for e in errs:
     print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
+cat "$W/main.log"
+if [ -n "$MODE" ]; then
+    case "$MODE" in   # #369: the finding each perturbation must produce
+        side-by-perfect) WANT='^FAIL: (p2full|p1hurt): side codes \$FF8105/\$FF810C = [0-9]+/[0-9]+ at the down \(f[0-9]+\), expected [12]/[12] — the timeout down went the wrong way$' ;;
+        perfect-by-side) WANT='^FAIL: (p2full|p1hurt): perfect flag \$FF8120 \[.*\], expected 0x[0-9a-f]+ — the winner.s damage test moved$' ;;
+        round2-before-end) WANT='^FAIL: [a-z0-9]+: no refill between the down \(f[0-9]+\) and the match end \(f[0-9]+\) — round2-before-end: no round 2$' ;;
+    esac
+    [ "$rc" = 0 ] && vs_ctl_left_green "$MODE" "FAIL: tenant timeout audit — control mode $MODE left the gate green"
+    vs_ctl_caught "$W/main.log" "$WANT" || :; echo "FAIL: tenant timeout audit (control mode $MODE)"; exit 1
+fi
+[ "$rc" = 0 ] || { echo "FAIL: tenant timeout audit"; exit 1; }
 echo 'PASS: the timeout judge awards the down to the HP leader ($FF8105/$FF810C)'
 echo '      for all three tenants (legacy control green, inverted control judged'
 echo '      the other way); the winner'"'"'s perfect flag $FF8120 tells unhurt from'

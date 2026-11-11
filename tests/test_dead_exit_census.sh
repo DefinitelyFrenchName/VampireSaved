@@ -116,9 +116,17 @@ for _a in $ALLOW; do
     command grep -qF "$_t" "$W/allowed" || bad "ALLOW is stale: $_p no longer carries a matched line '$_t'"
 done
 IFS="$_old"
-if [ -n "${VS_CTL:-}" ]; then
-    [ "$fail" = 1 ] && { echo "FAIL: test_dead_exit_census (control mode $VS_CTL: the planted stub was named)"; exit 1; }
-    vs_ctl_left_green "$VS_CTL" "FAIL: test_dead_exit_census — control mode $VS_CTL: the planted stub was not named"
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on the census naming ITS planted stub
+    [ "$fail" = 1 ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_dead_exit_census — control mode $VS_CTL: the planted stub was not named"
+    case "$VS_CTL" in   # the stub's file AND the pattern its mode exists to prove (P1/P3 WORDONLY, P4/P5 DEADEXIT)
+        planted-word-only) TAG='WORDONLY|P1' ;;
+        planted-inverted) TAG='WORDONLY|P3' ;;
+        planted-unconditional) TAG='DEADEXIT|P4' ;;
+        planted-unrefused) TAG='DEADEXIT|P5' ;;
+        *) TAG='NONE|NONE' ;;
+    esac
+    vs_ctl_caught "$W/hits.txt" "^${TAG%%|*} .*/${EXTRA##*/}:[0-9]+: \\[${TAG#*|}\\] " || :
+    echo "FAIL: test_dead_exit_census (control mode $VS_CTL: the planted stub was named)"; exit 1
 fi
 
 echo "== 2. what the census is for: the stubs under CONTROL=flip, classified as the runners do"

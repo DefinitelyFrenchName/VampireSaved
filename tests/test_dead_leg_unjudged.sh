@@ -47,7 +47,8 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d)" || { echo "FAIL: test_dead_leg_unjudged — mktemp -d failed (W)"; exit 2; }; trap '[ -n "${KEEP_W:-}" ] || rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }
+: > "$W/main.log"   # #369: sections 1 and 2's findings, read by vs_ctl_caught under a mode
 # DLU_TABLE: another table of the same form (tests/audit_dead_leg_linux.sh passes the Linux-only release gates' rows,
 # tests/expected/dead_leg_unjudged_linux.tsv, run on PILOT at release; ruled 14z-223)
 T="${DLU_TABLE:-$REPO/tests/expected/dead_leg_unjudged.tsv}"
@@ -148,14 +149,14 @@ run_row() {  # run_row <gate> <mode> <script> <out> <dead instrument> — the mo
     # PAIRINGS_OUT: audit_legacy_pairings keeps every dead leg's sandbox under its output dir (#233), ~2,000 files a run
     # here; this gate's runs keep theirs in its own scratch, never in build/ (the 14z-221 close tier's plan refused on them)
     env CONTROL="$_m" PAIRINGS_OUT="$_o.lp" MAME_BIN=/usr/bin/false "$(dead_env "$_dv")" timeout -k 30 600 sh "$_s" < /dev/null > "$_o.mode" 2>&1; _st=$?
-    ( . "$REPO/tests/lib/classify.sh"; vs_classify_control "$_st" "$_o.mode" "$_s" "$_m"; printf '%s\t%s\n' "$VS_CTL_EXEC" "$_st" ) > "$_o.cls"
+    ( . "$REPO/tests/lib/classify.sh"; vs_classify_control "$_st" "$_o.mode" "$_s" "$_m"; printf "%s\t%s\n" "$(vs_ctl_class_word)" "$_st" ) > "$_o.cls"
     env -u CONTROL PAIRINGS_OUT="$_o.lpp" MAME_BIN=/usr/bin/false "$(dead_env "$_dv")" timeout -k 30 600 sh "$_s" < /dev/null > "$_o.plain" 2>&1; echo $? > "$_o.pst"
     # a row whose dead instrument is not MAME_BIN: the mode once more with ONLY that instrument dead and MAME_BIN UNSET
     # (never made dead), so the row's class is shown to come from the instrument it names, not from the dead MAME every
     # other run carries (14z-221c, rule-checker runs 2026-11-06-1665 and -1666 Q4)
     if [ "$_dv" != MAME_BIN ]; then
         env -u MAME_BIN CONTROL="$_m" PAIRINGS_OUT="$_o.lo" "$(dead_env "$_dv")" timeout -k 30 600 sh "$_s" < /dev/null > "$_o.only" 2>&1; _st=$?
-        ( . "$REPO/tests/lib/classify.sh"; vs_classify_control "$_st" "$_o.only" "$_s" "$_m"; printf '%s\t%s\n' "$VS_CTL_EXEC" "$_st" ) > "$_o.ocls"
+        ( . "$REPO/tests/lib/classify.sh"; vs_classify_control "$_st" "$_o.only" "$_s" "$_m"; printf "%s\t%s\n" "$(vs_ctl_class_word)" "$_st" ) > "$_o.ocls"
     fi
 }
 pool=0
@@ -200,6 +201,16 @@ while IFS="$(printf '\t')" read -r g m c sc dv; do
     else ok "$g: plain run red (exit $pst) and silent with a dead emulator"; fi
 done < "$W/rows.tsv"
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: the in-gate controls (section 3) never run under a mode; the mode's own finding
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_dead_leg_unjudged"   # is read from sections 1 and 2
+    case "$VS_CTL" in   # nj-stripped: a stripped gate's mode run read its pre-fix class; plain-loud: a row's plain run printed
+        nj-stripped) WANT='^  FAIL  [a-z0-9_]+@[a-z0-9-]+ reads (HONOURED|LIES|UNJUDGED-CAUGHT) under a dead emulator, frozen UNJUDGED ' ;;
+        plain-loud) WANT='^  FAIL  [a-z0-9_]+: its plain run prints NOT JUDGED \(the helper is not silent without a mode\)$' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: test_dead_leg_unjudged"; exit 1
+fi
+
 echo "== 3. in-gate control: each gate with its NJ lines neutered reads its frozen pre-fix class again"
 nfired=0; nrows=0
 while IFS="$(printf '\t')" read -r g m c sc dv; do
@@ -207,17 +218,14 @@ while IFS="$(printf '\t')" read -r g m c sc dv; do
     grep -q 'STRIP-FAILED' "$W/c/$g/strip.txt" && continue
     sg="$(cut -f1 "$W/s.$g.$m.cls" 2>/dev/null)"
     sline="$(grep -a -m1 -E '^(FAIL|CONTROL|  File|[A-Za-z]*Error)' "$W/s.$g.$m.mode" | cut -c1-90)"
-    case "$sc" in HONOURED|LIES) ;; *) bad "$g: the frozen stripped class '$sc' is neither HONOURED nor LIES"; continue ;; esac
+    case "$sc" in HONOURED|LIES|UNJUDGED-CAUGHT) ;; *) bad "$g: the frozen stripped class '$sc' is not HONOURED, LIES or UNJUDGED-CAUGHT (#369 piece 5: a migrated gate's)"; continue ;; esac
     if [ "$sg" = "$sc" ]; then nfired=$((nfired + 1))
     else bad "nj-stripped: $g@$m with its NJ lines neutered reads ${sg:-nothing}, frozen $sc [$sline]"; fi
 done < "$W/rows.tsv"
 if [ "$nfired" = "$nrows" ]; then vs_ctl_fired nj-stripped "all $nrows rows' gates with their NJ lines neutered read their frozen pre-fix class under a dead emulator, none UNJUDGED"
 else vs_ctl_dead nj-stripped "only $nfired of $nrows neutered gates read their frozen pre-fix class" || fail=1; fi
 
-if vs_ctl_is plain-loud; then
-    if [ "$loud1" = 1 ] && [ "$nloud" -gt 0 ]; then vs_ctl_fired plain-loud "the loud helper printed its NOT JUDGED line in section 1's plain case and in $nloud of $nrows rows' plain runs"
-    else vs_ctl_dead plain-loud "the loud helper did not print where planted (section 1: $loud1, plain runs: $nloud of $nrows)" || fail=1; fi
-else   # in-gate: the same two checks, run on the loud copies, would have failed
+if :; then   # in-gate: the same two checks, run on the loud copies, would have failed (a plain run only, #369)
     nloud_ig=0
     while IFS="$(printf '\t')" read -r g m c sc dv; do
         grep -qa '^NOT JUDGED: ' "$W/l.$g.$m.plain" 2>/dev/null && nloud_ig=$((nloud_ig + 1))

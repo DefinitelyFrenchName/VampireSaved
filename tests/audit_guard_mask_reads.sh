@@ -147,7 +147,7 @@ sys.exit(bad)
 PY
 
 echo "== 3. the reads: one reader, offsets 4..28 only, ours == vanilla"
-python3 - "$W" "$MODE" <<'PY' || fail=1
+python3 - "$W" "$MODE" > "$W/main.log" <<'PY' || fail=1
 import sys, collections
 w = sys.argv[1]; bad = 0
 MODE = sys.argv[2] if len(sys.argv) > 2 else ""
@@ -195,7 +195,8 @@ for leg in ("vanilla", "ours"):
 chk(res["vanilla"][1] == res["ours"][1], "ours == vanilla: identical per-offset inventory (legacy pairing, same frames)")
 # 5. must-fire control on the reducer — a synthetic offset-0 hit must FAIL it
 fs, _, _ = reduce([(3000, 0x02761E, 0x028D50, 0)])
-if any("OFFSET 0 READ" in f for f in fs): print("CONTROL FIRED: offset-0-read — a read at table offset 0 is caught (the mode injects one into the real ours leg)")
+if MODE: pass   # the in-gate control: a plain run only (#369: under a mode its line is not the mode's evidence)
+elif any("OFFSET 0 READ" in f for f in fs): print("CONTROL FIRED: offset-0-read — a read at table offset 0 is caught (the mode injects one into the real ours leg)")
 else: print("CONTROL DEAD: offset-0-read — a synthetic offset-0 read was not caught"); bad = 1
 fs, _, _ = reduce([])
 chk(any("LIVENESS" in f for f in fs), "control: an empty trace is a FAIL, not a clean null")
@@ -203,6 +204,13 @@ fs, _, _ = reduce([(3000, 0x000926, 0x000000, 0x1234)])
 chk(any("IN PLAY" in f for f in fs), "control: a foreign reader during the match is caught")
 sys.exit(bad)
 PY
+cat "$W/main.log"
+if [ "$MODE" = offset-0-read ]; then   # #369: honoured only on section 3's own finding on the ours leg
+    [ "$fail" = 1 ] || vs_ctl_left_green "$MODE" "FAIL: audit_guard_mask_reads — control mode $MODE left the gate green"
+    WANT='^  FAIL  ours: OFFSET 0 READ [1-9][0-9]* time\(s\) — mask\[0\] IS reachable'
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: audit_guard_mask_reads (control mode: $MODE)"; exit 1
+fi
 
 echo "== 4. the instrument's alignment (#228 step 4, option A)"
 if [ "$FREEZE_CLOCK" = 1 ]; then
@@ -220,9 +228,15 @@ if [ "$FREEZE_CLOCK" = 1 ]; then
 fi
 if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "both legs on emulated time, at their frozen game clocks"
 else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
-ia_stage audit_guard_mask_reads "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" 2 "$W/st" "$MODE" || fail=1
+ia_stage audit_guard_mask_reads "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" 2 "$W/st" "$MODE" > "$W/stage.txt" || fail=1
+cat "$W/stage.txt"
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL: audit_guard_mask_reads (control mode: $MODE)"; exit 1; }
+    # #369: drift-clock on the frozen game-clock comparison, first-frame-skip on the staging leg against replay.lua
+    case "$MODE" in
+    drift-clock) CF="$W/align_bad.txt"; WANT='game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+    *) CF="$W/stage.txt"; WANT='FAIL: the staging reference leg \([^)]*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+    esac
+    [ "$fail" = 1 ] && { vs_ctl_caught "$CF" "$WANT" || :; echo "FAIL: audit_guard_mask_reads (control mode: $MODE)"; exit 1; }
     vs_ctl_left_green "$MODE" "FAIL: audit_guard_mask_reads — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

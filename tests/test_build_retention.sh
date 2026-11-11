@@ -61,6 +61,16 @@ case " $CTLS " in *" ${VS_CTL:-none} "*) BR="$(make_copy "$VS_CTL")" ;; esac
 python3 "$BR" --selftest > "$W/self.txt" 2>&1 || true
 sed 's/^/  /' "$W/self.txt"
 grep -q '^SELFTEST PASS$' "$W/self.txt" || { echo "FAIL: the tool's selftest"; fail=1; }
+if [ -n "${VS_CTL:-}" ] && [ "$fail" != 0 ]; then   # #369: the selftest's own finding on the unit the perturbation reaches
+    case "$VS_CTL" in
+        comment-counted)    WANT="^  FAIL rd_comment +[(]'KEEP', 'code'[)]\$" ;;
+        input-not-first)    WANT="^  FAIL emu_new +[(]'ARCHIVE', 'evidence'[)]\$" ;;
+        open-ticket-blind)  WANT="^  FAIL rd_ticket +[(]'ARCHIVE', 'evidence'[)]\$" ;;
+        unrecorded-staging) WANT="^  FAIL rulecheck/2026-01-01-2 +[(]'PRUNE', 'recorded'[)]\$" ;;
+        apply-unverified)   WANT="^  FAIL apply: an unverified archive is refused and stays\$" ;;
+    esac
+    vs_ctl_caught "$W/self.txt" "$WANT" || :
+fi
 
 python3 tools/build_retention.py plan --root . --no-sizes --out "$W/plan.tsv" > "$W/plan.txt" 2>&1 || { echo "FAIL: the plan of this tree"; cat "$W/plan.txt"; fail=1; }
 if [ -f "$W/plan.tsv" ]; then

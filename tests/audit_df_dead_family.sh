@@ -87,27 +87,35 @@ for leg in don:13 dem:01; do n="${leg%%:*}"; id="${leg#*:}"
     done
 done
 bad=0
+: > "$W/main.log"   # #369: the probe check's findings, read by vs_ctl_caught under candidate-reached
 for n in don dem; do
     for pr in 2622a 2619e; do
         f="$W/${n}_$pr.log"
-        grep -q '^END ' "$f" || { echo "  FAIL: $n/$pr: no END line — dead leg"; bad=1; continue; }
+        grep -q '^END ' "$f" || { echo "  FAIL: $n/$pr: no END line — dead leg"; vs_ctl_nj "$n/$pr wrote no END line: a dead leg judged nothing"; bad=1; continue; }
         hits="$(grep -c '^PROBE' "$f" || true)"
         if [ "$pr" = 2622a ]; then
             if [ "$MODE" = candidate-reached ]; then
-                if [ "$hits" = 0 ]; then echo "  candidate-reached mode ($n): candidate 0x2622A NOT reached (0 hits), as it never is — the mode demands the forbidden reach, so the gate FAILs"; bad=1
+                if [ "$hits" = 0 ]; then echo "  FAIL: $n: candidate-reached mode: candidate 0x2622A NOT reached (0 hits), as it never is — the mode demands the forbidden reach, so the gate FAILs" | tee -a "$W/main.log"; bad=1
                 else echo "CONTROL DEAD: candidate-reached — candidate 0x2622A was reached $hits times ($n)"; fi
             elif [ "$hits" = 0 ]; then
-                if [ "$n" = don ]; then vs_ctl_fired candidate-reached "candidate 0x2622A is never reached (0 hits); the mode demands the forbidden reach so the gate FAILs"; fi
+                if [ "$n" = don ] && [ -z "$MODE" ]; then vs_ctl_fired candidate-reached "candidate 0x2622A is never reached (0 hits); the mode demands the forbidden reach so the gate FAILs"; fi
                 echo "  ok    $n: candidate 0x2622A never reached (0 hits)"
             else
                 echo "CONTROL DEAD: candidate-reached — candidate 0x2622A was reached $hits times ($n)"; echo "  FAIL: $n: candidate 0x2622A reached $hits times"; bad=1
             fi
         else
             fr="$(grep -m1 '^PROBE' "$f" | awk '{print $2}')"
-            [ "$hits" = 1 ] && [ "$fr" = 3259 ] && echo "  ok    $n: control 0x2619E fired once, logged at f3259 (during the press frame 3260)" || { echo "  FAIL: $n: control 0x2619E fired $hits times (first at ${fr:-never}; want once, logged 3259)"; bad=1; }
+            [ "$hits" = 1 ] && [ "$fr" = 3259 ] && echo "  ok    $n: control 0x2619E fired once, logged at f3259 (during the press frame 3260)" || { echo "  FAIL: $n: control 0x2619E fired $hits times (first at ${fr:-never}; want once, logged 3259)"; bad=1
+                if [ "$MODE" = candidate-reached ] && [ "$hits" = 0 ]; then vs_ctl_nj "$n: the positive control 0x2619E never fired, so the probe is blind and the candidate's 0 hits judged nothing"; fi; }
         fi
     done
 done
+if [ "$MODE" = candidate-reached ]; then   # #369: honoured only on the probe check's own finding; the alignment is not what it perturbs
+    [ "$bad" = 1 ] || vs_ctl_left_green "$MODE" "FAIL audit_df_dead_family — control mode $MODE left the gate green"
+    WANT='^  FAIL: (don|dem): candidate-reached mode: candidate 0x2622A NOT reached \(0 hits\)'
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL audit_df_dead_family (control mode: $MODE)"; exit 1
+fi
 echo "== the instrument's alignment (#228 step 4, option A)"
 if [ "$FREEZE_CLOCK" = 1 ]; then
     [ "$bad" = 0 ] || { echo "REFUSED: the audit failed — nothing frozen"; exit 1; }
@@ -125,9 +133,15 @@ fi
 if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then
     echo "  ok    every probe run on emulated time, at its frozen game clock"
 else echo "  FAIL: $(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; bad=1; fi
-ia_stage audit_df_dead_family "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || bad=1
+ia_stage audit_df_dead_family "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" > "$W/stage.txt" || bad=1
+cat "$W/stage.txt"
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$bad" = 1 ] && { echo "FAIL audit_df_dead_family (control mode: $MODE)"; exit 1; }
+    # #369: drift-clock on the frozen game-clock comparison, first-frame-skip on the staging leg against replay.lua
+    case "$MODE" in
+    drift-clock) CF="$W/align_bad.txt"; WANT='game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+    *) CF="$W/stage.txt"; WANT='FAIL: the staging reference leg \([^)]*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+    esac
+    [ "$bad" = 1 ] && { vs_ctl_caught "$CF" "$WANT" || :; echo "FAIL audit_df_dead_family (control mode: $MODE)"; exit 1; }
     vs_ctl_left_green "$MODE" "FAIL audit_df_dead_family — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || bad=1; fi

@@ -87,6 +87,20 @@ fi
 if lint "$T" > "$W/lint.txt" 2>&1; then sed 's/^/  /' "$W/lint.txt"
 else sed 's/^/  /' "$W/lint.txt"; echo "FAIL: the template lint"; fail=1; fi
 
+if [ -n "${VS_CTL:-}" ] && [ "$fail" != 0 ]; then   # #369: the self-test (or lint) line the variant's one defect must produce
+    case "$VS_CTL" in
+    plant-is-live)          F=s1;   WANT='^  FAIL: plant next-closed: a generated START HERE citing #6 [(]done[)] fails the open-ticket check$' ;;
+    dup-blind)              F=s1;   WANT='^  FAIL: dup-entries: a repeated heading with differing bodies passes the entry check and fails --headings$' ;;
+    stale-row-accepted)     F=s1;   WANT='^  FAIL: plant row-stale: one character changed fails the copy check$' ;;
+    claim-partial-accepted) F=s1;   WANT='^  FAIL: claim refuses a partial run$' ;;
+    range-ends)             F=s1;   WANT='^  FAIL: open-tickets: a START HERE citing the range #5-#7 checks #6 inside it [(]done[)] and fails [(]#256[)]$' ;;
+    claim-unscoped)         F=s1;   WANT='^  FAIL: claim: opens with its scope [(]#270[)]' ;;
+    form-unchecked)         F=s2;   WANT='^  FAIL: refused: not a tracked file$' ;;
+    skip-unresolved)        F=s3;   WANT='^SKIP  [(]a[)] home is a ticket only: HEADING$' ;;   # the split home SKIPped, not UNRESOLVED
+    unpaired-plant)         F=lint; WANT='^FAIL: plant [a-z_]+_plant expects exit 0 — a plant must fail its check$' ;;
+    esac
+    vs_ctl_caught "$W/$F.txt" "$WANT" || :
+fi
 if [ -z "${VS_CTL:-}" ]; then
     for c in plant-is-live dup-blind stale-row-accepted claim-partial-accepted claim-unscoped range-ends; do
         python3 tools/close_standing.py --selftest --perturb "$c" > "$W/c_$c.txt" 2>&1 || true

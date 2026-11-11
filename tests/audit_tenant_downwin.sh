@@ -173,7 +173,7 @@ leg fd1 01 03 ";3006:ff8450:0091;3008:ff8452:0091" "$W/p2jab.rpl"
 leg ctl_nolast 01 03 "$KOBASE"
 wait
 
-python3 - "$W" "$MODE" <<'PY' || { echo "FAIL: tenant downwin audit"; exit 1; }
+rc=0; python3 - "$W" "$MODE" > "$W/main.log" <<'PY' || rc=$?   # #369: the checks' findings, for vs_ctl_caught (set -eu: the status kept, not fatal)
 import sys
 W, mode = sys.argv[1], sys.argv[2]
 # leg -> (side, perfect): side = $FF8105 at the down (1 = P1 won, 2 = P2 won);
@@ -310,57 +310,70 @@ for leg in LEGS:
         continue
     print(f"  ok: {leg} — last-bar KO judged to P{side} at f{down} (bat 0 -> 0xFF), perfect {perf:#04x}, "
           f"match end f{end}, next match live at f{refill} (loser's slot {lid:#04x} -> {rr[lslot]:#04x})")
-# THE CONTROLS (in-gate): each perturbed reading must disagree on BOTH confound legs
-if all(l in seen for l in CONFOUND):
-    ev = ", ".join(f"{l} $FF8120={seen[l][1]:#04x} reads P{RETRACTED.get(seen[l][1])}, side P{WANT[l][0]}" for l in CONFOUND)
-    if all(RETRACTED.get(seen[l][1]) != WANT[l][0] for l in CONFOUND):
-        print(f"CONTROL FIRED: side-by-perfect — the retracted reading misjudges both confound legs ({ev})")
+if not mode:   # #369: the in-gate controls run in a plain run only
+    # THE CONTROLS (in-gate): each perturbed reading must disagree on BOTH confound legs
+    if all(l in seen for l in CONFOUND):
+        ev = ", ".join(f"{l} $FF8120={seen[l][1]:#04x} reads P{RETRACTED.get(seen[l][1])}, side P{WANT[l][0]}" for l in CONFOUND)
+        if all(RETRACTED.get(seen[l][1]) != WANT[l][0] for l in CONFOUND):
+            print(f"CONTROL FIRED: side-by-perfect — the retracted reading misjudges both confound legs ({ev})")
+        else:
+            print(f"CONTROL DEAD: side-by-perfect — the retracted reading agrees with a confound leg ({ev})"); errs.append("side-by-perfect dead")
+        ev = ", ".join(f"{l} side P{seen[l][0]} predicts {BY_SIDE.get(seen[l][0], 0):#04x}, $FF8120={seen[l][1]:#04x}" for l in CONFOUND)
+        if all(BY_SIDE.get(seen[l][0]) != seen[l][1] for l in CONFOUND):
+            print(f"CONTROL FIRED: perfect-by-side — the side-derived expectation misses both confound legs ({ev})")
+        else:
+            print(f"CONTROL DEAD: perfect-by-side — the side-derived expectation matches a confound leg ({ev})"); errs.append("perfect-by-side dead")
     else:
-        print(f"CONTROL DEAD: side-by-perfect — the retracted reading agrees with a confound leg ({ev})"); errs.append("side-by-perfect dead")
-    ev = ", ".join(f"{l} side P{seen[l][0]} predicts {BY_SIDE.get(seen[l][0], 0):#04x}, $FF8120={seen[l][1]:#04x}" for l in CONFOUND)
-    if all(BY_SIDE.get(seen[l][0]) != seen[l][1] for l in CONFOUND):
-        print(f"CONTROL FIRED: perfect-by-side — the side-derived expectation misses both confound legs ({ev})")
+        missing = [l for l in CONFOUND if l not in seen]
+        for c in ("side-by-perfect", "perfect-by-side"):
+            print(f"CONTROL DEAD: {c} — confound leg(s) {missing} not judged")
+        errs.append(f"the confound legs {missing} were not judged")
+    # round2-before-end (#343): the retracted predicate must place its refill AFTER the match end on every KO leg
+    if len(ends) == len(WANT):
+        ev = ", ".join(f"{l} f{o} > end f{e}" if o is not None else f"{l} none" for l, (d, e, o) in ends.items())
+        if all(o is not None and o > e for (d, e, o) in ends.values()):
+            print(f"CONTROL FIRED: round2-before-end — the retracted round-2 refill lands after the match end on every KO leg ({ev})")
+        else:
+            print(f"CONTROL DEAD: round2-before-end — the retracted round-2 refill does not land after the match end on every KO leg ({ev})"); errs.append("round2-before-end dead")
     else:
-        print(f"CONTROL DEAD: perfect-by-side — the side-derived expectation matches a confound leg ({ev})"); errs.append("perfect-by-side dead")
-else:
-    missing = [l for l in CONFOUND if l not in seen]
-    for c in ("side-by-perfect", "perfect-by-side"):
-        print(f"CONTROL DEAD: {c} — confound leg(s) {missing} not judged")
-    errs.append(f"the confound legs {missing} were not judged")
-# round2-before-end (#343): the retracted predicate must place its refill AFTER the match end on every KO leg
-if len(ends) == len(WANT):
-    ev = ", ".join(f"{l} f{o} > end f{e}" if o is not None else f"{l} none" for l, (d, e, o) in ends.items())
-    if all(o is not None and o > e for (d, e, o) in ends.values()):
-        print(f"CONTROL FIRED: round2-before-end — the retracted round-2 refill lands after the match end on every KO leg ({ev})")
+        missing = [l for l in WANT if l not in ends]
+        print(f"CONTROL DEAD: round2-before-end — KO leg(s) {missing} reached no match end")
+        errs.append(f"round2-before-end: legs {missing} not judged")
+    # THE LAST-BAR CONTROL, IN-GATE (14z-216, the M24 freeze: declared at 14z-215 but fired only as a CONTROL= mode, so a plain
+    # run never printed it and the runner read it NOT FIRED): ctl's KO with the SAME base pokes and NO last-bar pokes (the
+    # 14z-104 rig, HP alone) must not be a last-bar death — P2's +0x138/bat not 0 the frame before the KO; no KO is DEAD.
+    crow = {}
+    try:
+        for line in open(f"{W}/ctl_nolast/field.txt"):
+            f = line.split()
+            if len(f) >= 3 and f[0] == "F":
+                crow[int(f[1])] = {k: int(v) for k, v in (kv.split("=") for kv in f[2:])}
+    except OSError:
+        pass
+    cko = next((fr for fr in sorted(crow) if crow[fr]["p2hp"] < 0), None)
+    if cko is None or cko - 1 not in crow:
+        print("CONTROL DEAD: ko-without-last-bar — the HP-only leg ctl_nolast has no KO"); errs.append("ko-without-last-bar dead")
+    elif (crow[cko - 1]["nb2"], crow[cko - 1]["bat2"]) != (0, 0):
+        print(f"CONTROL FIRED: ko-without-last-bar — with HP alone the KO (f{cko}) is not a last-bar death: P2's +0x138 "
+              f"{crow[cko - 1]['nb2']} and bat {crow[cko - 1]['bat2']} the frame before (expected 0 and 0 on the last bar)")
     else:
-        print(f"CONTROL DEAD: round2-before-end — the retracted round-2 refill does not land after the match end on every KO leg ({ev})"); errs.append("round2-before-end dead")
-else:
-    missing = [l for l in WANT if l not in ends]
-    print(f"CONTROL DEAD: round2-before-end — KO leg(s) {missing} reached no match end")
-    errs.append(f"round2-before-end: legs {missing} not judged")
-# THE LAST-BAR CONTROL, IN-GATE (14z-216, the M24 freeze: declared at 14z-215 but fired only as a CONTROL= mode, so a plain
-# run never printed it and the runner read it NOT FIRED): ctl's KO with the SAME base pokes and NO last-bar pokes (the
-# 14z-104 rig, HP alone) must not be a last-bar death — P2's +0x138/bat not 0 the frame before the KO; no KO is DEAD.
-crow = {}
-try:
-    for line in open(f"{W}/ctl_nolast/field.txt"):
-        f = line.split()
-        if len(f) >= 3 and f[0] == "F":
-            crow[int(f[1])] = {k: int(v) for k, v in (kv.split("=") for kv in f[2:])}
-except OSError:
-    pass
-cko = next((fr for fr in sorted(crow) if crow[fr]["p2hp"] < 0), None)
-if cko is None or cko - 1 not in crow:
-    print("CONTROL DEAD: ko-without-last-bar — the HP-only leg ctl_nolast has no KO"); errs.append("ko-without-last-bar dead")
-elif (crow[cko - 1]["nb2"], crow[cko - 1]["bat2"]) != (0, 0):
-    print(f"CONTROL FIRED: ko-without-last-bar — with HP alone the KO (f{cko}) is not a last-bar death: P2's +0x138 "
-          f"{crow[cko - 1]['nb2']} and bat {crow[cko - 1]['bat2']} the frame before (expected 0 and 0 on the last bar)")
-else:
-    print("CONTROL DEAD: ko-without-last-bar — the HP-only leg died on its last bar anyway"); errs.append("ko-without-last-bar dead")
+        print("CONTROL DEAD: ko-without-last-bar — the HP-only leg died on its last bar anyway"); errs.append("ko-without-last-bar dead")
 for e in errs:
     print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
+cat "$W/main.log"
+if [ -n "$MODE" ]; then
+    case "$MODE" in   # #369: the finding each perturbation must produce
+        side-by-perfect) WANT='^FAIL: (p2win|p1hurt): side code \$FF8105 = [0-9]+ at the down \(f[0-9]+\), expected [12] — the down went to the wrong side$' ;;
+        perfect-by-side) WANT='^FAIL: (p2win|p1hurt): perfect flag \$FF8120 \[.*\], expected 0x[0-9a-f]+ — the winner.s damage test moved$' ;;
+        ko-without-last-bar) WANT='^FAIL: [a-z0-9]+: the KO \(f[0-9]+\) is not a last-bar death: .*$' ;;
+        round2-before-end) WANT='^FAIL: [a-z0-9]+: no refill between the down \(f[0-9]+\) and the match end \(f[0-9]+\) — round2-before-end: no round 2$' ;;
+    esac
+    [ "$rc" = 0 ] && vs_ctl_left_green "$MODE" "FAIL: tenant downwin audit — control mode $MODE left the gate green"
+    vs_ctl_caught "$W/main.log" "$WANT" || :; echo "FAIL: tenant downwin audit (control mode $MODE)"; exit 1
+fi
+[ "$rc" = 0 ] || { echo "FAIL: tenant downwin audit"; exit 1; }
 echo 'PASS: the KO-path life-marker transition judges cleanly with every'
 echo '      tenant as winner AND as victim, the side read from $FF8105 and the'
 echo '      winner'"'"'s perfect flag $FF8120 telling unhurt from hurt; each last-bar KO'

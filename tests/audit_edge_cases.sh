@@ -204,7 +204,7 @@ leg f1_hui 10 03 "$W/frame1.rpl" "$MT"
 leg f1_pyr 11 03 "$W/frame1.rpl" "$MT"
 wait
 
-python3 - "$W" "$MODE" <<'PY' || { echo "FAIL: edge-case audit"; exit 1; }
+python3 - "$W" "$MODE" > "$W/main.log" <<'PY' && rc=0 || rc=$?
 import sys
 W, mode = sys.argv[1], sys.argv[2]
 errs = []
@@ -294,8 +294,11 @@ for leg in ("dko_ctl","dko_don","dko_hui","dko_pyr"):
         errs.append(f"{leg}: {e}"); continue
     print(f"  ok: {leg} — last-bar double KO drawn at f{adv[0]} (both bats 0 -> 0xff; $FF8105 = 3, "
           "$FF8120 unwritten 0x00)")
-# THE CONTROLS (in-gate): each perturbed reading must disagree on BOTH confound legs
-if all(l in seen for l in CONFOUND):
+# THE CONTROLS (in-gate): each perturbed reading must disagree on BOTH confound legs (a plain run only: under a mode
+# their lines are not the mode's evidence, #369)
+if mode:
+    pass
+elif all(l in seen for l in CONFOUND):
     ev = ", ".join(f"{l} $FF8120={seen[l][1]:#04x} reads {RETRACTED.get(seen[l][1])}, side {TKO[l][0]}" for l in CONFOUND)
     if all(RETRACTED.get(seen[l][1]) != TKO[l][0] for l in CONFOUND):
         print(f"CONTROL FIRED: side-by-perfect — the retracted reading misjudges both confound legs ({ev})")
@@ -332,7 +335,7 @@ for leg, want in F1.items():
 # THE LAST-BAR CONTROLS, IN-GATE (14z-216, the M24 freeze: declared at 14z-215 but fired only as CONTROL= modes, so a
 # plain run printed neither and the runner read both NOT FIRED): one leg each with the SAME base pokes as the KO legs and
 # NO last-bar pokes (the 14z-104 rig, HP alone) must fail last_bar(); a leg with no KO is DEAD, never caught.
-for ctl, leg, vic in (("ko-without-last-bar", "kctl_nolast", ["2"]), ("dko-without-last-bar", "dctl_nolast", ["1", "2"])):
+for ctl, leg, vic in (() if mode else (("ko-without-last-bar", "kctl_nolast", ["2"]), ("dko-without-last-bar", "dctl_nolast", ["1", "2"]))):
     rows = load(leg)
     if not rows:
         print(f"CONTROL DEAD: {ctl} — the control leg {leg} produced no samples"); errs.append(f"{ctl} dead"); continue
@@ -347,6 +350,19 @@ for e in errs:
     print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
+cat "$W/main.log"
+if [ -n "$MODE" ]; then   # #369: a mode is honoured only on its own finding in the check's output
+    [ "$rc" != 0 ] || vs_ctl_left_green "$MODE" "FAIL: edge-case audit (control mode $MODE)"
+    case "$MODE" in
+    side-by-perfect) WANT='^FAIL: tko_(p2|hurt): side code \$FF8105 = [0-9]+ at the down \(f[0-9]+\), expected [0-9]+$' ;;
+    perfect-by-side) WANT='^FAIL: tko_(p2|hurt): perfect flag \$FF8120 \[[^]]*\], expected 0x[0-9a-f]+$' ;;
+    ko-without-last-bar) WANT='^FAIL: [tv]ko_[a-z0-9]+: the KO of P[12] \(f[0-9]+\) is not a last-bar death: ' ;;
+    dko-without-last-bar) WANT='^FAIL: dko_[a-z0-9]+: the KO of P[12] \(f[0-9]+\) is not a last-bar death: ' ;;
+    *) WANT='' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+fi
+[ "$rc" = 0 ] || { echo "FAIL: edge-case audit"; exit 1; }
 echo 'PASS: the deliberate edges hold — a last-bar KO-in-capture judges both'
 echo '      directions (side $FF8105, the thrower'"'"'s perfect flag $FF8120),'
 echo '      last-bar mirror trades draw ($FF8105 = 3), frame-1 inputs serve'

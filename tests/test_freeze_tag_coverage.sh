@@ -69,7 +69,7 @@ cd "$(dirname "$0")/.."
 REGISTRY="${REGISTRY:-tests/expected/registry.tsv}"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
-bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
+bad() { printf '  FAIL  %s\n' "$1"; [ -n "${W:-}" ] && printf '  FAIL  %s\n' "$1" >> "$W/main.log"; fail=1; }   # main.log: #369
 . "$(dirname "$0")/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d)" || { echo "FAIL: test_freeze_tag_coverage — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 perturb() {  # perturb <name> <out> — a COPY of the registry
@@ -158,4 +158,13 @@ if [ "${FTC_CONTROLS:-1}" = 1 ]; then
     fi
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: honoured only on the section the perturbed registry copy must fail
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL"
+    case "$VS_CTL" in
+        untagged-row) WANT="^  FAIL  NO FREEZE TAG for registry row 'donovan-m99' " ;;
+        fingerprint-not-in-tag) WANT='^  FAIL  TAG MESSAGE NAMES NO FINGERPRINT:.* donovan-m18( |$)' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT"
+    echo "FAIL"; exit 1
+fi
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

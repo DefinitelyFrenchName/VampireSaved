@@ -87,7 +87,8 @@ case1 "$GEN" "$W/s1" > "$W/s1.txt" 2>&1
     || ok "fbneo and mame: an older roms/ set loses to a newer rompath/ one and the reverse; FBNeo's roms/ carries the newer bytes"
 
 if vs_ctl_is first-found; then
-    [ "$rc" = 1 ] && { echo "FAIL: test_launcher_newest (control mode: first-found)"; exit 1; }
+    WANT='roms older: chose [^ ]*/roms/vsavjw\.zip, not the newer rompath/vsavjw\.zip$'   # #369: section 1's own row
+    [ "$rc" = 1 ] && { vs_ctl_caught "$W/s1.txt" "$WANT"; echo "FAIL: test_launcher_newest (control mode: first-found)"; exit 1; }
     vs_ctl_left_green "first-found" "FAIL: test_launcher_newest — control mode first-found left the gate green"
 fi
 

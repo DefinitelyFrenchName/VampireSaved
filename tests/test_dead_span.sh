@@ -74,25 +74,37 @@ ACC363="--allow-pcidx 29cc2@29944 --allow-pcidx 29d02@29966 --allow-pcidx 29d92@
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 VJ="$W/vsavj_op.bin $W/vsavj_data.bin"
 
+# #369: a mode is honoured only on the VERDICT line of its own rule, in the tool's output ($W/main.log)
+case "${VS_CTL:-}" in
+    plant-jsr) WANT='^VERDICT NOT DEAD: refs A [1-9]' ;;
+    plant-long) WANT='^VERDICT NOT DEAD: refs A [0-9]+ C [1-9]' ;;
+    plant-table) WANT='^VERDICT NOT DEAD: refs .* T [1-9]' ;;
+    plant-lea) WANT='^VERDICT NOT DEAD: refs .* R [1-9]' ;;
+    byte-table) WANT='^VERDICT NOT DEAD: refs .* D [1-9]' ;;
+    live-span) WANT='^VERDICT NOT DEAD: .*(live inside [1-9]|fenced no)' ;;
+esac
 for c in plant-jsr plant-long plant-table plant-lea; do
     if vs_ctl_is "$c"; then
         echo "== MODE $c: vsavj's span with a planted reference"
         # rule D's accepted base is passed too (14z-221c, rule-checker run 2026-11-05-1651 Q4), so the plant's own rule decides
-        $TOOL $VJ --span 024024-024029 $ACC294 --plant "${c#plant-}"; rc=$?
+        $TOOL $VJ --span 024024-024029 $ACC294 --plant "${c#plant-}" > "$W/main.log" 2>&1; rc=$?; cat "$W/main.log"
         [ "$rc" -eq 0 ] && vs_ctl_left_green "$c" "FAIL: the planted reference was not seen"
+        vs_ctl_caught "$W/main.log" "$WANT"
         echo "FAIL (mode): as required — the planted reference made the span NOT DEAD"; exit 1
     fi
 done
 if vs_ctl_is byte-table; then
     echo "== MODE byte-table: the gate's check run on the byte-table tail PRG:0x0236CE-0x0236D3"
-    $TOOL $VJ --span 0236ce-0236d3; rc=$?
+    $TOOL $VJ --span 0236ce-0236d3 > "$W/main.log" 2>&1; rc=$?; cat "$W/main.log"
     [ "$rc" -eq 0 ] && vs_ctl_left_green byte-table "FAIL: a PC-indexed byte table's tail was judged DEAD"
+    vs_ctl_caught "$W/main.log" "$WANT"
     echo "FAIL (mode): as required — the byte table's tail was judged NOT DEAD"; exit 1
 fi
 if vs_ctl_is live-span; then
     echo "== MODE live-span: the gate's check run on the fall-through twin PRG:0x024888-0x02488D"
-    $TOOL $VJ --span 024888-02488d; rc=$?
+    $TOOL $VJ --span 024888-02488d > "$W/main.log" 2>&1; rc=$?; cat "$W/main.log"
     [ "$rc" -eq 0 ] && vs_ctl_left_green live-span "FAIL: a span reached by fall-through was judged DEAD"
+    vs_ctl_caught "$W/main.log" "$WANT"
     echo "FAIL (mode): as required — the live span was judged NOT DEAD"; exit 1
 fi
 

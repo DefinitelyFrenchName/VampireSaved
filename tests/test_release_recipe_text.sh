@@ -135,5 +135,15 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: the mode's own finding in the check's output
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_release_recipe_text (control mode $VS_CTL changed no verdict)"
+    case "$VS_CTL" in
+    qtdebug-dropped)      WANT='^      mame: no Linux make line carrying USE_QTDEBUG=0 ' ;;
+    deps-dropped)         WANT='^      mame: EMULATOR\.md names no Linux dependencies$' ;;
+    recipe-route-dropped) WANT='^      fbneo: README does not tell a recipe player the launchers run only a prebuilt program$' ;;
+    esac
+    vs_ctl_caught "$W/check.txt" "$WANT" || :
+    echo "FAIL: test_release_recipe_text (control mode $VS_CTL)"; exit 1
+fi
 if [ "$fail" = 0 ]; then echo "PASS: test_release_recipe_text"; exit 0; fi
 echo "FAIL: test_release_recipe_text"; exit 1

@@ -358,7 +358,7 @@ for line in sys.stdin:
 # ---- section 1: FBNeo
 binary_rows=0
 echo "== 1. fbneo $FB"
-check_dir "$FB" "fbneo$EXESUF" || fail=1
+check_dir "$FB" "fbneo$EXESUF" > "$W/s1_check.txt" || fail=1; cat "$W/s1_check.txt"   # #369: a mode reads its finding here
 # the FULL message (2026-09-13): `CPS-2 WIDE v1` alone is also in the driver's long
 # name, so it could not tell a binary built without Cps2WideInit from one built with it
 strings -a "$FB/fbneo$EXESUF" | grep -q "CPS-2 WIDE v1 profile active" || { echo "FAIL: fbneo does not carry the profile (no 'CPS-2 WIDE v1 profile active' in the binary)"; fail=1; }
@@ -422,7 +422,7 @@ fi
 # ---- section 2: MAME
 echo "== 2. mame $MM"
 f2=0
-check_dir "$MM" "cps2$EXESUF" || f2=1
+check_dir "$MM" "cps2$EXESUF" > "$W/s2_check.txt" || f2=1; cat "$W/s2_check.txt"   # #369: a mode reads its finding here
 echo "MEASURED: binary-record-rows = $binary_rows"
 "$MM/cps2$EXESUF" -listfull vsavjw 2>/dev/null | grep -q vsavjw || { echo "FAIL: cps2 does not know vsavjw"; f2=1; }
 # -verifyroms can never say "is good" on a WIDE content set: the descriptor carries the
@@ -576,7 +576,8 @@ fi
 # content shows up as a flagged member the build does not author. Both then FAIL here.
 if [ "$f2" = 0 ]; then
     "$MM/cps2$EXESUF" -verifyroms vsavjw -rompath "$(native_pathlist "$W/standalone")" > "$W/sa_verify.log" 2>&1 || true
-    verify_check "$W/sa_verify.log" "$REPO/$MERGED/rompath/vsavjw.zip" " (standalone set alone, expectation from the build)" || f2=1
+    verify_check "$W/sa_verify.log" "$REPO/$MERGED/rompath/vsavjw.zip" " (standalone set alone, expectation from the build)" > "$W/s3a.txt" || f2=1
+    cat "$W/s3a.txt"   # #369: the standalone modes read their finding here
 fi
 
 # ---- 3b / 3c: the behavioural A/B on both emulators
@@ -593,11 +594,11 @@ if [ "$f2" = 0 ]; then
     }
     cmp_legs() {  # cmp_legs <label> <ram_a> <ram_b> <vid_a> <vid_b>
         if ! cmp -s "$2" "$3"; then
-            echo "FAIL: $1 — the standalone set diverges from the build arrangement in work RAM:"
+            echo "FAIL: $1 — the standalone set diverges from the build arrangement in work RAM:" | tee -a "$W/main.log"
             diff "$2" "$3" | head -4; return 1
         fi
         if ! cmp -s "$4" "$5"; then
-            echo "FAIL: $1 — the standalone set diverges from the build arrangement in the FRAMEBUFFER:"
+            echo "FAIL: $1 — the standalone set diverges from the build arrangement in the FRAMEBUFFER:" | tee -a "$W/main.log"
             diff "$4" "$5" | head -4; return 1
         fi
         d="$(sort -u "$4" | wc -l | tr -d ' ')"
@@ -699,8 +700,8 @@ fi
 # ---- section 3's must-fire controls: TWO perturbations, a gfx member and an AUDIO member.
 # The audio one exists because 3 of the 7 completion members are QSound (vm3.11m/12m and
 # dl-1425.bin) and NEITHER compared stream can see them — only 3a can, which is exactly
-# why 3a does not read the packager's declaration.
-if [ "$f2" = 0 ]; then
+# why 3a does not read the packager's declaration. A plain run's (#369): under a mode its lines are no evidence.
+if [ "$f2" = 0 ] && [ -z "${VS_CTL:-}" ]; then
     # (i) a GFX completion member with another gfx member's bytes: same name, same size,
     # so it loads; work RAM is unmoved and the FRAMEBUFFER is what shows it.
     sa_perturb vm3.14m vm3.16m "$W/standalone" "$W/sa_gfx"
@@ -731,6 +732,19 @@ fi
 [ "$f2" = 0 ] && echo "  ok: record, self-contained, $SIGNED, knows vsavjw, -verifyroms flags exactly the WIDE members, reproduced 05_timeout_idle's frozen masked expectation"
 [ "$f2" = 0 ] || fail=1
 
+# #369: a mode is honoured only on its own finding in the main checks' output (sections 1 and 2's check_dir, 3a's
+# -verifyroms check, 3b/3c's comparison); the in-gate controls below are a plain run's
+if [ -n "${VS_CTL:-}" ]; then
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_release_binaries ($OSARCH) — control mode $VS_CTL left the gate green"
+    cat "$W/s1_check.txt" "$W/s2_check.txt" "$W/s3a.txt" >> "$W/main.log" 2>/dev/null || :
+    case "$VS_CTL" in
+    flipped-library-byte) WANT='^FAIL: .*/fb_flip/[^ ]+ sha256 [0-9a-f]{64} != record [0-9a-f]{64}$' ;;
+    absolute-reference) WANT='^FAIL: [^ ]+ (references /.* \(not bundled: absolute or non-system\)$|needs [^ ]+: not in this folder|imports [^ ]+, NOT FOUND|resolves [^ ]+ to .*, outside this folder)' ;;
+    standalone-member-content) WANT="^FAIL: (-verifyroms flagged \['vm3\.14m'\] unexpectedly / missed \[\]|(mame|fbneo) — the standalone set diverges from the build arrangement in (work RAM|the FRAMEBUFFER):)\$" ;;
+    standalone-audio-member-content) WANT="^FAIL: -verifyroms flagged \['vm3\.11m'\] unexpectedly / missed \[\]\$" ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :; echo "FAIL: test_release_binaries ($OSARCH)"; exit 1
+fi
 # ---- must-fire controls: the two perturbed copies must FAIL check_dir
 if [ -z "$FLIP_SRC" ]; then
     vs_ctl_dead flipped-library-byte "no directory on this host bundles a library to flip — untestable here, not proven" || true

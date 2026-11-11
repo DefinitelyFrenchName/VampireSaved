@@ -82,6 +82,10 @@ show()  { sed 's/^/        /' "$1"; }
 fixture "$W/f1"
 vs_ctl_is bundled-lib-removed && perturb_removed "$W/f1"
 vs_ctl_is runpath-lost && perturb_runpath "$W/f1"
+case "$VS_CTL" in   # #369: the finding each perturbation must produce in section 1's own output ($W/s1.txt)
+bundled-lib-removed) WANT='cps2 needs libSDL2-2\.0\.so\.0: not in this folder and not on the host-provided list' ;;
+runpath-lost)        WANT='cps2 resolves libSDL2-2\.0\.so\.0 to /usr/lib/[^ ]*, but this folder ships it — RUNPATH does not reach the folder' ;;
+esac
 if check "$W/f1" "$LIST" "$W/s1.txt"; then
     if grep -q 'ask the host for 6 sonames, every one on the host-provided list (4 manylinux, 2 ruled)' "$W/s1.txt"; then
         echo "  1 ok: the fixture passes — 6 sonames asked of the host, 4 manylinux + 2 ruled"
@@ -132,7 +136,11 @@ if not ok:
 print("  5 ok: the list — 23 manylinux_2_39 + 14 ruled, each ruled row with its reason, no duplicate")
 PY
 
-# ---- must-fire controls: each perturbation of the fixture must FAIL, for its stated reason
+# ---- must-fire controls: each perturbation of the fixture must FAIL, for its stated reason (a plain run only, #369: a
+# mode is judged on section 1's own output)
+if [ -n "$VS_CTL" ]; then
+    [ "$fail" = 0 ] || vs_ctl_caught "$W/s1.txt" "$WANT" || :
+else
 fixture "$W/c1"; perturb_removed "$W/c1"
 if check "$W/c1" "$LIST" "$W/c1.txt"; then
     vs_ctl_dead bundled-lib-removed "the fixture without its bundled libSDL2 passed" || true; fail=1
@@ -148,6 +156,7 @@ elif grep -q 'RUNPATH does not reach the folder' "$W/c2.txt"; then
     vs_ctl_fired runpath-lost "$(grep -m1 'RUNPATH' "$W/c2.txt")"
 else
     vs_ctl_dead runpath-lost "failed for another reason: $(head -1 "$W/c2.txt")" || true; fail=1
+fi
 fi
 
 [ "$fail" = 0 ] && echo "PASS: test_host_libs" || { echo "FAIL: test_host_libs"; exit 1; }

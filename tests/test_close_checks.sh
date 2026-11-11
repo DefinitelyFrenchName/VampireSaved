@@ -51,6 +51,13 @@ if vs_ctl_is partial-as-full || vs_ctl_is expect-ignored; then CC="$(make_copy "
 python3 "$CC" --selftest > "$W/self.txt" 2>&1 || true
 sed 's/^/  /' "$W/self.txt"
 grep -q '^SELFTEST PASS$' "$W/self.txt" || { echo "FAIL: the runner's selftest"; fail=1; }
+if [ -n "${VS_CTL:-}" ] && [ "$fail" != 0 ]; then   # #369: the selftest's own finding for the copy's one perturbation
+    case "$VS_CTL" in
+        partial-as-full) WANT='^  FAIL: status refuses a partial run as the run of record$' ;;
+        expect-ignored)  WANT='^  plant +NOT AS EXPECTED +[0-9.]+s$' ;;
+    esac
+    vs_ctl_caught "$W/self.txt" "$WANT" || :
+fi
 
 if [ -z "${VS_CTL:-}" ]; then
     for c in partial-as-full expect-ignored; do

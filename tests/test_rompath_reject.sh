@@ -48,6 +48,7 @@ ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d)" || { echo "FAIL: test_rompath_reject — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+: > "$W/main.log"
 
 HELPER="$REPO/tools/rompath_reject.sh"
 DONOVAN="$REPO/tools/build_donovan.sh"
@@ -162,7 +163,7 @@ for sh in $SHELLS; do
     if out="$(helper_cases "$H" "$sh" main)"; then
         ok "$sh: exit 1 / set -e / an unset-variable demand / TERM / no final OK move rompath aside; before-pack moves nothing; success and a stale REJECTED keep rompath"
     else
-        bad "$sh: the helper cases:"; printf '%s\n' "$out"
+        bad "$sh: the helper cases:"; printf '%s\n' "$out" | tee -a "$W/main.log"   # main.log: the check's findings (#369)
     fi
 done
 
@@ -170,14 +171,23 @@ echo "== 2. the wiring of both real builders =="
 if out="$(wiring "$D" 'rm -rf "$OUTBASE/rompath"' '. "$(dirname "$0")/rompath_reject.sh"' 'rompath_reject_arm "$OUTBASE/rompath"')"; then
     ok "tools/build_donovan.sh: sourced and armed after the clear, before the pack; disarmed after every check, before OK"
 else
-    bad "tools/build_donovan.sh wiring:"; printf '%s\n' "$out"
+    bad "tools/build_donovan.sh wiring:"; printf '%s\n' "$out" | tee -a "$W/main.log"
 fi
 if out="$(wiring "$MERGED" 'rm -rf "$OUT"; mkdir -p "$OUT"' '. "$REPO/tools/rompath_reject.sh"' 'rompath_reject_arm "$OUT/rompath"')"; then
     ok "tools/build_merged.sh: sourced and armed after the clear, before the pack; disarmed after every check, before OK"
 else
-    bad "tools/build_merged.sh wiring:"; printf '%s\n' "$out"
+    bad "tools/build_merged.sh wiring:"; printf '%s\n' "$out" | tee -a "$W/main.log"
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: the mode's own finding in sections 1-2; the in-gate controls run only plainly
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_rompath_reject (control mode $VS_CTL changed no verdict)"
+    case "$VS_CTL" in
+    rename-disabled) WANT='^  FAIL  [^ ]+ exit1: exit 1 \(want 1\), rompath yes \(want no\), rompath\.REJECTED no \(want yes\)$' ;;
+    disarm-early)    WANT='^        [^ ]*/mode_donovan\.sh: the disarm does not come AFTER every verifier and the fingerprint$' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT"
+    echo "FAIL: test_rompath_reject (control mode $VS_CTL)"; exit 1
+fi
 echo "== 3. must-fire controls =="
 for n in $(vs_ctl_declared "$0"); do
     case "$n" in

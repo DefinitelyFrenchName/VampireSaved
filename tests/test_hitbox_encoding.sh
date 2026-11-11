@@ -258,9 +258,16 @@ if [ "$FREEZE_CLOCK" = 1 ]; then
 fi
 if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "both tap runs on emulated time, at their frozen game clocks"
 else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
-ia_stage test_hitbox_encoding "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || fail=1
+ia_stage test_hitbox_encoding "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" > "$W/stage.txt" || fail=1; cat "$W/stage.txt"   # #369: the mode reads its finding from here
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL (control mode: $MODE)"; exit 1; }
+    if [ "$fail" = 1 ]; then   # #369: the mode is honoured only on its own finding in the alignment check's output
+        case "$MODE" in
+        drift-clock) WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+        first-frame-skip) WANT='FAIL: the staging reference leg \(.*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+        esac
+        cat "$W/align_bad.txt" "$W/stage.txt" > "$W/main.log" 2>/dev/null
+        vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL (control mode: $MODE)"; exit 1
+    fi
     vs_ctl_left_green "$MODE" "FAIL — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

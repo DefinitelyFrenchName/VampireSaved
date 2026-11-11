@@ -32,7 +32,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d)" || { echo "FAIL: test_instr_align_unjudged — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # #369: the cases' findings
 
 IAL="$REPO/tests/lib/instr_align.sh"; CTLS="$REPO/tests/lib/controls.sh"; CLS="$REPO/tests/lib/classify.sh"
 shadow() {  # shadow <src> <marker> <sed expression> <out>: <src> with <sed expression> applied on <marker>'s line
@@ -128,6 +128,14 @@ cases() {
 cases
 
 if [ -n "${VS_CTL:-}" ]; then
+    case "$VS_CTL" in   # #369: the case each disabled line must misread, named by the cases' own FAIL row
+    nj-check-honoured)    WANT="FAIL  drift-clock, the breakpoint run wrote no ALIGN line -> HONOURED \(exit" ;;
+    nj-stage-honoured)    WANT="FAIL  first-frame-skip, the staging leg wrote no anchor -> HONOURED \(exit" ;;
+    nj-manifest-honoured) WANT="FAIL  first-frame-skip, the manifest holds no staging run -> HONOURED \(exit" ;;
+    nj-silencer-dropped)  WANT="FAIL    another mode: ia_stage's own drift leg dead \(IA_NJ=0\) printed NOT JUDGED: under control mode other-mode, " ;;
+    dead-close-honoured)  WANT="FAIL  drift-clock left the gate green -> HONOURED \(exit" ;;
+    esac
+    [ "$fail" = 0 ] || vs_ctl_caught "$W/main.log" "$WANT"
     [ "$fail" = 0 ] && echo "PASS: test_instr_align_unjudged" || echo "FAIL: test_instr_align_unjudged (control mode $VS_CTL)"; exit "$fail"
 fi
 echo "== controls: each new line disabled must misread its case"

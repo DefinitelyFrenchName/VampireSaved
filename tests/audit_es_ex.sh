@@ -74,7 +74,19 @@ decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 || { ec
 IMG="$W/vsavj_data.bin"
 # WHICH ROM AND WHICH IMAGE (14z-209, rule-checker run 2026-10-25-1294 Q1/Q4): tests/lib/pristine_vsavj.sh.
 . "$REPO/tests/lib/pristine_vsavj.sh"
-vs_pristine_vsavj "$W/pv" "$W/vsavj_data.bin" || { echo "FAIL: audit_es_ex (the ROM or the analysed image is not pristine vsavj)"; exit 1; }
+if vs_pristine_vsavj "$W/pv" "$W/vsavj_data.bin" > "$W/pv.log"; then cat "$W/pv.log"; else
+    cat "$W/pv.log"
+    # #369: a provenance mode is honoured only on its own check's FAIL line; under any other mode the run judged nothing
+    case "$MODE" in
+    foreign-image) WANT='^FAIL: the analysed image .* is not vsavj.s data view decrypted afresh from ROMDIR' ;;
+    foreign-romset) WANT='^FAIL: ROMDIR is not the pristine reference set ' ;;
+    foreign-rompath) WANT='^FAIL: MAME_ROMPATH is set ' ;;
+    foreign-mame) WANT='^FAIL: the MAME the legs run is not the pin.s release:' ;;
+    *) WANT='' ;;
+    esac
+    if [ -n "$WANT" ]; then vs_ctl_caught "$W/pv.log" "$WANT" || :; else vs_ctl_nj "the ROM provenance check failed before the gate's own checks ran"; fi
+    echo "FAIL: audit_es_ex (the ROM or the analysed image is not pristine vsavj)"; exit 1
+fi
 if [ -z "$MODE" ]; then vs_pristine_vsavj_controls "$W/pv" || { echo "FAIL: audit_es_ex (a provenance control is dead)"; exit 1; }; fi
 echo "== audit_es_ex: the vsavj ES/EX moves, named by the engine ($(git describe --always --dirty 2>/dev/null), $(hostname -s))"
 
@@ -139,8 +151,9 @@ for j in "$W"/rigs/*.json; do
         grep -qE '^(CRASH|PCWEEDS|SOFTRESET)' "$W/legs/$b/$pc/run.log" 2>/dev/null && { bad "leg $b/$pc CRASHED"; dead=1; }
     done
 done
-if [ "$n" = 0 ]; then bad "NO rig was measured (an empty run can never pass)"
-elif [ "$dead" = 0 ]; then ok "$((n * 3)) legs of $n rigs ended clean in $(( $(date +%s) - t0 )) s"; fi
+if [ "$n" = 0 ]; then bad "NO rig was measured (an empty run can never pass)"; vs_ctl_nj "no rig was measured: an empty run judged nothing"
+elif [ "$dead" = 0 ]; then ok "$((n * 3)) legs of $n rigs ended clean in $(( $(date +%s) - t0 )) s"
+else vs_ctl_nj "a leg did not complete or CRASHED: its truncated trace moves the event lines, which is not a finding"; fi
 for j in "$W"/rigs/*.json; do
     b="$(basename "$j" .json)"
     [ -d "$W/legs/$b" ] || continue
@@ -178,7 +191,7 @@ fi
 want_of "$W/want.tsv"
 vs_ctl_is swapped-move && { swap_move "$W/want.tsv" "$W/want.sw"; mv "$W/want.sw" "$W/want.tsv"; }
 if cmp -s "$W/got.tsv" "$W/want.tsv"; then ok "$(wc -l < "$W/got.tsv" | tr -d ' ') event lines equal the frozen ones"
-else bad "the events differ from $EXP:"; diff "$W/want.tsv" "$W/got.tsv" | head -12 | sed 's/^/        /'; fi
+else bad "the events differ from $EXP:"; diff "$W/want.tsv" "$W/got.tsv" > "$W/events.diff"; head -12 "$W/events.diff" | sed 's/^/        /'; fi
 
 echo "== 4. structure, from the values"
 python3 - "$W/rows.jsonl" <<'PY' || fail=1
@@ -203,7 +216,16 @@ sys.exit(bad)
 PY
 
 if [ -n "$MODE" ] && [ "$MODE" != drift-clock ] && [ "$MODE" != first-frame-skip ]; then
-    if [ "$fail" = 1 ]; then vs_ctl_fired "$MODE" "the gate FAILED on its perturbed input (mode)"; echo "FAIL"; exit 1; fi
+    if [ "$fail" = 1 ]; then   # #369: honoured only on the mode's own finding in section 3's compare (the frozen-line diff)
+        TB="$(printf '\t')"
+        case "$MODE" in
+        unsigned-offsets) WANT="^> SA${TB}(far|near)${TB}(236PP|623PP|41236START)${TB}" ;;   # ES Big Breath, ES Big Blow or Big Banana off its frozen line
+        empty-bank) WANT="^> DE${TB}[^${TB}]+${TB}[^${TB}]+${TB}FIRED-NO-STOCK${TB}" ;;
+        swapped-move) WANT="^< $(head -1 "$W/want.tsv" | sed 's/[][\.*^$(){}?+|]/\\&/g')\$" ;;   # the copy's swapped first line
+        *) WANT='' ;;
+        esac
+        vs_ctl_caught "$W/events.diff" "$WANT" || :; echo "FAIL"; exit 1
+    fi
     echo "REFUSED: mode $MODE — its perturbation did not make the gate fail: a dead mode, not a verdict"; exit 3
 fi
 
@@ -224,9 +246,15 @@ if [ "$FREEZE_CLOCK" = 1 ]; then
 fi
 if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "every probe leg on emulated time, at its frozen game clock"
 else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
-ia_stage audit_es_ex "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 2 "$W/st" "$MODE" || fail=1
+ia_stage audit_es_ex "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 2 "$W/st" "$MODE" > "$W/stage.txt" || fail=1
+cat "$W/stage.txt"
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL (control mode: $MODE)"; exit 1; }
+    # #369: drift-clock on the frozen game-clock comparison, first-frame-skip on the staging leg against replay.lua
+    case "$MODE" in
+    drift-clock) CF="$W/align_bad.txt"; WANT='game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+    *) CF="$W/stage.txt"; WANT='FAIL: the staging reference leg \([^)]*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+    esac
+    [ "$fail" = 1 ] && { vs_ctl_caught "$CF" "$WANT" || :; echo "FAIL (control mode: $MODE)"; exit 1; }
     vs_ctl_left_green "$MODE" "FAIL — control mode $MODE left the gate green"
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi

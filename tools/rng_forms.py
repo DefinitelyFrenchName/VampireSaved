@@ -168,6 +168,8 @@ def main():
         if not diff:
             ok(f"all {len(rows)} rows equal the frozen expectation")
 
+    if a.control:   # #369 (14z-225): under a mode the gate judges the mode on its own finding; the in-tool controls are plain-run only
+        return 1 if fails else 0
     print("== 5. controls")
     for n in ("ident-flipped", "baseline-moved", "form-inert"):
         print(f"CONTROL FIRED: {n} — the perturbed copy is caught" if fired.get(n) else f"CONTROL DEAD: {n} — the perturbed copy was not caught")

@@ -36,18 +36,21 @@ fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 floor="$(grep -v '^#' "$FLOOR_FILE" | tr -d ' \n')"
 case "$floor" in ''|*[!0-9]*) echo "FAIL: $FLOOR_FILE carries no integer floor"; exit 1;; esac
 
-if vs_ctl_is planted-prologue; then
-    echo "== MODE planted-prologue: the historical caller through the extractor"
-    $TOOL --plant --floor "$floor"; rc=$?
-    # the tool's own exit is the verdict: 1 means the plant was reported (the control fired)
-    [ "$rc" -eq 0 ] && vs_ctl_left_green planted-prologue "FAIL: the planted reference passed"
-    echo "FAIL (mode): as required — the plant was reported"; exit 1
-fi
-if vs_ctl_is empty-census; then
-    echo "== MODE empty-census: no files through the census"
-    $TOOL --plant-empty --floor "$floor"; rc=$?
-    [ "$rc" -eq 0 ] && vs_ctl_left_green empty-census "FAIL: an empty census passed the floor"
-    echo "FAIL (mode): as required — the empty census failed its floor"; exit 1
+if [ -n "${VS_CTL:-}" ]; then   # #369: the mode's own finding, from the tool's output, is the evidence
+    W="$(mktemp -d)" || { echo "FAIL: test_module_refs — mktemp -d failed"; exit 2; }
+    trap 'rm -rf "$W"' EXIT
+    case "$VS_CTL" in
+        planted-prologue) echo "== MODE planted-prologue: the historical caller through the extractor"; ARG=--plant
+            WANT='^  UNRESOLVED <plant e01ae8de\^:tools/vanilla_join_rig\.py>:110  name_moves\.PROLOGUE$' ;;
+        empty-census) echo "== MODE empty-census: no files through the census"; ARG=--plant-empty
+            WANT=' 0 reference\(s\) over 0 files is below the floor of [0-9]+$' ;;
+    esac
+    $TOOL "$ARG" --floor "$floor" > "$W/main.log" 2>&1; rc=$?
+    cat "$W/main.log"
+    # the tool's own exit is the verdict: 0 means the perturbation passed the census
+    [ "$rc" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: the $VS_CTL perturbation passed the census"
+    vs_ctl_caught "$W/main.log" "$WANT"
+    echo "FAIL (mode): as required — the $VS_CTL perturbation was reported"; exit 1
 fi
 
 echo "== 1. the census, floor $floor (from $FLOOR_FILE)"

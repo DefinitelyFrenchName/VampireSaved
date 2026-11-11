@@ -76,6 +76,7 @@ for t in huitzil:10 donovan:13; do
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_landing_sound (the hits)"; exit 1; }
 echo "== 2. the first landing by ear: native against ours (and the pre-swap build, the control)"
+: > "$W/main.log"
 for n in huitzil donovan; do
     land="$(sed -n 's/^LANDING //p' "$W/hits_$n.txt")"; eval "LAND_$n=$land"
     leg $n native wav $((land + 120)) & leg $n ours wav $((land + 120)) & leg $n ctl wav $((land + 120)) &
@@ -84,7 +85,8 @@ wait
 OURS=ours; vs_ctl_is pre-swap-build && OURS=ctl
 for n in huitzil donovan; do
     eval "land=\$LAND_$n"; echo "  -- $n"
-    if python3 tools/landing_sound_ab.py same "$W/$n.native.wav" "$W/$n.$OURS.wav" "$land" $((land + 120)); then eval "SAME_$n=0"; else eval "SAME_$n=1"; fail=1; fi
+    if python3 tools/landing_sound_ab.py same "$W/$n.native.wav" "$W/$n.$OURS.wav" "$land" $((land + 120)) > "$W/same_$n.txt"; then eval "SAME_$n=0"; else eval "SAME_$n=1"; fail=1; fi
+    cat "$W/same_$n.txt"; cat "$W/same_$n.txt" >> "$W/main.log"   # #369: the check's findings, for vs_ctl_caught
 done
 # THE SHEET (#291, D2): with SHEET_OUT set, each tenant's two read-tap legs as this run played them, re-run under their
 # own read tap and proven on the site's reads they logged, and the first landing's two captures as the ruled clips.
@@ -118,7 +120,8 @@ if sheet_on && [ -z "${VS_CTL:-}" ]; then
     done
 fi
 if vs_ctl_is pre-swap-build; then
-    [ "$fail" = 1 ] && { echo "FAIL: audit_landing_sound (control mode: the pre-swap build's landing stands out)"; exit 1; }
+    [ "$fail" = 1 ] && { vs_ctl_caught "$W/main.log" "MISMATCH the landing window differs by over 4x the control's difference \\([0-9]+ vs [0-9]+\\)\$"
+        echo "FAIL: audit_landing_sound (control mode: the pre-swap build's landing stands out)"; exit 1; }
     vs_ctl_left_green "pre-swap-build" "FAIL: audit_landing_sound — the pre-swap build read as the same landing"
 fi
 echo "== 3. control: the build before the swap must FAIL the same check, for both tenants"

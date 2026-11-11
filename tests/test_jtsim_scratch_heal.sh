@@ -61,6 +61,7 @@ trap 'rm -rf "$WORK"' EXIT
 S="$WORK/scratch"
 VS_SHARES_DIR="$WORK/shares"; export VS_SHARES_DIR   # the tool's host claim (#370) taken in this run's own directory
 fail=0
+bad() { echo "  FAIL: $*" | tee -a "$WORK/main.log"; fail=1; }   # #369: the main check's findings
 missing() { git -C "$S" ls-files --deleted | wc -l | tr -d ' '; }
 hollow() {  # delete the first N tracked files, macros.def among them — the reaper's shape
     git -C "$S" ls-files | head -200 > "$WORK/victims"
@@ -76,7 +77,7 @@ a = s.index("# ---------------------------------------------------- 1b. HEAL")
 b = s.index('if [ "$ENSURE" = 1 ]; then', a)
 open(p, "w").write(s[:a] + s[b:])
 PY
-grep -q "1b. HEAL" "$CTL" && { echo "  FAIL: the control still carries the heal"; fail=1; }
+grep -q "1b. HEAL" "$CTL" && { bad "the control still carries the heal"; }
 # THE SECOND SHADOW TOOL (#232): only the submodule heal cut, the top-level heal kept
 CTL2="$(shadow_tool "$WORK/ctl2" mister_mra.sh)"
 python3 - "$CTL2" <<'PY'
@@ -86,8 +87,8 @@ a = s.index("sub_ok() {  # sub_ok <path>")
 b = s.index('if [ "$ENSURE" = 1 ]; then', a)
 open(p, "w").write(s[:a] + s[b:])
 PY
-grep -q "sub_ok" "$CTL2" && { echo "  FAIL: the submodule control still carries the submodule heal"; fail=1; }
-grep -q "1b. HEAL" "$CTL2" || { echo "  FAIL: the submodule control lost the top-level heal"; fail=1; }
+grep -q "sub_ok" "$CTL2" && { bad "the submodule control still carries the submodule heal"; }
+grep -q "1b. HEAL" "$CTL2" || { bad "the submodule control lost the top-level heal"; }
 # THE EXECUTABLE FORM: under CONTROL=heal-removed section 2 runs the shadow
 # tool — and must FAIL (the clone stays hollow).
 TOOL=tools/mister_mra.sh
@@ -103,32 +104,43 @@ a = s.index("# ---------------------------------------------------- 0b. THE LOCK
 b = s.index('PIN="$(sed', a)
 open(p, "w").write(s[:a] + "unlock() { :; }\n" + s[b:])
 PY
-grep -q "0b. THE LOCK" "$CTL3" && { echo "  FAIL: the lock control still carries the lock"; fail=1; }
+grep -q "0b. THE LOCK" "$CTL3" && { bad "the lock control still carries the lock"; }
 TOOL6=tools/mister_mra.sh
 vs_ctl_is lock-removed && TOOL6="sh $CTL3"
+case "$VS_CTL" in   # #369: the finding each shadow tool must produce in its own section (CWANT: section 5 owns WANT)
+heal-removed)           CWANT="FAIL: [0-9]+ still missing\$" ;;
+lock-removed)           CWANT="FAIL: the tool ran while pid [0-9]+ held the scratch\$" ;;
+submodule-heal-removed) CWANT="FAIL: the reaped submodule stays broken\$" ;;
+esac
 
 echo "== 1. a fresh scratch is cloned and pinned =="
-JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure on a fresh dir"; fail=1; }
-[ "$(git -C "$S" rev-parse HEAD)" = "$PIN" ] && echo "  ok: HEAD is the pin $PIN" || { echo "  FAIL: HEAD is not the pin"; fail=1; }
-[ "$(missing)" = 0 ] && echo "  ok: no tracked file missing" || { echo "  FAIL: $(missing) missing on a fresh clone"; fail=1; }
+JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { bad "ensure on a fresh dir"; }
+[ "$(git -C "$S" rev-parse HEAD)" = "$PIN" ] && echo "  ok: HEAD is the pin $PIN" || { bad "HEAD is not the pin"; }
+[ "$(missing)" = 0 ] && echo "  ok: no tracked file missing" || { bad "$(missing) missing on a fresh clone"; }
 
 echo "== 2. the reaper's shape (.git intact, tracked files gone) is HEALED IN PLACE =="
 hollow
 n="$(missing)"; [ "$n" -gt 100 ] && echo "  ok: hollowed — $n tracked files missing, macros.def among them" \
-                                 || { echo "  FAIL: could not hollow the clone"; fail=1; }
+                                 || { bad "could not hollow the clone"; }
 reflog_before="$(git -C "$S" reflog | wc -l | tr -d ' ')"
-JTSIM_SCRATCH="$S" $TOOL --ensure-scratch --quiet || { echo "  FAIL: ensure on a hollow clone"; fail=1; }
+st2=0; JTSIM_SCRATCH="$S" $TOOL --ensure-scratch --quiet > "$WORK/ens2.log" 2>&1 || st2=$?; cat "$WORK/ens2.log"
+if vs_ctl_is heal-removed && { [ "$st2" != 0 ] || grep -qF "$CTL:" "$WORK/ens2.log"; }; then   # #369: a dead copy is no finding
+    vs_ctl_nj "the heal-less copy did not run to its end (exit $st2, or a shell error naming the copy), so a hollow clone after it is not the heal's absence"
+    echo "FAIL: jtsim scratch heal"; exit 1
+fi
+[ "$st2" = 0 ] || { bad "ensure on a hollow clone"; }
 [ "$(missing)" = 0 ] && [ -f "$S/cores/cps2w/cfg/macros.def" ] \
-    && echo "  ok: healed — 0 missing, macros.def back" || { echo "  FAIL: $(missing) still missing"; fail=1; }
+    && echo "  ok: healed — 0 missing, macros.def back" || { bad "$(missing) still missing"; }
 [ "$(git -C "$S" reflog | wc -l | tr -d ' ')" = "$reflog_before" ] \
-    && echo "  ok: healed IN PLACE (reflog untouched — no re-clone)" || { echo "  FAIL: the clone was re-created, not healed"; fail=1; }
+    && echo "  ok: healed IN PLACE (reflog untouched — no re-clone)" || { bad "the clone was re-created, not healed"; }
 
 echo "== 3. the object store hollowed too -> RE-CLONE, at the pin =="
 hollow; rm -rf "$S/.git/objects/pack"
-JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure on a store-hollow clone"; fail=1; }
+JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { bad "ensure on a store-hollow clone"; }
 [ "$(missing)" = 0 ] && [ -f "$S/cores/cps2w/cfg/macros.def" ] && [ "$(git -C "$S" rev-parse HEAD)" = "$PIN" ] \
-    && echo "  ok: re-cloned — complete and at the pin" || { echo "  FAIL: not recovered from a hollow store"; fail=1; }
+    && echo "  ok: re-cloned — complete and at the pin" || { bad "not recovered from a hollow store"; }
 
+if [ -z "$VS_CTL" ]; then   # #369: the in-gate controls run in a plain run only (here and in sections 5 and 6)
 echo "== 4. MUST-FIRE CONTROL: the tool WITHOUT the heal leaves the hollow clone hollow =="
 hollow
 n="$(missing)"
@@ -136,9 +148,10 @@ JTSIM_SCRATCH="$S" sh "$CTL" --ensure-scratch --quiet || true
 [ "$(missing)" = "$n" ] && [ "$n" -gt 100 ] \
     && vs_ctl_fired heal-removed "without the heal, $n files stay missing" \
     || { vs_ctl_dead heal-removed "$(missing) missing after a heal-less ensure"; fail=1; }
+fi
 
 echo "== 5. a REAPED SUBMODULE (#232: gitdir HEAD, gitfile and files gone) is HEALED to the recorded commit =="
-JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure before the submodule case"; fail=1; }
+JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { bad "ensure before the submodule case"; }
 SM=modules/fx68k; SG="$S/.git/modules/modules/fx68k"
 WANT="$(git -C "$S" ls-tree HEAD "$SM" | awk '{print $3}')"
 git -C "$S" config submodule.modules/fx68k.url "$REPO/emu/jtcores/modules/fx68k"
@@ -149,19 +162,25 @@ reap_sub() {  # the shape the 03:35 maintenance left on 2026-10-06
     (cd "$S/$SM" && xargs rm -f < "$WORK/subvictims")
     rm -f "$SG/HEAD" "$S/$SM/.git"
 }
-sub_good && echo "  ok: $SM initialised from the local checkout at $WANT" || { echo "  FAIL: could not initialise $SM locally"; fail=1; }
+sub_good && echo "  ok: $SM initialised from the local checkout at $WANT" || { bad "could not initialise $SM locally"; }
 reap_sub
-sub_good && { echo "  FAIL: could not reap $SM"; fail=1; } || echo "  ok: reaped — HEAD, gitfile and $(wc -l < "$WORK/subvictims" | tr -d ' ') files gone"
-JTSIM_SCRATCH="$S" $TOOL5 --ensure-scratch --quiet || true
+sub_good && { bad "could not reap $SM"; } || echo "  ok: reaped — HEAD, gitfile and $(wc -l < "$WORK/subvictims" | tr -d ' ') files gone"
+st5=0; JTSIM_SCRATCH="$S" $TOOL5 --ensure-scratch --quiet > "$WORK/ens5.log" 2>&1 || st5=$?; cat "$WORK/ens5.log"
+if vs_ctl_is submodule-heal-removed && { [ "$st5" != 0 ] || grep -qF "$CTL2:" "$WORK/ens5.log"; }; then   # #369: a dead copy is no finding
+    vs_ctl_nj "the submodule-heal-less copy did not run to its end (exit $st5, or a shell error naming the copy), so a broken submodule after it is not the heal's absence"
+    echo "FAIL: jtsim scratch heal"; exit 1
+fi
 if vs_ctl_is submodule-heal-removed; then
-    sub_good && echo "  ok (mode): healed anyway" || { echo "  FAIL: the reaped submodule stays broken"; fail=1; }
+    sub_good && echo "  ok (mode): healed anyway" || { bad "the reaped submodule stays broken"; }
 else
-    sub_good && echo "  ok: healed — at $WANT, gitfile back, nothing deleted" || { echo "  FAIL: $SM not healed"; fail=1; }
-    [ "$(git -C "$S" rev-parse HEAD)" = "$PIN" ] && echo "  ok: the superproject is still at the pin" || { echo "  FAIL: the superproject moved"; fail=1; }
+    sub_good && echo "  ok: healed — at $WANT, gitfile back, nothing deleted" || { bad "$SM not healed"; }
+    [ "$(git -C "$S" rev-parse HEAD)" = "$PIN" ] && echo "  ok: the superproject is still at the pin" || { bad "the superproject moved"; }
+    if [ -z "$VS_CTL" ]; then
     reap_sub
     JTSIM_SCRATCH="$S" sh "$CTL2" --ensure-scratch --quiet >/dev/null 2>&1 || true
     sub_good && { vs_ctl_dead submodule-heal-removed "the reaped submodule healed without the submodule heal"; fail=1; } \
              || vs_ctl_fired submodule-heal-removed "without the submodule heal $SM stays broken (HEAD $(git -C "$S/$SM" rev-parse --short HEAD 2>/dev/null || echo none), want ${WANT%%${WANT#???????}})"
+    fi
 fi
 
 echo "== 6. THE LOCK (#299; the jtsim-scratch host claim since #370): a live holder is waited for, a dead one taken over, none left behind =="
@@ -169,22 +188,23 @@ LOCK="$VS_SHARES_DIR/jtsim-scratch.flock"
 sh -c '. "$1/tests/lib/shares.sh"; vs_shares_claim section6 jtsim-scratch; exec sleep 120' _ "$REPO" > /dev/null 2>&1 & HOLDER=$!
 _i=0; while [ "$(cut -d' ' -f1 "$LOCK" 2>/dev/null)" != "$HOLDER" ] && [ "$_i" -lt 100 ]; do sleep 0.1; _i=$((_i + 1)); done
 if MRA_LOCK_WAIT=2 JTSIM_SCRATCH="$S" $TOOL6 --ensure-scratch --quiet > "$WORK/lock6.log" 2>&1; then
-    echo "  FAIL: the tool ran while pid $HOLDER held the scratch"; fail=1
+    bad "the tool ran while pid $HOLDER held the scratch"
 else
     grep -q "held on this host by $HOLDER section6 .*waited 2s of 2)" "$WORK/lock6.log" && [ "$(cut -d' ' -f1 "$LOCK" 2>/dev/null)" = "$HOLDER" ] \
         && echo "  ok: held by a live pid, the run waited 2 s and gave up; the holder's lock untouched" \
-        || { echo "  FAIL: refused, but not on the lock: $(tail -1 "$WORK/lock6.log")"; fail=1; }
+        || { bad "refused, but not on the lock: $(tail -1 "$WORK/lock6.log")"; }
 fi
-if ! vs_ctl_is lock-removed; then
+if [ -z "$VS_CTL" ]; then
     if MRA_LOCK_WAIT=2 JTSIM_SCRATCH="$S" sh "$CTL3" --ensure-scratch --quiet >/dev/null 2>&1; then
         vs_ctl_fired lock-removed "without the lock the tool ran through a scratch pid $HOLDER held"
     else vs_ctl_dead lock-removed "the lock-less copy refused a held scratch"; fail=1; fi
 fi
 kill -9 "$HOLDER" 2>/dev/null; wait "$HOLDER" 2>/dev/null || true
-MRA_LOCK_WAIT=3 JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure after the holder died"; fail=1; }
+MRA_LOCK_WAIT=3 JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { bad "ensure after the holder died"; }
 if MRA_LOCK_WAIT=0 JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet > "$WORK/lock6b.log" 2>&1; then
     echo "  ok: the holder SIGKILLed, its token freed for the next run, and nothing left holding it after that run"
-else echo "  FAIL: the token is still held after the run: $(tail -1 "$WORK/lock6b.log")"; fail=1; fi
+else bad "the token is still held after the run: $(tail -1 "$WORK/lock6b.log")"; fi
 
+if [ -n "$VS_CTL" ] && [ "$fail" -ne 0 ]; then vs_ctl_caught "$WORK/main.log" "$CWANT" || :; fi   # #369: the mode's own finding
 if [ "$fail" -eq 0 ]; then echo "PASS: a hollowed jtsim scratch clone is healed, re-cloned when its store is gone, the scratch is locked, and the controls fire"
 else echo "FAIL: jtsim scratch heal"; exit 1; fi

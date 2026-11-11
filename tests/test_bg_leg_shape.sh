@@ -58,13 +58,18 @@ fi
 
 echo "1. the audited tests/ tree carries no unsafe backgrounded emulator leg"
 if out1="$(python3 tools/audit_bg_leg_shape.py "$AUD" 2>&1)"; then
+    printf '%s\n' "$out1" > "$T/main.log"
     printf '%s\n' "$out1" | sed 's/^/  /'
     echo "  ok: no RISKY group, no UNRESOLVED group"
 else
+    printf '%s\n' "$out1" > "$T/main.log"
     printf '%s\n' "$out1" | sed 's/^/  /'
     echo "  FAIL: see the RISKY/UNRESOLVED lines above"; rc=1
+    # #369: the auditor's own finding on the gate whose set +e the mode removed
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$T/main.log" "/mode/$(basename "$PSRC" | sed 's/[.]/[.]/g'):[0-9]+ — backgrounded emulator leg captures [\$][?] under set -e with no .set [+]e. in the group" || :
 fi
 
+if [ -z "${VS_CTL:-}" ]; then   # the in-gate control: a plain run only (#369)
 echo "2. must-fire control: the same auditor over that tree with one real gate's set +e removed"
 perturb "$T/bad"
 if python3 tools/audit_bg_leg_shape.py "$T/bad" > "$T/bad.log" 2>&1; then
@@ -72,6 +77,7 @@ if python3 tools/audit_bg_leg_shape.py "$T/bad" > "$T/bad.log" 2>&1; then
     rc=1
 else
     vs_ctl_fired plus-e-removed "$(basename "$PSRC") with its set +e deleted -> $(command grep 'RISKY:' "$T/bad.log" | tr -d ' ')"
+fi
 fi
 
 echo

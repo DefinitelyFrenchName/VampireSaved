@@ -46,7 +46,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 EXP=tests/expected/gate_follows.tsv
 W="$(mktemp -d "${TMPDIR:-/tmp}/gfol.XXXXXX")" || { echo "FAIL: test_gate_follows — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # #369: the main check's findings
 
 census() { python3 tools/gate_follows.py --root "$1" 2>"$W/census.err" | cut -f1,2 | sort; }   # stderr kept: a mode prints a crash's (#310)
 cls() { awk -F'\t' -v c="$1" '$1==c{print $2}' "$2" | sort; }
@@ -156,14 +156,14 @@ echo "== 2b. no gate declares all of tests/replays/ without composing a path the
 if python3 tools/gate_follows.py --root "$root" --overwide > "$W/ow.txt" 2> "$W/ow.err"; then
     ok "$(cat "$W/ow.err")"; ow_red=""
 else
-    bad "$(cat "$W/ow.err")"; sed 's/^/        /' "$W/ow.txt" | head -12; ow_red=1
+    bad "$(cat "$W/ow.err")"; sed 's/^/        /' "$W/ow.txt" | head -12; ow_red=1; cat "$W/ow.txt" >> "$W/main.log"
 fi
 
 echo "== 2. the reconciliation: no declaration narrower than its gate's text, its widening rules or its own description"
 if python3 tools/gate_follows.py --root "$root" --reconcile > "$W/rec.txt" 2> "$W/rec.err"; then
     ok "$(cat "$W/rec.err")"; rec_red=""
 else
-    bad "$(cat "$W/rec.err")"; sed 's/^/        /' "$W/rec.txt" | head -12; rec_red=1
+    bad "$(cat "$W/rec.err")"; sed 's/^/        /' "$W/rec.txt" | head -12; rec_red=1; cat "$W/rec.txt" >> "$W/main.log"
 fi
 
 # THE MODE'S VERDICT (#310 group 6, 14z-215): the checks ran on a PARTIAL copy of the tree, so a red counts as this
@@ -195,8 +195,13 @@ if [ -n "$VS_CTL" ]; then
     if [ -n "$other" ]; then
         echo "NOT JUDGED: $VS_CTL — the copy is red on something that is not this mode's own finding ($other), so its FAIL is not the perturbation caught"
         echo "FAIL"; exit 1
-    elif [ -n "$own" ]; then
-        vs_ctl_fired "$VS_CTL" "$own, and nothing else on the copy is red (mode)"; echo "FAIL"; exit 1
+    elif [ -n "$own" ]; then   # #369: the CAUGHT line comes from the check's own row, the ERE naming this mode's finding
+        case "$VS_CTL" in
+        dropped-declaration) WANT="FAIL  a frozen declaring gate LOST its declaration: $g ?\$" ;;
+        replays-rewidened) WANT="^$g	OVERWIDE	tests/replays/\$" ;;
+        *) WANT="^$g	UNCOVERED	(.*[ ])?$_mc:" ;;
+        esac
+        vs_ctl_caught "$W/main.log" "$WANT"; echo "FAIL"; exit 1
     elif [ "$fail" = 0 ]; then
         vs_ctl_left_green "$VS_CTL" "FAIL: test_gate_follows — control mode $VS_CTL: the perturbed $g.sh was not named"
     else

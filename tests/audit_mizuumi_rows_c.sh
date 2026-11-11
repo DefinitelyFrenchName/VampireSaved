@@ -276,7 +276,8 @@ done < "$W/jobs"
 echo "  ok    $(wc -l < "$W/jobs" | tr -d ' ') legs complete"
 
 echo "== 2. the checks"
-python3 - "$W" "$MODE" "$REPO" <<'PY'
+ML="$W/main${MODE:+.$MODE}.log"   # #369: the checks' findings, for vs_ctl_caught (per mode: the in-gate controls re-run this gate in $W)
+python3 - "$W" "$MODE" "$REPO" > "$ML" <<'PY'
 import sys
 W, mode, REPO = sys.argv[1], sys.argv[2], sys.argv[3]
 sys.path.insert(0, f"{REPO}/tools")
@@ -463,6 +464,25 @@ print(f"  info  the Finishing Shower input's first button (MP) lands a normal fi
 sys.exit(1 if bad else 0)
 PY
 rc=$?
+cat "$ML"
+if [ -n "$MODE" ]; then
+    case "$MODE" in   # #369: the finding each perturbation must produce
+        lock-unpoked) WANT='^  FAIL  F5 hs_up: .*$' ;;
+        exit-swapped) WANT='^  FAIL  F2 hs_up: first in-match \+0x37F write \[\(.* is 8 from 0x0403ee, written in the headsit$' ;;
+        p2-side) WANT='^  FAIL  (F2 hs_[a-z0-9]+: first in-match \+0x37F write \[\] |D2 m_df: \+0xB2 writes P1 ).*$' ;;
+        headsit-blind) WANT='^  FAIL  F1 crouch_p2: .*$' ;;
+        countdown-shifted) WANT='^  FAIL  F3 hs_(p2|up): .*\(want \[8, 7, 6, 5, 4, 3, 2, 1\]\)$' ;;
+        row-swapped) WANT='^  FAIL  G1 jbc_rd: .*$' ;;
+        es-blind) WANT='^  FAIL  G1 jbc_lp: .*$' ;;
+        readback-unpoked) WANT='^  FAIL  G4 readback: .*$' ;;
+        hiword-dropped) WANT='^  FAIL  G1 jbc_[a-z_]+: \+0x364 writes at f\[.*\]: .*$' ;;
+        decode-rotated|poke-ignored) WANT='^  FAIL  D4 Morrigan.s hit .*$' ;;
+        attribution-swapped) WANT='^  FAIL  D3 m_read: .*$' ;;
+        projectiles-halved|projectile-reads-p1) WANT='^  FAIL  (D8 Soul Fist|D9 Finishing Shower missiles): .*$' ;;
+    esac
+    [ "$rc" = 0 ] && vs_ctl_left_green "$MODE" "FAIL: audit_mizuumi_rows_c — control mode $MODE left the gate green"
+    vs_ctl_caught "$ML" "$WANT"; echo "FAIL: audit_mizuumi_rows_c (control mode $MODE)"; exit 1
+fi
 [ "$rc" = 0 ] || { echo "FAIL: audit_mizuumi_rows_c"; exit 1; }
 if [ -z "$MODE" ]; then
     # THE CONTROLS: each declared mode re-runs the checks on the SAME legs (no new MAME run) and must FAIL

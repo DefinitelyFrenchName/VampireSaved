@@ -158,6 +158,9 @@ A="$($CF "$T/a" --list-anchors --fields "$F" 2>/dev/null | tr '\n' ' ')"
 # 3 anchor mode absorbs skew (7 frames here)
 if $CF "$T/a" "$SIDE_B" --fields "$F" --follow 0,10 --label-a mame --label-b sim > "$T/o1" 2>&1
 then ok "3 skewed sides agree at the anchor"; else bad "3 skewed sides disagreed:"; sed 's/^/      /' "$T/o1"; fi
+cat "$T/o1" >> "$T/main.log"   # #369: check 3's output, a main check's findings
+
+if [ -z "${VS_CTL:-}" ]; then   # #369: the in-gate controls 2 and 4 run in a plain run only
 
 # 2 must-fire: a byte-swapped side is not 68k order, so the predicate dies
 if $CF "$T/a" "$T/swap" --fields "$F" --follow 0 > "$T/o2" 2>&1
@@ -169,6 +172,7 @@ if $CF "$T/a" "$T/bad" --fields "$F" --follow 0 > "$T/o3" 2>&1
 then vs_ctl_dead perturbed-field "perturbed timer compared equal"; bad "4"
 else grep -q "MISMATCH.*timer" "$T/o3" && { vs_ctl_fired perturbed-field "timer mismatch reported"; ok "4 control fired"; } \
                                        || { vs_ctl_dead perturbed-field "wrong failure"; bad "4 wrong failure:"; sed 's/^/      /' "$T/o3"; }; fi
+fi
 
 # 5 the runner's rule-7 / scratch refusals
 out="$(ROMDIR="$T" "$REPO/tools/run_sim_jtcps2.sh" "$REPO/tests/replays/05_timeout_idle.rpl" \
@@ -244,12 +248,14 @@ PATCH="$REPO/emu/jtcores-patches/0002-jtframe-sim-wramdump.patch"
 awk '{ if (!done && $0 ~ /^\+#ifdef _JTFRAME_SIM_WRAMDUMP$/) { print "+    int leak=1;"; done=1 } print }' \
     "$PATCH" > "$T/leak.patch"
 CHECK_PATCH="$PATCH"; vs_ctl_is unguarded-line && CHECK_PATCH="$T/leak.patch"
-if python3 "$T/guardcheck.py" "$CHECK_PATCH"; then
-    ok "6 every added code line is inside #ifdef _JTFRAME_SIM_WRAMDUMP"
+if python3 "$T/guardcheck.py" "$CHECK_PATCH" > "$T/o6m" 2>&1; then
+    cat "$T/o6m"; ok "6 every added code line is inside #ifdef _JTFRAME_SIM_WRAMDUMP"
 else
-    bad "6 the harness patch adds code OUTSIDE the macro guard"
+    cat "$T/o6m"; bad "6 the harness patch adds code OUTSIDE the macro guard"
 fi
-if python3 "$T/guardcheck.py" "$T/leak.patch" > "$T/o6" 2>&1
+cat "$T/o6m" >> "$T/main.log"   # #369: check 6's output, a main check's findings
+if [ -n "${VS_CTL:-}" ]; then :   # #369: the in-gate control 6c runs in a plain run only
+elif python3 "$T/guardcheck.py" "$T/leak.patch" > "$T/o6" 2>&1
 then vs_ctl_dead unguarded-line "an unguarded line passed the checker"; bad "6c"
 else vs_ctl_fired unguarded-line "an unguarded added line is rejected"; ok "6c control fired"; fi
 
@@ -470,5 +476,14 @@ if [ -f "$P10" ]; then
     fi
 fi
 
+if [ "$fail" != 0 ] && [ -n "${VS_CTL:-}" ]; then   # #369: honoured only on the mode's own finding in checks 3 and 6
+    case "$VS_CTL" in
+        byte-swapped-side) WANT='no anchor found \(mame: 1, sim: 0\)' ;;
+        perturbed-field) WANT='MISMATCH anchor0\+0 .* timer \$FF8109' ;;
+        unguarded-line) WANT='^ *unguarded: int leak=1;$' ;;
+    esac
+    vs_ctl_caught "$T/main.log" "$WANT" || :
+fi
 rm -rf "$T"
-[ $fail = 0 ] && echo "PASS test_sim_wram_contract" || { echo "FAIL test_sim_wram_contract"; exit 1; }
+if [ $fail = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL test_sim_wram_contract"; echo "PASS test_sim_wram_contract"
+else echo "FAIL test_sim_wram_contract"; exit 1; fi

@@ -93,6 +93,14 @@ control() {  # control <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log"
     fi
 }
-for n in $(vs_ctl_declared "$0"); do control "$n"; done
+[ -n "$VS_CTL" ] || for n in $(vs_ctl_declared "$0"); do control "$n"; done   # #369: the in-gate controls, plain run only
 
-if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL"; echo "PASS"; else
+    # #369: a mode is honoured only on its own finding in the main check's output: the guide its perturbation stales
+    case "$VS_CTL" in
+        rule-text-changed) WANT='FAIL  \.claude/skills/mame-fbneo-instruments/GUIDE\.md is STALE against ' ;;
+        incident-changed|guide-hand-edited) WANT='FAIL  \.claude/skills/mister-jtframe-core/GUIDE\.md is STALE against ' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "$VS_CTL" ] || vs_ctl_caught "$W/tree.log" "$WANT" || :
+    echo "FAIL"; exit 1; fi

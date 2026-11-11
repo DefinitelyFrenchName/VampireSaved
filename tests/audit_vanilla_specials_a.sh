@@ -96,7 +96,18 @@ decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 || { ec
 IMG="$W/vsavj_data.bin"
 # WHICH ROM AND WHICH IMAGE (14z-209, rule-checker run 2026-10-25-1294 Q1/Q4): tests/lib/pristine_vsavj.sh.
 . "$REPO/tests/lib/pristine_vsavj.sh"
-vs_pristine_vsavj "$W/pv" "$W/vsavj_data.bin" || { echo "FAIL: audit_vanilla_specials_a (the ROM or the analysed image is not pristine vsavj)"; exit 1; }
+# #369: the check's lines land in a file, so a provenance mode reads its own finding there (the four checks of
+# tests/lib/pristine_vsavj.sh, each mode's FAIL line as _pv_check prints it)
+case "$MODE" in
+foreign-image) CTL_WANT="^FAIL: the analysed image .*/ctl/foreign_data\.bin \(sha1 [0-9a-f]+\) is not vsavj's data view decrypted afresh from ROMDIR" ;;
+foreign-romset) CTL_WANT='^FAIL: ROMDIR is not the pristine reference set \(tools/audit_roms.py against docs/checksums.txt\):$' ;;
+foreign-rompath) CTL_WANT="^FAIL: MAME_ROMPATH is set \('.*/ctl/romdir_foreign'\), so the MAME legs would not load the audited ROMDIR" ;;
+foreign-mame) CTL_WANT="^FAIL: the MAME the legs run is not the pin's release:\$" ;;
+esac
+vs_pristine_vsavj "$W/pv" "$W/vsavj_data.bin" > "$W/pv.txt" || { cat "$W/pv.txt"
+    case "$MODE" in foreign-*) vs_ctl_caught "$W/pv.txt" "$CTL_WANT" ;; esac
+    echo "FAIL: audit_vanilla_specials_a (the ROM or the analysed image is not pristine vsavj)"; exit 1; }
+cat "$W/pv.txt"
 if [ -z "$MODE" ]; then vs_pristine_vsavj_controls "$W/pv" || { echo "FAIL: audit_vanilla_specials_a (a provenance control is dead)"; exit 1; }; fi
 
 # the legs: <tab>:<pins> — the whiff legs at 488/820, the contact ("~") parts at the far pin with their walk-in
@@ -270,11 +281,12 @@ fi
 if ia_check_manifest "$CLOCKS" "$M" > "$W/align_problems.txt"; then ok "all $(grep -c . "$M") legs counted emulated frames and ended on their frozen game clocks"
 else nope "legs off their frozen game clocks:"; sed 's/^/        /' "$W/align_problems.txt" | head -8; clause_failed drift-clock; fi
 _sl=$(awk -F'\t' '$2=="JE" {print NR; exit}' "$M")
-if ia_stage audit_vanilla_specials_a "$CLOCKS" "$INSTR" "$M" "$_sl" "$W/stage" "$MODE"; then :; else bad=$((bad + 1)); clause_failed first-frame-skip; fi
-case "$MODE" in drift-clock|first-frame-skip) ;; *)
+_st=0; ia_stage audit_vanilla_specials_a "$CLOCKS" "$INSTR" "$M" "$_sl" "$W/stage" "$MODE" > "$W/stage.txt" || _st=1; cat "$W/stage.txt"   # #369: first-frame-skip reads its finding here
+if [ "$_st" = 1 ]; then bad=$((bad + 1)); clause_failed first-frame-skip; fi
+if [ -z "$MODE" ]; then   # #369: the in-gate controls' lines belong to a plain run
     [ "$IA_DRIFT" = fired ] && vs_ctl_fired drift-clock "$IA_DRIFT_MSG" || { vs_ctl_dead drift-clock "$IA_DRIFT_MSG"; bad=$((bad + 1)); }
-    [ "$IA_SKIP" = fired ] && vs_ctl_fired first-frame-skip "$IA_SKIP_MSG" || { vs_ctl_dead first-frame-skip "$IA_SKIP_MSG"; bad=$((bad + 1)); } ;;
-esac
+    [ "$IA_SKIP" = fired ] && vs_ctl_fired first-frame-skip "$IA_SKIP_MSG" || { vs_ctl_dead first-frame-skip "$IA_SKIP_MSG"; bad=$((bad + 1)); }
+fi
 
 : > "$W/an_list"
 for L in $LEGS; do tab="${L%%:*}"
@@ -299,12 +311,13 @@ grep -v '^#' "$EXP" > "$W/exp.tsv" 2>/dev/null || : > "$W/exp.tsv"
 cp "$W/exp.tsv" "$W/exp_cmp.tsv"
 [ "$MODE" = swapped-chains ] && { swap_chains "$W/exp.tsv" "$W/exp_cmp.tsv"; }
 if cmp -s "$W/exp_cmp.tsv" "$W/got.tsv"; then ok "the identity table equals $EXP ($(grep -c . "$W/got.tsv") rows)"
-else nope "the identity table moved"; diff "$W/exp_cmp.tsv" "$W/got.tsv" | head -12; clause_failed swapped-chains; fi
+else nope "the identity table moved"; diff "$W/exp_cmp.tsv" "$W/got.tsv" > "$W/s6.diff"; head -12 "$W/s6.diff"; clause_failed swapped-chains; fi
 
 echo "== 7. the events that entered a normal are exactly the declared ones"
 cp "$W/got.tsv" "$W/s7.tsv"
 [ "$MODE" = hidden-normal ] && { hide_normal "$W/got.tsv" "$W/s7.tsv"; }
-declared_check "$W/s7.tsv" || { bad=$((bad + 1)); clause_failed hidden-normal; }
+_s7=0; declared_check "$W/s7.tsv" > "$W/s7.txt" || _s7=1; cat "$W/s7.txt"
+[ "$_s7" = 0 ] || { bad=$((bad + 1)); clause_failed hidden-normal; }
 
 echo "== 8. the hit counts at contact"
 awk -F'\t' '$1 ~ /~$/ {print $1"\t"$2"\t"$5}' "$W/got.tsv" > "$W/hits.tsv"
@@ -312,10 +325,11 @@ awk -F'\t' '$1 ~ /~$/ {print $1"\t"$2"\t"$5}' "$W/got.tsv" > "$W/hits.tsv"
 awk -F'\t' '$1 ~ /~$/ {print $1"\t"$2"\t"$5}' "$W/exp.tsv" > "$W/exp_hits.tsv"
 if cmp -s "$W/exp_hits.tsv" "$W/hits.tsv" && [ -s "$W/hits.tsv" ]; then
     ok "contact hit counts equal the frozen ones: $(awk -F'\t' '{printf "%s %s=%s; ", $1, $2, $3}' "$W/hits.tsv")"
-else nope "contact hit counts moved"; diff "$W/exp_hits.tsv" "$W/hits.tsv" | head; clause_failed sheet-hits; fi
+else nope "contact hit counts moved"; diff "$W/exp_hits.tsv" "$W/hits.tsv" > "$W/s8.diff"; head "$W/s8.diff"; clause_failed sheet-hits; fi
 
 echo "== 9. live engine ticks"
-ticks_check $(cat "$W/an_list") || { bad=$((bad + 1)); clause_failed dead-tap; }
+_s9=0; ticks_check $(cat "$W/an_list") > "$W/s9.txt" || _s9=1; cat "$W/s9.txt"
+[ "$_s9" = 0 ] || { bad=$((bad + 1)); clause_failed dead-tap; }
 
 echo "== 10. the join against the workbook (tick verdicts, live-vs-derived agreement, the values hash)"
 if [ ! -f "$SHEET" ]; then
@@ -334,6 +348,22 @@ else
     else nope "verdicts, tick agreement or values moved"; diff "$W/vexp.tsv" "$W/vgot.tsv" | head -16; fi
 fi
 
+if [ -n "$MODE" ]; then   # #369: a mode is honoured only on its own finding in its section's output; section 11 is a plain run's
+    case " $FAILED " in *" $MODE "*)
+        cat "$W/align_problems.txt" "$W/stage.txt" "$W/s6.diff" "$W/s7.txt" "$W/s8.diff" "$W/s9.txt" > "$W/main.log" 2>/dev/null
+        case "$MODE" in
+        drift-clock) CTL_WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+        first-frame-skip) CTL_WANT='FAIL: the staging reference leg \(.*\) reads [0-9a-f]+ at frame [0-9]+, replay\.lua [0-9a-f]+$' ;;
+        swapped-chains) CTL_WANT="^< (FE|AU)	" ;;
+        hidden-normal) CTL_WANT="FAIL  [0-9]+ special events entered a normal or baseline chain; declared [0-9]+ — undeclared \[.*\('AU', '623LK'\)" ;;
+        sheet-hits) CTL_WANT='^> DE~	623LP	2$' ;;
+        dead-tap) CTL_WANT='FAIL  0 of [1-9][0-9]* events whose move walks an attack node have live engine ticks' ;;
+        esac
+        vs_ctl_caught "$W/main.log" "$CTL_WANT"; echo "FAIL: audit_vanilla_specials_a (control mode $MODE: its clause failed)"; exit 1 ;;
+    esac
+    [ "$bad" = 0 ] && vs_ctl_left_green "$MODE" "FAIL: audit_vanilla_specials_a — control mode $MODE left the gate green"
+    echo "REFUSED: control mode $MODE ran and its clause did not fail"; exit 3
+fi
 echo "== 11. must-fire controls (the three perturbed copies and the dead tap; drift-clock and first-frame-skip above)"
 swap_chains "$W/exp.tsv" "$W/swapped.tsv"
 if cmp -s "$W/exp.tsv" "$W/swapped.tsv"; then vs_ctl_dead swapped-chains "swapping two chain cells leaves the table unchanged"; bad=$((bad + 1))
@@ -350,9 +380,5 @@ if [ -s "$W/leg_JE_deadtap/t.txt" ] && ! grep -q '^T ' "$W/leg_JE_deadtap/t.txt"
     else vs_ctl_fired dead-tap "JE's rig with TICK_PC=000000 logs 0 ticks and the live-tick check refuses it: $(sed 's/^ *FAIL *//' "$W/deadtap.txt" | cut -c1-90)"; fi
 else vs_ctl_dead dead-tap "the dead-tap leg logged ticks or did not run"; bad=$((bad + 1)); fi
 
-if [ -n "$MODE" ]; then
-    case " $FAILED " in *" $MODE "*) echo "FAIL: audit_vanilla_specials_a (control mode $MODE: its clause failed)"; exit 1 ;; esac
-    echo "REFUSED: control mode $MODE ran and its clause did not fail"; exit 3
-fi
 [ "$bad" = 0 ] && { echo "PASS: audit_vanilla_specials_a"; exit 0; }
 echo "FAIL: audit_vanilla_specials_a ($bad)"; exit 1

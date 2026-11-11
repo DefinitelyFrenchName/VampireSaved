@@ -121,7 +121,7 @@ PY
     esac
     case "$1" in
     row-missing)        EXPECT="has no row in" ;;
-    state-disagrees)    EXPECT="on GitHub" ;;
+    state-disagrees)    EXPECT="closed means nothing is left to do" ;;   # only the open/closed line prints it, never the parked one (#369, 14z-225; review r6)
     parked-disagrees)   EXPECT="labelled parked on GitHub" ;;
     link-unresolved)    EXPECT="which no line of" ;;
     learned-in-archive) EXPECT="is not a live document" ;;
@@ -155,6 +155,12 @@ if run_tool "$DATA" page >"$W/page.log" 2>&1; then
     ok "$(grep '^PASS' "$W/page.log")"
 else
     bad "the generated page is not current:"; sed 's/^/        /' "$W/page.log" | head -20
+fi
+if [ -n "$VS_CTL" ]; then   # #369: the mode is honoured only on its own finding in the main checks' output
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL"
+    cat "$W/check.log" "$W/page.log" > "$W/main.log"
+    vs_ctl_caught "$W/main.log" "$(printf '%s' "$EXPECT" | sed 's/[][\.*^$()+?{}|]/\\&/g')" || :
+    echo "FAIL"; exit 1
 fi
 
 # --- must-fire controls on a perturbed copy -------------------------------

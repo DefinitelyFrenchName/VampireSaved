@@ -20,7 +20,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d "${TMPDIR:-/tmp}/mameid.XXXXXX")" || { echo "FAIL: test_mame_ident — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # #369: the main check's findings
 
 stub() {  # stub <name> <version line> <listfull first line>
     printf '#!/bin/sh\ncase "$1" in -version) echo "%s" ;; -listfull) echo "%s" ;; esac\n' "$2" "$3" > "$W/$1"; chmod +x "$W/$1"
@@ -56,7 +56,8 @@ echo "== the pin: release $WANT (tools/setup_mame.sh)"
 [ "$N_OK" = 1 ] && ok "an executable that is not MAME is REFUSED" || bad "the non-MAME executable was not refused: $(cat "$W/notmame.out")"
 
 if [ -n "${VS_CTL:-}" ]; then
-    [ "$fail" = 1 ] && { vs_ctl_fired "$VS_CTL" "the helper without its release comparison accepted the 0.0 stub"; echo "FAIL: test_mame_ident (control mode)"; exit 1; }
+    CWANT="FAIL  the 0\.0 stub was not refused for its release: .*-version .0\.0 .*release [0-9.]+: yes; "   # #369: the ACCEPT line, the one case the perturbation reaches, not a refusal for another reason (review r1; WANT is the pin's release)
+    [ "$fail" = 1 ] && { vs_ctl_caught "$W/main.log" "$CWANT"; echo "FAIL: test_mame_ident (control mode)"; exit 1; }
     echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the gate fail: a dead mode, not a verdict"; exit 3
 fi
 echo "== controls"

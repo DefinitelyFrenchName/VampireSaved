@@ -91,7 +91,7 @@ perturb() {  # perturb <name> <dir>
         for f in docs/game/atlas/character_tables.md docs/game/engine_internals.md docs/game/gotchas.md docs/project/cps2_wide.md; do
             sed -i.bak 's/OBJ bank table/OBJ bank chart/g' "$2/$f"
         done
-        EXPECT="matches NOTHING" ;;
+        EXPECT="obj_bank_table: key 'per-char(acter)? OBJ bank table' matches NOTHING" ;;   # the planted lock's own dead key, not any lock's (review r1)
     *) echo "no such perturbation: $1"; exit 3 ;;
     esac
 }
@@ -106,6 +106,8 @@ if python3 tools/checkdocs.py --root "$ROOT" $SELFTEST >"$W/tree.log" 2>&1; then
     ok "checkdocs.py PASS on the tree ($(grep -o '[0-9]* locks, [0-9]* file-sites' "$W/tree.log" | head -1))"
 else
     bad "checkdocs.py FAILS on the tree:"; sed 's/^/        /' "$W/tree.log"
+    # #369: under a mode, the check's own finding is the EXPECT its perturbation set (the substring, as an ERE)
+    [ -z "$VS_CTL" ] || vs_ctl_caught "$W/tree.log" "$(printf '%s' "$EXPECT" | sed 's/[][\.*^$()+?{}|]/\\&/g')" || :
 fi
 
 # --- must-fire controls on a perturbed copy -------------------------------
@@ -119,6 +121,6 @@ control() {  # control <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log"
     fi
 }
-for n in $(vs_ctl_declared "$0"); do control "$n"; done
+[ -n "$VS_CTL" ] || for n in $(vs_ctl_declared "$0"); do control "$n"; done   # the in-gate controls: a plain run only (#369)
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

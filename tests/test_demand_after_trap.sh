@@ -90,11 +90,18 @@ if out="$(scan "$SCAN")"; then
 else
     bad "demand(s) after an EXIT trap — write them as explicit tests:"; printf '%s\n' "$out" | sed 's/^/        /'
 fi
+printf '%s\n' "${out:-}" > "$W/main.log"   # #369: the scan's findings, read by vs_ctl_caught under a mode
 
 mkdir -p "$W/a/lib" "$W/b/lib"
 printf "$BAD_STUB" > "$W/a/g.sh"
 printf '#!/bin/sh\nset -eu\n: "${FOO:?set FOO}"\nW=$(mktemp -d); trap '"'"'rm -rf "$W"'"'"' EXIT\ncat <<EOS\nstub ${BAR:?} in a heredoc is fine\nEOS\n' > "$W/b/g.sh"
-if scan "$W/a" >/dev/null; then vs_ctl_dead demand-after-trap "a demand AFTER the trap was not reported"; bad "control"; else vs_ctl_fired demand-after-trap "a demand after the trap is reported"; ok "control fires"; fi
+if [ -n "${VS_CTL:-}" ]; then :   # #369: the in-gate control's line is a plain run's, never a mode's evidence
+elif scan "$W/a" >/dev/null; then vs_ctl_dead demand-after-trap "a demand AFTER the trap was not reported"; bad "control"; else vs_ctl_fired demand-after-trap "a demand after the trap is reported"; ok "control fires"; fi
 if scan "$W/b" >/dev/null; then ok "control: a demand BEFORE the trap, and one inside a heredoc, are allowed"; else bad "control: the allowed shapes were reported"; fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on the scan naming the planted script
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL"
+    vs_ctl_caught "$W/main.log" '^zz_synthetic_demand\.sh:4: : "\$\{FOO:\?'
+    echo "FAIL"; exit 1
+fi
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

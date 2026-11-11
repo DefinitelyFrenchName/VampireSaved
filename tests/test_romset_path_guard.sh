@@ -223,7 +223,9 @@ PY2
     grep -q 'skipped .*vsavjw.zip: a generated set' "$D/a.log" || { echo "    (a) romdir's vsavjw.zip was not reported skipped"; bad=1; }
     return $bad
 }
-if section7 "$TOOL" "$T/s7" > "$T/s7.txt" 2>&1; then
+section7 "$TOOL" "$T/s7" > "$T/s7.txt" 2>&1 && s7=0 || s7=1
+cat "$T/s7.txt" >> "$T/main.log"   # #369: the main check's findings, read by vs_ctl_caught under a mode
+if [ "$s7" = 0 ]; then
     echo "  ok: (a) romdir's generated vsavjw.zip and (b) an outside link target both unchanged; outputs are regular zips"
 else
     fail "a link at the output path was written through:"; sed 's/^/    /' "$T/s7.txt"
@@ -244,21 +246,27 @@ section9() {
     done
     return $bad
 }
-if section9 "$TOOL" "$T/s9" > "$T/s9.txt" 2>&1; then
+section9 "$TOOL" "$T/s9" > "$T/s9.txt" 2>&1 && s9=0 || s9=1
+cat "$T/s9.txt" >> "$T/main.log"
+if [ "$s9" = 0 ]; then
     echo "  ok: relative romdir and outdir from another cwd: every overlay link resolves to its source member"
 else
     fail "a relative romdir gave an unusable overlay:"; sed 's/^/    /' "$T/s9.txt"
 fi
 
-# #310 group 6 (14z-215): the mode exits 1 on ITS finding only — a dangling link in section 8; a gate left green is this
-# control dead (LIES), a red elsewhere is NOT JUDGED
-if vs_ctl_is relative-link; then
-    if grep -q 'the link DANGLES' "$T/s9.txt"; then echo; echo "FAIL: control mode relative-link (see above)"; exit 1; fi
-    [ "$rc" = 0 ] && vs_ctl_left_green relative-link "FAIL: control mode relative-link — the pre-#250 overlay left every link resolving"
-    echo "NOT JUDGED: relative-link — the gate is red, but section 8 shows no dangling link: $(head -1 "$T/s9.txt")"
-    echo "FAIL: control mode relative-link (see above)"; exit 1
+# #369 (14z-225): a mode run is honoured only on its own finding in the main check's output (sections 7 and 8 under the
+# copy): a link target overwritten in section 7 (old-write), a dangling link in section 8 (relative-link); a gate left
+# green is the control dead (LIES), a red without the finding NOT JUDGED (vs_ctl_caught)
+if [ -n "${VS_CTL:-}" ]; then
+    [ "$rc" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: control mode $VS_CTL — its copy left sections 7 and 8 green"
+    case "$VS_CTL" in
+        old-write) WANT="^ *\\(a\\) romdir's vsavjw\\.zip WAS OVERWRITTEN$" ;;
+        relative-link) WANT="^ *vsavj?\\.zip: the link DANGLES \\(-> " ;;
+    esac
+    echo; vs_ctl_caught "$T/main.log" "$WANT" || :
+    echo "FAIL: control mode $VS_CTL (see above)"; exit 1
 fi
-if ! vs_ctl_is old-write; then
+if [ -z "${VS_CTL:-}" ]; then
     echo "== 9. controls =="
     if ! old_write "$T/ctl.py" > "$T/ctl_build.txt" 2>&1; then
         vs_ctl_dead old-write "the copy could not be built: $(tail -1 "$T/ctl_build.txt")" || rc=1

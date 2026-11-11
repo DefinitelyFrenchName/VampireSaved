@@ -54,9 +54,18 @@ hooked_ok() { [ "$2" -eq 0 ] && echo "$1" | grep -q '^STATE hooked' && echo "$1"
 for c in $PLANTS; do
     if vs_ctl_is "$c"; then
         echo "== MODE $c: the merged image with the $c plant"
-        out="$($TOOL "$BUILD/verify_op.bin" $REF --plant "$c" 2>&1)"; rc=$?
+        $TOOL "$BUILD/verify_op.bin" $REF --plant "$c" > "$W/main.log" 2>&1; rc=$?; out="$(cat "$W/main.log")"
         echo "$out" | grep -E '^(STATE|VERDICT|FAIL)' | sed 's/^/        /'
         hooked_ok "$out" "$rc" && vs_ctl_left_green "$c" "FAIL: the $c plant still read hooked and OK"
+        case "$c" in   # #369: each plant's own finding in the tool's output
+            unmapped-escape) WANT='^FAIL  body \+0x[0-9A-F]+ [a-z.]+: lands on 0x[0-9A-F]+, not 0x[0-9A-F]+ \(vs2 target 0x[0-9A-F]+\)$' ;;
+            insn-flip)   WANT="^FAIL  body \\+0x[0-9A-F]+: '.*' differs from vs2's '.*'\$" ;;
+            table-flip)  WANT='^FAIL  inline table 0x[0-9A-F]+\+[0-9]+ differs from vs2.s opcode view$' ;;
+            record-flip) WANT='^FAIL  the records block differs from vs2.s$' ;;
+            row-default) WANT='^STATE half: .*; row 0x13 -> 0x02AE2C \(dead span 0x024024\); dead span decodes jmp ' ;;
+            half-hook)   WANT='^STATE half: .*; row 0x13 -> 0x024024 \(dead span 0x024024\); dead span decodes moveq ' ;;
+        esac
+        vs_ctl_caught "$W/main.log" "$WANT"
         echo "FAIL (mode): as required — the $c plant was caught"; exit 1
     fi
 done

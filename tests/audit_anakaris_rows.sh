@@ -208,7 +208,7 @@ done
 echo "  ok    $nl legs complete"
 
 echo "== 2. the checks"
-python3 - "$W" "$MODE" $LEGS <<'PY'
+python3 - "$W" "$MODE" $LEGS > "$W/main.log" <<'PY'
 import sys
 W, mode, LEGS = sys.argv[1], sys.argv[2], sys.argv[3:]
 def fields(n):
@@ -421,5 +421,20 @@ if not mode:
 sys.exit(1 if bad else 0)
 PY
 rc=$?
-[ "$rc" = 0 ] || { echo "FAIL: audit_anakaris_rows"; exit 1; }
+cat "$W/main.log"
+if [ "$rc" != 0 ]; then
+    # #369: a mode is honoured only on its own check's finding in the main check's output
+    case "$MODE" in
+    float-on-diagonal) WANT='^  FAIL  F1 float: ' ;;
+    strength-swapped|p1-side) WANT='^  FAIL  C1 curse standing: ' ;;
+    air-as-ground) WANT='^  FAIL  C2 curse airborne: ' ;;
+    hand-offset) WANT='^  FAIL  M2 the hand objects ' ;;
+    ctl-as-pm) WANT='^  FAIL  W2 Pharaoh Magic KO: ' ;;
+    unpoked-set) WANT='^  FAIL  W4 win: ' ;;
+    readback-unpoked) WANT='^  FAIL  R1 readback: ' ;;
+    *) WANT='' ;;
+    esac
+    [ -z "$MODE" ] || vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL: audit_anakaris_rows"; exit 1
+fi
 echo "PASS: audit_anakaris_rows — +0x152 the 0x77 hover timer (re-armed once by Up while hovering), +0x156/+0x1A0 the victim's curse timer (rising with +0x56) and flag, +0x1AA the KO'd victim's Pharaoh Magic flag that sets P1 +0x18D to 4, +0x374 the Mummy Drop hands' X"

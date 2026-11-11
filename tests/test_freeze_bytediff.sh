@@ -51,7 +51,8 @@ if [ ! -f "$CMP" ]; then
 elif cmp -s "$CMP" "$W/got.txt"; then
     echo "  ok: $REC equals the render ($(grep -c '^RANGE ' "$W/got.txt" | tr -d ' ') ranges over $(grep -c '^TRACK ' "$W/got.txt" | tr -d ' ') tracks)"
 else
-    echo "  FAIL: the record differs from the render:"; diff "$CMP" "$W/got.txt" | head -12 | sed 's/^/      /'; fail=1
+    diff "$CMP" "$W/got.txt" > "$W/diff1.txt" || :   # #369: the comparison's finding, read by vs_ctl_caught under a mode
+    echo "  FAIL: the record differs from the render:"; head -12 "$W/diff1.txt" | sed 's/^/      /'; fail=1
 fi
 
 echo "-- 2. the instrument sees a byte inside a placed file (M21 -> M22, #194 at 0x0FDF69)"
@@ -72,4 +73,9 @@ if [ -z "${VS_CTL:-}" ] && [ -f "$REC" ]; then
     fi
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: honoured only on the dropped RANGE line coming back from the render
+    [ "$fail" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_freeze_bytediff"
+    vs_ctl_caught "$W/diff1.txt" "^> $(grep -m1 '^RANGE ' "$REC" | sed 's/[][\.*^$+?(){}|]/\\&/g')\$" || :
+    echo "FAIL: test_freeze_bytediff"; exit 1
+fi
 if [ "$fail" -eq 0 ]; then echo "PASS: test_freeze_bytediff"; else echo "FAIL: test_freeze_bytediff"; exit 1; fi

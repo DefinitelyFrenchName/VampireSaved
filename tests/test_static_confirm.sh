@@ -174,5 +174,55 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: the predictor marks STALE by each of its seven rules, narrows as #188 option B and #286 (a) rule, and carries the rest"
-else echo "FAIL: test_static_confirm"; exit 1; fi
+if [ "$fail" = 0 ]; then [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_static_confirm"; echo "PASS: the predictor marks STALE by each of its seven rules, narrows as #188 option B and #286 (a) rule, and carries the rest"
+else
+    # #369: a mode is honoured only on its own finding in the selftest's output: the first case its perturbed copy breaks
+    # (the line the in-gate control quotes; a `'` in a gate list reads `.`)
+    case "${VS_CTL:-}" in
+        no-dir-rule) WANT='^ *FAIL: docs/data/table\.tsv -> stale \[.g_gitlist., .g_lsvar., .g_named., .g_walkroot., .g_whole.\], expected \[' ;;
+        no-whole-rule) WANT='^ *FAIL: docs/data/table\.tsv -> stale \[.g_named., .g_shdocs.\], expected \[' ;;
+        no-data-rule) WANT='^ *FAIL: notes/locked\.md -> stale \[.g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[' ;;
+        no-template-rule) WANT='^ *FAIL: tests/new\.sh -> stale \[.g_cdwalk., .g_constwalk., .g_gitlist., .g_lsglob., .g_lsvar., .g_pylist., .g_subwalk., .g_testslink., .g_testswalk., .g_walkroot., .g_whole.\], expected \[' ;;
+        no-git-rule) WANT='^ *FAIL: \.gitignore -> stale \[.g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[' ;;
+        dashdash-comment) WANT='^ *FAIL: cfg/base/x\.txt -> stale \[.g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[' ;;
+        binary-as-text) WANT='^ *FAIL: notes/locked\.md -> stale \[.g_bin., .g_data., .g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[' ;;
+        narrow-build-off) WANT='^ *FAIL: build/m1/new\.log -> stale \[.g_buildbare., .g_buildsub., .g_buildtmpl., .g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[' ;;
+        narrow-state-off) WANT='^ *FAIL: STATE\.md -> stale \[.g_gitlist., .g_lsvar., .g_statearg., .g_statemsg., .g_statepair., .g_stateread., .g_walkroot., .g_whole.\], expected \[' ;;
+        narrow-literal-blind) WANT='^ *FAIL: STATE\.md -> stale \[.g_gitlist., .g_lsvar., .g_statearg., .g_walkroot., .g_whole.\], expected \[' ;;
+        dir-template-off) WANT='^ *FAIL: build/m1/new\.log -> stale \[.g_buildsub., .g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[' ;;
+        r3-prose-off) WANT='^ *FAIL: docs/data/table\.tsv -> stale \[.g_gitlist., .g_lsvar., .g_named., .g_prose., .g_pyheredoc., .g_pyident., .g_shdocs., .g_walkroot., .g_whole.\], expected \[' ;;
+        r3-joined-off) WANT='^ *FAIL: docs/data/table\.tsv -> stale \[.g_constwalk., .g_gitlist., .g_join., .g_lsvar., .g_named., .g_pyfile., .g_shdocs., .g_walkroot., .g_whole.\], expected \[' ;;
+        r3c-off|sibling-off) WANT='^ *FAIL: tools/sibdata/b\.mjs -> stale \[.g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[.g_gitlist., .g_lsvar., .g_sib., .g_walkroot., .g_whole.\]$' ;;   # one finding, two perturbations of the g_sib reader (one per run)
+        shdef-off) WANT='^ *FAIL: rel/m23/mame/README\.md -> stale \[.g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[.g_gitlist., .g_lsvar., .g_shdef., .g_walkroot., .g_whole.\]$' ;;
+        list-git-off) WANT='^ *FAIL: docs/data/table\.tsv -> stale \[.g_lsvar., .g_named., .g_shdocs., .g_walkroot., .g_whole.\], expected \[' ;;
+        scratch-off) WANT='^ *FAIL: build/agent9/t1/x\.sh -> stale \[.g_buildtmpl., .g_gitlist., .g_lsglob., .g_lsvar., .g_walkroot., .g_whole.\], expected \[' ;;
+        md-narrow-off) WANT='^ *FAIL: CLAUDE\.md -> stale \[.g_gitlist., .g_lsvar., .g_mdmsg., .g_mdread., .g_walkroot., .g_whole.\], expected \[' ;;
+        data-position-off) WANT='^ *FAIL: notes/ruled\.md -> stale \[.g_gitlist., .g_lsvar., .g_reg., .g_walkroot., .g_whole.\], expected \[' ;;
+        runs-data-off) WANT='^ *FAIL: notes/man\.md -> stale \[.g_gitlist., .g_lsvar., .g_mani., .g_maniruns., .g_planner., .g_walkroot., .g_whole.\], expected \[' ;;
+        runs-change-off) WANT='^ *FAIL: tests/rulecheck/runs/2026-01-02-01/packet\.md -> stale \[.g_constwalk., .g_gitlist., .g_lsvar., .g_maniruns., .g_planner., .g_testswalk., .g_walkroot., .g_whole.\], expected \[' ;;
+        runs-link-off) WANT='^ *FAIL: tests/rulecheck/runs/2026-01-01-01/verdict\.txt -> stale \[.g_gitlist., .g_lsvar., .g_maniruns., .g_walkroot., .g_whole.\], expected \[' ;;
+        runs-link-basename) WANT='^ *FAIL: tests/rulecheck/runs/2026-01-02-01/verdict\.txt -> stale \[.g_gitlist., .g_lsvar., .g_maniruns., .g_runlink., .g_walkroot., .g_whole.\], expected \[' ;;
+        recursive-off) WANT='^ *FAIL: tests/rulecheck/ledger\.tsv -> stale \[.g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[' ;;
+        recursive-loose) WANT='^ *FAIL: tests/rulecheck/ledger\.tsv -> stale \[.g_constwalk., .g_gitlist., .g_lsvar., .g_testslink., .g_testswalk., .g_walkroot., .g_whole.\], expected \[' ;;
+        whole-coarse-off) WANT='^ *FAIL: docs/data/table\.tsv -> stale \[.g_cdfind., .g_cdwalk., .g_constwalk., .g_gitlist., .g_lsdir., .g_lsglob., .g_lsvar., .g_named., .g_shdocs., .g_subwalk., .g_testswalk., .g_walkroot., .g_walksub., .g_whole.\], expected \[' ;;
+        lsf-scope-off) WANT='^ *FAIL: docs/data/table\.tsv -> stale \[.g_gitlist., .g_lsdir., .g_lsglob., .g_lsvar., .g_named., .g_shdocs., .g_walkroot., .g_whole.\], expected \[' ;;
+        walks-dir-loose) WANT='^ *FAIL: tests/rulecheck/ledger\.tsv -> stale \[.g_cdwalk., .g_constwalk., .g_gitlist., .g_lsvar., .g_subwalk., .g_testswalk., .g_walkroot., .g_whole.\], expected \[' ;;
+        runs-self-off) WANT='^ *FAIL: tests/rulecheck/runs/2026-01-02-01/packet\.md -> stale \[.g_gitlist., .g_lsvar., .g_maniruns., .g_planner., .g_walkroot., .g_whole.\], expected \[' ;;
+        runs-dir-off) WANT='^ *FAIL: tests/rulecheck/ledger\.tsv -> stale \[.g_cdwalk., .g_constwalk., .g_gitlist., .g_lsvar., .g_pylist., .g_subwalk., .g_testslink., .g_testswalk., .g_walkroot., .g_whole.\], expected \[' ;;
+        bound-exact-run) WANT='^ *FAIL: data/end\.tsv -> stale \[.g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[' ;;
+        bound-first-component) WANT='^ *FAIL: g_bound rel/m23/mame/README\.md: 4 stale, bounded = reference; ' ;;
+        r3-memo-loose) WANT='^ *FAIL: rel/m23/mame/README\.md -> stale \[.g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[.g_gitlist., .g_lsvar., .g_shdef., .g_walkroot., .g_whole.\]$' ;;
+        sheets-scratch-off) WANT='^ *FAIL: build/sheets/abc123/gates/g_x/legs/h1\.native\.rpl -> stale \[.g_buildtmpl., .g_gitlist., .g_lsvar., .g_walkroot., .g_whole.\], expected \[' ;;
+        prune-off) WANT='^ *FAIL: plan A: the pruned listing holds no scratch — ' ;;
+        lazy-scratch-off) WANT='^ *FAIL: plan A: a whole-tree reader is STALE on scratch alone — ' ;;
+        workers-eff-empty) WANT='^ *FAIL: plan B: two workers give the serial plan — ' ;;
+        budget-off) WANT='^ *FAIL: plan D: the budget refuses 12 untracked paths over 10 — no refusal' ;;
+        deadline-off) WANT='^ *FAIL: plan E: the time limit refuses — no refusal' ;;
+        walk-cap-listing-off) WANT='^ *FAIL: plan F: from git.s listing, a new scratch file re-runs the whole-tree reader — ' ;;
+        scratch-mtime-off) WANT='^ *FAIL: plan C: scratch older than the base run re-runs nothing — ' ;;
+        heredoc-off) WANT='^ *FAIL: docs/data/table\.tsv -> stale \[.g_gitlist., .g_lsvar., .g_named., .g_pyheredoc., .g_shdocs., .g_walkroot., .g_whole.\], expected \[' ;;
+        prose-pairing) WANT='^ *FAIL: STATE\.md -> stale \[.g_gitlist., .g_lsvar., .g_statearg., .g_statepair., .g_stateread., .g_walkroot., .g_whole.\], expected \[' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/self.txt" "$WANT" || :
+    echo "FAIL: test_static_confirm"; exit 1; fi

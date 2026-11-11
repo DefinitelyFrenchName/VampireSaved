@@ -63,7 +63,8 @@ elif vs_ctl_is assignment-chain; then
 fi
 export VSP_EXTRA_SH
 
-python3 - <<'PY'
+st=0
+python3 - <<'PY' > "$W/scan.txt" 2>&1 || st=$?
 import os, re, subprocess, sys
 
 files = subprocess.run(["git", "ls-files", "*.sh"], capture_output=True,
@@ -224,6 +225,18 @@ print("CONTROL FIRED: bashism-in-sh — a [[ ]] test in a #!/bin/sh script is fl
 if not _hit:
     sys.exit(1)
 PY
+cat "$W/scan.txt"
+if [ "$st" != 0 ]; then
+    # #369: a mode is honoured only on its own finding in the scan's output (its stub named with the construct)
+    case "${VS_CTL:-}" in
+        bashism-in-sh) WANT='/bashism\.sh:2  \[\[ \]\] test ' ;;
+        assignment-chain) WANT='/chain\.sh:2  TENANT_MANIFEST=build/manifest/pyron\.toml TENANT_CHAR=0x11 GF=' ;;
+        *) WANT='' ;;
+    esac
+    [ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/scan.txt" "$WANT" || :
+    exit "$st"
+fi
 
+[ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_shell_portability (control mode $VS_CTL changed no verdict)"
 echo "PASS: shell portability (no #!/bin/sh script uses a bash-only
       construct; no assignment-only continuation chain strands its vars)"

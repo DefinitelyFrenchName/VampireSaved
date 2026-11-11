@@ -82,7 +82,7 @@ cd "$REPO" || exit 1
 W=$(mktemp -d) || { echo "FAIL: test_checkdocs_rom — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 fail=0
 ok()  { echo "  ok   $1"; }
-bad() { echo "  FAIL $1"; fail=1; }
+bad() { echo "  FAIL $1"; echo "  FAIL $1" >> "$W/main.log"; fail=1; }   # the findings land in main.log (#369)
 # the untouched-file guard's reading: mtime (ns), inode, size and content hash. A write restored before the end
 # still moves the mtime, which a content compare alone cannot see (#299, rule-checker run 2026-10-22-1170).
 fstamp() { python3 -c 'import hashlib, os, sys; s = os.stat(sys.argv[1]); print(s.st_mtime_ns, s.st_ino, s.st_size, hashlib.sha1(open(sys.argv[1], "rb").read()).hexdigest())' "$1"; }
@@ -152,6 +152,7 @@ echo "== 2. every check, over the tree"
 out="$W/run.txt"
 python3 "$RUN_TOOL" $RUN_ROOT --views "$RUN_VIEWS" --check-covered $RUN_COV > "$out" 2>&1
 rc=$?
+cat "$out" >> "$W/main.log"
 [ "$rc" = 0 ] || { sed 's/^/    /' "$out"; bad "checkdocs_rom exited $rc"; }
 grep -q '^MISMATCH' "$out" && bad "a check disagreed with the image"
 summary=$(grep -E '^[0-9]+ checks, ' "$out")
@@ -198,6 +199,7 @@ ctl() {  # ctl <name> <expected substring> <root> <views> [tool]
         vs_ctl_dead "$_n" "exited $_rc but not for the stated reason"; bad "control $_n"
     fi
 }
+if [ -z "$VS_CTL" ]; then   # the in-gate controls: a plain run only (#369); control 6's copy is built in both
 ctl reworded-claim     "no longer contains"            "$W/root1" "$W/views"      # 1 a quoted claim reworded -> STALE
 ctl flipped-rom-byte   "0x028DD8"                      "$W/root"  "$W/v2"         # 2 a flipped ROM byte -> MISMATCH
 ctl paraphrase-literal "the constant loaded into d0"   "$W/root"  "$W/v3"         # 3 the PARAPHRASE claim's literal fact
@@ -224,13 +226,15 @@ else
         sed 's/^/    /' "$W/c5.txt"; vs_ctl_dead dropped-covered-row "exited $_rc but not for the stated reason"; bad "control 5"
     fi
 fi
+fi
 
 # 6 — the guard below, proven on a SCRATCH copy: written in place and restored before the check, the old shape of
 # control 5. Its content is back, so a content compare passes; the mtime moved, so the guard must catch it. The copy's
 # mtime is set to 2000 first, so the write moves it even on a filesystem with coarse timestamps.
 cp "$COV" "$W/gcopy.tsv"; touch -t 200001010000 "$W/gcopy.tsv"; _g0="$(fstamp "$W/gcopy.tsv")"
 printf 'venue_pointer_table\tvenue_assets.md\tPRG:0x38C258\n' >> "$W/gcopy.tsv"; cp "$W/cov.bak" "$W/gcopy.tsv"
-if ! cmp -s "$W/gcopy.tsv" "$W/cov.bak"; then
+if [ -n "$VS_CTL" ]; then :   # (a plain run only, #369)
+elif ! cmp -s "$W/gcopy.tsv" "$W/cov.bak"; then
     vs_ctl_dead restored-write "the scratch copy's content was not restored, so the control does not test a restored write"; bad "control 6"
 elif [ "$(fstamp "$W/gcopy.tsv")" = "$_g0" ]; then
     vs_ctl_dead restored-write "a restored in-place write left the guard's reading unchanged"; bad "control 6"
@@ -242,4 +246,15 @@ GUARD_FILE="$COV"; GUARD_STAMP="$COV_STAMP"
 [ "$(fstamp "$GUARD_FILE")" = "$GUARD_STAMP" ] \
     || bad "the guarded file $GUARD_FILE was written during the run (mtime, inode, size or content moved; a control must perturb a copy; under CONTROL=restored-write this is the written scratch copy)"
 
+if [ -n "$VS_CTL" ] && [ "$fail" != 0 ]; then   # #369: the finding each perturbation must produce (section 2's tool, or the guard)
+    case "$VS_CTL" in
+    reworded-claim)      WANT='^MISMATCH +[a-z0-9_]+ +Stale: id_space[.]md no longer contains: .*ending cleanly at `0x0502A8`' ;;
+    flipped-rom-byte)    WANT='^MISMATCH +loader_immediates +Mismatch: 0x028DD8 ' ;;
+    paraphrase-literal)  WANT='^MISMATCH +watchdog_in_blitter_loop +Mismatch: the constant loaded into d0: ' ;;
+    vacuous-validator)   WANT='^MISMATCH +per_set_table_bases +Vacuous: ' ;;
+    dropped-covered-row) WANT='^MISMATCH +venue_pointer_table +no longer covers PRG:0x38C258 ' ;;
+    restored-write)      WANT='^  FAIL the guarded file .*/gcopy[.]tsv was written during the run ' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+fi
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

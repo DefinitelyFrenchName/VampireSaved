@@ -61,7 +61,8 @@ W="$(mktemp -d)"; trap 'vs_shares_release; rm -rf "$W"' EXIT; trap 'exit 130' IN
 . "$REPO/tests/lib/shares.sh"; vs_shares_claim test_release_asset_shape release-assets   # SHARES-CLAIM (#370, 14z-225): the host claim on what its # SHARES: line names
 fail=0
 ok()  { echo "  ok    $*"; }
-bad() { echo "  FAIL  $*"; fail=1; }
+bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # main.log: the check's findings (#369)
+: > "$W/main.log"
 
 # THE RELEASE UNDER TEST: the newest release/<name>/ that has a freeze tag —
 # the same `sort -V` rule the tool's own --prune uses, so the two cannot
@@ -217,6 +218,18 @@ if [ -z "$orphan" ]; then ok "no file of release/$NAME/ is left out of every ass
 else bad "left out of every asset: $(echo "$orphan" | tr '\n' ' ')"; fi
 if [ -z "$ghost" ]; then ok "no asset names a file the tree does not hold"
 else bad "named but absent: $(echo "$ghost" | tr '\n' ' ')"; fi
+
+if [ -n "${VS_CTL:-}" ]; then   # #369: the mode's own finding, from sections 0-5; the in-gate controls run only plainly
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL test_release_asset_shape (control mode $VS_CTL changed no verdict)"
+    case "$VS_CTL" in
+    route-mixed)           WANT='^  FAIL  [^ ]+ carries a prebuilt binary AND the driver patch/recipe — ' ;;
+    applier-missing)       WANT='^  FAIL  [^ ]+ is not self-sufficient — missing:.* apply_release\.py( |$)' ;;
+    page-missing)          WANT='^  FAIL  [^ ]+ is not self-sufficient — missing:.* apply_release\.html( |$)' ;;
+    dry-run-claims-upload) WANT="^  FAIL  the dry run's last line does not say it uploaded nothing: done: [0-9]+ asset\\(s\\) on " ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    echo "FAIL test_release_asset_shape (control mode $VS_CTL)"; exit 1
+fi
 
 # ---- the controls ---------------------------------------------------------
 echo "== controls"

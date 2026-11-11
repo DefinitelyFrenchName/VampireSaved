@@ -157,7 +157,7 @@ must_fire() {  # must_fire <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$W/case.log" | head -4
     fi
 }
-for n in $(vs_ctl_declared "$0"); do must_fire "$n"; done
+[ -n "$VS_CTL" ] || for n in $(vs_ctl_declared "$0"); do must_fire "$n"; done   # #369: the stand-alone cases in a plain run only
 
 # --- 4. MUST-NOT-FIRE: the six shapes the corpus writes ----------------------
 accepts() {  # accepts <label> <file body>
@@ -188,4 +188,6 @@ accepts "decision 7  <details>/<summary>" \
 accepts "a KNOWN tag INSIDE a code span" \
         'use `<div>` here\n'
 
+# #369: a mode is judged on section 2's own rejection of the planted copy, named by the construct's own reason
+if [ -n "$VS_CTL" ] && [ "$fail" != 0 ]; then vs_ctl_caught "$W/parse.log" "^ *FAIL  [^ ]*/mode\.md:[0-9]+: unsupported construct: $(expect "$VS_CTL")"; fi
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

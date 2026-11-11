@@ -62,4 +62,13 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
+if [ -n "${VS_CTL:-}" ]; then   # #369: a mode is honoured only on its own finding in the selftest's output
+    [ "$fail" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_emu_run_compare (control mode $VS_CTL)"
+    case "$VS_CTL" in   # verdict-ignored: the FAIL/SKIP rows summed into mame's gate row; one-side-counted: B's missing row summed as 0
+        verdict-ignored) WANT="^ +FAIL: want 'LANE mame KIND gate N 1 A_S 100 B_S 200 RATIO_B_OVER_A 2\\.000' got LANE mame KIND gate N [2-9]" ;;
+        one-side-counted) WANT="^ +FAIL: want .* got LANE prereq KIND gate N 1 A_S 7 B_S 0 " ;;
+    esac
+    vs_ctl_caught "$W/self.txt" "$WANT" || :
+    echo "FAIL: test_emu_run_compare"; exit 1
+fi
 if [ "$fail" -eq 0 ]; then echo "PASS: test_emu_run_compare"; else echo "FAIL: test_emu_run_compare"; exit 1; fi

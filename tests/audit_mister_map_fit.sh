@@ -82,6 +82,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 BUILD="${MAP_FIT_BUILD:-build/m3b_merged34}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 MAPFIT_MODE="${VS_CTL:-}"; export MAPFIT_MODE
@@ -90,7 +91,8 @@ MAPFIT_MODE="${VS_CTL:-}"; export MAPFIT_MODE
 [ -f "$BUILD/patch/effect_map.json" ] || {
     echo "SKIP: no manifests at $BUILD/patch/"; exit 0; }
 
-python3 - "$BUILD" <<'PY'
+rc=0
+python3 - "$BUILD" > "$W/main.log" 2>&1 <<'PY' || rc=$?
 import glob, hashlib, json, os, sys, zipfile
 sys.path.insert(0, "tools")
 import gfx_tiles as G
@@ -321,29 +323,33 @@ if identity_holds(wrong_scramble if MODE == "no-scramble" else scramble, SAMPLE)
 else:
     bad("the CPS-2 GFX scramble does NOT cancel the .rom interleave — every "
         "footprint in this gate and in mister_map.md is then wrong")
-if identity_holds(wrong_scramble, SAMPLE):
+# THE IN-GATE CONTROLS run in a plain run only: under a mode the verdict is the main check's (#369)
+if MODE:
+    pass
+elif identity_holds(wrong_scramble, SAMPLE):
     print("CONTROL DEAD: no-scramble — the identity check passes with NO scramble, so it is not testing the permutation")
     bad("control did not fire: no-scramble")
 else:
     print("CONTROL FIRED: no-scramble — the identity fails without the scramble")
 
 # ── 7. controls ────────────────────────────────────────────────────────
-print("== control A: the UNTRIMMED 16 MB QSound region must be rejected ==")
-csize, cwords, _ = rom_layout(0x1000000)
-if csize <= IOCTL_MAX:
-    print("CONTROL DEAD: untrimmed-qsound — the untrimmed .rom fits the 26-bit ioctl_addr"); bad("control A did not fire")
-elif cwords["firmware"] < WORD_MAX:
-    print("CONTROL DEAD: untrimmed-qsound — half-fired: the firmware start word still fits 16 bits"); bad("control A half-fired")
-else:
-    print(f"CONTROL FIRED: untrimmed-qsound — {csize/2**20:.2f} MB > 64 MB, and "
-          f"qsnd_start {cwords['firmware']} KiB > 65535")
+if not MODE:
+    print("== control A: the UNTRIMMED 16 MB QSound region must be rejected ==")
+    csize, cwords, _ = rom_layout(0x1000000)
+    if csize <= IOCTL_MAX:
+        print("CONTROL DEAD: untrimmed-qsound — the untrimmed .rom fits the 26-bit ioctl_addr"); bad("control A did not fire")
+    elif cwords["firmware"] < WORD_MAX:
+        print("CONTROL DEAD: untrimmed-qsound — half-fired: the firmware start word still fits 16 bits"); bad("control A half-fired")
+    else:
+        print(f"CONTROL FIRED: untrimmed-qsound — {csize/2**20:.2f} MB > 64 MB, and "
+              f"qsnd_start {cwords['firmware']} KiB > 65535")
 
-print("== control B: +1 MB of the obj-bank-5 REGION must overflow bank 0 ==")
-cb0, _ = bank_tops(placement(QS_PLACED, c5_len=GROUPC_BANK + (1 << 20)))
-if cb0 <= BANK:
-    print(f"CONTROL DEAD: obj-bank5-plus-1mb — bank 0 still fits at {cb0:#x}"); bad("control B did not fire")
-else:
-    print(f"CONTROL FIRED: obj-bank5-plus-1mb — bank 0 would need {cb0-BANK} B more")
+    print("== control B: +1 MB of the obj-bank-5 REGION must overflow bank 0 ==")
+    cb0, _ = bank_tops(placement(QS_PLACED, c5_len=GROUPC_BANK + (1 << 20)))
+    if cb0 <= BANK:
+        print(f"CONTROL DEAD: obj-bank5-plus-1mb — bank 0 still fits at {cb0:#x}"); bad("control B did not fire")
+    else:
+        print(f"CONTROL FIRED: obj-bank5-plus-1mb — bank 0 would need {cb0-BANK} B more")
 
 if errs:
     print(f"\nFAIL: MiSTer map fit — {len(errs)} problem(s)")
@@ -352,3 +358,15 @@ print("\nPASS: the MiSTer SDRAM placement map fits AS PLACED (bank 1 exactly "
       "full, bank 0 with 131,072 B free), and every content extent it "
       "records is frozen (docs/project/mister_map.md)")
 PY
+cat "$W/main.log"
+if [ -n "${VS_CTL:-}" ]; then
+    [ "$rc" != 0 ] || vs_ctl_left_green "$VS_CTL" "FAIL: audit_mister_map_fit (control mode $VS_CTL left the gate green)"
+    case "$VS_CTL" in   # the finding each known-bad input must produce in the main check
+        untrimmed-qsound)   WANT="^FAIL: header word firmware = [0-9]+ KiB does not fit 16 bits\$" ;;
+        obj-bank5-plus-1mb) WANT="^FAIL: SDRAM bank 0 overflows by [0-9]+ B\$" ;;
+        no-scramble)        WANT="^FAIL: the CPS-2 GFX scramble does NOT cancel the \\.rom interleave" ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    exit 1
+fi
+exit "$rc"

@@ -59,7 +59,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' 
 # it must FAIL.
 SCAN=tests
 if vs_ctl_is stripped-pin; then
-    python3 - "$W/mode" <<'PY'
+    python3 - "$W/mode" > "$W/mode.txt" <<'PY'
 import sys, pathlib, shutil
 sys.path.insert(0, "tools"); import audit_mame_bin_pin as m
 dst = pathlib.Path(sys.argv[1]); dst.mkdir()
@@ -68,11 +68,18 @@ src = next(f for f in sorted(dst.glob("*.sh")) if m.verdict(f) == "pinned")
 src.write_text("\n".join(l for l in src.read_text(errors="replace").splitlines() if not m.PIN.search(l)) + "\n")
 print(f"  mode: {src.name} minus its pin lines, in a copy of tests/")
 PY
-    SCAN="$W/mode"
+    cat "$W/mode.txt"; SCAN="$W/mode"
+    G="$(sed -n 's/^  mode: \([A-Za-z0-9_]*\)\.sh minus its pin lines.*/\1/p' "$W/mode.txt")"   # #369: the stripped gate names the finding
+    WANT="^  UNPINNED: [^ ]*/mode/$G\.sh — boots vsavjw via a MAME wrapper with no MAME_BIN"
 fi
 
 echo "== 1. every gate that boots vsavjw through a MAME wrapper pins its binary =="
-python3 tools/audit_mame_bin_pin.py "$SCAN" || fail=1
+python3 tools/audit_mame_bin_pin.py "$SCAN" > "$W/main.log" 2>&1 || fail=1   # #369: the main check's findings kept
+cat "$W/main.log"
+if [ -n "$VS_CTL" ]; then   # #369: a mode is judged on section 1's own finding; the self-test control runs in a plain run only
+    if [ "$fail" -ne 0 ]; then vs_ctl_caught "$W/main.log" "$WANT" || :; echo "FAIL: mame-bin pin gate"; exit 1; fi
+    echo "PASS: every vsavjw-booting gate pins its MAME binary"; exit 0
+fi
 
 echo "== 2. MUST-FIRE CONTROL: a removed pin is reported; a stock-set gate is not =="
 if python3 tools/audit_mame_bin_pin.py --selftest; then vs_ctl_fired stripped-pin "a pinned gate minus its pin lines is reported UNPINNED"

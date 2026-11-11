@@ -53,11 +53,16 @@ if [ -n "$VS_CTL" ]; then
         missing-measurement) mkgate "$T/m.sh" "# m.sh — a stub" "# MEASURES: rows — 1 the table's rows"; classify "$T/m.sh" "PASS: fine" ;;
         below-floor)         mkgate "$T/m.sh" "# m.sh — a stub" "# MEASURES: rows — 10 the table's rows"; classify "$T/m.sh" "PASS: fine" "MEASURED: rows = 0" ;;
         freeze-refused)      mkgate "$T/m.sh" "# m.sh — a stub" "# MEASURES: rows — 10 the table's rows"
-                             if ( FREEZE=1 vs_meas_guard "$T/m.sh" rows 0 ); then echo "  the guard ACCEPTED a freeze at 0 rows under a floor of 10"; echo "PASS (the known-bad was NOT caught)"; exit 0
-                             else echo "  the guard REFUSED the freeze at 0 rows under a floor of 10"; echo "FAIL (the known-bad was caught — the mode reached the gate's own FAIL)"; exit 1; fi ;;
+                             if ( FREEZE=1 vs_meas_guard "$T/m.sh" rows 0 ) > "$T/main.log" 2>&1; then cat "$T/main.log"; echo "  the guard ACCEPTED a freeze at 0 rows under a floor of 10"; echo "PASS (the known-bad was NOT caught)"; exit 0
+                             else cat "$T/main.log"; echo "  the guard REFUSED the freeze at 0 rows under a floor of 10"
+                                  WANT='^REFUSED FREEZE: rows = 0 < floor 10 — '; vs_ctl_caught "$T/main.log" "$WANT"; echo "FAIL (the known-bad was caught — the mode reached the gate's own FAIL)"; exit 1; fi ;;   # #369: the guard's own refusal
     esac
-    echo "  classified $VS_VERDICT: $VS_DETAIL"
-    [ "$VS_VERDICT" = FAIL ] && { echo "FAIL (the known-bad was caught — the mode reached the gate's own FAIL)"; exit 1; }
+    echo "  classified $VS_VERDICT: $VS_DETAIL" | tee "$T/main.log"   # #369: the classifier's own verdict is the finding
+    case "$VS_CTL" in
+        missing-measurement) WANT='^  classified FAIL: measures RED: (.* )?rows\(not measured\)' ;;
+        below-floor)         WANT='^  classified FAIL: measures RED: (.* )?rows=0<10( |$)' ;;
+    esac
+    [ "$VS_VERDICT" = FAIL ] && { vs_ctl_caught "$T/main.log" "$WANT"; echo "FAIL (the known-bad was caught — the mode reached the gate's own FAIL)"; exit 1; }
     echo "PASS (the known-bad was NOT caught)"; exit 0
 fi
 

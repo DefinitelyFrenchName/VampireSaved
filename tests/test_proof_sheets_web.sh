@@ -46,7 +46,8 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d)" || { echo "FAIL: test_proof_sheets_web — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # main.log: the check's findings (#369)
+: > "$W/main.log"
 T="$REPO/tools/proof_sheets.py"
 
 echo "== 1. a synthetic local run"
@@ -100,7 +101,8 @@ event-handler) python3 -c "import sys,glob; p=sorted(glob.glob(sys.argv[1]+'/g/*
 missing-stylesheet) rm -f "$W/web/sheets.css" ;;
 builds-sentence) python3 -c "import sys,re; p=sys.argv[1]+'/index.html'; s=open(p).read(); open(p,'w').write(re.sub(r'1 of the 2 builds[^<]*\\.', 'Every build matched its frozen reference.', s))" "$W/web" ;;
 esac
-python3 "$T" webcheck "$W/web" --run "$W/src" > "$W/check.out" 2>&1 && ok "webcheck PASS on the build, its builds sentence checked against the run" || { bad "webcheck: $(grep WEB-PROBLEM "$W/check.out" | head -3 | tr '\n' ' ')"; }
+python3 "$T" webcheck "$W/web" --run "$W/src" > "$W/check.out" 2>&1; wc_rc=$?; cat "$W/check.out" >> "$W/main.log"
+[ "$wc_rc" = 0 ] && ok "webcheck PASS on the build, its builds sentence checked against the run" || { bad "webcheck: $(grep WEB-PROBLEM "$W/check.out" | head -3 | tr '\n' ' ')"; }
 pages="$(find "$W/web" -name '*.html' | wc -l | tr -d ' ')"; foot="$(grep -l 'id="credits"' $(find "$W/web" -name '*.html') | wc -l | tr -d ' ')"
 [ "$pages" -ge 2 ] && [ "$foot" = "$pages" ] && ok "every page carries the credits footer ($foot of $pages)" || bad "credits footer on $foot of $pages pages"
 # the intro's builds sentence is counted from the run (ruled 14z-213: "Count from the run"): 1 of the fixture's 2 builds is unregistered
@@ -226,8 +228,27 @@ v="$(tty_check "$PUB" real)"
 vi="$(tty_check "$PUB" intr intr)"
 [ "$vi" = INTR-EXITED ] && ok "under a terminal, Ctrl+C at the upload's prompt ended the publisher and its upload within 5 s" \
     || bad "Ctrl+C at the upload's prompt did not end the run ($vi): $(tr -d '\r' < "$W/tty.intr.out" | tail -2 | tr '\n' ' ')"
-if [ -n "${VS_CTL:-}" ]; then
-    [ "$fail" = 0 ] && echo "PASS: test_proof_sheets_web" || echo "FAIL: test_proof_sheets_web (control mode ${VS_CTL})"; exit "$fail"
+if [ -n "${VS_CTL:-}" ]; then   # #369: each mode's own finding, from webcheck's output or the section 2b check
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_proof_sheets_web (control mode $VS_CTL changed no verdict)"
+    case "$VS_CTL" in
+    missing-credits)    WANT='^ *WEB-PROBLEM g/[^ ]+\.html: no credits footer$' ;;
+    full-size-tile)     WANT='^ *WEB-PROBLEM pics/[^ ]+\.webp: 384x224, larger than the reduced size$' ;;
+    full-size-link)     WANT='^ *WEB-PROBLEM g/audit_landing_sound\.html: links \.\./pics/audit_landing_sound\.a\.native\.0\.full\.webp, which the build does not hold$' ;;
+    escaping-link)      WANT='^ *WEB-PROBLEM g/audit_landing_sound\.html: links \.\./\.\./src/pics/audit_landing_sound\.a\.native\.1\.wav, outside the build$' ;;
+    log-shipped)        WANT='^ *WEB-PROBLEM g/audit_landing_sound\.log: a \.log file ships ' ;;
+    local-path)         WANT='^ *WEB-PROBLEM index\.html: a local path: /Users/someone/build/x$' ;;
+    unscrubbed-path)    WANT='^ *WEB-PROBLEM index\.html: a local path: /Volumes/Disk/x$' ;;
+    unreduced-clip)     WANT='^ *WEB-PROBLEM pics/audit_landing_sound\.a\.native\.1\.wav: 2 channel\(s\) at 48000 Hz, not reduced$' ;;
+    inline-style)       WANT='^ *WEB-PROBLEM index\.html: an inline <style> \(a strict Content-Security-Policy refuses it\)$' ;;
+    style-attribute)    WANT='^ *WEB-PROBLEM g/[^ ]+\.html: a style= attribute \(a strict Content-Security-Policy refuses it\)$' ;;
+    inline-script)      WANT='^ *WEB-PROBLEM index\.html: a <script> \(a strict Content-Security-Policy refuses it\)$' ;;
+    event-handler)      WANT='^ *WEB-PROBLEM g/[^ ]+\.html: an inline event handler \(a strict Content-Security-Policy refuses it\)$' ;;
+    missing-stylesheet) WANT='^ *WEB-PROBLEM g/[^ ]+\.html: its stylesheet \.\./sheets\.css does not exist$' ;;
+    builds-sentence)    WANT='^ *WEB-PROBLEM index\.html: its builds sentence does not match the run ' ;;
+    no-foreground)      WANT='^  FAIL  the upload could not read the terminal \(NO-READ\): .*PROMPT> ' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT"
+    echo "FAIL: test_proof_sheets_web (control mode ${VS_CTL})"; exit 1
 fi
 
 echo "== 3. controls: each perturbed copy must FAIL webcheck on its own fault"

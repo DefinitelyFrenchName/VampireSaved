@@ -1,0 +1,16 @@
+SPAWNED, READ, BUT REFUSED AT RECORD — 14z-225, 2026-11-11.
+
+This packet (#369 migration batch 1, the re-check of 2026-11-11-1766) was prepared and two rule-checker readers
+were spawned in one message; the first attempt to spawn reader A ended on a transient permission-check failure ("The
+server-side auto mode classifier gave no verdict ... the response ended before its verdict arrived"), and both readers
+were spawned again together. Both answered (saved verbatim: build/agent225/m369/rc_verdict_a11.txt, _b11.txt; the
+real packet's reader read VIOLATED on Q1, the planted control's reader VIOLATED), but `rulecheck.py record` refused the
+run:
+
+  "FAIL: run 2026-11-11-1767: 1 reader(s) failed the spawn check, 0 slot(s) never spawned — the run is not recorded;
+   spawn fresh readers (a fallback or a context leak is an uncalibrated instrument)"
+
+So there is NO recorded verdict and no ledger row: the run does not count as evidence. Its real reader's finding (the
+Mac pins do not check untracked files or tracked files outside tests/ and tools/; test_retraction_reach leans on
+untracked build files; audit_dead_leg_linux's plain run never ran) was nonetheless acted on — named in the claim — on
+the maintainer's choice "Name the gap, re-check now" (2026-11-11), and the packet is redone as 2026-11-11-1768.

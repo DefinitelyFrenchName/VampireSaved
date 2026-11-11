@@ -434,7 +434,16 @@ if grep -q '^Traceback' "$W/analysis.err"; then
     echo "NOT JUDGED: the analysis crashed"; echo "FAIL: audit_tenant_cpu_ai"; exit 1
 fi
 if [ "$rc" = 3 ]; then echo "REFUSED: CONTROL=$MODE — the plant did not reach the legs (above)"; exit 3; fi
-if [ "$rc" = 5 ]; then echo "FAIL: audit_tenant_cpu_ai (a leg ran another set than it names: refused before any figure)"; exit 1; fi
+case "$MODE" in   # #369: the finding each perturbation must produce, in the analysis's verdict stream ($W/analysis.err)
+    guard-tap-shifted) WANT='^  FAIL  A native: every class-0x10 call with \+0x1BC != 0 refused at the guard: (.*, )?[a-z0-9_]+ 0/[1-9][0-9]*(, .*)?$' ;;
+    shadow-class-removed) WANT='^  FAIL  B the Lua copy of 0x2CD38 agrees with the routine.s RETURN \(SR.s Z bit at the callers. bne\) on every native call: .*; first disagreements .*$' ;;
+    return-tap-shifted) WANT='^  FAIL  B every native entry of 0x2CD38 paired with a stop at its own return address: .*$' ;;
+    return-flag-swapped) WANT='^  FAIL  B the Lua copy of 0x2CD38 agrees with the routine.s RETURN \(SR.s C bit at the callers. bne\) on every native call: .*; first disagreements .*$' ;;
+    wrong-build) WANT='^  FAIL  identity: [a-z0-9_]+_native: ran vsavj, not vsav2 — refused, nothing it measured is judged$' ;;
+esac
+if [ "$rc" = 5 ]; then
+    [ -n "$MODE" ] && vs_ctl_caught "$W/analysis.err" "$WANT"
+    echo "FAIL: audit_tenant_cpu_ai (a leg ran another set than it names: refused before any figure)"; exit 1; fi
 if [ "$rc" = 4 ]; then
     for l in $LEGS; do [ -f "$W/$l/mame.log" ] && tail -2 "$W/$l/mame.log" | sed "s|^|    $l: |"; done
     [ -n "$MODE" ] && echo "NOT JUDGED: a leg is dead or incomplete under $MODE, so this run judged nothing"
@@ -467,7 +476,7 @@ else
 fi
 
 if [ -n "$MODE" ]; then   # the mode's verdict is the gate's own: it must FAIL
-    [ "$fail" = 1 ] && { echo "FAIL: audit_tenant_cpu_ai (control mode $MODE)"; exit 1; }
+    [ "$fail" = 1 ] && { vs_ctl_caught "$W/analysis.err" "$WANT"; echo "FAIL: audit_tenant_cpu_ai (control mode $MODE)"; exit 1; }
     vs_ctl_left_green "$MODE" "FAIL: audit_tenant_cpu_ai (control mode $MODE left it green)"
 fi
 [ "$fail" = 0 ] && { echo "PASS: audit_tenant_cpu_ai — Behaviour A (native refuses every class-0x10 continuation at +0x1BC != 0, ours continues), the ported caller 0x418952 reached on both sides, the 0x2CD38 copy agrees on every native call, each adaptive leg's own B event count, all as frozen"; exit 0; }

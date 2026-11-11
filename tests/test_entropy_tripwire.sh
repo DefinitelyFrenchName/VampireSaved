@@ -86,9 +86,14 @@ else
     echo "  FAIL  a wrong verdict:"; cat "$W/s2.txt"; rc=1
 fi
 
-if vs_ctl_is planted-blob || vs_ctl_is old-selector; then
-    [ "$rc" = 1 ] && { echo "FAIL: test_entropy_tripwire (control mode: $VS_CTL)"; exit 1; }
-    vs_ctl_left_green "$VS_CTL" "FAIL: test_entropy_tripwire — control mode $VS_CTL left the gate green"
+if vs_ctl_is planted-blob || vs_ctl_is old-selector; then   # #369: honoured only on the finding in its own section's output
+    [ "$rc" = 1 ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_entropy_tripwire — control mode $VS_CTL left the gate green"
+    case "$VS_CTL" in
+        planted-blob) MAINLOG="$W/s1.txt"; WANT='/planted\.bin  \[extra\]  [0-9.]+ bits/byte' ;;
+        old-selector) MAINLOG="$W/s2.txt"; WANT='^    a STAGED blob: exit 0, want FAIL$' ;;
+    esac
+    vs_ctl_caught "$MAINLOG" "$WANT"
+    echo "FAIL: test_entropy_tripwire (control mode: $VS_CTL)"; exit 1
 fi
 
 echo "== 3. controls"

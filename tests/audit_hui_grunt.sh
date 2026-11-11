@@ -95,9 +95,9 @@ mkdir -p "$W/ours" "$W/native"
   "$REPO/tests/lua/ring_tap.lua" >out 2>&1 ) &
 wait
 
-python3 - "$W" "${GRUNT_OURS_A2:-}" "$(basename "$BUILD")" <<'PY' || fail=1
+python3 - "$W" "${GRUNT_OURS_A2:-}" "$(basename "$BUILD")" "$MODE" > "$W/main.log" <<'PY' || fail=1   # #369: its findings, for vs_ctl_caught
 import re, sys
-W, ours_a2, bld = sys.argv[1], sys.argv[2].lower(), sys.argv[3]
+W, ours_a2, bld, mode = sys.argv[1], sys.argv[2].lower(), sys.argv[3], sys.argv[4]
 ATT = [3400, 4050, 4700, 5350, 6000]
 # frozen per BUILD vs native vsav2: per-attempt extra-voice slot (the id
 # landing ~f+45..f+60, between the electric burst and the 010x recovery
@@ -172,7 +172,9 @@ for leg, want in EXPECT.items():
     if rc == 0:
         print(f"  ok: {leg} — 5/5 attempts formed; kernel-voice pattern "
               f"matches frozen ({[x or '-' for x in want]})")
-if ours_mid1 is not None and ours_mid1 != ["0001"]:
+if mode:
+    pass   # #369: the in-gate control runs in a plain run only
+elif ours_mid1 is not None and ours_mid1 != ["0001"]:
     print("CONTROL FIRED: perturbed-inventory — the measured attempt-2 voice "
           f"{ours_mid1} differs from a wrong expected id, so a perturbed expectation "
           "(the mode's GRUNT_OURS_A2) fails the comparison and the gate FAILs")
@@ -181,6 +183,11 @@ else:
           "so the perturbation would have nothing to mismatch")
 sys.exit(rc)
 PY
+cat "$W/main.log"
+if [ -n "$MODE" ]; then
+    [ "$fail" = 1 ] && { vs_ctl_caught "$W/main.log" "FAIL: ours attempt 2 kernel-voice slot \['[0-9a-f]{4}'(, '[0-9a-f]{4}')*\] != frozen \['0001'\]\$" || :; echo "FAIL: audit_hui_grunt (control mode $MODE)"; exit 1; }
+    vs_ctl_left_green "$MODE" "FAIL: audit_hui_grunt — control mode $MODE left the gate green"
+fi
 
 # THE SHEET (#291, D2): with SHEET_OUT set, the two ring-tap legs this verdict compared, re-run under ring_tap.lua
 # itself, one moment per electrocution's kernel-voice slot, EVENT-PROVEN on each leg's own ring log. Nothing the gate

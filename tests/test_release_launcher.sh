@@ -39,6 +39,7 @@ REL="${1:-release/merged-m26}"
 [ -d "$REL" ] || { echo "SKIP: no release tree at $REL"; exit 0; }
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+: > "$W/main.log"
 fail=0
 ok()   { echo "  ok: $*"; }
 bad()  { echo "FAIL: $*"; fail=1; }
@@ -100,6 +101,7 @@ for plat in fbneo mame; do
         fi
     fi
     run "$D"
+    cat "$OUT" >> "$W/main.log"   # #369: the success path's own output is the main check's evidence
     if [ "$RC" = 0 ] && grep -q '^WOULD RUN: ' "$OUT"; then
         grep -q 'vsavjw' "$OUT" || bad "$plat: the invocation does not name the set"
         if [ "$plat" = fbneo ]; then
@@ -172,6 +174,11 @@ else
 fi
 
 # ---- the must-fire control, in-gate: an unpatched binary on the success path
+if [ -n "${VS_CTL:-}" ]; then   # #369: the launcher's own refusal, on the success path the mode made unpatched
+    [ "$fail" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: test_release_launcher (control mode $VS_CTL changed no verdict)"
+    vs_ctl_caught "$W/main.log" '^!! that FBNeo does not carry the CPS-2 WIDE profile' || :
+    echo "FAIL: test_release_launcher (control mode $VS_CTL)"; exit 1
+fi
 CD="$W/ctl"; stage fbneo "$CD"
 printf '#!/bin/sh\necho stock\n' > "$CD/emulator/bin/$OSARCH/fbneo"; chmod +x "$CD/emulator/bin/$OSARCH/fbneo"
 run "$CD"

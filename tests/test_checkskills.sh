@@ -141,6 +141,13 @@ if python3 tools/checkskills.py --root "$ROOT" $SELFTEST >"$W/tree.log" 2>&1; th
     ok "checkskills.py PASS on the tree ($(grep -o '[0-9]* rules' "$W/tree.log" | head -1))"
 else
     bad "checkskills.py FAILS on the tree:"; sed 's/^/        /' "$W/tree.log"
+    # #369: under a mode, the check's own finding line carrying the EXPECT its perturbation set (an ERE already)
+    case "${VS_CTL:-}" in
+    '') ;;
+    unanchored-rule) WANT='^  FAIL  MSC: defined in the skill, ANCHORED NOWHERE: MSC-999$' ;;   # its EXPECT names no rule
+    *) WANT="^  FAIL  [A-Z]+: .*$EXPECT" ;;
+    esac
+    [ -z "$VS_CTL" ] || vs_ctl_caught "$W/tree.log" "$WANT" || :
 fi
 
 # --- must-fire controls on a perturbed copy -------------------------------
@@ -154,6 +161,6 @@ control() {  # control <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log"
     fi
 }
-for n in $(vs_ctl_declared "$0"); do control "$n"; done
+[ -n "$VS_CTL" ] || for n in $(vs_ctl_declared "$0"); do control "$n"; done   # the in-gate controls: a plain run only (#369)
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

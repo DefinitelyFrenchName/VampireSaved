@@ -133,8 +133,15 @@ grep -v '^#' "$EXPECT" > "$W/want.tsv"
 if diff "$W/want.tsv" "$W/got.tsv" > "$W/diff.txt"; then ok "every row as frozen"
 else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt"; fi
 
-if [ -n "$CONTROL" ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: $CONTROL — the planted copy fails the frozen compare"; echo "FAIL: test_reaction_classes (control mode)"; exit 1
-    else echo "CONTROL DEAD: $CONTROL — the planted copy passed"; echo "FAIL: test_reaction_classes"; exit 1; fi
+if [ -n "$CONTROL" ]; then   # #369: the plant's own row, moved in the frozen compare's diff (the main check's output)
+    . "$REPO/tests/lib/controls.sh"
+    [ "$fail" = 1 ] || vs_ctl_left_green "$CONTROL" "FAIL: test_reaction_classes (control mode $CONTROL: the planted copy passed)"
+    case "$CONTROL" in
+        stager-38-copy)     WANT='^> vsavj[[:space:]]route[[:space:]]stager_ground[[:space:]]38[[:space:]]copy$' ;;
+        record-06-to-38)    WANT='^> vsavj[[:space:]]records[[:space:]]class[[:space:]]38[[:space:]]2 ' ;;
+        thunk-copy-removed) WANT='^> ours[[:space:]]route[[:space:]]stager_ground[[:space:]]4e[[:space:]]none$' ;;
+    esac
+    vs_ctl_caught "$W/diff.txt" "$WANT" || :
+    echo "FAIL: test_reaction_classes (control mode $CONTROL)"; exit 1
 fi
 if [ "$fail" = 0 ]; then echo "PASS: test_reaction_classes"; else echo "FAIL: test_reaction_classes"; exit 1; fi

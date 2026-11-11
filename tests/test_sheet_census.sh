@@ -40,7 +40,7 @@ vs_ctl_mode "$0"
 REG=tests/ci_emulator.tsv
 DEBT=tests/expected/sheet_debt.txt
 W="$(mktemp -d)" || { echo "FAIL: test_sheet_census — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
-bad=0; ok() { echo "  ok    $1"; }; nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
+bad=0; ok() { echo "  ok    $1"; }; nope() { echo "  FAIL  $1" | tee -a "$W/main.log"; bad=$((bad + 1)); }
 
 SPAN_DEBT=tests/expected/sheet_span_debt.txt
 census() {  # census <tests dir> <debt file> [<span debt file>] -> the tool's rows and PROBLEM lines; status 1 on a problem
@@ -93,6 +93,7 @@ fi
 echo "== test_sheet_census: every emulator gate declares its comparative sheet, or is on the debt list (#291) =="
 echo "== 1. the census"
 census "$SRC" "$SDEBT" > "$W/got.txt"; rc=$?
+cat "$W/got.txt" >> "$W/main.log"   # #369: the census's rows and PROBLEM lines, the main check's findings
 nl="$(command grep -c '^legs	' "$W/got.txt")"; nn="$(command grep -c '^none	' "$W/got.txt")"
 nr="$(command grep -c '^no-reference-leg	' "$W/got.txt")"; nd="$(command grep -c '^debt	' "$W/got.txt")"
 np="$(command grep -c '^no-picture	' "$W/got.txt")"
@@ -197,6 +198,7 @@ echo "== 4. tests/lib/sheet.sh assigns only __sheet_ names (sh has no locals)"
 lk="$(leaks "$LIB" | tr '\n' ' ')"
 if [ -z "$lk" ]; then ok "every variable the helper sets is __sheet_-prefixed"; else nope "the helper sets caller-visible names: $lk"; fi
 
+if [ -z "${VS_CTL:-}" ]; then   # #369: the in-gate controls run in a plain run only
 echo "== 5. must-fire controls on the census"
 mkdir -p "$W/t1" "$W/t2"; cp tests/*.sh "$W/t1/"; cp tests/*.sh "$W/t2/"
 neuter_decl "$W/t1" "$L1"
@@ -229,6 +231,19 @@ else vs_ctl_dead span-dropped "$SPANNED with its span rows neutered was not name
 leak_copy "$W/leak.sh"
 if [ -n "$(leaks "$W/leak.sh")" ]; then vs_ctl_fired leaky-helper "a copy whose row loop uses _sf is named: $(leaks "$W/leak.sh" | tr '\n' ' ')"
 else vs_ctl_dead leaky-helper "a copy whose row loop uses _sf was not named"; nope "control leaky-helper"; fi
+fi
 
-[ "$bad" = 0 ] && { echo "PASS: test_sheet_census — $nl legs, $nr no-reference-leg, $np no-picture, $nn none, $nd on the debt list"; exit 0; }
+[ "$bad" = 0 ] && { [ -z "${VS_CTL:-}" ] || vs_ctl_left_green "$VS_CTL" "FAIL: test_sheet_census (control mode $VS_CTL changed no verdict)"; echo "PASS: test_sheet_census — $nl legs, $nr no-reference-leg, $np no-picture, $nn none, $nd on the debt list"; exit 0; }
+# #369: a mode is honoured only on its own finding in the main checks' output (the census rows, sections 3c and 4)
+case "${VS_CTL:-}" in
+    dropped-declaration) WANT="^PROBLEM.$L1: no .# SHEET:. line and not in the debt list" ;;
+    silent-legs) WANT="^PROBLEM.$L1: declares legs but never sources tests/lib/sheet\\.sh" ;;
+    debt-regrown) WANT="^PROBLEM.$L1: declares .# SHEET: legs. but is still in the debt list" ;;
+    span-debt-regrown) WANT="^PROBLEM.$SPANNED: writes spans but is still on the span debt list" ;;
+    span-dropped) WANT="^PROBLEM.$SPANNED: a .legs. gate with no span" ;;
+    orphan-note) WANT='^ *FAIL  a note names no gate that exists: audit_no_such_gate $' ;;
+    leaky-helper) WANT='^ *FAIL  the helper sets caller-visible names: _sf $' ;;
+    *) WANT='' ;;
+esac
+[ -z "${VS_CTL:-}" ] || vs_ctl_caught "$W/main.log" "$WANT" || :
 echo "FAIL: test_sheet_census ($bad)"; exit 1

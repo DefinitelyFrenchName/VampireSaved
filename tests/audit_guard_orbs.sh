@@ -110,7 +110,7 @@ wait
 [ -z "${KEEP:-}" ] || { mkdir -p "$KEEP"; cp "$W/native/st" "$KEEP/native.st" 2>/dev/null || true; cp "$W/ours/st" "$KEEP/ours.st" 2>/dev/null || true; }
 
 prc=0; echo "== 2. the checks"
-W="$W" MODE="$MODE" python3 - <<'PY' || prc=$?
+W="$W" MODE="$MODE" python3 - > "$W/main.log" <<'PY' || prc=$?
 import os, sys
 W, MODE = os.environ["W"], os.environ["MODE"]
 ORBS = 1400          # frozen 14z-221c: drawn sub-0x16 piece-frames on each leg (175 frames x 8 orbs)
@@ -176,6 +176,7 @@ if not MODE:
         else: print(f"CONTROL DEAD: {c} — the gate passes on the perturbed copy"); fail = 1
 sys.exit(fail)
 PY
+cat "$W/main.log"
 # a dead leg (exit 4) judged nothing: NOT JUDGED under a mode, never a fired control (14z-221c, rule-checker run 2026-11-05-1653)
 if [ "${prc:-0}" = 4 ]; then
     vs_ctl_nj "the native or ours leg never reached its END line with every frame 2300-7240"
@@ -184,7 +185,13 @@ fi
 [ "${prc:-0}" = 0 ] || fail=1
 if [ -n "$MODE" ]; then
     [ "$fail" = 1 ] || vs_ctl_left_green "$MODE" "FAIL: audit_guard_orbs (control mode)"
-    echo "CONTROL FIRED: $MODE — the gate failed with the control applied"
+    # #369: honoured only on the comparison's own finding in step 2's output
+    case "$MODE" in
+    orbs-dropped) WANT='^  FAIL  drawn class-0x72 pieces equal on [0-9]+ of 4941 frames .*; drawn sub-0x16 piece-frames native [1-9][0-9]*, ours 0 \(frozen [0-9]+\)$' ;;
+    orb-displaced) WANT='^  FAIL  drawn class-0x72 pieces equal on [0-9]+ of 4941 frames \(first difference f[0-9]+: .*; drawn sub-0x16 piece-frames native [1-9][0-9]*, ours [1-9][0-9]* \(frozen [0-9]+\)$' ;;
+    *) WANT='' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
     echo "FAIL: audit_guard_orbs (control mode)"; exit 1
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_guard_orbs"; else echo "FAIL: audit_guard_orbs"; exit 1; fi

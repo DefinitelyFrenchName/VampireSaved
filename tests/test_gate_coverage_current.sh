@@ -58,5 +58,14 @@ if [ -z "$VS_CTL" ]; then
         else vs_ctl_fired "$c" "the perturbed copy fails --check"; fi
     done
 fi
+if [ -n "$VS_CTL" ]; then   # #369: honoured only on the regeneration diff naming what the copy perturbed
+    [ "$fail" -eq 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL"
+    case "$VS_CTL" in
+        hand-edited-coverage) WANT='^ *-### `hand\.sh` — test, x$' ;;   # the planted entry, absent from the regeneration
+        description-dropped) WANT="^ *-### \`$g\\.sh\`" ;;   # the gate whose WHAT was dropped leaves the page
+    esac
+    vs_ctl_caught "$W/check.log" "$WANT"
+    echo "FAIL"; exit 1
+fi
 [ "$fail" -eq 0 ] && echo "PASS" || echo "FAIL"
 exit "$fail"

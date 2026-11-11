@@ -853,5 +853,19 @@ if sheet_on && [ -z "${VS_CTL:-}" ] && [ -s "$W/sheet_cells.tsv" ]; then
     done < "$W/sheet_cells.tsv"
 fi
 
+if [ -n "${VS_CTL:-}" ]; then
+    case "$VS_CTL" in   # #369: the finding each perturbation must produce, in the verdict's own output ($W/verdict.txt)
+        arc-swap) WANT='^  FAIL: post-release arc peak differs between legs for victims \{.*\} \(ours, native\)$' ;;
+        wrong-thrower) WANT='^  FAIL: identity — the attacker.s loaded \+0x60 base is not 0x13.s on every captured frame: .*$' ;;
+        unpinned-level) WANT='^  FAIL: hold trajectories diverge in ORDER for victims \[.+\]$' ;;
+        nohold-dropped) WANT='^  FAIL: no hold for \[.+\]; ES never spent a stock for \[.*\] — VOID$' ;;
+        nohold-overdeclared) WANT='^  FAIL: declared no-hold but HELD on a leg: \[.+\] \(the declaration .*\)$' ;;
+        nohold-dead-leg|nohold-wrong-base) WANT='^  FAIL: declared no-hold victims whose legs are not proven live .*: \[.+\]$' ;;
+        press-is-kick) WANT='^  FAIL: press input — .* is not toward \+ [MH]P: .*\(want R \+ [MH]P = [23]\)$' ;;
+        nohold-no-attempt) WANT='^  FAIL: declared no-hold victims with NO air-throw attempt on a leg .*: \[.+\]$' ;;
+    esac
+    [ "$fail" = 1 ] && { vs_ctl_caught "$W/verdict.txt" "$WANT" || :; echo "FAIL: tenant throw geometry (control mode $VS_CTL)"; exit 1; }
+    vs_ctl_left_green "$VS_CTL" "FAIL: tenant throw geometry — control mode $VS_CTL left the gate green"
+fi
 [ "$fail" = 0 ] || { echo "FAIL: tenant throw geometry"; exit 1; }
 echo "PASS: the tenants' throws match native VS2 geometry at the matched level (Phobos's three, Pyron's and Donovan's standard, Pyron's air throw with its declared no-hold victims; re-frozen 14z-193, air rows 14z-194)"

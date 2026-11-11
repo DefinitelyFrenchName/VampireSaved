@@ -167,6 +167,7 @@ vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate sc
     if grep -qa '^REFUSED: CONTROL=' "$_clog"; then
         VS_CTL_EXEC=REFUSED; VS_CTL_EXEC_DETAIL="declared in the header, not a mode of the gate"; return 0
     fi
+    VS_CTL_EXEC_SPEAKER=""
     _vs_classify_base "$_cst" "$_clog" 90
     _cself=""
     if [ -n "$_cgate" ]; then
@@ -196,17 +197,36 @@ vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate sc
             VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="a SKIP with exit $_cst is not a verdict: $(grep -aE -m1 '^ *SKIP' "$_clog" | cut -c1-90)"
         elif grep -qa '^NOT JUDGED: ' "$_clog"; then   # NOT-JUDGED (#310)
             VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="the mode run measured nothing: $(grep -a -m1 '^NOT JUDGED: ' "$_clog" | cut -c13-92)"
+            # #369 piece 5 (maintainer-ruled 2026-11-09, "Name the speaker"): WHICH line made it UNJUDGED. `caught` when
+            # every NOT JUDGED line is vs_ctl_caught's backstop (the check failed without its finding) — and below, when
+            # a gate off the debt list FAILs with no CAUGHT line at all (#369's rule itself) — `own` when the
+            # gate's own line spoke (a dead leg's vs_ctl_nj, a crash surfaced by vs_ctl_show_err, …). The dead-leg and
+            # crash-sweep tables read it through vs_ctl_class_word: a migrated gate's real run must be UNJUDGED on its own
+            # line, and its known-bad leg (that line neutered) UNJUDGED-CAUGHT.
+            if grep -a '^NOT JUDGED: ' "$_clog" | grep -qavE '^NOT JUDGED: under control mode [^,]+, the check failed without its finding '; then
+                VS_CTL_EXEC_SPEAKER=own
+            else VS_CTL_EXEC_SPEAKER=caught; fi
         elif _vs_tool_death "$_clog" > /dev/null; then   # TOOL-ERROR (#367)
             VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a gate that died on a tool's error is not a verdict (exit $_cst): $(_vs_tool_death "$_clog" | cut -c1-90)"
         elif [ -n "$_cname" ] && grep -qa "^CONTROL CAUGHT: $_cname — " "$_clog"; then   # #369 CAUGHT
             VS_CTL_EXEC=HONOURED; VS_CTL_EXEC_DETAIL="its own check caught it (exit $_cst): $(grep -a -m1 "^CONTROL CAUGHT: $_cname — " "$_clog" | cut -c17-106)"
         elif ! { command -v vs_ctl_debt_listed >/dev/null 2>&1 && vs_ctl_debt_listed "$_cgate"; }; then   # #369 no positive evidence
             VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="no positive evidence from its own check: exit $_cst with no 'CONTROL CAUGHT: ${_cname:-<no name>}' line (#369)"
+            VS_CTL_EXEC_SPEAKER=caught   # #369 piece 5: the backstop itself spoke (no CAUGHT line at all)
         else   # the gate is on tests/expected/ctl_caught_debt.tsv: the pre-#369 fall-through until it is migrated
             VS_CTL_EXEC=HONOURED; VS_CTL_EXEC_DETAIL="reached the gate's own FAIL (exit $_cst; on the #369 debt list)"
         fi ;;
     esac
     return 0
+}
+
+# vs_ctl_class_word — the class as the dead-leg and crash-sweep tables and test_plants_not_applied write it (#369 piece 5,
+# maintainer-ruled 2026-11-09 "Name the speaker"): VS_CTL_EXEC, except an UNJUDGED made so only by #369's backstop
+# (vs_ctl_caught's NOT JUDGED line, or a FAIL with no CAUGHT line in a gate off the debt list), written UNJUDGED-CAUGHT.
+# A gate's OWN line (vs_ctl_nj, a REFUSED, a SKIP, a surfaced crash) keeps the plain word. Call after vs_classify_control.
+vs_ctl_class_word() {
+    if [ "${VS_CTL_EXEC:-}" = UNJUDGED ] && [ "${VS_CTL_EXEC_SPEAKER:-}" = caught ]; then echo UNJUDGED-CAUGHT
+    else echo "${VS_CTL_EXEC:-}"; fi
 }
 
 _vs_classify_base() {

@@ -256,7 +256,7 @@ if [ -s "$W/align_bad.txt" ]; then echo "  FAIL  $(wc -l < "$W/align_bad.txt" | 
 else echo "  ok    every run of both legs on emulated time, at its frozen game clock"; fi
 sa="$(ia_anchor "$W/stage/21_don_mash.align")"; saf="$(ia_anchor_frame "$W/stage/21_don_mash.align")"
 if [ -n "$sa" ] && [ "$sa" = "$(basis_at 21_don_mash "$saf")" ]; then echo "  ok    the staging reference leg reproduces the basis at frame $saf"
-else echo "  FAIL  the staging reference leg reads ${sa:-nothing} at frame ${saf:-?}, the basis $(basis_at 21_don_mash "${saf:-0}")"; fail=1; fi
+else echo "  FAIL  the staging reference leg reads ${sa:-nothing} at frame ${saf:-?}, the basis $(basis_at 21_don_mash "${saf:-0}")" | tee -a "$W/main.log"; fail=1; fi
 
 _flags=""
 vs_ctl_is range-moved && _flags="--frozen-shift 2"
@@ -276,8 +276,18 @@ cat "$W/read_reloc.txt"
 echo
 echo "== must-fire controls"
 if [ -n "${VS_CTL:-}" ]; then
-    if [ "$fail" = 1 ]; then vs_ctl_fired "$VS_CTL" "the gate's own read fails under the control"; echo "FAIL: audit_walker_ghost (control mode)"; exit 1
-    else vs_ctl_dead "$VS_CTL" "the gate's own read still passed" || true; echo "FAIL: audit_walker_ghost"; exit 1; fi
+    # #369: a mode is honoured only on its own finding in the main check's output — the alignment problems, the staging
+    # line and both legs' reads (the findings of the ERIS discovery runs, build/agent225/s225a/eris/runA)
+    [ "$fail" = 1 ] || vs_ctl_left_green "$VS_CTL" "FAIL: audit_walker_ghost — control mode $VS_CTL left the gate green"
+    case "$VS_CTL" in
+    supervisor-read) WANT="^CHECK FAIL[[:space:]]0x[0-9a-f]+: GROUND — the instrument read a stack the walker's caller did not push onto$" ;;
+    range-moved) WANT='^CHECK FAIL[[:space:]]0x[0-9a-f]+: FROZEN — the live range 0x[0-9a-f]+\.\.0x[0-9a-f]+ differs from the frozen 0x[0-9a-f]+\.\.0x[0-9a-f]+: re-measure' ;;
+    drift-clock) WANT=': game clock [0-9a-f]+ at frame [0-9]+, frozen [0-9a-f]+$' ;;
+    first-frame-skip) WANT='FAIL  the staging reference leg reads [0-9a-f]+ at frame [0-9]+, the basis [0-9a-f]+$' ;;
+    mask-covers) WANT='^CHECK FAIL[[:space:]]0x[0-9a-f]+: VISIBLE — the push 0x[0-9a-f]+\.\.0x[0-9a-f]+ overlaps mask ff0550-ff06e0:' ;;
+    esac
+    cat "$W/align_bad.txt" "$W/read.txt" "$W/read_reloc.txt" >> "$W/main.log" 2>/dev/null || :
+    vs_ctl_caught "$W/main.log" "$WANT" || :; echo "FAIL: audit_walker_ghost (control mode)"; exit 1
 fi
 # supervisor-read: the instrument reading SP on 21_don_mash must fail the ground truth
 if python3 tools/walker_ghost.py "$W/ctl_sp" "$FROZEN" "$W/vj_op.bin" --no-frozen > "$W/ctl_sp.txt"; then

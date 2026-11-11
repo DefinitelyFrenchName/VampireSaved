@@ -1,0 +1,6 @@
+PREPARED, WITHDRAWN BEFORE ANY READER WAS SPAWNED — 14z-225, 2026-11-11.
+
+Reading this packet's real prompt before spawning (as the opener requires) showed the claim contradicting itself: one
+line says the commit's strict tier runs on "a clean clone of 8a1bebf0", another that it runs on the commit's tree
+(8a1bebf0 plus the rule-checker records). No reader was spawned; there is no verdict and no ledger row, and the run is
+not evidence. The claim is corrected and the packet redone as 2026-11-11-1770.

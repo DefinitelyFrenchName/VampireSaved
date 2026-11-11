@@ -91,7 +91,8 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' 
 decrypt_view vsavj "$W/vj_op.bin" "$W/vj.bin" || { echo "FAIL: vsavj decrypt view"; exit 1; }
 decrypt_view vsav2 "$W/v2_op.bin" "$W/v2.bin" || { echo "FAIL: vsav2 decrypt view"; exit 1; }
 
-VJ="$W/vj.bin" V2="$W/v2.bin" OURS="$MERGED/verify_data.bin" MERGED="$MERGED" python3 - <<'PY'
+rc=0
+VJ="$W/vj.bin" V2="$W/v2.bin" OURS="$MERGED/verify_data.bin" MERGED="$MERGED" python3 - > "$W/main.log" 2>&1 <<'PY' || rc=$?
 import os, struct, sys
 from pathlib import Path
 vj  = Path(os.environ["VJ"]).read_bytes()
@@ -232,36 +233,37 @@ else:
     notes.append(f"3: vsavj aliases all {want} tenant-victim cells onto the base half; "
                  f"vsav2 gives all {want} their own data — the #104 subject")
 
-# ── 4. MUST-FIRE CONTROLS ───────────────────────────────────────────────────
+# ── 4. MUST-FIRE CONTROLS (a plain run only: under a mode the verdict is section 1's, #369) ──
 ours = Path(os.environ["OURS"]).read_bytes()   # the REAL image, whatever the mode swapped in
-ctl = bytearray(ours)
-pa = u32(ours, TJ+4*0x11); off = u16(ours, pa+2*0x03)
-ctl[pa+off+8] ^= 0x01                       # one byte of one record
-n = min(spacing(bytes(ctl),pa), spacing(v2,u32(v2,T2+4*0x11)))
-if cell(bytes(ctl),pa,0x03,n) == cell(v2,u32(v2,T2+4*0x11),0x03,n):
-    print("CONTROL DEAD: perturbed-record-byte — a perturbed record byte still compares equal")
-    fails.append("4a: CONTROL DID NOT FIRE — a perturbed record byte still compares equal")
-else:
-    print("CONTROL FIRED: perturbed-record-byte — one flipped record byte breaks the cell comparison")
+if not MODE:
+    ctl = bytearray(ours)
+    pa = u32(ours, TJ+4*0x11); off = u16(ours, pa+2*0x03)
+    ctl[pa+off+8] ^= 0x01                       # one byte of one record
+    n = min(spacing(bytes(ctl),pa), spacing(v2,u32(v2,T2+4*0x11)))
+    if cell(bytes(ctl),pa,0x03,n) == cell(v2,u32(v2,T2+4*0x11),0x03,n):
+        print("CONTROL DEAD: perturbed-record-byte — a perturbed record byte still compares equal")
+        fails.append("4a: CONTROL DID NOT FIRE — a perturbed record byte still compares equal")
+    else:
+        print("CONTROL FIRED: perturbed-record-byte — one flipped record byte breaks the cell comparison")
 
-naive = []
-for a in LEGACY:
-    pj, p2 = u32(vj,TJ+4*a), u32(v2,T2+4*a)
-    if [v for v in range(16) if cell(vj,pj,v,8*FIXED) != cell(v2,p2,v,8*FIXED)]:
-        naive.append(a)
-small = [a for a in LEGACY if spacing(vj,u32(vj,TJ+4*a)) < 8*FIXED]
-if not naive:
-    print("CONTROL DEAD: fixed-count-comparison — the fixed-count comparison found no false differences")
-    fails.append("4b: CONTROL DID NOT FIRE — the fixed-count comparison found no "
-                 "false differences, so this gate cannot show it is avoiding the trap")
-elif sorted(naive) != sorted(small):
-    print("CONTROL DEAD: fixed-count-comparison — the false positives are not exactly the small-spacing attackers")
-    fails.append(f"4b: the fixed-count comparison's false positives {[hex(a) for a in naive]} "
-                 f"are not exactly the small-spacing attackers {[hex(a) for a in small]}")
-else:
-    print(f"CONTROL FIRED: fixed-count-comparison — a FIXED {FIXED}-record comparison invents "
-          f"differences at exactly the attackers whose spacing is smaller "
-          f"({[hex(a) for a in naive]}); per-block spacing is what avoids it")
+    naive = []
+    for a in LEGACY:
+        pj, p2 = u32(vj,TJ+4*a), u32(v2,T2+4*a)
+        if [v for v in range(16) if cell(vj,pj,v,8*FIXED) != cell(v2,p2,v,8*FIXED)]:
+            naive.append(a)
+    small = [a for a in LEGACY if spacing(vj,u32(vj,TJ+4*a)) < 8*FIXED]
+    if not naive:
+        print("CONTROL DEAD: fixed-count-comparison — the fixed-count comparison found no false differences")
+        fails.append("4b: CONTROL DID NOT FIRE — the fixed-count comparison found no "
+                     "false differences, so this gate cannot show it is avoiding the trap")
+    elif sorted(naive) != sorted(small):
+        print("CONTROL DEAD: fixed-count-comparison — the false positives are not exactly the small-spacing attackers")
+        fails.append(f"4b: the fixed-count comparison's false positives {[hex(a) for a in naive]} "
+                     f"are not exactly the small-spacing attackers {[hex(a) for a in small]}")
+    else:
+        print(f"CONTROL FIRED: fixed-count-comparison — a FIXED {FIXED}-record comparison invents "
+              f"differences at exactly the attackers whose spacing is smaller "
+              f"({[hex(a) for a in naive]}); per-block spacing is what avoids it")
 
 for n_ in notes: print("  " + n_)
 if fails:
@@ -271,3 +273,14 @@ if fails:
     sys.exit(1)
 print(f"\nPASS: audit_capture_matrix ({os.environ['MERGED']})")
 PY
+cat "$W/main.log"
+if [ -n "${VS_CTL:-}" ]; then
+    [ "$rc" != 0 ] || vs_ctl_left_green "$VS_CTL" "FAIL: audit_capture_matrix (control mode $VS_CTL left the gate green)"
+    case "$VS_CTL" in   # the finding each perturbation must produce in section 1
+        perturbed-record-byte)  WANT="^FAIL: 1: attacker 0x11: 1 victim cell\\(s\\) differ from native vsav2 — \\['0x3'\\]\$" ;;
+        fixed-count-comparison) WANT="^FAIL: 1: attacker 0x06: [0-9]+ victim cell\\(s\\) differ from native vsav2" ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
+    exit 1
+fi
+exit "$rc"

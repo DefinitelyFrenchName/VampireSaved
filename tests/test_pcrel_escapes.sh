@@ -51,8 +51,10 @@ FROZEN="build/manifest/pcrel_escapes.toml"
 rc=0
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 PCREL_MODE=0; vs_ctl_is wrong-placement-suffix && PCREL_MODE=1; export PCREL_MODE
+W="$(mktemp -d)" || { echo "FAIL: test_pcrel_escapes — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 
-python3 - <<'PY' || rc=1
+# #369: the check's output is kept in $W/main.log, the file a mode's finding is read from
+python3 - > "$W/main.log" 2>&1 <<'PY' || rc=1
 import os, re, subprocess, sys
 
 BUILDS = ["hui64", "pyron49", "don_m30"]  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b  # re-pointed 14z-144 (M18 donovan/jedah freeze) <- 14z-143
@@ -169,7 +171,7 @@ for sec in merged_secs:
 ctl = next((s for s in merged_secs
             if s.get("placement_suffix") and os.path.isdir(f"build/{s['build']}/rompath")
             and os.path.isdir(s["extract"])), None)
-if ctl is not None:
+if ctl is not None and os.environ.get("PCREL_MODE") != "1":   # the in-gate control runs only in a plain run (#369)
     out = subprocess.run([sys.executable, "tools/verify_pcrel_data.py",
                           f"build/{ctl['build']}",
                           "--src-data", "build/out/vsav2_data.bin",
@@ -188,8 +190,14 @@ if rc == 0:
     print("  ok   x06cac0 absent everywhere — the 14z-69i fix still holds")
 sys.exit(rc)
 PY
+cat "$W/main.log"
 
 echo
+if [ -n "${VS_CTL:-}" ]; then
+    [ "$rc" = 0 ] && vs_ctl_left_green "$VS_CTL" "FAIL: control mode $VS_CTL changed no verdict."
+    vs_ctl_caught "$W/main.log" '^  FAIL merged_[a-z0-9_]+: merged inventory differs from its reference \[[a-z0-9_]+\] \(\+0/-[1-9][0-9]*\) —$' || :
+    echo "FAIL: see above (control mode $VS_CTL)."; exit 1
+fi
 if [ "$rc" = 0 ]; then
     echo "PASS: the pc-rel escape set is unchanged since reviewed."
     echo "      (That is what this asserts. It does NOT assert they are safe.)"

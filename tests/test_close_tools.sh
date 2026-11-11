@@ -82,7 +82,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d "${TMPDIR:-/tmp}/closetools.XXXXXX")" || { echo "FAIL: test_close_tools — mktemp -d failed (W)"; exit 2; }; trap 'vs_shares_release; rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 . "$REPO/tests/lib/shares.sh"; vs_shares_claim test_close_tools git-modules-index   # SHARES-CLAIM (#370, 14z-225): the host claim on what its # SHARES: line names
-fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*" | tee -a "$W/main.log"; fail=1; }   # the findings land in main.log (#369)
 unset RETRACTION_GREP_UNIVERSE   # a test harness's stand-in for the tree, set below for ONE control only (#268)
 
 runs_for() {   # runs_for <control>... — true outside a mode, or when the mode is one of this section's controls (#268)
@@ -265,6 +265,7 @@ if vs_ctl_is output-overwrites; then unguard "$W/ht_unguarded.py"; HT="$W/ht_ung
 python3 "$HT" --newest --state "$W/S.md" "$W/S.md" > "$W/ow.txt" 2>&1; rc=$?
 if [ "$rc" = 3 ] && grep -q '^REFUSED: the output path' "$W/ow.txt" && [ "$(shasum "$W/S.md" | cut -c1-40)" = "$H0" ]; then
     ok "the state file given as the output path is REFUSED and left byte-identical"
+elif [ "$(shasum "$W/S.md" | cut -c1-40)" != "$H0" ]; then bad "the state file given as the output path was OVERWRITTEN (exit $rc)"
 else bad "the state file given as the output path was not refused (exit $rc), or it changed"; fi
 fi
 
@@ -305,6 +306,20 @@ if [ -z "${VS_CTL:-}" ]; then
     if python3 tools/homes_tracked.py --selftest --blind >"$W/c2.out" 2>&1; then vs_ctl_dead build-home-planted "the BLIND variant passed the self-test — the plant is not what the self-test catches"; fail=1
     elif grep -q '^SELFTEST FAIL: (False, False' "$W/c2.out"; then vs_ctl_fired build-home-planted "the blind variant FAILS the self-test on the two build/ reads ($(grep '^SELFTEST FAIL' "$W/c2.out" | cut -c1-60)) while the real tool passes it (section 2)"
     else vs_ctl_dead build-home-planted "the blind variant exited non-zero WITHOUT the self-test's own FAIL line: $(tail -1 "$W/c2.out" | cut -c1-120)"; fail=1; fi
+fi
+if [ -n "${VS_CTL:-}" ] && [ "$fail" -ne 0 ]; then   # #369: the finding the mode's perturbation must produce in its section
+    case "$VS_CTL" in
+    gone-touched|gone-new-untouched) WANT='^  FAIL  FILE .*/mode[.]tsv: FAIL: a wording marked GONE is back in the tree: [(]1[)] since #268 ' ;;
+    case-fold-dropped)  WANT='^  FAIL  SELFTEST FAIL: the matcher missed the planted upper-case heading case' ;;
+    markup-dropped)     WANT='^  FAIL  SELFTEST FAIL: the matcher missed the planted quote-wrapped' ;;
+    build-home-planted) WANT='^  FAIL  SELFTEST FAIL: [(]False, False, ' ;;
+    bare-name-silent)   WANT='^  FAIL  SELFTEST FAIL: .* bare=False ' ;;
+    letter-unchecked)   WANT='^  FAIL  SELFTEST FAIL: .* letters=False ' ;;
+    bare-none-accepted) WANT='^  FAIL  SELFTEST FAIL: want 1 got 0 on ' ;;
+    note-always)        WANT="^  FAIL  a planted findings row read 'NOTE', not FAIL: " ;;
+    output-overwrites)  WANT='^  FAIL  the state file given as the output path was OVERWRITTEN ' ;;
+    esac
+    vs_ctl_caught "$W/main.log" "$WANT" || :
 fi
 [ "$fail" -eq 0 ] && echo "PASS" || echo "FAIL"
 exit "$fail"

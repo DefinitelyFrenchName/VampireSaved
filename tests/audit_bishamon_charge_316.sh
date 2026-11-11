@@ -116,7 +116,7 @@ done
 echo "  ok    28 legs complete"
 
 echo "== 2. the checks"
-python3 - "$W" "$MODE" $LEGS <<'PY'
+python3 - "$W" "$MODE" $LEGS > "$W/main.log" <<'PY'
 import sys
 W, mode, legs = sys.argv[1], sys.argv[2], sys.argv[3:]
 def fields(n):
@@ -198,6 +198,10 @@ nok = not [x for x in TR["P90"] if x[1] == 0x04185A]
 okp = len(rdp) == 1 and pf[rdp[0][0] + 1]["c106"] == 2 and pf[rdp[0][0] + 1]["lvl"] == level(rdp[0][1]) and rdp[0][1] == 111
 say(okp and same and nok, f"H5 P90: 6+LP reads +0x30E at 0x04183A {rdp} (frozen 111), then +0x106={pf[rdp[0][0] + 1]['c106'] if rdp else None} "
     f"+0x0A={pf[rdp[0][0] + 1]['lvl'] if rdp else None}; +0x30E = +0x316 on every held frame: {same}; no 0x04185A read: {nok}")
+if mode in ("p2-side", "tracker-swapped"):   # #369: the modes' finding is an ABSENCE of reads, so the tap's R events must be shown live
+    _p1 = all(any(x[1] == 0x04185A and x[2] == 0xFF8716 for x in TR[l]) for l in WANT)
+    if not (_p1 and len(rdp) == 1):
+        print(f"  BLIND  the tap's read events are not shown live (P1 reads at 0x04185a on every K leg: {_p1}; P90's read at 0x04183a: {len(rdp)})")
 ok, why, g = h1("DL90")
 say(ok and g == (111, 2), f"H6 DL90: down-back charges +0x316 too: {why} (frozen (111, 2))")
 for leg in ("D90", "R90", "idle"):
@@ -223,5 +227,20 @@ if not mode:
 sys.exit(1 if bad else 0)
 PY
 rc=$?
-[ "$rc" = 0 ] || { echo "FAIL: audit_bishamon_charge_316"; exit 1; }
+cat "$W/main.log"
+if [ "$rc" != 0 ]; then
+    # #369: a mode is honoured only on its own check's finding in the main check's output
+    case "$MODE" in
+    thresholds-shifted) WANT='^  FAIL  H1 K(57|89): read (71|110) at tap f[0-9]+; f[0-9]+: \+0x106=4 \+0x0A=(1|2) \(predicted (0|1)\)$' ;;
+    p2-side) WANT='^  FAIL  H1 K[0-9]+: 0 reads at 0x04185a$' ;;
+    pass-blind) WANT='^  FAIL  H3 K120: ' ;;
+    tracker-swapped) WANT='^  FAIL  H1 K[0-9]+: 0 reads at 0x04183a$' ;;
+    lilith-as-bishamon) WANT='^  FAIL  H8 Lilith held back ' ;;
+    short-as-long) WANT='^  FAIL  H2 K48: ' ;;
+    *) WANT='' ;;
+    esac
+    if grep -q '^  BLIND  ' "$W/main.log"; then vs_ctl_nj "the tap logged no read where one is measured (P1's 0x04185A reads, P90's 0x04183A read): its zero reads judged nothing"
+    else [ -z "$MODE" ] || vs_ctl_caught "$W/main.log" "$WANT" || :; fi
+    echo "FAIL: audit_bishamon_charge_316"; exit 1
+fi
 echo "PASS: audit_bishamon_charge_316 — +0x316 counts the logic passes back/down-back is held; at 6+LK it is read once and picks the level (<70, <110, else)"

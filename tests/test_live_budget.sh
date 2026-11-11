@@ -29,10 +29,11 @@ W="$(mktemp -d)" || { echo "FAIL: test_live_budget — mktemp -d failed (W)"; ex
 
 FILES="CLAUDE.md STATE.md HANDOFF.md docs/NEXT_SESSION.md"
 mkcopy() { for f in $FILES; do mkdir -p "$1/$(dirname "$f")"; cp "$f" "$1/$f"; done; }
-perturb() {  # perturb <name> <dir>; EXPECT = the failure's substring
+perturb() {  # perturb <name> <dir>; EXPECT = the failure's substring; WANT = the mode's finding in the main check's output (#369)
     case "$1" in
     over-lines)       i=0; while [ $i -lt 520 ]; do echo "- a line added by the over-lines control"; i=$((i + 1)); done >> "$2/docs/NEXT_SESSION.md"
-                      EXPECT="docs/NEXT_SESSION.md: " ; EXPECT2="-line maximum" ;;
+                      EXPECT="docs/NEXT_SESSION.md: " ; EXPECT2="-line maximum"
+                      WANT='^FAIL  docs/NEXT_SESSION\.md: [0-9,]+ lines, over the [0-9,]+-line maximum$' ;;
     long-lines)       python3 - "$2/HANDOFF.md" <<'PY'
 import sys
 p = sys.argv[1]
@@ -40,8 +41,9 @@ with open(p, "a") as f:
     for _ in range(4):
         f.write("| a long row added by the long-lines control " + "x" * 6000 + " |\n")
 PY
-                      EXPECT="HANDOFF.md: " ; EXPECT2="-byte cap" ;;
-    missing-document) rm "$2/CLAUDE.md"; EXPECT="CLAUDE.md: MISSING" ; EXPECT2="MISSING" ;;
+                      EXPECT="HANDOFF.md: " ; EXPECT2="-byte cap"
+                      WANT='^FAIL  HANDOFF\.md: [0-9,]+ bytes, over the [0-9,]+-byte cap$' ;;
+    missing-document) rm "$2/CLAUDE.md"; EXPECT="CLAUDE.md: MISSING" ; EXPECT2="MISSING"; WANT='^FAIL  CLAUDE\.md: MISSING — ' ;;
     *) echo "no such perturbation: $1"; exit 3 ;;
     esac
 }
@@ -68,6 +70,8 @@ control() {  # control <name>
         vs_ctl_dead "$1" "failed for the wrong reason"; bad "$1:"; sed 's/^/        /' "$d/log" | head -8
     fi
 }
-for n in $(vs_ctl_declared "$0"); do control "$n"; done
+if [ -z "$VS_CTL" ]; then for n in $(vs_ctl_declared "$0"); do control "$n"; done   # #369: the copies' controls in a plain run only
+elif [ "$fail" != 0 ]; then vs_ctl_caught "$W/tree.log" "$WANT"   # #369: the mode's own finding (WANT set by the mode's perturb above)
+fi
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

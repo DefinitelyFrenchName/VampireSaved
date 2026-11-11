@@ -34,6 +34,9 @@ vs_ctl_is live-site && LIVE=3ffffe
 # 14z-221c: 023f68, the `move.b $23f84(pc,d0.w),d0` whose byte table (indexed by the victim's +0x56, unmasked)
 # tools/audit_dead_span.py rule D finds within 0x100 of #294's span — the read executing 0 times bounds that reference
 SITES="$SPAN,024002,024020,02402a,029cc0,02383c,0238fc,023d82,023f68,$LIVE"
+# #369: under the mode the REAL live site stays breakpointed too, so the unreached address's zero is read beside a site
+# shown live in the same runs (a blind instrument reads NOT JUDGED, not the mode's finding)
+vs_ctl_is live-site && SITES="$SITES,02addc"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
 JOBS=${JOBS:-6}; pool=0
 for lg in tests/expected/vsavj/masked-v2/logs/*.log; do
@@ -44,9 +47,9 @@ for lg in tests/expected/vsavj/masked-v2/logs/*.log; do
   pool=$((pool + 1)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi
 done
 wait
-W="$W" SPAN="$SPAN" LIVE="$LIVE" python3 - <<'PY'
+W="$W" SPAN="$SPAN" LIVE="$LIVE" MODE="${VS_CTL:-}" python3 - > "$W/main.log" <<'PY' && rc=0 || rc=$?
 import glob, os, sys
-W, span, live = os.environ["W"], os.environ["SPAN"].split(","), os.environ["LIVE"]
+W, span, live, mode = os.environ["W"], os.environ["SPAN"].split(","), os.environ["LIVE"], os.environ["MODE"]
 tot, rep, bad, n = {}, {}, [], 0
 for f in sorted(glob.glob(f"{W}/*.txt")):
     n += 1; L = open(f).read().splitlines(); name = os.path.basename(f)[:-4]
@@ -64,6 +67,20 @@ if n == 0 or bad: fail = 1
 for s in span:
     if tot.get(s, 0): print(f"  FAIL  the span head PRG:0x{s.upper()} executed {tot[s]} times"); fail = 1
 if tot.get(live, 0) > 0: print(f"CONTROL FIRED: live-site — PRG:0x{live.upper()} executed {tot[live]} times in {rep[live]} replays: the instrument sees execution")
+elif mode:   # #369: under the mode the unreached address is the main check's finding, not this control's verdict
+    print(f"  FAIL  the live site PRG:0x{live.upper()} registered no execution in {n} runs"); fail = 1
+    if not tot.get("02addc", 0): print(f"  BLIND  the real live site PRG:0x02ADDC also registered no execution in {n} runs"); fail = 1
 else: print(f"CONTROL DEAD: live-site — PRG:0x{live.upper()} registered no execution: the bound is blind"); fail = 1
 print("PASS" if not fail else "FAIL"); sys.exit(fail)
 PY
+cat "$W/main.log"
+if [ "$rc" != 0 ]; then
+    if [ -n "${VS_CTL:-}" ]; then   # #369: honoured only on the mode's own finding, and only when every run completed
+        if grep -qE '^runs 0;|^  INCOMPLETE ' "$W/main.log"; then
+            vs_ctl_nj "no run, or a run that did not complete: the live site's count measures nothing"
+        elif grep -q '^  BLIND  ' "$W/main.log"; then
+            vs_ctl_nj "the real live site PRG:0x02ADDC registered no execution either: the instrument is blind, so the unreached address's zero measures nothing"
+        else vs_ctl_caught "$W/main.log" '^  FAIL  the live site PRG:0x3FFFFE registered no execution in [1-9][0-9]* runs$' || :; fi
+    fi
+    exit 1
+fi
