@@ -6,14 +6,18 @@
 #   cut by the real uploader, the shipped applier, `sh PLAY.command` in a live GNOME session),
 #   opens a window, reaches the select screen showing the release's own version mark, and plays
 #   SOUND: its own audio stream is linked to the session's sink, and that stream, recorded for
-#   15 s at the select screen, carries signal in every 5 s window.
+#   15 s at the select screen, carries signal in every 5 s window. A run in which FBNeo PAUSED (its window lost focus
+#   or was minimised: the M24 release's first run, 14z-217, #352) is reported as PAUSED, its mark, links and sound NOT
+#   judged, never as a mark or sound failure of the release.
 # HOW: tools/upload_release_assets.sh --dry-run cuts the assets (or ASSETS=<dir> of zips, e.g.
 #   downloaded from the release); apply_release.py builds the set from ROMDIR;
 #   tools/desktop_session_play.py records the null sink with pw-record (rec.wav, evidence),
 #   launches PLAY.command, sends keys through XTEST, captures the window with xwd, snapshots
 #   pw-dump at select and records the emulator's OWN stream node (app.wav);
 #   tools/desktop_mark_check.py judges the select capture at font-pixel resolution against the
-#   manifests' version font; tools/desktop_audio_check.py reads the links and the WAV levels.
+#   manifests' version font; tools/desktop_audio_check.py reads the links and the WAV levels;
+#   tools/desktop_pause_check.py reads FBNeo's own PAUSE overlay (drawn from its font, emu/fbneo) on every FBNeo
+#   capture up to select, BEFORE those judgements (#352): a paused leg is PAUSED and its three checks are not run.
 #   About 6 min of desktop time (five runs of ~60-75 s). Linux with a live session ONLY: on any
 #   other host it SKIPs and says so; at release it runs on PILOT (see HOW IT REACHES A RELEASE).
 #   One harness at a time on the session: it claims it (tests/lib/desktop_session.sh) and is REFUSED (exit 3) beside
@@ -21,8 +25,9 @@
 # EXPECTS: per emulator, mark mismatches 0 of 147 font cells, at least one active link from the
 #   emulator's node to auto_null and from auto_null to pw-record, and every 5 s window of the
 #   emulator's own stream above -45 dBFS RMS (the sink measured 14z-194 at -27 to -36 dBFS after
-#   select); each control fails.
-# FOLLOWS: tools/upload_release_assets.sh tools/desktop_session_play.py tools/desktop_audio_check.py tests/lib/shares.sh tests/lib/share_lock.py tests/shares.tsv
+#   select); no FBNeo capture up to select carrying the PAUSE overlay (a paused leg: FAIL, "not judged, PAUSED");
+#   each control fails.
+# FOLLOWS: tools/upload_release_assets.sh tools/desktop_session_play.py tools/desktop_audio_check.py tools/desktop_pause_check.py tests/lib/shares.sh tests/lib/share_lock.py tests/shares.tsv
 #   tools/desktop_mark_check.py build/manifest/version_font.json build/manifest/donovan.toml
 #   build/manifest/huitzil.toml build/manifest/pyron.toml tests/lib/desktop_session.sh
 #   build/manifest/ tests/lib/controls.sh emu/fbneo/ emu/fbneo-patches/ tools/setup_fbneo.sh
@@ -32,6 +37,7 @@
 #
 # MUST-FIRE: known-bad: muted-stream — the same run with the emulator's sound switched off at launch (MAME `-sound none` through PLAY.command's own argument pass-through, FBNeo SDL_AUDIODRIVER=dummy) must FAIL the signal check on BOTH emulators: a silent game is exactly what a gate that only saw a window would pass
 # MUST-FIRE: known-bad: unlinked-recorder — the recorder started with node.autoconnect=false (alive, linked to nothing) must FAIL the link check: a recording that is not of the emulator's output proves nothing about its sound, and the gate must be able to tell
+# MUST-FIRE: known-bad: minimised — FBNeo's window minimised 3 s after launch (the driver's iconify step: SDL_WINDOWEVENT_MINIMIZED reaches the same pause_game() as a focus loss) must make the FBNeo leg read PAUSED, never a mark or sound FAIL (in-gate: FBNeo's PAUSE overlay drawn from its font onto a copy of this run's own select capture must make the gate's pause reading name it, no desktop time; mode: the real FBNeo run minimised, about 70 s of desktop time, at release only — the maintainer, 2026-11-10: "build it this way but only as a release-time mode")
 # MUST-FIRE: known-bad: wrong-mark — the select capture judged against a mark one glyph off (the release's mark with its last character changed) must FAIL: a mark check that accepts a near miss cannot tell this release's binary from the last one's
 #
 # WHY. #226 (filed 14z-191): the Linux release had never been run as a player gets it. At 14z-193
@@ -159,12 +165,30 @@ play() {  # play <emu> <run label> [driver options...] -> prints the run dir; re
     ( cd "$pkg" && python3 apply_release.py --romdir "$ROMDIR" --out ./rompath ) > "$d/apply.log" 2>&1 || {
         echo "      $e.$lab: the shipped applier failed:" >&2; tail -3 "$d/apply.log" | sed 's/^/        /' >&2; return 3; }
     stp="$(eval echo "\$STEPS_$e")"
+    # the minimised mode (#352): FBNeo's window minimised 3 s after launch, captured 4 s later (paused0), then the steps
+    [ "$e" = fbneo ] && vs_ctl_is minimised && stp="wait:3,iconify:,wait:4,cap:paused0,$stp"
     rc=0
     timeout -k 10 200 python3 "$REPO/tools/desktop_session_play.py" --pd "$pkg" --out "$d" --steps "$stp" \
         --env "XDG_DATA_HOME=$W/$e.$lab/xdg" "$@" > "$d/drive.log" 2>&1 || rc=$?
     if [ "$rc" != 0 ]; then
         echo "      $e.$lab: the desktop run broke (exit $rc):" >&2; tail -4 "$d/drive.log" | sed 's/^/        /' >&2; return 3; fi
     echo "$d"
+}
+
+# paused_caps <run dir> -> the FBNeo captures up to select that carry FBNeo's PAUSE overlay, space-separated (#352); a
+# capture the detector cannot read is named `<label>(unread)`. FBNeo pauses on a focus loss or a minimise and plays on
+# behind the step schedule once a key step gives it focus back (measured 14z-225 on PILOT), so a pause seen at ANY
+# capture up to select voids that leg's mark, links and sound. THE LIMIT: a pause that began and ended between two
+# captures is not seen.
+PCAPS="paused0 title select"
+paused_caps() {
+    _pz=""
+    for _c in $PCAPS; do
+        [ -f "$1/$_c.png" ] || continue
+        _v="$(python3 tools/desktop_pause_check.py judge "$1/$_c.png" 2>&1 | tail -1)"
+        case "$_v" in "PAUSE yes "*) _pz="$_pz $_c" ;; "PAUSE no "*) ;; *) _pz="$_pz $_c(unread)" ;; esac
+    done
+    echo "${_pz# }"
 }
 
 # judge <emu> <run dir> <mark> -> prints MARK/LINKS/SIGNAL lines, sets M_OK L_OK S_OK
@@ -189,12 +213,36 @@ judge() {
 
 # ---- the real runs (in a CONTROL= mode, the perturbation applied to them) ----------------------
 RDEAD=""; EV=""
-for e in fbneo mame; do
+EMUS="fbneo mame"; vs_ctl_is minimised && EMUS=fbneo   # the minimised mode perturbs FBNeo only
+for e in $EMUS; do
     echo "== $e: the player's run"
     opts=""
     vs_ctl_is muted-stream && opts="$(mute_args "$e")"
     vs_ctl_is unlinked-recorder && opts="$UNLINK"
     d="$(play "$e" real $opts)" || { RDEAD="$RDEAD $e(the run broke)"; vs_ctl_nj "$e: the player's run did not complete"; bad "$e: the run did not complete (see above)"; continue; }   # #310 g7 NJ
+    # a PAUSED FBNeo leg (#352): its mark, links and sound are not judged — FAIL, but never as the release's mark or sound
+    if [ "$e" = fbneo ]; then
+        pz="$(paused_caps "$d")"
+        # a capture the pause check could not read (no PIL, no emu/fbneo font, a broken capture) is NOT JUDGED — never a
+        # pause, never the minimised mode's finding (rule-checker run 2026-11-11-1773 Q4)
+        case " $pz " in *"(unread)"*)
+            bad "fbneo: not judged — the pause check could not read: $pz (tools/desktop_pause_check.py: no PIL, no emu/fbneo font, or a broken capture); its mark, link and sound are not judged"
+            if [ -n "${VS_CTL:-}" ]; then RDEAD="$RDEAD fbneo(unreadable)"; vs_ctl_nj "fbneo: the pause check could not read: $pz"; fi   # #310 g7 NJ
+            continue ;;
+        esac
+        if [ -n "$pz" ]; then
+            act="$(python3 -c 'import json,sys; print(" ".join("%s:%s" % (j["label"], j.get("active")) for j in map(json.loads, open(sys.argv[1])) if j.get("ev") == "cap"))' "$d/drive.jsonl" 2>/dev/null || true)"
+            bad "fbneo: not judged, PAUSED — FBNeo showed its PAUSE overlay on: $pz (its window lost focus or was minimised; X's active window per capture: ${act:-not logged})"
+            if vs_ctl_is minimised; then EV="$EV fbneo"
+            elif [ -n "${VS_CTL:-}" ]; then RDEAD="$RDEAD fbneo(paused)"; vs_ctl_nj "fbneo: the run PAUSED (FBNeo's overlay on: $pz)"; fi   # #310 g7 NJ
+            continue
+        fi
+        if vs_ctl_is minimised; then
+            _n=0; for _c in $PCAPS; do [ -f "$d/$_c.png" ] && _n=$((_n + 1)); done
+            if [ "$_n" = 0 ]; then RDEAD="$RDEAD fbneo(no capture)"; vs_ctl_nj "fbneo: the minimised run left no capture of $PCAPS to read"   # #310 g7 NJ
+            else RDEAD="$RDEAD fbneo(no pause seen on its $_n capture(s))"; fi
+        fi
+    fi
     mk="$MARK"; vs_ctl_is wrong-mark && mk="$(wrong_mark "$MARK")"
     M_LINE=""; judge "$e" "$d" "$mk"
     # under a mode, the leg is LIVE only when the run gave the mode's check something to read (#310 group 7, 14z-223):
@@ -220,6 +268,13 @@ done
 
 # ---- a mode's readout: it fires on its OWN evidence on both emulators' runs, never on any red of the run (#310 group 7,
 # 14z-223: before, a run that broke failed every check and the mode read that as its firing)
+if vs_ctl_is minimised; then
+    if [ "$EV" = " fbneo" ]; then vs_ctl_fired minimised "the minimised FBNeo leg read PAUSED, its mark and sound not judged (mode)"
+    else case "$RDEAD" in
+        *"(the run broke)"*|*"(no capture)"*|*"(unreadable)"*) ;;   # a dead leg: its NOT JUDGED line is printed above, never the control's finding
+        *) echo "CONTROL DEAD: minimised — the minimised FBNeo run was live but showed no PAUSE overlay:$RDEAD" ;; esac; fi
+    echo "FAIL: audit_release_linux_desktop (control mode)"; exit 1
+fi
 if [ -n "${VS_CTL:-}" ]; then
     if [ "$EV" = " fbneo mame" ]; then vs_ctl_fired "$VS_CTL" "its check failed on both emulators' live runs (mode)"
     elif [ -n "$RDEAD" ]; then vs_ctl_nj "a leg was dead:$RDEAD, so the perturbation was judged on${EV:- no run}"   # #310 g7 NJ
@@ -233,13 +288,19 @@ if [ -z "${VS_CTL:-}" ]; then
     dead=""; got=""
     for e in fbneo mame; do
         d="$(play "$e" muted $(mute_args "$e"))" || { dead="$dead $e(run broke)"; continue; }
+        # a paused FBNeo, or one whose pause check could not read a capture, is silent or unjudged for its own reason,
+        # never the mute's (#352; `(unread)` marks a capture the check could not read)
+        [ "$e" = fbneo ] && [ -n "$(paused_caps "$d")" ] && { dead="$dead fbneo(paused or unreadable: $(paused_caps "$d"))"; continue; }
         judge "$e" "$d" "$MARK" > "$d/judge.txt"
         if [ "$S_OK" = 0 ]; then got="$got $e:$(grep SIGNAL "$d/judge.txt" | sed 's/^ *//')"; else dead="$dead $e(signal passed)"; fi
     done
     if [ -z "$dead" ]; then vs_ctl_fired muted-stream "the signal check failed on both emulators —$got"
     else vs_ctl_dead muted-stream "not caught on:$dead" || fail=1; fi
 
-    if d="$(play fbneo unlinked $UNLINK)"; then
+    d=""; ud="$(play fbneo unlinked $UNLINK)" && d="$ud"; pz=""; [ -n "$d" ] && pz="$(paused_caps "$d")"
+    if [ -n "$pz" ]; then
+        vs_ctl_dead unlinked-recorder "the FBNeo run paused or its pause check could not read it (on: $pz), so its links say nothing about the recorder (#352)" || fail=1
+    elif [ -n "$d" ]; then
         judge fbneo "$d" "$MARK" > "$d/judge.txt"
         if [ "$L_OK" = 0 ]; then vs_ctl_fired unlinked-recorder "the link check failed — $(grep LINKS "$d/judge.txt" | sed 's/^ *//')"
         else vs_ctl_dead unlinked-recorder "the unlinked recorder still read as linked: $(grep LINKS "$d/judge.txt")" || fail=1; fi
@@ -247,11 +308,23 @@ if [ -z "${VS_CTL:-}" ]; then
 
     wm="$(wrong_mark "$MARK")"; dead=""; got=""
     for e in fbneo mame; do
+        # a paused FBNeo's select capture shows no select screen, so a rejected mark there is the pause, never the control;
+        # an unreadable capture is no verdict either (#352)
+        [ "$e" = fbneo ] && pz="$(paused_caps "$OUT/fbneo.real")" && [ -n "$pz" ] && { dead="$dead fbneo(paused or unreadable: $pz)"; continue; }
         m="$(python3 tools/desktop_mark_check.py "$OUT/$e.real/select.png" "$wm" 2>&1)" || true
         case "$m" in *" mismatches 0 of "*) dead="$dead $e" ;; *" mismatches "[0-9]*) got="$got $e:$(echo "$m" | sed -n 's/.*\(mismatches [0-9]* of [0-9]*\).*/\1/p')" ;; *) dead="$dead $e(no verdict)" ;; esac
     done
     if [ -z "$dead" ]; then vs_ctl_fired wrong-mark "$wm rejected on both captures —$got"
     else vs_ctl_dead wrong-mark "$wm accepted or unread on:$dead" || fail=1; fi
+
+    # minimised, in-gate (#352; the real minimised run is the release-time mode only, maintainer-ruled 2026-11-10): FBNeo's
+    # overlay drawn from its font onto a copy of this run's own select capture must make paused_caps name it
+    mkdir -p "$W/minimised"
+    if [ -f "$OUT/fbneo.real/select.png" ] && python3 tools/desktop_pause_check.py draw "$OUT/fbneo.real/select.png" "$W/minimised/select.png" > /dev/null 2>&1; then
+        pz="$(paused_caps "$W/minimised")"
+        case " $pz " in *" select "*) vs_ctl_fired minimised "the drawn overlay on this run's select capture reads PAUSED (select)" ;;
+            *) vs_ctl_dead minimised "the drawn overlay on this run's select capture was not read as PAUSED: '$pz'" || fail=1 ;; esac
+    else vs_ctl_dead minimised "no FBNeo select capture of this run to draw on, or the draw failed" || fail=1; fi
 fi
 
 echo "  (runs kept under $OUT)"

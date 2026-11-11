@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent225/t352/RULING_352.txt	e092baa787a734fe40649561cbfb03eaf21f2c27
+build/agent225/t352/t352.patch	869511be40dd62bcfd1bd2725eae195f91939c71
+build/agent225/t352/diff_tested_vs_staged.txt	49cfc6fb13b6b5df7ffde16e113e262ba12c61db
+build/agent225/t352/truth_table.tsv	115ee8262b5c4d8c4b2804596b99d4db8e8425b7
+build/agent225/t352/pilot_t352.out	6bc7d72ab4f06528b10ad4826363563802ee5964
+build/agent225/t352/pilot_t352b.out	52854b2c843b5468238cf5913be8b229946c5780
+build/agent225/t352/static_gate_runs.txt	c58fecfec69952848b7f8f9e7234329513137300
+build/agent225/t352/bookkeeping.txt	2f18d73d0a7995936e73875e86ecd23dd25dff96
+docs/project/must_fire_contract.md.lines-44-60 (lines 44-60 of docs/project/must_fire_contract.md)	1372a74d54760081ed87521062e76dc854513c59
+tools/desktop_pause_check.py	b2f307d7e30421a618ca64095428c0ea96f0710b
+tests/test_desktop_pause_check.sh	d04c4e5b24d4d3e1fd44fdeee624c2f5433bc0e2

@@ -236,6 +236,7 @@ declares	test_decrypt_oracle
 declares	test_defense_rows_census
 declares	test_demand_after_trap
 declares	test_describe_masked_shape
+declares	test_desktop_pause_check
 declares	test_df_field_readers
 declares	test_df_startup_provenance
 declares	test_doc_anchor_census

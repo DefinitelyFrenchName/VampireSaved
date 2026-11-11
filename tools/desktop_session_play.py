@@ -16,7 +16,10 @@ Generalised from the 14z-193 hand driver (build/agent193/t226/pilot_drive.py). W
      emulator window — the release binaries carry no harness), `pwdump:<label>` (a `pw-dump`
      snapshot to pwdump_<label>.json), `apprec:<binary>:<s>` (record the emulator's OWN output
      stream — the node whose application.process.binary is <binary> — for <s> seconds into
-     app.wav; the sink monitor also carries the desktop's own event sounds);
+     app.wav; the sink monitor also carries the desktop's own event sounds), `iconify:` (minimise the emulator
+     window with XIconifyWindow — FBNeo's SDL2 frontend pauses on SDL_WINDOWEVENT_MINIMIZED; the minimised control of
+     audit_release_linux_desktop, #352); every `cap` also logs X's active window (`xprop -root _NET_ACTIVE_WINDOW`) as
+     its `active` field, so a capture of a paused FBNeo shows where the focus was (#352, 14z-225);
   4. stops: TERM to the emulator's process group, KILL after 10 s (MAME ignores TERM, paid
      14z-193/194); SIGINT to pw-record (finalises the WAV header), KILL after 10 s — ALWAYS, even when
      a step raised (#310 group 7, 14z-223: a dead xwd made `cap` raise, the stop was skipped, and the
@@ -59,6 +62,7 @@ x11.XKeysymToKeycode.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
 xt.XTestFakeKeyEvent.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_int, ctypes.c_ulong]
 x11.XSetInputFocus.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_int, ctypes.c_ulong]
 x11.XRaiseWindow.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
+x11.XIconifyWindow.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_int]; x11.XDefaultScreen.argtypes = [ctypes.c_void_p]
 x11.XFlush.argtypes = [ctypes.c_void_p]; x11.XSync.argtypes = [ctypes.c_void_p, ctypes.c_int]
 dpy = x11.XOpenDisplay(None)
 if not dpy:
@@ -175,14 +179,22 @@ try:
       if not wid:
           ev("no_window", step=step); continue
       seen_window = True
+      if kind == "iconify":
+          r = x11.XIconifyWindow(dpy, int(wid, 16), x11.XDefaultScreen(dpy)); x11.XFlush(dpy)
+          ev("iconify", window=wid, status=r); continue
       if kind == "cap":
+          try:   # X's active window at this capture (#352): a paused FBNeo's capture says where the focus was
+              act = subprocess.run(["xprop", "-root", "_NET_ACTIVE_WINDOW"], capture_output=True, text=True, env=env,
+                                   timeout=10).stdout.strip().rsplit(" ", 1)[-1] or None
+          except (OSError, subprocess.TimeoutExpired):
+              act = None
           f = os.path.join(a.out, "%s.xwd" % arg)
           r = subprocess.run(["xwd", "-id", wid, "-out", f], capture_output=True, text=True, env=env, timeout=20)
           # no .xwd (xwd failed or is absent): logged as png=False, never a crash (#310 group 7, 14z-223)
           if os.path.exists(f):
               subprocess.run(["convert", f, f[:-4] + ".png"], env=env, timeout=60)
               os.remove(f)
-          ev("cap", label=arg, window=wid, png=os.path.exists(f[:-4] + ".png"), err=r.stderr.strip())
+          ev("cap", label=arg, window=wid, active=act, png=os.path.exists(f[:-4] + ".png"), err=r.stderr.strip())
       elif kind == "key":
           name, _, hold = arg.partition(":")
           x11.XRaiseWindow(dpy, int(wid, 16)); x11.XSetInputFocus(dpy, int(wid, 16), 2, 0); x11.XSync(dpy, 0)

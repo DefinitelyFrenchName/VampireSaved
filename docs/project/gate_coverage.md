@@ -13,13 +13,13 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**516 of 518 gates described.**
+**517 of 519 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 68 | 68 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 50 | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 51 | 51 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -798,7 +798,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 27 of
 
 ## platform
 
-the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 50 of 50 described.
+the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 51 of 51 described.
 
 ### `audit_release_linux_cleanhost.sh` — audit, emulator
 
@@ -810,11 +810,11 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 ### `audit_release_linux_desktop.sh` — audit, emulator
 
-**WHAT:** each prebuilt linux-x86_64 asset (FBNeo and MAME), taken as a player gets it (the asset cut by the real uploader, the shipped applier, `sh PLAY.command` in a live GNOME session), opens a window, reaches the select screen showing the release's own version mark, and plays SOUND: its own audio stream is linked to the session's sink, and that stream, recorded for 15 s at the select screen, carries signal in every 5 s window.
+**WHAT:** each prebuilt linux-x86_64 asset (FBNeo and MAME), taken as a player gets it (the asset cut by the real uploader, the shipped applier, `sh PLAY.command` in a live GNOME session), opens a window, reaches the select screen showing the release's own version mark, and plays SOUND: its own audio stream is linked to the session's sink, and that stream, recorded for 15 s at the select screen, carries signal in every 5 s window. A run in which FBNeo PAUSED (its window lost focus or was minimised: the M24 release's first run, 14z-217, #352) is reported as PAUSED, its mark, links and sound NOT judged, never as a mark or sound failure of the release.
 
-**HOW:** tools/upload_release_assets.sh --dry-run cuts the assets (or `ASSETS=<dir>` of zips, e.g. downloaded from the release); apply_release.py builds the set from ROMDIR; tools/desktop_session_play.py records the null sink with pw-record (rec.wav, evidence), launches PLAY.command, sends keys through XTEST, captures the window with xwd, snapshots pw-dump at select and records the emulator's OWN stream node (app.wav); tools/desktop_mark_check.py judges the select capture at font-pixel resolution against the manifests' version font; tools/desktop_audio_check.py reads the links and the WAV levels. About 6 min of desktop time (five runs of ~60-75 s). Linux with a live session ONLY: on any other host it SKIPs and says so; at release it runs on PILOT (see HOW IT REACHES A RELEASE). One harness at a time on the session: it claims it (tests/lib/desktop_session.sh) and is REFUSED (exit 3) beside another desktop gate or a release emulator already running; under audit_dead_leg_linux it claims nothing (14z-223).
+**HOW:** tools/upload_release_assets.sh --dry-run cuts the assets (or `ASSETS=<dir>` of zips, e.g. downloaded from the release); apply_release.py builds the set from ROMDIR; tools/desktop_session_play.py records the null sink with pw-record (rec.wav, evidence), launches PLAY.command, sends keys through XTEST, captures the window with xwd, snapshots pw-dump at select and records the emulator's OWN stream node (app.wav); tools/desktop_mark_check.py judges the select capture at font-pixel resolution against the manifests' version font; tools/desktop_audio_check.py reads the links and the WAV levels; tools/desktop_pause_check.py reads FBNeo's own PAUSE overlay (drawn from its font, emu/fbneo) on every FBNeo capture up to select, BEFORE those judgements (#352): a paused leg is PAUSED and its three checks are not run. About 6 min of desktop time (five runs of ~60-75 s). Linux with a live session ONLY: on any other host it SKIPs and says so; at release it runs on PILOT (see HOW IT REACHES A RELEASE). One harness at a time on the session: it claims it (tests/lib/desktop_session.sh) and is REFUSED (exit 3) beside another desktop gate or a release emulator already running; under audit_dead_leg_linux it claims nothing (14z-223).
 
-**EXPECTS:** per emulator, mark mismatches 0 of 147 font cells, at least one active link from the emulator's node to auto_null and from auto_null to pw-record, and every 5 s window of the emulator's own stream above -45 dBFS RMS (the sink measured 14z-194 at -27 to -36 dBFS after select); each control fails.
+**EXPECTS:** per emulator, mark mismatches 0 of 147 font cells, at least one active link from the emulator's node to auto_null and from auto_null to pw-record, and every 5 s window of the emulator's own stream above -45 dBFS RMS (the sink measured 14z-194 at -27 to -36 dBFS after select); no FBNeo capture up to select carrying the PAUSE overlay (a paused leg: FAIL, "not judged, PAUSED"); each control fails.
 
 ### `audit_wide_phase_a.sh` — audit, emulator
 
@@ -895,6 +895,14 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 **HOW:** decrypts the reference set with our tool and dumps MAME's opcode space, then compares byte for byte.
 
 **EXPECTS:** byte-identical; a difference is a defect in one implementation's reading of the CPS-2 encryption.
+
+### `test_desktop_pause_check.sh` — test, ci_static
+
+**WHAT:** tools/desktop_pause_check.py, which audit_release_linux_desktop uses to tell a PAUSED FBNeo leg from a real mark or sound failure, reads PAUSED on a frame carrying FBNeo's overlay and NOT on frames that only resemble it.
+
+**HOW:** frames drawn here by the tool's own `draw` (FBNeo's font, shadow then ink, as pause_game() draws it): the overlay on a black frame at scale 2 (the 768x576 window of the PILOT runs), on a busy frame at scale 2 and 3, on a black 384x224 frame at scale 1 — each must read `PAUSE yes`; a black frame, the busy frame, the ink drawn with no shadow on the busy frame (yellow game art at that place: the M26 fight captures, measured 14z-225 ink 140/140 shadow 0/107), the overlay moved 6 renderer pixels right, and the overlay in a dim grey ink — each must read `PAUSE no`; a capture that will not open, a missing font file, and a python with PIL blocked — each must read `PAUSE unread` (exit 2), never a verdict and never a traceback (#352, rule-checker run 2026-11-11-1774).
+
+**EXPECTS:** 4 of 4 yes, 5 of 5 no, 3 of 3 unread; each control fails the gate on its own case.
 
 ### `test_emu_clock.sh` — test, emulator
 

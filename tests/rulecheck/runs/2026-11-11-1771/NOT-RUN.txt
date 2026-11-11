@@ -1,0 +1,6 @@
+PREPARED, WITHDRAWN BEFORE ANY READER WAS SPAWNED — 14z-225, 2026-11-11.
+
+Re-reading the packet's artifacts before spawning showed truth_table.tsv's header describing a "human reading" column
+the table does not have, and the claim saying the tool reads PAUSED on "exactly the 10 that show the overlay" when a
+human read only 9 of the 81 captures. No reader was spawned; no verdict, no ledger row. Redone as 2026-11-11-1772 with
+the table carrying the human reading where one exists and the claim saying how many captures a human read.

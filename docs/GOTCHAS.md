@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-621 entries (49 game / 154 platform / 418 project), counted from the buckets at generation.
+623 entries (49 game / 156 platform / 418 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
@@ -74,7 +74,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A MOTION THAT LEAVES A NEUTRAL FRAME BETWEEN BACK AND DOWN-BACK IS TWO TAPS TOWARD BACK, AND A CHARACTER WITH A BACKDASH DASHES — the press then lands in the hop (paid: 14z-205, #229, forks F3 and P1)
 - THE GAME HAS ONE ROUND: A DOWN THAT ENDS THE MATCH IS NEVER FOLLOWED BY A ROUND 2, AND A KO POKED WITH HP ALONE ENDS THE MATCH WITH THE SPARE BAR UNUSED (paid: 14z-215, GitHub #343)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 154 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 156 entries
 
 - LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB; `/bin/sh` IS DASH; THE PINNED MAME'S VERBOSITY IS A BUILD FACT — three macOS facts the first Linux emulator tier paid for (paid: 2026-10-01, ERIS WSL2 Ubuntu, GitHub #201)
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
@@ -230,6 +230,8 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - GNU `timeout` PUTS ITS COMMAND IN A PROCESS GROUP OF ITS OWN — `kill -- -<pgid>` of the caller's group does not reach it (paid: 14z-218, PILOT)
 - AN EXCEPTION RAISED IN `sitecustomize.py` DOES NOT CRASH PYTHON — `site.py` catches it, prints "Error in sitecustomize", and the program runs (paid: 14z-218, the Mac; `tests/lib/crash_sweep.sh`)
 - AN APOSTROPHE INSIDE `${VAR:?message}` OPENS A QUOTE — the whole script fails to parse, at a line far below (paid: 14z-221, #310)
+- FBNeo'S SDL2 PAUSE OUTLASTS ITS CAUSE — once focus comes back the game plays on BEHIND the driver's step schedule, so a capture made on time shows an earlier screen and reads as a wrong mark (paid: 14z-217's M24 release run; measured 14z-225, PILOT, #352)
+- A TIMED-OUT EMULATOR GATE'S MAME OUTLIVES THE GATE AND THE RUNNER — it catches TERM and plays on; `timeout -k`'s KILL never fires because the gate's shell is already gone (paid: 14z-225, PILOT, #371)
 
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 418 entries
 

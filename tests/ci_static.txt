@@ -259,3 +259,6 @@ test_crash_sweep
 # its plain run red and silent, and without its `# #310 g7 NJ` lines HONOURED again; two controls. Needs ROMDIR, runs no
 # emulator; ~1 min.
 test_dead_leg_unjudged
+# 14z-225 (#352): FBNeo's PAUSE-overlay detector (tools/desktop_pause_check.py) against frames it draws from FBNeo's own
+# font (emu/fbneo, so not ci_portable: a clean CI checkout has no submodule); SKIPs without PIL or emu/fbneo; ~2 s.
+test_desktop_pause_check

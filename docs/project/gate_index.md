@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**518 scripts** — 157 ci_portable, 98 ci_static, 263 emulator-tier (run by name).
+**519 scripts** — 157 ci_portable, 99 ci_static, 263 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 68 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 51 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -158,6 +158,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_crash_guard.sh` | test | emulator | MAME, a build dir | ground truth for the crash guard (verdict-logic doctrine, CLAUDE.md §4: a detector is trusted only after it classifies known-good and known-bad scenarios correctly). | 14z-197 |
 | `tests/test_crypt_boundary.sh` | test | ci_static | ROMDIR | code in the WIDE extension must be stored RAW. | 14z-123 |
 | `tests/test_decrypt_oracle.sh` | test | emulator | MAME | verify tools/cps2_decrypt.py against MAME's own cps2crypt implementation (dual-implementation agreement). | 14z-225 |
+| `tests/test_desktop_pause_check.sh` | test | ci_static | ROMDIR | THE FBNEO PAUSE DETECTOR READS ITS GROUND TRUTH RIGHT ([VSP-19], #352, 14z-225). ROM-free and emulator-free, ~3 s; needs python3 with PIL and the FBNeo source checkout (emu/fbneo, for its font). | 14z-225 |
 | `tests/test_emu_clock.sh` | test | emulator | MAME, ~4 min | THE SHARED INSTRUMENT CLOCK STAYS ON EMULATED TIME UNDER BREAKPOINTS (14z-197, GitHub #228 step 4). | 14z-197 |
 | `tests/test_fbneo_boot_log.sh` | test | ci_portable | — | the verdict logic of tests/lib/fbneo_boot_log.sh (what a healthy FBNeo WIDE boot log must show) against RECORDED boot logs from two real hosts: | 2026-09-13 |
 | `tests/test_fbneo_instruments.sh` | test | emulator | MAME, FBNeo | ground truth for the B5b FBNeo instruments. | 14z-123 |

@@ -3645,3 +3645,30 @@ runs (measured: a child started with `subprocess.run([sys.executable, "-c", "pas
 `/bin/sh` on macOS) report `syntax error near unexpected token` at line 98, then at line 102 after an unrelated edit: the
 `'` in the expansion's word starts a single-quoted string that runs on through the file. Bisecting with `head -N | bash -n`
 named the line. Keep quotes out of a `:?` message, or quote the message as its own word.
+
+## FBNeo'S SDL2 PAUSE OUTLASTS ITS CAUSE — once focus comes back the game plays on BEHIND the driver's step schedule, so a capture made on time shows an earlier screen and reads as a wrong mark (paid: 14z-217's M24 release run; measured 14z-225, PILOT, #352)
+
+`pause_game()` (`emu/fbneo/src/burner/sdl/run.cpp`, reached by `SDL_WINDOWEVENT_FOCUS_LOST` or `_MINIMIZED`) stops the
+sound, draws a shadowed "PAUSE" at renderer (10,10) in its own font, and loops until `SDL_WINDOWEVENT_FOCUS_GAINED`,
+Tab or P. Measured on PILOT's live session with the window minimised 3 s after launch (`XIconifyWindow`): X's
+`_NET_ACTIVE_WINDOW` read `0x0` and the boot-name and title captures carried PAUSE; the driver's first key step
+(`XRaiseWindow` + `XSetInputFocus`) made the window active again and FBNeo resumed, but the select capture, on schedule,
+showed the QSound screen: `audit_release_linux_desktop` read mark 100 of 147 wrong, links and sound passing. The M24
+failure (14z-217) had PAUSE on its title and select captures and none on its fight capture: it too resumed later.
+**The rule:** a capture-schedule driver must read FBNeo's own PAUSE overlay before judging a capture
+(`tools/desktop_pause_check.py`, its template rendered from `sdl2_inprint.cpp`); a pause seen on any capture up to the
+judged one voids that leg. A pause that begins and ends between two captures is not seen.
+
+## A TIMED-OUT EMULATOR GATE'S MAME OUTLIVES THE GATE AND THE RUNNER — it catches TERM and plays on; `timeout -k`'s KILL never fires because the gate's shell is already gone (paid: 14z-225, PILOT, #371)
+
+`tests/run_all_emulator.sh` runs `timeout -k 30 <secs> tests/<gate>.sh`. At the limit `timeout` sends TERM to the gate's
+process group; a gate under dash with no TERM trap dies at once, `timeout` returns 124, and its KILL — sent only while
+the GATE still runs — never comes. The gate's MAME legs (`~/.cache/vampire-saved/mame/cps2 … replay_guard.lua`) caught
+the TERM (`SigCgt` bit 15; INT and QUIT ignored as background jobs) and ran on at 99.8 % CPU with parent 1, 3 to 10
+minutes later; a TERM by hand left them running 10 s on; KILL ended them. Their shutdown also races the runner's
+`rm -rf` of its temp: "Directory not empty", the run's `build/tmp/emu_*` left behind. A trap in the gate does not help
+(the split form left a process writing into the gate's directory 87-104 s after the runner ended).
+`tools/desktop_session_play.py` already knew ("MAME ignores TERM, paid 14z-193/194") and KILLs its own group. **The
+rule:** whoever times a gate out ends everything the gate started — its session, TERM then KILL — before removing its
+files (#371's prototype `session_run.py`, `build/agent225/t364/`, did this with zero survivors). **And `pgrep mame`
+is blind to these processes: the binary is named `cps2`** — count with `pgrep -x cps2` (and `-x fbneo`).
