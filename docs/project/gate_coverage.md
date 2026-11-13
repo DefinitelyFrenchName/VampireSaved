@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**517 of 519 gates described.**
+**518 of 520 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 68 | 68 | the suite runners and their own ground truth |
+| [runner](#runner) | 69 | 69 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 51 | 51 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 68 of 68 described.
+the suite runners and their own ground truth. 69 of 69 described.
 
 ### `audit_crash_sweep_emu.sh` — audit, emulator
 
@@ -487,6 +487,14 @@ the suite runners and their own ground truth. 68 of 68 described.
 **HOW:** builds a SYNTHETIC repository and project directory (no real transcript is committed: one carries the user's identity) holding every shape the collector must read right — a session key and its letter continuation (14z-9 / 14z-9b), a ledger row keyed by the transcript id instead of the key, an assistant message spread over two records (one usage), a mid-turn message recorded as a queue enqueue AND a user record (one message), harness noise, a transcript id on one STATE heading and none on the other (mapped by its commits), a tier run inside the span and one outside it — and requires the collector's exact figures; then `check` must pass, a PLANTED ledger row must move the run count by exactly one, and seven controls run shadow copies with one perturbation each, each of which must fail the comparison for its own reason. THE ACTIONS (#335, ruled 2026-10-29; tools/rc_actions.py): 14z-9's re-check names the run it follows ("after run 01", NAMED); 14z-10 holds a re-check linked only by its wording (WORDING), one whose wording shares nothing but whose meta.tsv records its action (RECORDED), a VOID run before an OK re-check (the VOID run is never the first), a calibration row (not an action), a packet marked NOT-RUN and a lone freeze whose plant died (an action of VOID runs only), the last two shown apart.
 
 **EXPECTS:** 14z-9: 4 rule-checker runs (one keyed by its transcript id), 2 VIOLATED, Q1/Q4/QP3 1 each, 3 packets, 1 re-check, longest 2; 1 commit (14z-9b's not counted); 3 findings; 2 retracted wordings; 2 tickets; 2 maintainer messages; reply median 10.0 min; 700 output tokens; 1 worker; 1 tier run, 0.03 h, 1 FAIL. 14z-10: its transcript found by its commit (DERIVED). Actions: 14z-9 3 (1 OK first: 33 %; Q1, Q4, QP3 1 each); 14z-10 3 (build 1, expectation 1, recommendation 1 OK first; Q1, Q2, Q4 1 each), 1 packet not run; all ESTIMATED; its build passed 0.5 h after its first packet (the two "prepared run" results in its transcript, 07:10 and 07:40). check: 0 bad. The plant: 5 runs. Each control FIRES. #339 (14z-214): a ledger row with no 14z key — `-`, or a transcript id no session in the collect claims — is keyed by tests/rulecheck/session_corrections.tsv (the synthetic rows 2026-01-01-07 `-` and 2026-01-01-08 `eeeeffff`, both to 14z-8: a 14z-8..14z-10 collect counts 2 runs for 14z-8); without its correction the collector STOPS naming the row (it used to drop it from both ledger pages without a word) — the `-` row and, alone, the unclaimed transcript-id row; a correction aimed at a keyed row, or at no ledger row, is refused; the row keyed by 14z-9's own transcript id stays counted by it.
+
+### `test_session_reap.sh` — test, ci_portable
+
+**WHAT:** tests/lib/session_run.py, through which tests/run_all_emulator.sh runs every gate (plain and CONTROL=), passes the gate's exit status through, gives the gate a TMPDIR of its own and removes it, ends every process left in the gate's session (TERM, a bounded wait, KILL) even when a nested timeout put it in a group of its own and it ignores TERM, and forwards a TERM sent to it to the gate's session; and the runner's four gate command lines go through it.
+
+**HOW:** the helper on small commands: exit 3; a shell killed by TERM (143); `timeout 1 sleep 9` (124). A command that writes into its TMPDIR: the TMPDIR is a fresh `gate.*` under the given base, and gone afterwards. A PLANT that exits 0 leaving two TERM-ignoring sleeps (one direct, one under a nested `timeout 600`, the shape measured on PILOT in 14z-225), each with a sleep length unique to this run: 0 must be left. A plain sleep behind the helper, the helper sent TERM: exit 143 and 0 left. The runner: every line that runs `tests/$_g.sh` names the helper (4 lines), and the runner exports JTSIM_SCRATCH (a MiSTer gate's scratch fallback would otherwise land in the per-gate TMPDIR).
+
+**EXPECTS:** 3 of 3 statuses, the TMPDIR case, 0 plant survivors, the forwarded TERM, 4 of 4 runner lines and the export.
 
 ### `test_shares.sh` — test, ci_portable
 

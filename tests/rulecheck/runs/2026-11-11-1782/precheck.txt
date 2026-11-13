@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: The split form is the one gate-side trap form measured; a trap that forwards TERM or KILL to the gate's legs was not tried.  [build/agent226/t364/recommendation.md]
+  FLAG D-ABSOLUTE: - **Measured under R — exactly these rows and nothing else:**  [build/agent226/t364/recommendation.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

@@ -696,6 +696,15 @@ control claims.
   `build/tmp/`, removed when the run ends, and refuses to START with less free space there than 10 GB (controls on more
   than one job; else 2 GB; `VS_TMP_MIN_GB` overrides), naming the shortfall. PILOT has about 12 GB free. Why: concurrent
   controls filled ERIS's 24 GB tmpfs `/tmp` (section 21, control `tmp-ignored`).
+- **Every gate run leaves nothing behind** (#364, #371; design R, ruled 2026-11-11, *"R, no lint (Recommended)"*): each
+  gate run, plain and CONTROL=, goes through `tests/lib/session_run.py`, which starts the gate in a session of its own
+  with a TMPDIR of its own (`gate.*` under the run's), and when the gate returns, whatever its status, TERMs whatever is
+  left in that session, waits up to 10 s (`REAP_WAIT`), KILLs the rest and removes the TMPDIR, reporting each step as
+  `### session_run:` lines in the gate's log; a timed-out gate's row so reads up to 10 s over its cap. A TERM, INT or
+  HUP sent to the runner's group is forwarded to the gate's session. The runner exports `JTSIM_SCRATCH` (the run's
+  scratch path, as before), so a MiSTer gate's fallback never lands in the per-gate TMPDIR. Ground truth:
+  `tests/test_session_reap.sh`; the facts it answers: `docs/platform/gotchas.md` "A TIMED-OUT EMULATOR GATE'S MAME
+  OUTLIVES THE GATE AND THE RUNNER".
 - **A control mode stopped by its host is DIED** (ruled 2026-10-27, *"Signatures -> DIED (Recommended)"*): a mode log
   carrying `No space left on device`, `mktemp: `, `cannot create …`, `Permission denied`, `Read-only file system`, `Too
   many open files`, `Cannot allocate memory` or `Disk quota exceeded` is a crash, never an honoured control

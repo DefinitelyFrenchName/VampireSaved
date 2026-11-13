@@ -55,7 +55,8 @@ leg() {  # leg <gate> <log> [VAR=value ...] — the gate as the runner invokes i
         case "$_tok" in [A-Z_][A-Z0-9_]*=*) _env="$_env $_tok" ;; *) _pos="$_pos $_tok" ;; esac
     done
     # shellcheck disable=SC2086
-    env $_env "$@" timeout -k 30 "$_tmo" "tests/$_lg.sh" $_pos < /dev/null > "$_ll" 2>&1; echo $?
+    # through tests/lib/session_run.py as the runner runs every gate since #364/#371 (design R, 14z-226)
+    env $_env "$@" python3 tests/lib/session_run.py timeout -k 30 "$_tmo" "tests/$_lg.sh" $_pos < /dev/null > "$_ll" 2>&1; echo $?
 }
 
 echo "== 1. the hook (in-gate control hook-off's ground truth)"

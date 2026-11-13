@@ -103,6 +103,7 @@ esac
 if vs_ctl_is emu-identity-unchecked; then cp "$T/emu_unchecked.sh" "$R/tests/run_all_emulator.sh"
 else cp tests/run_all_emulator.sh "$R/tests/run_all_emulator.sh"; fi
 for _l in classify controls measures; do cp "tests/lib/$_l.sh" "$R/tests/lib/$_l.sh"; done
+cp tests/lib/session_run.py "$R/tests/lib/"   # the emulator runner runs every gate through it (#364/#371, 14z-226)
 cp tools/static_confirm.py tools/battery_reach.py tools/build_dirs.py "$R/tools/"
 cp tests/expected/build_dirs.tsv "$R/tools/"
 case "${VS_CTL:-}" in

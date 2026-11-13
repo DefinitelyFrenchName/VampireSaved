@@ -1,0 +1,12 @@
+decision	recommendation
+subject	#364/#371: recommend design R (the emulator runner reaps each gate's session and removes its TMPDIR) without the lint, over the 276-file trap patch
+session	14z-226
+model	rule-checker@163e4ce9cf7b
+claim	Recommend design R for #364 and #371 (the emulator runner starts each gate in a session of its own with a TMPDIR of its own, and after the gate returns TERMs what is left in that session, waits up to 10 s, KILLs the rest and removes the TMPDIR), without the lint for new files, over G (the split trap form in 276 files): it rests on PILOT's runner runs where the split form still left a recreated work directory and the runner's temp directory (build/agent225/t364/pilot_t364b.out) and where three TERM-catching cps2 processes outlived their gates (build/agent225/t364/design.md fact 4), on the prototype's runs that left 0 survivors on PILOT for the planted gate and the timed-out audit_command_throws with both passing gates still PASS (build/agent225/t364/pilot_t371.out) and 0 survivors on the Mac for the plant (build/agent226/t364/mac_t371.out), on the static runner having no timeout wrapper (tests/run_all_static.sh line 503), and on the maintainer's words on #310 "greenfield a solution instead of piling on patches" (DECISIONS_HISTORY.md, 14z-223); NOT TESTED: the pooled lanes at --jobs N, the two Linux desktop gates, the Verilator lane and a real MAME gate timed out on the Mac; on the Mac the TMPDIR removal misses a gate's bare mktemp -d directory (docs/platform/gotchas.md), and a manual kill under dash still leaves an EXIT-only gate's directory.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	0 flag(s)
+deliverables	build/agent226/t364/recommendation.md
+action	2026-11-11-1778

@@ -1,0 +1,12 @@
+decision	recommendation
+subject	#371/#364: close both with design R's commit (the emulator runner reaps each gate's session and removes its TMPDIR), measured on every item the ruling listed NOT TESTED
+session	14z-226
+model	rule-checker@163e4ce9cf7b
+claim	Close #371 and #364 with design R's commit: R as built (tests/lib/session_run.py on the emulator runner's four gate lines, tests/test_session_reap.sh) was measured, before its commit, on every item the ruling listed NOT TESTED, and every measured gate verdict through R either PASSes or matches the stock runner on the same host; R left no cps2, Verilator sim or gate.* directory on any host, while the stock runner left an orphan cps2 under a runner TERM. #364 closes with the manual-kill case under dash, the Mac's bare mktemp -d and the absence of a lint as named limits, as ruled. The deliverables are the measurement report and the two closing comments.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	7 flag(s): D-ABSOLUTE 7
+deliverables	build/agent226/r371/report_r.md build/agent226/r371/comment_371.md build/agent226/r371/comment_364.md
+action	2026-11-12-1784

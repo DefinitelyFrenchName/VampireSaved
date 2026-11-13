@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent226/t364/recommendation.md	23f233d04e61903aa127f0c468b1183f76d78f1f
+build/agent225/t364/design.md	4f4176de7db6facd32713cc8cda050831a781272
+build/agent225/t364/pilot_t364.out	c10a156f1f8a623f2846eb6ca744e23fd92291cb
+build/agent225/t364/pilot_t364b.out	2bcce6a0bb70c0edbe53497198383e6833c94e86
+build/agent225/t364/pilot_t371.out	5273dcf2e0b8fc5bf77e2651097e8f901e76057f
+build/agent225/t364/session_run.py	442f005e28e83ee73d46b7c683be798f90b46078
+build/agent225/t364/census364.txt	23236feea4b0c87c8da0df0a8a16aed38e85e349
+build/agent226/t364/mac_t371.sh	5a1f09f5921c89c6548d396b9aa79c207e064f83
+build/agent226/t364/mac_t371.out	4d91aef2c1604040a1fd48c3a5ea062d04fbdf0a
+build/agent226/t364/issue_364.md	e4a42b1a61856cf325b7a7b6103398db347b274b
+build/agent226/t364/issue_364_comments.txt	e4ade082e23eb38c47ba4e7ea0153f79e3969ef5
+build/agent226/t364/issue_371.md	f5cb0fdf250174ea92098e5da4cc770034edb907
+DECISIONS_HISTORY.md.lines-9883-9900 (lines 9883-9900 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-08 (14z-223) — #310: a post-mortem and a greenfield proposal before any batch 6")	fc1dcdc167dd5acea184148b4a143a2ab8cfdf9f
+docs/platform/gotchas.md.lines-3420-3432 (lines 3420-3432 of docs/platform/gotchas.md)	e9916b8e945cdff8284298ad1b10fc30b7897e45
+tests/run_all_emulator.sh.lines-620-685 (lines 620-685 of tests/run_all_emulator.sh)	3bc09913a56fb9e99ef85d96f4c09d09647b2c67
+tests/run_all_static.sh.lines-498-506 (lines 498-506 of tests/run_all_static.sh)	503521d01c4d33937b45a96eb7c609d90432e646

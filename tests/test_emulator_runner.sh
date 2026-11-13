@@ -246,6 +246,7 @@ cmp -s "$REPO/tests/lib/classify.sh" "$T/classify_tool.sh" && fail "could not di
 ln -s "$CTLLIB" "$FR/tests/lib/controls.sh"   # the controls reader beside it (14z-147)
 ln -s "$MEASLIB" "$FR/tests/lib/measures.sh"   # the measurement reader too (14z-180): the runner must survive a gate that declares nothing
 ln -s "$REPO/tests/lib/share_pool.py" "$FR/tests/lib/share_pool.py"   # the # SHARES: reader (#370, 14z-225)
+ln -s "$REPO/tests/lib/session_run.py" "$FR/tests/lib/session_run.py"   # every gate run goes through it (#364/#371, 14z-226)
 
 # Stub tools so the runner's preconditions execute for real.
 printf '#!/usr/bin/env python3\nimport sys\n' > "$FR/tools/audit_roms.py"
@@ -1172,21 +1173,27 @@ t21() {  # t21 <runner> <log> [env...] -> the TMPDIR the gate saw
     (cd "$FR" && env -u TMPDIR "$@" ROMDIR="$T/roms" MERGED=build/fake_merged sh "tests/$_r" --lane mame --log "$_l" > "$_l.out" 2>&1) || true
     sed -n 's/^gate TMPDIR=//p' "$_l/g_tmp.log" 2>/dev/null | head -1
 }
+# Since #364/#371 (design R, 14z-226) every gate gets a TMPDIR of its own, `gate.*` directly under the run's (or the
+# caller's), from tests/lib/session_run.py; the run's directory is its parent.
 v21="$(t21 run_all_emulator.sh "$T/l21")"
 case "$v21" in
-    */build/tmp/emu_*) ok "no TMPDIR from the caller: the gate's TMPDIR is the run's own ($(basename "$v21"))"
-        [ -d "$v21" ] && fail "the run's temp directory $v21 is still there after the run" || ok "the run's temp directory is removed at the end" ;;
+    */build/tmp/emu_*/gate.*) ok "no TMPDIR from the caller: the gate's TMPDIR is its own under the run's ($(basename "$(dirname "$v21")")/$(basename "$v21"))"
+        [ -d "$(dirname "$v21")" ] && fail "the run's temp directory $(dirname "$v21") is still there after the run" || ok "the run's temp directory is removed at the end" ;;
     *) fail "no TMPDIR from the caller: the gate saw TMPDIR=$v21"; vs_ctl_is tmp-ignored && vs_ctl_fired tmp-ignored "with the DISK-TMPDIR test disabled the gate saw TMPDIR=$v21" ;;
 esac
 mkdir -p "$T/caller_tmp"; v21b="$(t21 run_all_emulator.sh "$T/l21b" TMPDIR="$T/caller_tmp")"
-[ "$v21b" = "$T/caller_tmp" ] && ok "a caller's TMPDIR is kept" || fail "a caller's TMPDIR=$T/caller_tmp reached the gate as $v21b"
+case "$v21b" in
+    "$T/caller_tmp/gate."*) ok "a caller's TMPDIR is kept (the gate's own $(basename "$v21b") under it)"
+        [ -e "$v21b" ] && fail "the gate's TMPDIR $v21b is still there after the run" || ok "the gate's TMPDIR under the caller's is removed" ;;
+    *) fail "a caller's TMPDIR=$T/caller_tmp reached the gate as $v21b" ;;
+esac
 t21 run_all_emulator.sh "$T/l21c" VS_TMP_MIN_GB=999999 >/dev/null
 if grep -q 'this run needs 999999 GB' "$T/l21c.out" && [ ! -f "$T/l21c/g_tmp.log" ]; then ok "too little free temp space: the run refuses to start and names the shortfall"
 else fail "with VS_TMP_MIN_GB=999999 the run did not refuse at the start ($(tail -1 "$T/l21c.out" 2>/dev/null))"; fi
 if ! vs_ctl_is tmp-ignored; then
     ln -s "$T/runner_tmpoff.sh" "$FR/tests/run_all_emulator_tmpoff.sh"
     v21d="$(t21 run_all_emulator_tmpoff.sh "$T/l21d")"; rm -f "$FR/tests/run_all_emulator_tmpoff.sh"
-    [ "$v21d" = unset ] && vs_ctl_fired tmp-ignored "a runner without the disk TMPDIR leaves the gate on the default /tmp (TMPDIR unset) — section 21 catches it" \
+    case "$v21d" in /tmp/gate.*) true ;; *) false ;; esac && vs_ctl_fired tmp-ignored "a runner without the disk TMPDIR leaves the gate on the default /tmp ($v21d) — section 21 catches it" \
         || { vs_ctl_dead tmp-ignored "the runner without the disk TMPDIR handed the gate TMPDIR=$v21d"; fail "tmp-ignored"; }
 fi
 rm -f "$FR/tests/g_tmp.sh"
@@ -1195,7 +1202,9 @@ echo "22. a selected gate whose worker died before writing its row is a FAIL, ne
 # PILOT: tests/lib/measures.sh's scratch file was named by $$, which every pooled subshell shares; two stub gates
 # finishing together removed each other's, a worker died under set -e, and a lane of three printed GREEN on PASS 1.
 # g_lost kills the pooled worker that started it (its parent, or the timeout wrapper's parent), so no row is written.
+# Since #364/#371 (14z-226) the chain is worker -> tests/lib/session_run.py -> timeout -> gate: it steps past both.
 { echo '#!/bin/sh'; echo ': "${MAME_BIN:-}"'; echo 'p=$PPID; case "$(ps -o comm= -p "$p" 2>/dev/null)" in *timeout*) p="$(ps -o ppid= -p "$p" | tr -d " ")" ;; esac'
+  echo 'case "$(ps -o command= -p "$p" 2>/dev/null)" in *session_run.py*) p="$(ps -o ppid= -p "$p" | tr -d " ")" ;; esac'
   echo 'kill -9 "$p"; echo "PASS: the worker is gone"; exit 0'; } > "$FR/tests/g_lost.sh"; chmod +x "$FR/tests/g_lost.sh"
 mk g_kept 0 "kept"
 reg "$(row g_lost mame release - '')" "$(row g_kept mame release - '')"

@@ -458,3 +458,7 @@ test_plants_not_applied
 # test_ctl_show_err.sh — #310 group 5 (14z-215): tests/lib/controls.sh vs_ctl_show_err on stub gates running a crashing
 # perturbed copy (Python main path, shell syntax error, an expected exception) classified as the runners do; three controls. ~2 s.
 test_ctl_show_err
+# test_session_reap.sh — #364/#371 (design R, 14z-226): tests/lib/session_run.py passes a gate's status through, gives it
+# a TMPDIR of its own and removes it, reaps its session's TERM-ignoring leftovers and forwards a TERM sent to it; the
+# emulator runner's four gate command lines go through it; three controls. ~10 s.
+test_session_reap

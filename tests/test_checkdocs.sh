@@ -123,4 +123,7 @@ control() {  # control <name>
 }
 [ -n "$VS_CTL" ] || for n in $(vs_ctl_declared "$0"); do control "$n"; done   # the in-gate controls: a plain run only (#369)
 
+# A mode whose perturbation left checkdocs green closes on the contract's own line (#310), never on PASS (review r6's
+# CHECK on #369 batch 1, fixed 14z-226 as the maintainer ruled: "fix items 1,34").
+if [ "$fail" = 0 ] && [ -n "$VS_CTL" ]; then vs_ctl_left_green "$VS_CTL" "FAIL: test_checkdocs (control mode $VS_CTL left checkdocs green)"; fi
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

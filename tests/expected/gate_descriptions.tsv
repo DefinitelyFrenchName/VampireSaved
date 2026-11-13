@@ -476,6 +476,7 @@ declares	test_select_port_hygiene
 declares	test_select_wheel
 declares	test_session_close
 declares	test_session_metrics
+declares	test_session_reap
 declares	test_shadow_tenant
 declares	test_shared_writes
 declares	test_shares

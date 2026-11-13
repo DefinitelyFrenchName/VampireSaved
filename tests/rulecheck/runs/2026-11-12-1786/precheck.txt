@@ -1,0 +1,9 @@
+  FLAG D-ABSOLUTE: Each of the 9 gets the same verdict, FAIL, on the parent (§ 7).  [build/agent226/r371/report_r.md]
+  FLAG D-ABSOLUTE: Being taken later, this census shows nothing was left by the time it ran, not at the moment each run ended.  [build/agent226/r371/report_r.md]
+  FLAG D-ABSOLUTE: - **Manual runs are not wrapped.** R is called only from the emulator runner's four gate lines; a gate run by hand does not go through it (#364's case).  [build/agent226/r371/report_r.md]
+  FLAG D-ABSOLUTE: - **TERM to the runner's PID alone was held until the gate's 60 s timeout** in the one run each way: the parent ended at 78 s, R at 81 s (table above), so th...  [build/agent226/r371/report_r.md]
+  FLAG D-ABSOLUTE: When the gate returns, with any status, the helper TERMs every process still in that session, waits up to 10 s, KILLs the rest and removes the TMPDIR.  [build/agent226/r371/comment_371.md]
+  FLAG D-ABSOLUTE: On PILOT, with TMPDIR set outside the repo (see the new ticket below), each of the MiSTer lane's 8 gates and each of its 4 declared modes PASSed through R, o...  [build/agent226/r371/comment_371.md]
+  FLAG D-ABSOLUTE: - TERM sent to the runner's PID alone was held until the gate's 60 s timeout, in one run each way.  [build/agent226/r371/comment_371.md]
+  FLAG D-ABSOLUTE: So under the runner, the cleanup no longer depends on the gate's EXIT-only trap running.  [build/agent226/r371/comment_364.md]
+packet_check: 8 flag(s): D-ABSOLUTE 8

@@ -121,6 +121,9 @@ echo "== 2b. a second method: plain grep, sharing nothing with the reader (14z-2
 # the accepted forms; a hit must be one of the ALLOWED lines (fixture or prose text, by exact content), never a new one.
 # The share_lock.py line (#370, 14z-225) is no resuming trap: the host claim's helper ignores HUP on purpose and lives
 # exactly as long as its owner shell (SHARE-LOCK-OWNER), so a hangup that spares the owner never frees its token.
+# tests/lib/session_run.py's handler (#364/#371, design R, 14z-226) catches TERM, INT and HUP on purpose: it forwards the
+# signal to the gate's session, reaps it and exits 128+N, never resuming the gate's work; its docstring line says so in
+# prose. tests/test_session_reap.sh's two plant lines are fixtures: TERM-ignoring sleeps the helper must KILL.
 # This gate and tools/signal_traps.py hold bad forms as fixtures by design and are left out. Grep-pattern-bound: a trap
 # built in a variable or a signal list split across lines is beyond it (stated, not tested).
 GA="$W/grep_allowed.txt"
@@ -128,6 +131,10 @@ cat > "$GA" <<'ALLOWED'
 tests/test_tmp_hygiene.sh	trap 'rm -rf "$Q/x"' INT TERM
 tests/test_tmp_hygiene.sh	else ok "eight safe trap forms not named (a later trap, \"\$M\" alone, another variable, trap text in quotes, an INT-only trap, a heredoc, a trap after a later-line [ -n ] guard, the word trap as an argument)"; fi
 tests/lib/share_lock.py	    signal.signal(signal.SIGHUP, signal.SIG_IGN)
+tests/lib/session_run.py	  2. stays itself in the CALLER's process group, so a TERM, INT or HUP sent to the runner's group (a Ctrl-C, a caller's
+tests/lib/session_run.py	    for s in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+tests/test_session_reap.sh	sh -c 'trap "" TERM; exec sleep $N1' &
+tests/test_session_reap.sh	$TO 600 sh -c 'trap "" TERM; sleep $N2' &
 ALLOWED
 git -C "$REPO" ls-files tests tools | grep -v '^tests/rulecheck/' | grep -vx 'tests/test_signal_traps.sh' | grep -vx 'tools/signal_traps.py' > "$W/grep_files.txt"
 printf '#!/bin/sh\nW="$(mktemp -d)" || exit 2\ntrap '"'"'rm -rf "$W"'"'"' EXIT INT TERM\n' > "$W/plant2b.sh"
@@ -152,7 +159,14 @@ else
         vs_ctl_caught "$W/grep_hits.txt" "/plant2b\.sh:3:trap .* EXIT INT TERM$" || :
         echo "FAIL: test_signal_traps (control mode: the planted trap was named NEW)"; exit 1; fi
     bad "plain grep over $ng tracked files: $nnew hit(s) outside the allowed lines (above) — a trap the reader may not have judged"; fi
-if vs_ctl_is grep-planted; then vs_ctl_left_green grep-planted "FAIL: test_signal_traps — the planted trap was not named by the grep"; fi
+if vs_ctl_is grep-planted; then   # not named: a run red for another reason is UNJUDGED, only a green one LIES (review r6's
+    # CHECK on #369 batch 1, fixed 14z-226 as the maintainer ruled: "fix items 1,34")
+    if [ "$fail" != 0 ]; then
+        vs_ctl_nj "the run is red for a reason other than the planted trap, which the grep did not name"
+        echo "FAIL: test_signal_traps (control mode grep-planted)"; exit 1
+    fi
+    vs_ctl_left_green grep-planted "FAIL: test_signal_traps — the planted trap was not named by the grep"
+fi
 echo "$W/plant2b.sh" > "$W/grep_plant_list.txt"; grep2b "$W/grep_plant_list.txt" "$W/grep_plant_hits.txt"
 if grep -q "plant2b.sh:3:" "$W/grep_plant_hits.txt"; then vs_ctl_fired grep-planted "$(head -1 "$W/grep_plant_hits.txt" | cut -c1-120)"
 else vs_ctl_dead grep-planted "the grep did not name a planted resuming trap" || fail=1; fi

@@ -1,0 +1,25 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent226/r371/report_r.md	25609528b3ab8f521f828df2e36f6b9d0e0b5cd4
+build/agent226/r371/comment_371.md	92639319a2ec207b8cbd4eaf002103d2f14bbdbd
+build/agent226/r371/comment_364.md	1135b9bc489ad0b3a9b1a68a638a2618aa7d04b9
+build/agent226/r371/pilot/r371_report.txt	0f65b3bc4eab8708b908de9a455ffa17f05d6574
+build/agent226/r371/pilot/r371b_report.txt	928398377898da2588b0014b4b05a745660fff4f
+build/agent226/r371/pilot/r371c/report.txt	52209c5841870b225b2b90f37e66562503637fa6
+build/agent226/r371/pilot/r371d/report.txt	feb9739ac0290e9fc2003c2d9c9273d393d33789
+build/agent226/r371/pilot_r371c.sh	f472661a189a5c5aa03e2e45392c93211691aa3d
+build/agent226/r371/pilot_r371d.sh	fec409d2e551319214e8a08b1fceae55526d6abb
+build/agent226/r371/mister_fail_lines.txt	4fdb7267997aa87f68cef608c6c0414b065c28dc
+build/agent226/r371/mac_tmo/results.tsv	3b63b16138cdec8145de3acf634ce7af14c0f31d
+build/agent226/r371/mac_ctl/results.tsv	aa398311760e1f2adb9469507dc719e57b3ca1da
+build/agent226/r371/mac_census_after.txt	07e15600a9b7c6afed62369344ff6f13a18e1aae
+build/agent226/r371/eris/eris_r371_stream.txt	eba7ae702d97d0433d2d21fb26284e904bb31423
+build/agent226/r371/x/p/tier.out.lines-495-527 (lines 495-527 of build/agent226/r371/x/p/tier.out)	e2a9e658c206dce81de1315b30f77d441a0e8aa3
+build/agent226/r371/x/e/tier.out.lines-490-518 (lines 490-518 of build/agent226/r371/x/e/tier.out)	fb1abb6d0193b54fb1919854c97b876a72cd76b0
+build/agent226/tier1/tier.out.lines-585-613 (lines 585-613 of build/agent226/tier1/tier.out)	1dc94ee2b2afa1e3d4828a4877ad3a48e7a1d9bc
+build/agent226/r371/issue_mister_tmp.md	116ac94383b11c22b6ec7eabb4b8f134fa9413ca
+tests/lib/session_run.py	2733545e3e3f87023e4988325de81176e515b223
+tests/run_all_emulator.sh.lines-420-490 (lines 420-490 of tests/run_all_emulator.sh)	535cb5e4032988d5052c58faeaed75a8281e0abc
+tests/run_all_emulator.sh.lines-625-700 (lines 625-700 of tests/run_all_emulator.sh)	eceac27e3dc1a3ce31998b18654d624abe75d825
+DECISIONS_HISTORY.md.lines-10119-10140 (lines 10119-10140 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-11 (14z-226) — #364/#371: design R is built, without the lint", and the entries after it up to line 10140)	bd31419a1d1d740890aee1aa5c1e0438210d712c
+build/agent226/t364/issue_364.md	e4a42b1a61856cf325b7a7b6103398db347b274b
+build/agent226/t364/issue_371.md	f5cb0fdf250174ea92098e5da4cc770034edb907

@@ -1,0 +1,6 @@
+PREPARED, WITHDRAWN BEFORE ANY READER WAS SPAWNED — 14z-226, 2026-11-11.
+
+prepare's packet check flagged the deliverable's sentence "The split form is the one gate-side trap form measured", and
+it is false: pilot_t364b.out measured the EXIT-only form too. No reader was spawned; there is no verdict and no ledger
+row, and the run is not evidence. The sentence (and the claim's twin) now name both forms measured, with the artifact;
+the packet is redone with --redoes 2026-11-11-1782.

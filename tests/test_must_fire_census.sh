@@ -21,7 +21,7 @@
 #   controls do.
 #
 # MUST-FIRE: perturbed-copy: dropped-declaration — a copy of tests/ with one gate's `# MUST-FIRE:` line neutered must drop that gate from the declaring inventory (section 1 fails), or the inventory is not read from the header
-# MUST-FIRE: perturbed-copy: neutered-verdict — a copy with one declaring gate's `CONTROL FIRED:` lines commented out must put that gate in the header-only set (section 2 fails), or "prints a verdict" is not measured
+# MUST-FIRE: perturbed-copy: neutered-verdict — a copy with one declaring gate's `CONTROL FIRED:` lines neutered and a `vs_ctl_caught` call left in must put that gate in the header-only set (section 2 fails), or "prints a verdict" is not measured, or a mode-only call is counted as one
 #
 # WHY. [VSP-19] says verdict logic is itself tested and the project's convention
 # for that is the MUST-FIRE CONTROL — a perturbation that must turn the gate
@@ -35,15 +35,17 @@
 # declaration ONE grammar and the runners a reader; this gate freezes the
 # three inventories the reader sees.
 #
-# WHAT IT HOLDS (static, ROM-free, ~1 s):
+# WHAT IT HOLDS (static, ROM-free, ~15 s: measured 14z-226 on the Mac, ~1 s before the tool lookup):
 #   1. every gate whose LEADING COMMENT BLOCK carries an R10 declaration is in
 #      the frozen inventory — a gate dropping its declaration FAILS, a new
 #      declaring gate must be added (the list only grows);
 #   2. the HEADER-ONLY set — declaring gates whose non-comment code prints no
 #      `CONTROL FIRED:` / `CONTROL DEAD:` line (as the literal or through the
-#      lib's `vs_ctl_fired` / `vs_ctl_dead`) — equals the frozen debt or is
-#      SMALLER; a gate JOINING it FAILS. Retiring a row means the gate now
-#      prints its control's verdict;
+#      lib's `vs_ctl_fired` / `vs_ctl_dead`, or through a tools/ program the
+#      code names that prints the line itself) — equals the frozen debt or is
+#      SMALLER; a gate JOINING it FAILS. `vs_ctl_caught` is NOT a verdict line
+#      here: it prints only under a mode (#369), never in a plain run (14z-226).
+#      Retiring a row means the gate now prints its control's verdict;
 #   3. the RETROFIT DEBT — gates that mention `must-fire` in any spelling and
 #      declare nothing under the grammar — can only SHRINK;
 #   4. the two controls above, on perturbed copies of tests/, through the same
@@ -64,19 +66,39 @@ W="$(mktemp -d)" || { echo "FAIL: test_must_fire_census — mktemp -d failed (W)
 bad=0; ok() { echo "  ok    $1"; }; nope() { echo "  FAIL  $1" | tee -a "$W/main.log"; bad=$((bad + 1)); }
 : > "$W/main.log"   # #369: the main check's findings (sections 1-3), the file a mode's evidence is read from
 
-# The census as ONE function over a tests dir, so the controls run the real thing. A migrated gate's mode close is its
-# vs_ctl_caught call (#369, 14z-225), which replaced the vs_ctl_fired "$VS_CTL" close the census counted before.
+# The census as ONE function over a tests dir, so the controls run the real thing.
+# A VERDICT LINE is one a PLAIN run prints: `CONTROL FIRED:` / `CONTROL DEAD:` (the literal, or vs_ctl_fired /
+# vs_ctl_dead) in the gate's own code, or in a tools/ program its code names that prints the line itself (audit_rng_forms
+# -> tools/rng_forms.py). vs_ctl_caught is NOT one: it prints only under a mode (#369), so a gate whose only verdict call
+# it is prints nothing in a plain run and is header-only (review r6's CHECK on #369 batch 1, fixed 14z-226 as the
+# maintainer ruled: "fix items 1,34").
+own_verdict() { /usr/bin/grep -v '^[[:space:]]*#' "$1" | /usr/bin/grep -qE 'CONTROL (FIRED|DEAD): |vs_ctl_(fired|dead) '; }
+tool_verdict() {
+    for t in $(/usr/bin/grep -v '^[[:space:]]*#' "$1" | /usr/bin/grep -oE 'tools/[A-Za-z0-9_]+\.py' | sort -u); do
+        [ -f "$REPO/$t" ] && /usr/bin/grep -qE 'CONTROL (FIRED|DEAD): ' "$REPO/$t" && return 0
+    done
+    return 1
+}
 census() {  # $1 = tests dir -> "declares|header-only|retrofit-debt\t<gate>" lines, sorted
     for f in "$1"/*.sh; do
         g="$(basename "$f" .sh)"
         if [ -n "$(vs_ctl_declared "$f")" ]; then
             echo "declares	$g"
-            /usr/bin/grep -v '^[[:space:]]*#' "$f" | /usr/bin/grep -qE 'CONTROL (FIRED|DEAD): |vs_ctl_(fired|dead|caught) ' \
-                || echo "header-only	$g"
+            own_verdict "$f" || tool_verdict "$f" || echo "header-only	$g"
         elif /usr/bin/grep -qiE 'must[- ]?fire' "$f" && [ -z "$(vs_ctl_none "$f")" ]; then
             echo "retrofit-debt	$g"
         fi
     done | sort
+}
+
+# neutered-verdict's gate and perturbation, shared by the mode and control (b): the first declaring gate whose verdict
+# lines are its OWN (none from a tool), its FIRED/DEAD lines neutered and a vs_ctl_caught call appended, so it must
+# join the header-only set, or a mode-only call is still being counted as a verdict.
+pick_h1() { census "$1" | awk -F'\t' '$1=="declares"{d[$2]=1} $1=="header-only"{h[$2]=1} END{for(g in d) if(!(g in h)) print g}' | sort |
+    while read -r g; do own_verdict "$1/$g.sh" && ! tool_verdict "$1/$g.sh" && { echo "$g"; break; }; done; }
+neuter_verdict() {
+    perl -pi -e 'next if /^\s*#/; s/CONTROL (FIRED|DEAD): /CONTROL XXXXX: /g; s/vs_ctl_(fired|dead) /vs_ctl_XXXX /g' "$1"
+    echo 'vs_ctl_caught /dev/null "^neutered-verdict$" || :' >> "$1"
 }
 
 # THE EXECUTABLE FORM: under CONTROL=<name> the perturbed copy IS the input.
@@ -88,8 +110,8 @@ if vs_ctl_is dropped-declaration; then
     WANT="^ +declares	$d1\$"
 elif vs_ctl_is neutered-verdict; then
     mkdir -p "$W/in"; cp tests/*.sh "$W/in/"; SRC="$W/in"
-    h1="$(census tests | awk -F'\t' '$1=="declares"{d[$2]=1} $1=="header-only"{h[$2]=1} END{for(g in d) if(!(g in h)) print g}' | sort | head -1)"
-    perl -pi -e 'next if /^\s*#/; s/CONTROL (FIRED|DEAD): /CONTROL XXXXX: /g; s/vs_ctl_(fired|dead|caught) /vs_ctl_XXXX /g' "$SRC/$h1.sh"
+    h1="$(pick_h1 tests)"
+    neuter_verdict "$SRC/$h1.sh"
     WANT="^ +header-only	$h1\$"
 fi
 
@@ -149,9 +171,9 @@ d1="$(/usr/bin/grep '^declares' "$W/got.txt" | head -1 | cut -f2)"
 perl -pi -e 's/^# MUST-FIRE: /# MUST-XX: /' "$W/t1/$d1.sh"
 if census "$W/t1" | /usr/bin/grep -qx "declares	$d1"; then vs_ctl_dead dropped-declaration "removing $d1's declaration left it in the census"; nope "control (a)"
 else vs_ctl_fired dropped-declaration "a neutered declaration ($d1) drops out of the inventory"; ok "control (a) fires"; fi
-h1="$(awk -F'\t' '$1=="declares"{d[$2]=1} $1=="header-only"{h[$2]=1} END{for(g in d) if(!(g in h)) print g}' "$W/got.txt" | sort | head -1)"
-perl -pi -e 'next if /^\s*#/; s/CONTROL (FIRED|DEAD): /CONTROL XXXXX: /g; s/vs_ctl_(fired|dead|caught) /vs_ctl_XXXX /g' "$W/t2/$h1.sh"
-if census "$W/t2" | /usr/bin/grep -qx "header-only	$h1"; then vs_ctl_fired neutered-verdict "$h1 with its FIRED/DEAD lines neutered joins the header-only set"; ok "control (b) fires"
+h1="$(pick_h1 tests)"
+neuter_verdict "$W/t2/$h1.sh"
+if census "$W/t2" | /usr/bin/grep -qx "header-only	$h1"; then vs_ctl_fired neutered-verdict "$h1 with its FIRED/DEAD lines neutered and a vs_ctl_caught call left joins the header-only set"; ok "control (b) fires"
 else vs_ctl_dead neutered-verdict "$h1 with its verdict lines neutered did not join the header-only set"; nope "control (b)"; fi
 
 [ "$bad" = 0 ] && { echo "PASS: test_must_fire_census — $nd declaring, $nh header-only, $nr retrofit debt"; exit 0; }

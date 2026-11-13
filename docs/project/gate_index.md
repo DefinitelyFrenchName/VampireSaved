@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**519 scripts** — 157 ci_portable, 99 ci_static, 263 emulator-tier (run by name).
+**520 scripts** — 158 ci_portable, 99 ci_static, 263 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 68 | the suite runners and their own ground truth |
+| [runner](#runner) | 69 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 51 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -94,6 +94,7 @@ the suite runners and their own ground truth.
 | `tests/test_runner_collation.sh` | test | ci_portable | — | THE RUNNERS SORT IN BYTE ORDER WHATEVER THE CALLER'S LOCALE (#278, 14z-208b). ci_portable: no ROM, ~1 s. | 14z-208b |
 | `tests/test_scratch_census.sh` | test | ci_portable | — | every scratch program a session wrote is classed, and each class holds (`tools/scratch_census.py`, 14z-185b, GitHub #190 P4). | 14z-185b |
 | `tests/test_session_metrics.sh` | test | ci_portable | — | the session dashboard's collector reads every source as its rule says and labels every figure with its class (`tools/session_metrics.py`, 14z-198, GitHub #264). | 14z-198 |
+| `tests/test_session_reap.sh` | test | ci_portable | — | A GATE RUN LEAVES NOTHING BEHIND (#364, #371; design R, ruled 2026-11-11, 14z-226). ROM-free and emulator-free, ~15 s; needs python3 and GNU timeout (or gtimeout). | 2026-11-11 |
 | `tests/test_shares.sh` | test | ci_portable | — | GATES DECLARE WHAT THEY SHARE; THE POOL AND THE HOST CLAIM KEEP HOLDERS APART (#370, 14z-225). ci_portable: no ROM, ~25 s. | 14z-225 |
 | `tests/test_sheet_census.sh` | test | ci_portable | — | EVERY EMULATOR GATE SAYS WHAT ITS COMPARATIVE SHEET SHOWS, OR IS ON THE RETROFIT'S DEBT LIST (GitHub #291 slice S1, 14z-204; the design ruled 2026-10-17: "Declared in each gate (Recommended)"). | 14z-204 |
 | `tests/test_shell_portability.sh` | test | ci_portable | — | a `#!/bin/sh` script must actually be POSIX sh (14z-90, GitHub issue #15). | 14z-90 |

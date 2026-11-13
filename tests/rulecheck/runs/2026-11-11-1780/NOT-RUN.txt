@@ -1,0 +1,6 @@
+PREPARED, WITHDRAWN BEFORE ANY READER WAS SPAWNED — 14z-226, 2026-11-11.
+
+prepare's packet check flagged a sentence of the deliverable (build/agent226/t364/recommendation.md, the manual-kill
+limit) that cited no artifact. No reader was spawned; there is no verdict and no ledger row, and the run is not
+evidence. The citation (pilot_t364.out §1; design.md fact 3, §4) is added and the packet redone with --redoes
+2026-11-11-1780.

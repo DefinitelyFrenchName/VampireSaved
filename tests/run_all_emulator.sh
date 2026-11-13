@@ -479,6 +479,10 @@ if [ -n "$SKIP" ]; then
 fi
 echo "  jobs       $RUN_JOBS   timeout ${TMO}s (a row's 7th column overrides it)"
 JTSIM_BASE="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"
+# Exported (#364, 14z-226): each gate now gets a TMPDIR of its own (SESSION-REAP below), so a MiSTer gate's fallback
+# `${JTSIM_SCRATCH:-$TMPDIR/vampire-saved-jtsim}` would land in it and be removed with it; the export keeps the path
+# every gate resolved before, the run's own. A pooled slot still overrides it per gate (JTSIM_SCRATCH=<base>-slotN).
+export JTSIM_SCRATCH="$JTSIM_BASE"
 [ "$RUN_JOBS" -gt 1 ] && echo "  scratch    $JTSIM_BASE (mister slot 0), $JTSIM_BASE-slotN (slots 1..$((RUN_JOBS-1)))"
 echo "  temp       ${TMPDIR:-/tmp}${VS_RUN_TMP:+ (made for this run, removed at the end)}"
 echo "  log        $LOGDIR"
@@ -621,12 +625,17 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
     } > "$_log"
     # </dev/null: a gate that reads stdin otherwise swallows the rest of the
     # queue — paid for once already in run_all_static.sh.
+    # SESSION-REAP (#364, #371; design R, ruled 2026-11-11, 14z-226): every gate run, plain and CONTROL=, goes through
+    # tests/lib/session_run.py — the gate in a session of its own with a TMPDIR of its own; when it returns, whatever
+    # is left in its session gets TERM, up to 10 s, then KILL, and the TMPDIR is removed. Measured before it: a
+    # timed-out gate's MAME caught TERM and outlived gate and runner at full CPU, and its leftovers broke this run's
+    # own temp removal. tests/test_session_reap.sh holds the helper and these four lines.
     if [ -n "$TIMEOUT_BIN" ]; then
         # shellcheck disable=SC2086
-        env $_env "$TIMEOUT_BIN" -k 30 "$_tmo" "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_log" 2>&1 && _st=0 || _st=$?
+        env $_env python3 tests/lib/session_run.py "$TIMEOUT_BIN" -k 30 "$_tmo" "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_log" 2>&1 && _st=0 || _st=$?
     else
         # shellcheck disable=SC2086
-        env $_env "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_log" 2>&1 && _st=0 || _st=$?
+        env $_env python3 tests/lib/session_run.py "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_log" 2>&1 && _st=0 || _st=$?
     fi
     _t1=$(date +%s); _dur=$((_t1 - _t0))
     # EXIT STATUS DECIDES FIRST. A gate that prints `SKIP:` AND exits non-zero
@@ -678,10 +687,10 @@ run_control() {  # run_control <name> — one control mode of run_one's gate ($_
               echo "### cmd: env$_env CONTROL=$_cn tests/$_g.sh$_pos"; } > "$_clog"
             if [ -n "$TIMEOUT_BIN" ]; then
                 # shellcheck disable=SC2086
-                env $_env CONTROL="$_cn" "$TIMEOUT_BIN" -k 30 "$_tmo" "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_clog" 2>&1 && _cs=0 || _cs=$?
+                env $_env CONTROL="$_cn" python3 tests/lib/session_run.py "$TIMEOUT_BIN" -k 30 "$_tmo" "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_clog" 2>&1 && _cs=0 || _cs=$?
             else
                 # shellcheck disable=SC2086
-                env $_env CONTROL="$_cn" "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_clog" 2>&1 && _cs=0 || _cs=$?
+                env $_env CONTROL="$_cn" python3 tests/lib/session_run.py "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_clog" 2>&1 && _cs=0 || _cs=$?
             fi
             _c1=$(date +%s); _cdur=$((_c1 - _c0))
             vs_classify_control "$_cs" "$_clog" "tests/$_g.sh" "$_cn"

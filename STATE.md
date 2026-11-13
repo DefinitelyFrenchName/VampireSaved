@@ -110,8 +110,9 @@ results: `build/agent225/close/tier_results.tsv`, the next close's `--prev`.
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **#364/#371 are fixed by design R, without the lint (2026-11-11, 14z-226):** the emulator runner reaps each gate's session (TERM, up to 10 s, KILL) and removes its per-gate TMPDIR; the 276 EXIT-only files are not patched — `DECISIONS_HISTORY.md` "Ruled 2026-11-11 (14z-226) — #364/#371: design R is built, without the lint".
 - **#352: the desktop gate's `minimised` control is a release-time mode only, its in-gate form the drawn overlay (2026-11-10/11, 14z-225)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-10 (14z-225) — #352: the PAUSE-reading gate change …" and "Ruled 2026-11-11 (14z-225) — #352 is finished as a matrix, then committed".
-- **#369 lands with a shrink-only debt list and a lint with a stated limit (2026-11-08/09, 14z-224):** a mode is HONOURED only on its own `CONTROL CAUGHT:` line unless its gate is on `tests/expected/ctl_caught_debt.tsv`, which only shrinks — `DECISIONS_HISTORY.md` "Ruled 2026-11-08 (14z-224) — #369's design …" and "Ruled 2026-11-09 (14z-224) — #369's lint …"; the further limits the session named are accepted as stated limits (14z-225) — `DECISIONS_HISTORY.md` "Ruled 2026-11-09 (14z-225) — #369's lint: the further limits the session named stand".
+- **#369 lands with a shrink-only debt list and a lint with a stated limit (2026-11-08/09, 14z-224):** a mode is HONOURED only on its own `CONTROL CAUGHT:` line unless its gate is on `tests/expected/ctl_caught_debt.tsv`, which only shrinks — `DECISIONS_HISTORY.md` "Ruled 2026-11-08 (14z-224) — #369's design …" and "Ruled 2026-11-09 (14z-224) — #369's lint …"; the further limits the session named are accepted as stated limits (14z-225) — `DECISIONS_HISTORY.md` "Ruled 2026-11-09 (14z-225) — #369's lint: the further limits the session named stand"; batch 1's eight review CHECKs: items 1, 3 and 4 fixed (14z-226), the other five and ERE tightness in general stand as stated limits — `DECISIONS_HISTORY.md` "Ruled 2026-11-11 (14z-226) — #369 batch 1's session-named limits: items 1, 3 and 4 fixed, the rest stand".
 - **#370 is built as A1, B1, C1 (2026-11-08, 14z-224):** today's sharing written down, every gate carries a `# SHARES:` line, a host-wide per-token lock — `DECISIONS_HISTORY.md` "Ruled 2026-11-08 (14z-224) — #370's design …"; the host lock is an OS file lock (`fcntl.flock`, `tests/lib/share_lock.py`), never a hand-written one (14z-225) — "Ruled 2026-11-09 (14z-225) — #370's host claim is an OS file lock …".
 - **#356 is built as Option 1 (a tenant-only copy of the speed-line effect with vs2's 14-row tables), with the raw allocator, and frozen as M25 as built (frozen 14z-220, `91bde83b`); its one-frame Dark Force phase is accepted and is #360 (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #356" and "Ruled 2026-11-03 (14z-219) — #356".
 - **#345's option A1b is built and its timing ACCEPTED: frozen in M25 with #356 (14z-220, `91bde83b`) — ours loses no logic frame in Blizzard Sword where native does; the moved expectations (pass_overrun, the stale lag exemption, donovan_2's parity and RNG-form rows) re-frozen at the freeze, each through its own rule-checker run; vsavj's table PRG:0x1F3FD2 is never touched; B stays held (2026-11-02 and 2026-11-03, 14z-218/219)** — `DECISIONS_HISTORY.md` "Ruled 2026-11-02 (14z-218) — #345", "Ruled 2026-11-03 (14z-219) — #345: option A is built as A1b" and "… the built A1b's timing is accepted".
@@ -210,17 +211,6 @@ them would reduce the legacy footprint from 5 bytes to 2.
 
 Only undecided items live here; a ruling moves its entry to `DECISIONS_HISTORY.md` in the
 commit that records it (CLAUDE.md [VSP-17]).
-
-- **#369 batch 1's session-named limits (14z-225):** eight review CHECKs of round r6 kept as named limits, not fixed —
-  `test_must_fire_census`'s header-only class excluding a gate whose only verdict call is `vs_ctl_caught`; two of #369's
-  own refusal lines read as speaker "own" in `classify.sh` (unreachable in-tree); `test_checkdocs` and
-  `test_signal_traps` line 155 (pre-existing: LIES where UNJUDGED is right, never a false HONOURED);
-  `test_plants_not_applied`'s CAUGHT line being its own comparison echo; and the EREs of `audit_vanilla_specials_a`
-  swapped-chains, `audit_vanilla_specials_b` swapped-strengths and `audit_vanilla_pursuits` class-raw/tick-dropped
-  matching any drift of the perturbed rows — plus ERE tightness in general, which the #369 contract leaves to review
-  (`build/agent225/m369/rc/M369_scope.md`; reviews.tsv rows 132-139). Options: (a) accept them as stated limits, as the
-  maintainer did for 14z-224's; (b) fix the eight in the next #369 batch; (c) accept the pre-existing ones, fix the
-  rest. No recommendation is made here: one is an action and would need its rule-checker run.
 
 ## THE DEADNESS REGISTER (opened 14z-71, maintainer's standing instruction)
 

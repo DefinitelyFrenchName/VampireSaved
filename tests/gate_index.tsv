@@ -527,4 +527,5 @@ tests/audit_dead_leg_linux.sh	runner
 tests/audit_beam_slide.sh	character-data
 tests/audit_guard_orbs.sh	character-data
 tests/test_shares.sh	runner
+tests/test_session_reap.sh	runner
 tests/test_desktop_pause_check.sh	platform

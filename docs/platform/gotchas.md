@@ -3672,3 +3672,10 @@ minutes later; a TERM by hand left them running 10 s on; KILL ended them. Their 
 rule:** whoever times a gate out ends everything the gate started — its session, TERM then KILL — before removing its
 files (#371's prototype `session_run.py`, `build/agent225/t364/`, did this with zero survivors). **And `pgrep mame`
 is blind to these processes: the binary is named `cps2`** — count with `pgrep -x cps2` (and `-x fbneo`).
+**Since 14z-226 the emulator runner does it** (design R, ruled 2026-11-11): every gate run, plain and CONTROL=, goes
+through `tests/lib/session_run.py` — the gate in a session of its own with a TMPDIR of its own, the session's leftovers
+TERMed, up to 10 s, then KILLed, the TMPDIR removed; a TERM, INT or HUP sent to the runner's group is forwarded to the
+gate's session (the helper stays in the caller's group: a helper that `setsid`s itself is out of a Ctrl-C's reach and
+leaves the gate running). Its handlers go in BEFORE the gate starts, or a TERM in the gap kills the helper and the gate
+lives on. Ground truth: `tests/test_session_reap.sh`. A gate run by hand, and `tools/trace_controls.sh`'s strace runs,
+are not wrapped.
