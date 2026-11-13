@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-225 CLOSE, 2026-11-11)
+# NEXT SESSION — orientation (rewritten at the 14z-226 CLOSE, 2026-11-13)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -16,7 +16,7 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 - **WHEN TO COMMIT (ruled 2026-10-17):** only at a ticket closure, a freeze or release, work handed to PILOT or ERIS, or the close. Before EVERY tier, regenerate the generated files and run the bookkeeping gates the change touches — THE WHOLE LIST in `docs/project/working_methods.md` ("Before every tier"), not a remembered subset: 14z-223's tier went red on three of them (`test_must_fire_census`, `test_gate_descriptions`, `test_expectation_provenance` for a new gate and table) — IN A CLEAN CHECKOUT of the staged tree (`git worktree add --detach` of a commit-tree object): the main tree holds #229's untracked gates, which break the generators.
 - **#369's rule is live (`23ccb65c`):** a control mode is HONOURED only on a `CONTROL CAUGHT: <mode> — ` line printed
   by `vs_ctl_caught <file> <ERE>` (`tests/lib/controls.sh`), unless its gate is on `tests/expected/ctl_caught_debt.tsv`
-  (310 rows, shrink-only). A NEW gate with control modes calls the helper; it cannot join the list
+  (100 rows since 14z-225's batch 1, shrink-only). A NEW gate with control modes calls the helper; it cannot join the list
   (`tests/test_ctl_caught_lint.sh`). The literal may not appear in any other code file under `tests/` or `tools/`, comments
   included (`docs/project/must_fire_contract.md` § #369).
 - **Never edit a script while it runs** ([MJC-54]); the emulator runner reports a tracked file changed during its run.
@@ -25,16 +25,18 @@ Say so at the opener. Never spawn any agent at `max`. A recommendation leans onl
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
 idle env --default-signal=PIPE`: the inhibitor alone leaves SIGPIPE ignored for every child, gotchas.md, 14z-223). It crashed
-once on 2026-11-08 (no shutdown record; the maintainer brought it back). Idle at the 14z-225 close, its checkout
-`~/vampire-saved` on `main` at `df4b0902` (fetch: it lacks the 14z-225 commits until the push). **ERIS** (WSL2, 24 threads,
-47 GB) runs the release shape; not reached in 14z-225's second part, its checkout `~/vampire-saved` last at the scratch `f0007e54`
-(never pushed, the #369 batch-1 run): move it to `main` first. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
+once on 2026-11-08 (no shutdown record; the maintainer brought it back). Idle at the 14z-226 close, its checkout
+`~/vampire-saved` on `main` at `df4b0902` (fetch first); its disk 101 G of 249 G used, our home 80 G (the maintainer freed
+space 2026-11-12; feedback memory `pilot-disk-cleanup-before-runs`). **ERIS** (WSL2, 24 threads, 47 GB) runs the release
+shape; its checkout `~/vampire-saved` on `main` at `a2f8b817` (fetch first). Hold an ERIS run's ssh open
+(`ssh eris 'wsl.exe -u koneko -- bash …'`): WSL shuts the distro down when the last session ends (gotchas.md, measured on
+ERIS 14z-226). Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare
 commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS)
 or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shell splits it at a pipe and mangles quotes), and
 a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-225's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-226's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Declared shares (#370 stage 1, `df4b0902`):** every gate carries one `# SHARES:` line; the emulator runner runs a
@@ -43,7 +45,12 @@ STATE 14z-225's CLOSE section. A red tier is re-run on THE RED RUN'S results (#3
   AFTER the two Linux release gates at release.
 - **`--order <an earlier run>/results.tsv`** starts a pooled lane longest first.
 - **Temp files on disk:** unless the caller set `TMPDIR`, a run's gates write under `build/tmp/emu_<stamp>.<pid>/`
-  (removed at the end); the run refuses to start with under 10 GB free there (`VS_TMP_MIN_GB`).
+  (removed at the end); the run refuses to start with under 10 GB free there (`VS_TMP_MIN_GB`). On Linux that in-repo
+  path makes every MiSTer-lane gate refuse to run (#372): set `TMPDIR` outside the repo for that lane.
+- **Every gate runs through design R since 14z-226 (`7b5938e9`, `tests/lib/session_run.py`):** its own session and a
+  `gate.*` TMPDIR; what is left when it returns is TERMed, up to `REAP_WAIT` (10) s, then KILLed, and the TMPDIR removed;
+  a TERM, INT or HUP to the runner reaches the gate's session. A child that starts its own session escapes the reap, and
+  `tools/trace_controls.sh`, the static lanes and manual runs are not wrapped (`docs/project/operations.md`).
 - **Three verdict holes closed:** a control mode stopped by its host (full disk, failed mktemp) is DIED, never HONOURED;
   a selected gate, or a passing gate's declared control, with no row is a FAIL ("LOST"); `tests/lib/measures.sh` no longer
   shares a scratch file across pooled subshells. **Before trusting a runner change, run its gate on PILOT as well as the
@@ -67,51 +74,53 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **Ask the open decision first:** #369 batch 1's session-named limits (STATE "Decisions pending").
-2. **#364 / #371 — put the recommendation through its rule-checker run, then to the maintainer.** Measured and prototyped
-   on PILOT in 14z-225 (`build/agent225/t364/design.md`, local; STATE 14z-225 (4)): design R, the emulator runner ending a
-   timed-out gate's whole session (TERM, a bounded wait, KILL) and removing a per-gate TMPDIR, ran with zero survivors and
-   the passing gates' verdicts unchanged (`session_run.py`). The options against it: the 276-file trap patch; R plus a lint
-   for new files. Not yet measured: the Mac, the pooled lanes at `--jobs N`, the desktop and Verilator gates.
-3. **#369 batch 2 — the 100 rows left on `tests/expected/ctl_caught_debt.tsv`:** the gates the dead-leg and crash-sweep
-   tables tie to, so each migration re-measures its rows (contract step 7: the stripped / kb column becomes UNJUDGED-CAUGHT).
-   `audit_release_linux_desktop` is among them. At the batch boundary apply the standing lesson below. #369 closes, and
-   #310 with it, when the list is empty and deleted.
-4. **#370's remaining work:** the emulator runner's token scheduler and the freeze-cadence cross-job write audit.
-5. **Ask the maintainer for the order of the rest.** Open tickets: bug #310 (closes with #369), #364, #371; evolution
-   #369, #370, #348; cosmetic #360. #352 is done, labelled `done unshipped` until a release runs its mode. Parked:
-   #123, #124, #125, #128, #344 (labelled `parked` on GitHub 2026-11-08 by the maintainer's account).
+1. **Put the maintainer's concern about #310's cost first, with numbers, before any more of its work.** At the 14z-226
+   close the maintainer said: **"we've been spending the best part of two whole weeks on #310 and its ramifications. And
+   while it's fine since we're trying to build something truly reliable, that is still an insane amount of effort to fix
+   something"**. #310 was filed 2026-10-22. It led to #364, #369, #370, #371 and #372, and touched commits in 14z-215 to
+   14z-226. Bring the MEASURED breakdown they asked for on 2026-11-10 (feedback memory `explain-check-cost-with-data`):
+   session hours and tier minutes per ticket in the family, and how much went to implementation, to scope, and to
+   rework after a misreading. Then ask, in their words, how much of what is left to do: #369 batch 2 (100 debt rows), #370's
+   token scheduler and write audit, and #372. Stopping where we are, with the debt list as a stated limit, is a real
+   option. So is a fixed time budget.
+2. **#369 batch 2 — the 100 rows left on `tests/expected/ctl_caught_debt.tsv`** (only if item 1 keeps it): the gates
+   the dead-leg and crash-sweep tables tie to, so each migration re-measures its rows (contract step 7: the stripped / kb
+   column becomes UNJUDGED-CAUGHT). `audit_release_linux_desktop` is among them. At the batch boundary, apply the standing
+   lesson below. #369 closes, and #310 with it, when the list is empty and deleted.
+3. **#370's remaining work** (only if item 1 keeps it): the emulator runner's token scheduler and the freeze-cadence
+   cross-job write audit.
+4. **#372** (bug, severity low): the MiSTer lane refuses the runner's in-repo temp on Linux with `TMPDIR` unset.
+5. **Ask the maintainer for the order of the rest.** Open tickets: bug #310 (closes with #369), #372; evolution #369,
+   #370, #348; cosmetic #360. #352 is done, labelled `done unshipped` until a release runs its mode. Parked: #123, #124,
+   #125, #128, #344.
+6. **PILOT's old scratch directories:** list them with their sizes (the session's `~/od`, `~/r371*` and earlier run copies
+   under our 80 G home) and ask before deleting any.
 
 **THE STANDING LESSON OF 14z-223** (feedback memory `step-back-before-patch-series`, gotcha "A FIX THAT LISTS THE WRONG
 ANSWERS NEVER FINISHES"): at every batch boundary of a multi-batch ticket, if the next batch repeats a patch family, write
-the one-paragraph alternative design and ask before starting it. **14z-225 applied it twice**: #369 batch 1's evidence
-gaps closed as a class (every gate directly reading a changed path re-run, not one gate per finding), and #352 closed as
-a matrix (every leg state under every way the gate runs, 16 cells) after three rounds that each found one narrower branch.
+the one-paragraph alternative design and ask before starting it.
 
 ## PARKED (not open work)
 
 - #124 (Killshread's aura palette), #123, #125, #128 (Marionette, parked again 14z-216).
-- #344 (cosmetic; the `parked` label added 2026-11-08 by the maintainer's account, the row reconciled at the 14z-225 close).
+- #344 (cosmetic; the `parked` label added 2026-11-08 by the maintainer's account).
 - **VampireSaved-Rebuilt#1** holds what is left of #120, closed 14z-205.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **`pgrep mame` is blind to the emulators:** the binary is `cps2` (and `fbneo`): count with `pgrep -x cps2`. A timed-out
-  emulator gate's MAME catches TERM and outlives its gate and runner (gotcha, #371).
-- **A pinned working-tree run sees no untracked file:** the Mac pins checked the index tree and unstaged changes under
-  tests/ and tools/ only; `test_retraction_reach` and `test_rule_checker` passed on untracked files. Evidence meant to
-  stand for a tree is run on a snapshot (`tests/run_on_snapshot.sh`), or the limit is named.
-- **`rulecheck.py record` refuses a run whose reader failed the spawn check** (a transient permission-check failure on the
-  first spawn of -1767): such a run is marked `NOT-RUN.txt` and redone with `--redoes`; so is a packet withdrawn before
-  spawning (-1769, -1771) when re-reading it shows a defect — cheaper than spending a round on it.
-- **`prepare` refuses an artifact a reader cannot read whole** (over ~25,000 tokens): pass it as `path:FIRST-LAST` slices.
-- **zsh: `path` is the array tied to `PATH`** — a loop variable named `path` empties the command search path; and `$S:t`
-  is a modifier (write `"${S}:path"`).
-- **FBNeo's SDL2 pause outlasts its cause** (gotcha, #352): a key step's focus resumes it, behind the step schedule.
+- **The on-demand scope cannot be fully exercised on PILOT or ERIS:** `test_meter_gain`, `audit_throw_recovery` and
+  `audit_guard_cancels` read data kept outside the tree (the community workbook, `~/charpages/framedata/` tables) that
+  neither box holds, so they SKIP or FAIL there whatever the runner. `audit_mask_window_ff42a2` is an instrument the
+  runner selects in no scope.
+- **A stray file seen once is not evidence:** rule-checker run 2026-11-13-1788 caught a work directory the stock runner
+  left on PILOT presented as evidence for R; one unrepeated run each way shows nothing about the difference.
+- **The on-demand scope takes about 6 h on PILOT at `--jobs 4` for half its rows** (`audit_sdram_bank_load` alone
+  6,715 s), about 3 h on ERIS at `--jobs 6`: split it between the boxes.
 
-## WHAT HAPPENED THIS SITTING (14z-225)
+## WHAT HAPPENED THIS SITTING (14z-226)
 
-- **Committed:** `df4b0902` (#370 stage 1), `25621357` (#369 batch 1), `511d4c59` (#352).
-- **Ruled:** #352's design ("build it this way but only as a release-time mode") and its finish ("Close it as a matrix,
-  then commit") (`DECISIONS_HISTORY.md` 14z-225); the first part's three rulings are recorded there too.
-- **Filed:** #371. **Commented:** #364 (the PILOT measurement), #352 (the measurement and a correction). **Closed:** none.
+- **Committed:** `7b5938e9` (#364/#371 design R; #369 batch 1's items 1, 3, 4).
+- **Ruled:** #369 batch 1's limits ("fix items 1,34, accept the others as limitations and don't fix them"), #364/#371's
+  design ("R, no lint (Recommended)") (`DECISIONS_HISTORY.md` 14z-226); the desktop gate's speed ideas declined ("since
+  it's release-only let's do neither").
+- **Closed:** #364, #371. **Filed:** #372.

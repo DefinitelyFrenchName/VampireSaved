@@ -695,7 +695,9 @@ control claims.
   (macOS always does, on disk), `tests/run_all_emulator.sh` points it at a directory of the run's own under
   `build/tmp/`, removed when the run ends, and refuses to START with less free space there than 10 GB (controls on more
   than one job; else 2 GB; `VS_TMP_MIN_GB` overrides), naming the shortfall. PILOT has about 12 GB free. Why: concurrent
-  controls filled ERIS's 24 GB tmpfs `/tmp` (section 21, control `tmp-ignored`).
+  controls filled ERIS's 24 GB tmpfs `/tmp` (section 21, control `tmp-ignored`). That directory is INSIDE the repo, so
+  on a Linux host with TMPDIR unset every `test_mister_*` gate refuses to write its RAM dumps there (the rule-7 guard)
+  and FAILs at once (#372, measured on PILOT 14z-226); run the mister lane on Linux with TMPDIR set outside the repo.
 - **Every gate run leaves nothing behind** (#364, #371; design R, ruled 2026-11-11, *"R, no lint (Recommended)"*): each
   gate run, plain and CONTROL=, goes through `tests/lib/session_run.py`, which starts the gate in a session of its own
   with a TMPDIR of its own (`gate.*` under the run's), and when the gate returns, whatever its status, TERMs whatever is

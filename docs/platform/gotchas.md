@@ -3235,7 +3235,13 @@ ending is not the job ending, in either direction. **Not general:** this was a n
 background processes notwithstanding (2026-09-13, on the Windows box ERIS replaced: a `setsid`
 sleep gone after 100 idle seconds, `uptime -s` showing the VM restarted; recorded then only in
 the session's own notes, NOT re-measured on ERIS), so on ERIS a stopped local task may take the
-job down with it — measure it there before relying on either outcome.
+job down with it — measure it there before relying on either outcome. **Measured on ERIS (14z-226,
+2026-11-11):** a run launched as `ssh eris 'wsl -e bash -s' < script`, the script starting `nohup setsid bash
+<run>.sh … &` and returning, died about a minute after its start (its run directory's last write 21:32 UTC, started
+21:31:50), and the next SSH found the WSL VM "up 0 min": with no `wsl.exe` client attached the VM shut down and took
+the detached job with it. (14z-225's #369 run used the same launch form and ran for hours; what differed is not
+measured.) What worked: hold the SSH session open from the Mac as a background task (`ssh eris 'wsl.exe -u <user> --
+bash <run>.sh'`), the run bounded by its own `timeout` (`build/agent226/r371/od_r371.sh`, local).
 
 ## `os.getsid()` ANSWERS FOR A ZOMBIE ON LINUX AND RAISES ESRCH ON macOS — and Linux `ps` keeps the zombie's name (`[sh] <defunct>`) where macOS shows `<defunct>` (measured 2026-10-03, 14z-189, #203)
 

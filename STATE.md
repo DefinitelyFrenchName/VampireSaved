@@ -38,71 +38,55 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-225 — **#370 stage 1 (every gate declares what it shares; the static pool and a kernel-lock host claim honour it); #369 migration batch 1 (210 gates off the debt list, each mode honoured only on its own CAUGHT line, piece 5 wired); #352 built and closed as a 16-cell matrix (the desktop gate reads FBNeo's own PAUSE overlay); #364 measured on PILOT and #371 filed (a timed-out emulator gate's MAME outlives it).** Opus 5.5, two transcripts: `4b144fa6` (cut short 2026-11-10 07:07 CET, the maintainer needing the Mac; `build/agent225/RESUME.md`) and `6ff1e472` (resumed 2026-11-10 19:20 CET).
+## Session 14z-226 — **#364 and #371 closed done by design R (`7b5938e9`: the emulator runner runs every gate in a session and a TMPDIR of its own, reaps the session, removes the TMPDIR), measured on every item the ruling listed before the commit; #369 batch 1's session-named limits ruled (items 1, 3, 4 fixed, the rest accepted); #372 filed.** Opus 5.5, transcript `a607a5d6` (compacted four times), 2026-11-11 to 2026-11-13.
 
 ### opened with
-The first part's opener is in transcript `4b144fa6`. The resumed part: the maintainer: **"read handoff.md, state.md and
-docs/next_session.md"**; then, on the pinned re-run, **"(a) Re-run audit_pool_drop pinned on the Mac: about 2 h, but the
-evidence is complete."** and **"btw PILOT is available but not ERIS right now"**; **"if anything can be run on PILOT in
-the meantime for another ticket then, go at it"**; **"Also, can we put PILOT to good use? Any ticket that might be
-tackled?"**; **"#352"**. Working evidence: `build/agent225/` (local; `m369/`, `t352/`, `t364/`, `tier*/`, `RESUME.md`).
+The maintainer: **"read handoff.md, state.md and docs/next_session.md"**; on the open decision, **"fix items 1,34, accept
+the others as limitations and don't fix them"**; on #364/#371's recommendation, the choice **"R, no lint
+(Recommended)"**; **"I believe both PILOT and ERIS are available. Any ticket they could be working on ?"**; on the
+on-demand gates, **"Run them on ERIS+PILOT (Recommended)"**; on the desktop gate's speed, **"since it's release-only let's
+do neither"**; on PILOT's disk, **"we should check what we can clean up before running such tests"** and **"I should have
+made ample space"**; at the end, **"start the close"**. Working evidence: `build/agent226/` (local; `r371/`, `t364/`,
+`tier1/`, `tier2/`).
 
-### (1) #370 STAGE 1 — `df4b0902`
-Committed in the first part (`df4b0902`, its message the record): every registered gate carries one `# SHARES:` line, the
-registry `tests/shares.tsv`, `tests/lib/share_pool.py` and `tests/lib/shares.sh`; the static pool never runs two jobs
-holding one token; the host claim is an OS file lock (`tests/lib/share_lock.py`, ruled "Kernel lock (Recommended)",
-`DECISIONS_HISTORY.md` 14z-225); the census gate `tests/test_shares.sh`; the two concurrent-controls lists retired.
-Rule-checker run 2026-11-09-1756 OK. Not built: the emulator token scheduler and the freeze-cadence cross-job write
-audit (#370 stays open).
+### (1) #364/#371 DESIGN R AND #369 BATCH 1'S LIMITS — `7b5938e9`
+Committed (`7b5938e9`, its message the record): `tests/lib/session_run.py` on the emulator runner's four gate lines (the
+gate in its own session and `gate.*` TMPDIR; what is left TERMed, up to 10 s, then KILLed; the TMPDIR removed; a TERM,
+INT or HUP to the runner forwarded), `JTSIM_SCRATCH` exported, `audit_pool_drop`'s legs through it, the new static gate
+`tests/test_session_reap.sh`; no lint, the 276 EXIT-only files not patched, as ruled (`DECISIONS_HISTORY.md` "Ruled
+2026-11-11 (14z-226) — #364/#371: design R is built, without the lint"). Evidence before the commit, on snapshot
+`84cc5181`: the planted TERM-ignoring and stopped `cps2` ("KILL needed for 2, 0 left after KILL"); real gates timed out
+and TERMed through R on PILOT and the Mac with 0 `cps2` left, where the stock runner left an orphan; the release-shape
+emulator tier through R on PILOT (PASS 472) and ERIS (PASS 458); the MiSTer lane on PILOT (GREEN, PASS 10, TMPDIR outside
+the repo); `test_mame_parity` on the Mac (GREEN, PASS 2); the on-demand scope split between the two boxes (45 of its 46
+rows: ERIS PASS 113 SKIP 2, PILOT PASS 124 FAIL 2), every non-PASS the same verdict on the parent `a2f8b817` (data kept
+outside the tree that the box lacks). Limits named in `build/agent226/r371/report_r.md` (local) and the closing comments.
+Rule-checker run 2026-11-13-1789 OK after 2026-11-12-1784 to 2026-11-13-1788 (-1788 caught a stray work directory the
+stock runner left on PILOT, seen once, presented as evidence for R; withdrawn). Also in the commit, as ruled
+(`DECISIONS_HISTORY.md` 14z-226): #369 batch 1's items 1, 3 and 4 fixed (`test_must_fire_census`, `test_checkdocs`,
+`test_signal_traps`), items 2 and 5-8 and the ERE tightness standing as limits. Strict confirm tier GREEN on the staged
+tree (`build/agent226/tier2/`, PASS 124, controls fired 563 of 563). #364 and #371 closed with their comments.
 
-### (2) #369 MIGRATION BATCH 1 — `25621357`
-210 gates leave `tests/expected/ctl_caught_debt.tsv` (310 rows to 100; the 100 left are the gates piece 5's frozen
-dead-leg and crash-sweep columns tie to), each declared mode ending in `vs_ctl_caught` on its main check's finding;
-piece 5 wired as ruled "Name the speaker (Recommended)" (`DECISIONS_HISTORY.md` 14z-225). 829 of 831 declared modes
-HONOURED on their own CAUGHT line on PILOT, ERIS and the Mac; the Mac re-runs pinned to the staged tree
-(`build/agent225/m369/rc/`: `mac_pinned2.txt`, `audit_pool_drop` plain PASS in 8,173 s on the maintainer's "(a)";
-`mac_pinned3.txt`, every gate directly reading a path that differs from PILOT's checkout, 225 modes HONOURED). The
-rule-checker found one real defect at round 9: `audit_dead_leg_linux`'s nj-stripped ERE lacked UNJUDGED-CAUGHT (the twin
-of r6's fix), fixed and swept for the class. Rule-checker run 2026-11-11-1770 OK after 2026-11-10-1757 to 2026-11-11-1768
-(-1767 refused at record, a reader having failed the spawn check, and -1769 withdrawn before spawning; both `NOT-RUN.txt`);
-on run -1767's finding the maintainer chose **"Name the gap, re-check now"**. Strict confirm tier GREEN on the commit's
-tree (`build/agent225/tier7/`, PASS 169). Limits named in `build/agent225/m369/rc/M369_scope.md`; the session-named
-ones are an open decision ("Decisions pending").
+### (2) #372 FILED — THE MISTER LANE REFUSES ITS IN-REPO TEMP
+Found while measuring R: on Linux with `TMPDIR` unset, the emulator runner puts its run temp under `build/tmp/` inside
+the repo, and every MiSTer-lane gate refuses to run there (`build/agent226/r371/mister_fail_lines.txt`, local; the parent
+does the same). Filed as #372 (bug, test-integrity, severity: low); `docs/project/operations.md` points at it.
 
-### (3) #352 — THE DESKTOP GATE READS FBNEO'S PAUSE OVERLAY — `511d4c59`
-Measured on PILOT's live desktop: FBNeo pauses on a focus loss or minimise and resumes behind the step schedule — the M24
-symptom reproduced by a minimise (capture sheet `build/agent225/t352/sheet_352.png` sent to the maintainer). Built as
-ruled ("build it this way but only as a release-time mode"; `DECISIONS_HISTORY.md` 14z-225): `tools/desktop_pause_check.py`
-(template from FBNeo's font; a missing PIL or font or a broken capture "PAUSE unread"), a paused or unreadable FBNeo leg
-not judged and the gate FAIL, the in-gate audio and mark controls DEAD on such a leg, the control `minimised` a CONTROL=
-mode only, X's active window logged per capture, the static gate `tests/test_desktop_pause_check.sh`. After three failed
-rounds the maintainer chose **"Close it as a matrix, then commit"**: 16 cells, 16 of 16 (`build/agent225/t352/matrix.tsv`).
-Found and fixed on the way: the in-gate wrong-mark read a paused capture as FIRED; an unreadable capture counted as a
-pause. Rule-checker run 2026-11-11-1777 OK after -1771 (withdrawn) to -1776; strict confirm tier GREEN on the commit's
-tree (`build/agent225/tier8/`). #352 is done; it is labelled `done unshipped` until a release runs its mode.
+### (3) WHAT THE SITTING LEFT FOR LATER
+The maintainer's speed ideas for the desktop FBNeo gate (unthrottle, skip the boot screens) declined: **"since it's
+release-only let's do neither"** (feedback memory `release-only-gates-not-optimised`). PILOT's disk: 230 G used, the
+project's home about 78 G; the old scratch directories are offered for deletion at the opener. The WSL shutdown gotcha
+carries ERIS's measurement (`docs/platform/gotchas.md`).
 
-### (4) #364 MEASURED ON PILOT; #371 FILED; THE RUNNER-REAP DESIGN PROTOTYPED
-On **"go at it"**: the census (276 files with an EXIT trap and no TERM trap, 160 of them emulator gates); on PILOT's dash an
-EXIT-only trap ran 0 times under TERM, INT and HUP; on the real emulator runner a timed-out gate left its work directory
-and the runner's own temp directory (its `rm -rf` raced a MAME still writing), and the split-form trap did not stop it.
-Worse: the timed-out gate's MAME processes outlived gate and runner at 100 % CPU (they catch TERM; `timeout -k`'s KILL
-never fires once the gate's shell is gone) — filed as **#371** on **"file it separately"**, and #364 commented. Design R
-(the runner ends the gate's whole session, TERM then KILL, then removes a per-gate TMPDIR) prototyped on PILOT with zero
-survivors and the passing gates' verdicts unchanged (`build/agent225/t364/design.md`, local). The recommendation between
-R, the 276-file patch and R with a lint has not been put: it needs its rule-checker run first (next session).
-
-### CLOSE (14z-225, 2026-11-11)
-Riding this close: the records of (1)-(4) (`DECISIONS_HISTORY.md`'s two #352 rulings of 14z-225, the open decision on
-#369 batch 1's session-named limits, the standing-ruling line for #352, the rows of #352, #364, #369, #370 and the new
-#371; #344's row set to `parked`, the label the maintainer's account added on GitHub 2026-11-08). Commits this sitting
-before the close: `df4b0902` (#370 stage 1), `25621357` (#369 batch 1), `511d4c59` (#352). Tickets closed: none; filed:
-#371; #352 labelled `done unshipped` with its "done, awaiting release" comment. Steps: sections (this group);
-next-session (the 14z-224 opener, 109 lines, quoted, to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-224 group,
-48 lines, to `STATE_HISTORY.md` with its ledger line); indexes (by the driver); dashboard (14z-163..14z-225, 3,834
-figures, 0 unclassed; five assets uploaded, `datasets` re-pointed: actions v16, costly v36, figures v36, rc_runs v36,
-tiers v37). The tier confirms on `build/agent225/tier8/tier_results.tsv` (`511d4c59`'s GREEN tier), not on 14z-224's
-close results: the sitting's three commits each ran their own strict confirm tier after that close. The tier's
-results: `build/agent225/close/tier_results.tsv`, the next close's `--prev`.
+### CLOSE (14z-226, 2026-11-13)
+Riding this close: the records of (1)-(3) (the ticket rows of #364 and #371 set to done, the new #372; the WSL gotcha's
+ERIS measurement; operations.md's #372 pointer). Commits this sitting before the close: `7b5938e9`. Tickets closed:
+#364, #371 (their comments cite `7b5938e9`, which reaches GitHub with this close's push); filed: #372. Steps: sections
+(this group); next-session (the 14z-225 opener, 117 lines, quoted, to `docs/NEXT_SESSION_HISTORY.md`); rollover (the
+14z-225 group to `STATE_HISTORY.md` with its ledger line); indexes (by the driver); dashboard (14z-163..14z-226, 3,886 figures, 0 unclassed; five assets uploaded, `datasets`
+re-pointed: actions v17, costly v37, figures v37, rc_runs v37, tiers v38). The tier confirms on
+`build/agent226/tier2/tier_results.tsv` (`7b5938e9`'s GREEN tier). The tier's results:
+`build/agent226/close/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
