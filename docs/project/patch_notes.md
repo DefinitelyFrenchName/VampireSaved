@@ -219,7 +219,7 @@ of the 15 Donovan naming parts outside native's Dark Force frames — ten of whi
 gate's frozen blind set) cannot show a missing routine there, the reverted leg equalling native too; inside them 1,511 frames differ (donovan_3/4/6/7) — the
 cause NOT ESTABLISHED (first attributed to the ruled Dark Force CHANGE never setting `+0x1C3`, RETRACTED the same session:
 poking `+0x1C3` over native's window left the difference unchanged, though that poke has no positive control; on donovan_6 the
-difference read in the colour bits, a split without a control) — GitHub #344. The Dark Force look is before the maintainer
+difference read in the colour bits, a split without a control) — GitHub #344 (CAUSE FOUND 14z-228, the poke shown to reach the branch: `docs/game/engine_internals.md` § The cause (measured 14z-228)). The Dark Force look is before the maintainer
 (`build/agent216/rc294/sheets/sheet294_df.png`, local): native draws Donovan in other colours than both of our builds. Built-image legacy replays against `mb_m` (01, 02, 03, 07, 105): 01 identical every
 frame; the other four differ on ONE frame (890), two bytes, `RAM:$FF06CC-$FF06CD` — the low word of a stacked return
 address into ported select-screen code that the new allocations moved by 0xDC0 (`0x413CDC` -> `0x414A9C`): the

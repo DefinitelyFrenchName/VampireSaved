@@ -1,0 +1,12 @@
+decision	recommendation
+subject	#360: close declined — the speed lines' phase follows slot parity and the pool's free-list history, which part inside Dark Force
+session	14z-228
+model	rule-checker@163e4ce9cf7b
+claim	Close #360 `declined` on the maintainer's word ("Record and close declined", DECISIONS_HISTORY.md "Ruled 2026-11-14 (14z-228) — #360 recorded and closed `declined`"), with the closing comment build/agent228/close/c360.md and the ticket row of docs/project/tickets.tsv set to declined. The mechanism it records: the speed-line handler's pair choice reads `$FF80B4 + $FF80B5` and keeps bit 0 (build/agent228/t360/static.txt, vs2 PRG:0x06E248-0x06E250); `$FF80B5` is set to the pool size and decremented once per slot by the walkers (static.txt: seven set-then-decrement pairs in vsavj, among them PRG:0x05E52E / 0x05E54E for the effect pool); the raw allocator pops the next slot from a stack (static.txt: `movea.w (a0)+,a4` at vsavj PRG:0x016FC8 and vs2 PRG:0x015710). On donovan_6 (build/agent228/t360/evidence.txt, from the logs fl6_*/st and d6_*/st by evidence.py): the two free lists are EQUAL from f2307 and DIFF from f3036 until f5677; at f3036 ours' pool holds three pieces native's does not (types 0x52 sub 6, 0x52 sub 4, 0x02 sub 1); at f5633 the list tops are native 03 01 06 05 and ours 01 03 09 08; at f5634 the pieces 0-3 sit in slots 5, 6, 1, 3 on native and 8, 9, 3, 1 on ours, the slot parity changing for pieces 0 and 1 only; 28 of 49 records differ, 15 and 13 on pieces 0 and 1 and none on pieces 2 and 3, and each of the 28 equals native's same piece at an adjacent frame; P1's state runs from f2900 differ (ours seq 0x16 over f2900-2950, native none). The records: docs/game/engine_internals.md § The speed-line effect, paragraph "Why two pieces run one frame out of phase inside Dark Force"; docs/game/atlas/ram.md rows `$FF80B4`, `$FF80B5`, `$FFF96E`. NOT TESTED: that the three extra pieces at f3036 are spawned by ours' Dark Force system rather than another cause (only that the fighters' states differ from f2900 and the lists first part at f3036); other Dark Force parts, other tenants, FBNeo, MiSTer; whether the phase is visible to a player.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	1 flag(s): D-ABSOLUTE 1
+deliverables	build/agent228/close/c360.md
+action	2026-11-14-1802

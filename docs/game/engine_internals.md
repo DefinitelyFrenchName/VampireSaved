@@ -1544,6 +1544,26 @@ every piece culled (what ours draws for Donovan through M24; the port's fix, a t
 `docs/project/patch_notes.md` 14z-219, staged for the M25 freeze). [M: `build/agent218/tspeed/REPORT.md` and `feas/REPORT.md` (local, the census
 and the static comparison); `tests/audit_don_speed_lines.sh` (the records against native vs2, 14z-219)]
 
+**Why two pieces run one frame out of phase inside Dark Force (measured 14z-228, #360, closed declined).** The handler's
+pair choice is not a frame phase: `$FF80B5` is the running walker's SLOT COUNTDOWN (`ram.md`), so `$B4+$B5` is frame
+parity XOR the piece's slot parity, and the slot comes from the pool's free list, a stack the raw allocator pops
+(`ram.md` `$FFF96E`), so it is set by the pool's whole allocation history. On `donovan_6` under the parity rig (picks,
+level 6, RNG 0000; merged-m26 against native vs2) the two free lists are equal from the round's start (f2307) to f3035;
+at f3036, inside Dark Force, ours allocates three pieces native does not (types 0x52 sub 6, 0x52 sub 4, 0x02 sub 1), and
+the lists stay in different orders until f5677. At the back dash (f5634) native's list top reads slots 03 01 06 05 and
+ours 01 03 09 08; the spawner allocates pieces 3..0, so pieces 0-3 sit in slots 5, 6, 1, 3 on native and 8, 9, 3, 1 on
+ours: pieces 0 and 1 change slot parity and alternate in opposite phase, pieces 2 and 3 do not — the 28 of 49 records.
+The fighters already differ from Dark Force activation (f2900: ours plays a 51-frame Dark Force pose, seq 0x16, native
+none; 5LP in Dark Force lasts 17 frames on native, seq 0x0A f3020-3036, and 12 on ours, f3020-3031), the two games'
+Dark Force systems differing by ruling (`DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-168)"). **The separating
+control:** the same build and copy with only ours' free list poked at f5633 into native's order for those four slots
+(`$FF2FF6`): the pieces take slots 5, 6, 1, 3 and 0 of 49 records differ from native (28 unpoked). So the copy is not at
+fault, and no change inside it can match native in general: native's own phase is its pool history. The 5LP length
+difference is observed, not investigated. **RETRACTED: #360's first reading** (14z-219), that the parity agreeing at every
+frame end on both legs put the difference in WHERE IN THE FRAME the handler reads the counter — `$B5` at a frame end is
+not the value any handler reads; each handler reads its own slot's countdown. [M: `build/agent228/t360/` (local: `d6_*` the speed-line tap with slots,
+`fl6_*` the free-list probe `freelist_tap.lua`, `d6_ours_fl` the poked control, `evidence.txt`); no gate]
+
 **Why vs2 draws nothing there (measured 14z-219, the class-0x72 census, #345).** The trail pieces (class 0x72, sub 0x00 —
 Blizzard Sword's snowflake machine, vs2 `PRG:0x06712C`) take their animation from the SHARED effect anim table, vs2
 `PRG:0x1D7428` / vsavj `PRG:0x1F3FD2` (vhunt2 `PRG:0x1DE55A`): the same 116-row index, the same nodes and the same
@@ -5218,15 +5238,46 @@ phase lag (the seq-D thunk's cycle cost), and the "fuchsia" of the original
 report (ping #7) is pal-06's correct orange -> magenta fade. CLOSED.
 
 
-**Donovan's colours inside Dark Force differ from vs2's (14z-216, GitHub #344; cause OPEN).** On the naming parts that use
+**Donovan's colours inside Dark Force differ from vs2's (14z-216, GitHub #344; ~~cause OPEN~~ CAUSE FOUND 14z-228, and
+the body half reaches all three tenants — the paragraph after this one; #344 stays parked by ruling).** On the naming parts that use
 Dark Force (`donovan_3`, `_4`, `_6`, `_7`), P1's palette rows 0x0A and 0x0C differ from native vs2 on about 378 frames
 each, all inside native's Dark Force window (P1 `+0x1C3`, the Power field, set: 2900-3287 on `donovan_6`, where ours
 never sets it) — on merged-m23 (without #294) and merged-m24 (with it) alike (`tests/audit_don_row0c.sh` MEASURE lines); row 0x0A
 also differs OUTSIDE that window on `donovan_3` and `_4` (739 and 410 frames against 388-frame windows), not
 characterised. On `donovan_6` every differing frame differs in the low 12 bits (colour) and read equal in the brightness
-nibble — a split without a control showing it could read a brightness difference. Poking `+0x1C3` to 1 over
+nibble — a split without a control showing it could read a brightness difference. ~~Poking `+0x1C3` to 1 over
 native's window on our build leaves it unchanged — a poke without a positive control, so the Power-field branch of the
-ported per-frame routine is neither ruled in nor out. Capture: `build/agent216/rc294/sheets/sheet294_df.png` (local).
+ported per-frame routine is neither ruled in nor out.~~ **RETRACTED 14z-228: the poke DOES reach the branch** — with it,
+the branch's own counter `+0x1CA` cycles on ours and row 0x0C takes all 4 of native's in-window colour rows (unpoked: 1,
+its normal row); "unchanged" was a COUNT of differing frames (10 of 388 equal either way), which stays high because the
+phase differs (below). Capture: `build/agent216/rc294/sheets/sheet294_df.png` (local).
+
+**The cause (measured 14z-228).** Native draws a fighter's Dark Force colours with TWO vs2 routines, both gated on the
+Power field `+0x1C3`, from vs2's per-fighter palette entry `PRG:0x029B4A` (palette-state dispatch, then `bsr 0x02A132`, the
+per-id routine table `PRG:0x02A142`, then `bsr 0x02AF7E`), and vsavj's twin entry `PRG:0x02A7C8` has only the first two:
+- **the body row (+0x18B, P1 row 0x0A): vs2's GENERIC Dark Force Power tint `PRG:0x02AF7E`**, run for every fighter
+  unless its own routine sets `+0x1C9` (the entry clears it first; Donovan's, Phobos's `0x02A2B6` and Pyron's row `0x02A182`,
+  a bare `rts`, never do): every other frame (`$FF80B4` bit 0) it steps `+0x1CA` mod 6 and picks
+  `{none,0x42,0x43,none,0x44,0x45}` + 4 × colour (`+0x3AE`) from a PER-CHARACTER table, `PRG:0x396C14[id]` (id 0x13 ->
+  `0x3ADFDC`, 0x10 -> `0x3AB69C`, 0x11 -> `0x3AC45C`), through the resolver `PRG:0x02A076`. vsav has no Power mode and no
+  such routine, so no tenant on ours gets it;
+- **Donovan's weapon row (+0x18B+2, P1 row 0x0C): the Dark Force branch of his own routine** (vs2 `PRG:0x02A35C`, ids
+  `0x316` + `{none,0,1,none,2,3}` + 4 × colour, same counter `+0x1CA`). Ours carries that routine (#294's `[perframe_hook]`)
+  but it tests `+0x1C3`, which ours' Dark Force CHANGE never sets — ours sets vsavj's Dark Force flag `+0x111` (vsavj's
+  per-character routines test it, e.g. Bulleta's `PRG:0x02A8EE`), over f2900-3288 on `donovan_6` against native's
+  `+0x1C3` f2900-3287; the palette state `+0x14E` reads 0 throughout on both legs.
+Both routines keep the brightness nibble and replace the colour bits (`andi.l #$f000f000` then `or`), which is the
+14z-216 split. Native steps `+0x1CA` by 2 per odd frame (the two routines in turn), ours by 1 when poked — the phase.
+**All three tenants miss the body tint** (14z-228, parity rig, merged-m26 vs native vs2, P1 rows 0x0A-0x0D): Phobos
+(`huitzil_4`, native's window f6000-6386) — native's row 0x0A leaves its outside-window rows on 375 of 387 window frames
+and ours differs from native on 385 of 387 (18 of 4,063 outside); Pyron (`pyron_4`, f6340-6727) — 382 of 388, ours 382
+of 388 (0 of 4,402 outside); rows 0x0B-0x0D equal inside both windows. Phobos's own per-frame routine (with its own
+`+0x1C3` branch at `PRG:0x02A2E8`) is not ported either. Not explained: Phobos's row 0x0B differs on 461 frames OUTSIDE
+the window; Donovan's row 0x0A outside the window on `donovan_3`/`_4` (above). On the capture sheets Pyron whitens
+visibly in native's Dark Force and Phobos pales slightly. Fix options laid out (a flag change for the sword; a tenant-only
+copy of the generic tint for the bodies) and not taken: the maintainer kept #344 parked (2026-11-14, "Record cause, keep
+parked"). [M: `build/agent228/t344/` (the fields probe `df_tap.lua`, the three-leg palette run `pn`/`po`/`pp`) and
+`build/agent228/t344t/` (Phobos and Pyron: `cmp344.py`, the sheets `phobos_crop.png`, `pyron_crop.png`), local; no gate]
 
 ### Rig facts (measured 14z-70/70b)
 

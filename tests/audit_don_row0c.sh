@@ -11,10 +11,14 @@
 #     R1 the electrocute rig (tests/replays/don/294_don_electrocuted.rpl: P2 Victor's held HP, Donovan shocked from f3412);
 #     R3 the 15 Donovan naming parts (tests/replays/naming/donovan_1..15; Foot Stab (ES) among them), judged OUTSIDE
 #        native's Dark Force frames (P1 +0x1C3, vs2's Dark Force POWER field, set). INSIDE them row 0x0C differs on about
-#        378 frames per Dark Force part (14z-216 on mb_294: 1511 frames, donovan_3/4/6/7); the CAUSE IS OPEN — measured,
-#        never asserted, never explained away. R5 MEASURES, every run, donovan_6 re-run with P1's +0x1C3 POKED to 1 over
-#        native's window (14z-216: the difference unchanged, 378 frames); whether that poke reaches the routine's read
-#        is NOT established (no positive control), so R5 rules nothing in or out.
+#        378 frames per Dark Force part (14z-216 on mb_294: 1511 frames, donovan_3/4/6/7) — measured, never asserted.
+#        ~~the CAUSE IS OPEN~~ the cause is FOUND (14z-228, #344 kept parked: docs/game/engine_internals.md § The cause
+#        (measured 14z-228)): ours' Dark Force never sets vs2's +0x1C3, which the ported routine's Dark Force branch
+#        tests, and vs2's generic Dark Force Power tint has no counterpart on vsavj. R5 MEASURES, every run, donovan_6
+#        re-run with P1's +0x1C3 POKED to 1 over native's window (14z-216: the difference unchanged, 378 frames);
+#        ~~whether that poke reaches the routine's read is NOT established~~ it does (14z-228, a separate probe: the
+#        branch's counter +0x1CA cycles and row 0x0C takes native's Dark Force colours, out of phase), so R5's count
+#        stays high on PHASE; R5 still prints, never asserts.
 # HOW: three legs per rig on MAME under tests/lua/pal_rows_tap.lua (non-debug; P1's rows 0x0A-0x0D dumped every
 #   frame): native vsav2, OURS (BUILD), and BAD — the same build with the per-frame table's row 0x13 put back to
 #   vsavj's default word in the emulator's decrypted-opcode share (OPATCH 02ae12:0040, nothing built: the table is read
@@ -88,9 +92,10 @@ wait
 
 # R5, MEASURED EVERY RUN (rule-checker run 2026-11-01-1543 Q1 asked for the premise behind an earlier attribution of the
 # window to the routine's Dark Force branch, vs2 0x2A35C `tst.b $1c3(a6)`): donovan_6 re-run on ours and on BAD with P1's
-# +0x1C3 POKED to 1 over NATIVE's own +0x1C3 frames. 14z-216: the difference unchanged (378 frames). The poke has no
-# positive control (run 2026-11-01-1544 Q4: it may never reach the routine's read), so R5 rules nothing in or out: it
-# prints, never asserts, and the window's cause is stated open.
+# +0x1C3 POKED to 1 over NATIVE's own +0x1C3 frames. 14z-216: the difference unchanged (378 frames). ~~The poke has no
+# positive control (run 2026-11-01-1544 Q4: it may never reach the routine's read), so R5 rules nothing in or out~~ —
+# 14z-228 measured, outside this gate, that the poke reaches the branch (engine_internals.md § The cause (measured
+# 14z-228)); the count stays high because the phase differs. R5 prints, never asserts.
 DFW="$(awk '$1=="V" && $2 >= 2500 { for (i=3;i<=NF;i++) if ($i ~ /^f1c3=/) { v=substr($i,6); if (v!="00") { if (!lo) lo=$2; hi=$2 } } } END { if (lo) print lo "-" hi }' "$W/c6/native/rig.log")"
 if [ -n "$DFW" ]; then
     J6="$REPO/tests/replays/naming/donovan_6.json"; FR6="$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['frames'])" "$J6")"
@@ -153,8 +158,9 @@ def diff(r, leg, row, lo=2500, hi=10**9):
     return [f for f in sorted(nP) if lo <= f <= hi and f in oP and nP[f][row] != oP[f][row]]
 d = diff("r1_shock", cmp_leg, "0c")
 (ok if not d else bad)(f"[R1 the electrocute rig] row 0x0C, {cmp_leg} vs native from 2500: {len(d)} differing frames{(' (first ' + ','.join(map(str, d[:5])) + ')') if d else ''}")
-# THE DARK FORCE WINDOW (measured 14z-216): inside native's +0x1C3 frames row 0x0C differs with a cause NOT established.
-# So R3 judges row 0x0C OUTSIDE native's +0x1C3 frames (must be 0) and MEASURES it inside; the window is stated open.
+# THE DARK FORCE WINDOW (measured 14z-216): inside native's +0x1C3 frames row 0x0C differs; the cause was found 14z-228
+# (engine_internals.md § The cause (measured 14z-228)) and #344 is parked by ruling, so R3 judges row 0x0C OUTSIDE
+# native's +0x1C3 frames (must be 0) and MEASURES it inside.
 def in_df(r, f): return L[(r, "native")][4].get(f, "00") not in ("00", "??")
 tot = {"0a": 0, "0b": 0, "0d": 0}; out_c = 0; in_c = 0; parts = []
 for p in range(1, 16):
@@ -166,7 +172,7 @@ for p in range(1, 16):
     parts.append(f"donovan_{p} 0c outside DF={len(o_)}{(' (first ' + ','.join(map(str, o_[:3])) + ')') if o_ else ''} inside DF={len(i_)} of native's {dfw} +0x1C3 frames (0a={dd['0a']} 0b={dd['0b']} 0d={dd['0d']})")
 for s_ in parts: print(f"        {s_}")
 (ok if out_c == 0 else bad)(f"[R3 the 15-part census] row 0x0C, {cmp_leg} vs native from 2500 outside native's +0x1C3 (Dark Force) frames: {out_c} differing frames over 15 parts")
-print(f"  MEASURE row 0x0C inside native's +0x1C3 frames: {in_c} differing frames (cause NOT ESTABLISHED)")
+print(f"  MEASURE row 0x0C inside native's +0x1C3 frames: {in_c} differing frames (#344, parked: cause in engine_internals.md)")
 print(f"  MEASURE rows 0x0A {tot['0a']}, 0x0B {tot['0b']}, 0x0D {tot['0d']} differing frames ({cmp_leg} vs native)")
 # R5 the premise: with +0x1C3 poked over native's window, ours equals native inside it and BAD does not
 def win(r):
@@ -181,7 +187,7 @@ else:
     def dwin(P): return [f for f in sorted(nP) if w6[0] <= f <= w6[1] and f in P and nP[f]["0c"] != P[f]["0c"]]
     po, pb = dwin(pp["ours"][0]), dwin(pp["bad"][0])
     unpoked = len([f for f in diff("c6", "ours", "0c") if w6[0] <= f <= w6[1]])
-    print(f"  MEASURE [R5] donovan_6 with P1 +0x1C3 poked to 1 over native's window {w6[0]}-{w6[1]}: ours {len(po)} differing frames on row 0x0C inside it (unpoked: {unpoked}), BAD {len(pb)} — whether the poke reaches the routine's read is not established (no positive control)")
+    print(f"  MEASURE [R5] donovan_6 with P1 +0x1C3 poked to 1 over native's window {w6[0]}-{w6[1]}: ours {len(po)} differing frames on row 0x0C inside it (unpoked: {unpoked}), BAD {len(pb)} — the poke reaches the branch (14z-228, outside this gate) and the count stays high on phase: engine_internals.md § The cause (measured 14z-228)")
 b1 = len(diff("r1_shock", "bad", "0c"))
 bparts = {p: len([f for f in diff(f"c{p}", "bad", "0c") if not in_df(f"c{p}", f)]) for p in range(1, 16)}
 blind = [f"donovan_{p}" for p, n in bparts.items() if n == 0]

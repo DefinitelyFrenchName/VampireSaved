@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent228/close/c360.md	b7734408c6083fc4ac048c75bf3d659963717bd8
+build/agent228/t360/static.txt	aecaac8dd6225418929808d745fa7e6b182528a9
+build/agent228/t360/evidence.txt	ad09328573e45430eb0bfa6a5247eb8ae541b4f2
+build/agent228/t360/evidence.py	6edaa33e0f35d3f451b33452151778dcd32295f7
+build/agent228/t360/run_flpoke.sh	c7d910582de2cfb7468cb4cbc0cd5f29d4ede595
+DECISIONS_HISTORY.md.lines-10226-10238 (lines 10226-10238 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-14 (14z-228) — #360 recorded and closed `declined`")	377e6a565cb7f097fdd1bf5f200eb374ad4adfaa
+docs/game/engine_internals.md.lines-1547-1565 (lines 1547-1565 of docs/game/engine_internals.md)	7b9c0b9b0d7072c24c17350fffb72874308f46e9
+docs/game/atlas/ram.md.lines-95-97 (lines 95-97 of docs/game/atlas/ram.md)	a643d4f0fa4e532f090024815f8048b4c4ceac9d

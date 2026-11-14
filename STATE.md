@@ -38,6 +38,36 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-228 — **#348 estimated (not now), #360's mechanism found and the ticket closed `declined`, #344's cause found and widened to all three tenants (kept parked).** Opus 5.5, transcript `ccd11d40`, 2026-11-14.
+
+### opened with
+The maintainer: **"read handoff.md, state.md and docs/next_session.md"**; then **"Estimate #348 and do the analysis for
+#360 and #344"**; on the options, **"Not now"** (#348), **"Record and close declined"** (#360), **"Check Phobos/Pyron
+first"** then **"Record cause, keep parked"** (#344) — `DECISIONS_HISTORY.md` 14z-228. Working evidence:
+`build/agent228/` (local; `t360/`, `t344/`, `t344t/`, `gate*/`).
+
+### (1) #348 ESTIMATED — NOT NOW
+A fresh package of `build/m3b_merged34` (6.2 s on the Mac) equals the tracked `release/merged-m26` on the manifest,
+`apply_release.py` and 20 of 20 patches on all three platforms; the tracked M25 differs on the manifest and 8 of 20
+patches (a free control). Five emulator-tier gates read `release/` and none declares it: the FOLLOWS reader has no
+`release` stem (`docs/project/gate_header_contract.md`). Estimated 2.5 to 4 active hours (ESTIMATED); ruled not now.
+
+### (2) #360 — THE PHASE IS THE POOL'S HISTORY; CLOSED `declined`
+`$FF80B5` is the running walker's slot countdown and the pool allocator pops a free-list stack, so the speed lines' pair
+choice follows slot parity; on `donovan_6` the two free lists part at f3036 inside Dark Force, where the two games' Dark
+Force systems differ by ruling (`docs/game/engine_internals.md` § The speed-line effect; `docs/game/atlas/ram.md`).
+The separating control: ours' free list poked at f5633 into native's order gives native's slots and 0 of 49 records
+differing (28 unpoked). Rule-checker run 2026-11-14-1803 OK after 2026-11-14-1802 (VIOLATED on Q1: ours' walker and copy not
+shown, the untapped premises not named; Q4: no control separating slot parity from a copy defect; both answered, the
+control run). Closed `declined` with its comment (`build/agent228/close/c360.md`); #344 and #348 commented.
+
+### (3) #344 — CAUSE FOUND, ALL THREE TENANTS, KEPT PARKED
+The body tint is vs2's generic Dark Force Power routine `PRG:0x02AF7E` (no vsavj counterpart); Donovan's sword is his
+ported routine's Dark Force branch, which tests vs2's `+0x1C3` where ours sets `+0x111`; the 14z-216 poke did reach the
+branch (retracted). Phobos and Pyron miss the same body tint (capture sheets `build/agent228/t344t/`, local).
+`docs/game/engine_internals.md` § The cause (measured 14z-228); `tests/audit_don_row0c.sh`'s header and two printed
+lines corrected (the gate PASS on the Mac before and after the last print fix, `build/agent228/gate/`, `gate2/`).
+
 ## Session 14z-227 — **the #310 family stops: its cost and the value of the 100 debt rows measured; #372 fixed and #370 finished by a simpler rule; #310, #369, #370 and #372 closed done (`e5bfe9dd`); #373 filed and fixed (the known-crash rig re-timed for the emulated clock, its gate migrated off the debt list).** Opus 5.5, transcript `006806e6` (compacted), 2026-11-13 to 2026-11-14.
 
 ### opened with

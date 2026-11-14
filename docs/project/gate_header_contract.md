@@ -81,7 +81,10 @@ HARNESS it reaches — the `tests/lib/*.sh` it sources and the `tools/run_*.sh` 
 runners it calls (not the build chain, whose subject is the romset) — plus its registry row's
 `args`. A reference composed from a variable is cut at the variable, so `tests/replays/$r.rpl`
 demands a declaration at least as wide as `tests/replays/`; untracked build outputs are not
-references.
+references. **A stem the reader does not know is invisible to the text class:** its `REF_RE` reads only `tests`, `tools`,
+`docs`, `emu` and `build/manifest`, so a gate reading `release/…` is never asked to declare it — measured 14z-228 (#348):
+five emulator-tier gates read `release/` in code (`audit_release_linux_desktop`, `audit_release_linux_cleanhost`,
+`audit_dead_leg_linux`, `test_readme_recording`, `test_release_binaries`) and none declares it.
 
 **The reconciliation** (`tests/test_gate_follows.sh`, ci_portable) has THREE classes, and a
 declaration must satisfy all of them. TEXT: every reference must be COVERED by a declared prefix
