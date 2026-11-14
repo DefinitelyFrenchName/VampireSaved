@@ -146,7 +146,16 @@ evidence:
   controls block RED.
 - **The debt list** (ruling C1): `tests/expected/ctl_caught_debt.tsv` lists every gate that declared a mode at
   8464fa3f and is not yet migrated; a listed gate keeps the old fall-through and its `vs_ctl_fired`. It only shrinks.
-  #369 closes, and #310 with it, when it is empty.
+  #369 and #310 closed with its 100 rows left, as #369's stated limit (ruled 2026-11-13, 14z-227): no batch migrates
+  them; a listed gate migrated for its own reasons still leaves the list in that commit. **What the 100 cost to leave,
+  measured (14z-227):** 348 of their 352 declared modes were read blind by eight readers from their latest logs (the
+  4 MiSTer modes not measured), with 18 hidden controls of known own and known foreign reds, all read right (batches 3
+  and 4, 88 real items, carried own-red controls only, so a false OWN there is uncontrolled). 343 were read as red from
+  the check the declaration names (one of them #373's crash, not the declared one); the other 5 (4 OTHER, 1 CANNOT-TELL) are not shown to have (for four of them the
+  same control fires in-gate on the plain run, which shows the check sees its fault there, not why the mode run
+  went red). The one defect found is #373: a firing line that claims a result the gate never checks. What stays open: a
+  listed gate's mode is still HONOURED on any red, so a later change that turns one red for a foreign reason is not
+  caught by the classifier.
 
 `tests/test_control_classifier.sh` holds the classifier (control `fallthrough-honoured`), `tests/test_controls_contract.sh`
 section 7 the helpers (`fired-under-mode`, `plain-caught-green`), and `tests/test_ctl_caught_lint.sh`

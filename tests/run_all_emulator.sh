@@ -128,7 +128,9 @@
 #                                                        it re-runs each gate once per control). In a pooled fbneo/mame
 #                                                        lane a gate whose `# SHARES:` line is `none` runs its controls as
 #                                                        pool jobs of their own, beside one another (#321, 14z-210; #370,
-#                                                        14z-225); any other gate runs them one after another in its slot
+#                                                        14z-225); any other gate runs them one after another in its slot.
+#                                                        A gate whose `# SHARES:` line names a token of tests/shares.tsv
+#                                                        runs after the pool's other gates, one at a time (#370, 14z-227)
 #   ... --order RESULTS.tsv                              LONGEST FIRST (#321, ruled 2026-10-26 "Yes, longest first"): a
 #                                                        pooled lane starts its gates in the order of their seconds in that
 #                                                        earlier run's results.tsv, a gate's control rows counted with it;
@@ -418,13 +420,16 @@ fi
 # concurrent controls ERIS's /tmp, a 24 GB tmpfs, filled and 28 modes read HONOURED in 0-1 s (build/agent210/t321e2/);
 # with TMPDIR on disk the same run took 7,947 s, every verdict equal, its temp peak 7.4 GB by a 30 s sample. So unless
 # the caller set TMPDIR (macOS always does, on disk), every gate's mktemp lands in a directory of this run's under
-# build/tmp/, removed when the run ends; and the run refuses to START on less free space there than it needs (10 GB
-# with controls on more than one job, else 2; VS_TMP_MIN_GB overrides), naming the shortfall, rather than die midway.
+# ${XDG_CACHE_HOME:-$HOME/.cache}/vampire-saved/tmp/, removed when the run ends; and the run refuses to START on less free
+# space there than it needs (10 GB with controls on more than one job, else 2; VS_TMP_MIN_GB overrides), naming the
+# shortfall, rather than die midway. OUTSIDE THE REPO (#372, 14z-227): it was build/tmp/ until then, and on Linux with
+# TMPDIR unset every MiSTer gate refused to write its RAM dumps inside the repo (the rule-7 guard) and FAILed at once
+# (measured on PILOT, 14z-226). tests/test_emulator_runner.sh section 21, controls tmp-ignored and tmp-in-repo.
 VS_RUN_TMP=""
 vs_tmp_clean() { [ -n "$VS_RUN_TMP" ] && [ -d "$VS_RUN_TMP" ] && rm -rf "$VS_RUN_TMP"; :; }
 if [ "$DRY" = 0 ]; then
     if [ -z "${TMPDIR:-}" ]; then   # DISK-TMPDIR
-        VS_RUN_TMP="$REPO/build/tmp/emu_$STAMP.$$"
+        VS_RUN_TMP="${XDG_CACHE_HOME:-$HOME/.cache}/vampire-saved/tmp/emu_$STAMP.$$"   # RUN-TMP-BASE
         mkdir -p "$VS_RUN_TMP" && [ -d "$VS_RUN_TMP" ] || { echo "FAIL: could not create this run's temp directory $VS_RUN_TMP"; exit 1; }
         export TMPDIR="$VS_RUN_TMP"
         trap 'vs_tmp_clean' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
@@ -784,6 +789,16 @@ for _lane_pool in $_POOLS; do
             printf '  %-34s %-7s %s\n' "$g" "$lane" "tests/$g.sh $_shown"
             continue
         fi
+        # TOKEN HOLDERS RUN ALONE (#370, 14z-227; the maintainer: "yes, that's the best way forward"): in a pooled lane, a
+        # gate whose `# SHARES:` line names a token of tests/shares.tsv (anything but `none` and `self`) is held back and
+        # run after the pool's other gates have finished, one at a time. Until then two holders of one token could start
+        # together: the second waited inside its slot on the host claim (up to 900 s), or, on `desktop-session`, REFUSED
+        # at once. It stands in for the token-aware scheduler of #370's design, which was not built: at 14z-227 the only
+        # emulator gates holding a token were the three Linux release gates. tests/test_emulator_runner.sh section 18f.
+        if [ "$_jobs" -gt 1 ] && python3 tests/lib/share_pool.py get "tests/$g.sh" 2>/dev/null | grep -qvxE 'none|self'; then   # TOKEN-SERIAL
+            printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$g" "$lane" "$scope" "$cadence" "$args" "$note" "$tmo" >> "$LOGDIR/.serial_$_lane_pool"
+            continue
+        fi
         if [ "$_jobs" -le 1 ]; then
             run_one "$g" "$lane" "$scope" "${args:--}" "${tmo:-}"
         else
@@ -857,6 +872,17 @@ for _lane_pool in $_POOLS; do
         fi
     done < "$LOGDIR/.lane_$_lane_pool"
     wait                       # the lane is not finished until its gates are
+    if [ -f "$LOGDIR/.serial_$_lane_pool" ]; then   # the token holders held back above (TOKEN-SERIAL), one at a time
+        printf '  (%s held back: a gate naming a shared token runs alone, #370)\n' "$(cut -f1 "$LOGDIR/.serial_$_lane_pool" | tr '\n' ' ' | sed 's/ $//')"
+        while IFS="$(printf '\t')" read -r g lane scope cadence args note tmo; do
+            [ -n "$g" ] || continue
+            _slot=""; _slot_env=""
+            if [ "$_lane_pool" = mister ]; then _slot_env="JTSIM_SCRATCH=$JTSIM_BASE "; fi
+            _slot_given=""
+            run_one "$g" "$lane" "$scope" "$_slot_env${args:--}" "${tmo:-}"
+        done < "$LOGDIR/.serial_$_lane_pool"
+        rm -f "$LOGDIR/.serial_$_lane_pool"
+    fi
     if [ -n "$SLOTFIFO" ]; then exec 8>&-; rm -f "$SLOTFIFO"; SLOTFIFO=""; fi
     # EVERY SELECTED GATE HAS A ROW (#321, 14z-210): a worker that dies between its gate's end and its row leaves no
     # verdict, and the tally counted only rows — on PILOT a pooled lane of three printed GREEN on PASS 1, because

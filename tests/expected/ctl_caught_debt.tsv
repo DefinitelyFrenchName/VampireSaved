@@ -7,7 +7,9 @@
 # mode, is gone, or did not exist at 8464fa3f (a new gate never joins the list), on a row that is not on this list's
 # first version (blob pinned in that gate as ORIGIN_BLOB) and on every committed version since (a deleted row never
 # comes back), and on a mode-declaring gate that is neither listed nor calls vs_ctl_caught. Migrate a gate (docs/project/must_fire_contract.md § #369), then delete its
-# row in the same commit. #369 closes, and #310 with it, when no row is left.
+# row in the same commit. #369 and #310 CLOSED with these rows left, as #369's stated limit (ruled 2026-11-13, 14z-227,
+# the maintainer: "agreed on both"; DECISIONS_HISTORY.md "Ruled 2026-11-13 (14z-227) — #369 and #310 close"): no batch
+# migrates them; a listed gate that is migrated for its own reasons still leaves the list in that commit.
 audit_air_dash_height.sh
 audit_air_gc_legacy.sh
 audit_chains174.sh

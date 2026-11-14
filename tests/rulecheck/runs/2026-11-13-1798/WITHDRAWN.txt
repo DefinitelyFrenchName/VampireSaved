@@ -1,0 +1,1 @@
+WITHDRAWN before spawning: the PACKET CHECK flagged a figure (Ubuntu 24.04) in c372.md that no artifact carries; cut and re-prepared as the next run.

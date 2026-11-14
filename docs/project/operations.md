@@ -693,11 +693,16 @@ control claims.
   `jobs-leak`).
 - **Temp files on disk** (ruled 2026-10-27, *"Runner sets disk TMPDIR (Recommended)"*): unless the caller set `TMPDIR`
   (macOS always does, on disk), `tests/run_all_emulator.sh` points it at a directory of the run's own under
-  `build/tmp/`, removed when the run ends, and refuses to START with less free space there than 10 GB (controls on more
-  than one job; else 2 GB; `VS_TMP_MIN_GB` overrides), naming the shortfall. PILOT has about 12 GB free. Why: concurrent
-  controls filled ERIS's 24 GB tmpfs `/tmp` (section 21, control `tmp-ignored`). That directory is INSIDE the repo, so
-  on a Linux host with TMPDIR unset every `test_mister_*` gate refuses to write its RAM dumps there (the rule-7 guard)
-  and FAILs at once (#372, measured on PILOT 14z-226); run the mister lane on Linux with TMPDIR set outside the repo.
+  `${XDG_CACHE_HOME:-$HOME/.cache}/vampire-saved/tmp/`, removed when the run ends, and refuses to START with less free
+  space there than 10 GB (controls on more than one job; else 2 GB; `VS_TMP_MIN_GB` overrides), naming the shortfall.
+  Why: concurrent controls filled ERIS's 24 GB tmpfs `/tmp` (section 21, control `tmp-ignored`). Until 14z-227 that
+  directory was `build/tmp/`, INSIDE the repo, so on a Linux host with TMPDIR unset every `test_mister_*` gate refused
+  to write its RAM dumps there (the rule-7 guard) and FAILed at once (#372, measured on PILOT 14z-226); it is outside
+  the repo since (section 21, control `tmp-in-repo`).
+- **A gate naming a shared token runs alone** (#370, 14z-227): in a pooled lane of `tests/run_all_emulator.sh`, a gate
+  whose `# SHARES:` line names a token of `tests/shares.tsv` is held back and run after the pool's other gates, one at
+  a time, so two holders of one token never start together (`test_emulator_runner` section 18f, control
+  `token-serial-off`). The static tier's pool schedules by token itself (`tests/lib/share_pool.py`).
 - **Every gate run leaves nothing behind** (#364, #371; design R, ruled 2026-11-11, *"R, no lint (Recommended)"*): each
   gate run, plain and CONTROL=, goes through `tests/lib/session_run.py`, which starts the gate in a session of its own
   with a TMPDIR of its own (`gate.*` under the run's), and when the gate returns, whatever its status, TERMs whatever is

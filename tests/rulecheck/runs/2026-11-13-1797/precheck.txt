@@ -1,0 +1,8 @@
+  FLAG D-ABSOLUTE: What this ticket set out to do, and where each part stands:  [build/agent227/close/c369.md]
+  FLAG D-ABSOLUTE: The list stays shrink-only, and a listed gate that is migrated for its own reasons still leaves it.  [build/agent227/close/c369.md]
+  FLAG D-ABSOLUTE: - 348 of the 352 modes those 100 gates declare were read blind from their latest logs by eight readers, one batch each, with 18 hidden controls (known own re...  [build/agent227/close/c369.md]
+  FLAG D-ABSOLUTE: Not every batch carried both kinds: batches 3 and 4 (88 real items) carried only own-red controls, batches 1, 2, 7 and 8 only foreign-red ones, batches 5 and...  [build/agent227/close/c369.md]
+  FLAG D-ABSOLUTE: - A listed gate's mode is still HONOURED on any red, so a later change that turns one red for a foreign reason is not caught by the classifier.  [build/agent227/close/c369.md]
+  FLAG D-ABSOLUTE: All 18 hidden controls were emulator-gate logs, so no control tested a false OWN on a static gate's log.  [build/agent227/close/c369.md]
+  FLAG D-ABSOLUTE: The one defect found is filed as #373.  [build/agent227/close/c310.md]
+packet_check: 7 flag(s): D-ABSOLUTE 7

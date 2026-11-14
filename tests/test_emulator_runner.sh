@@ -14,7 +14,8 @@
 #   and a control mode stopped by its host (a full disk, a failed mktemp, a refused write) reads DIED (#321); and one
 #   that died under set -e on a tool's error, the tool's line last in its log, reads DIED while a tool error before the
 #   gate's own FAIL stays honoured, and a NOT JUDGED log stays UNJUDGED (#367, section 14o); and with
-#   no TMPDIR from the caller a gate's temp files go to the run's own directory under build/tmp/, removed at the end,
+#   no TMPDIR from the caller a gate's temp files go to the run's own directory, removed at the end, OUTSIDE the repo under
+#   ${XDG_CACHE_HOME:-$HOME/.cache}/vampire-saved/tmp/ (#372, 14z-227; build/tmp/ until then),
 #   and a run with less free space there than it needs refuses to start (#321); and a selected gate whose worker
 #   died before writing its row is a FAIL of its own, never a GREEN on fewer rows (#321). Since 14z-215 (#310 group 3)
 #   the gate's own wall-clock checks (sections 9 and 18) count only in the plain run and under the mode they belong to,
@@ -22,7 +23,8 @@
 #   Since 14z-218: a --log directory that already holds a run is REFUSED and left untouched, an empty one and a
 #   --resume are accepted (#353, section 24); --stale --freeze asks the audit for the names a freeze judges and runs
 #   them, NOTEing the rest, while a --stale name outside --lane or --scope is still REFUSED, and under any --cadence a
-#   name of another cadence is left out with a NOTE (#347, section 25).
+#   name of another cadence is left out with a NOTE (#347, section 25). Since 14z-227 (#370): in a pooled lane two gates
+#   naming one token of tests/shares.tsv never run together; they run after the pool, one at a time (section 18f).
 # HOW: a synthetic repository of stub gates with KNOWN verdicts is driven through the REAL
 #   runner by symlink (never a copy of its logic), with stub tools so the runner's own
 #   preconditions run; the controls run copies of the runner (and, for #323, of the two readers) with a piece removed
@@ -48,6 +50,8 @@
 # MUST-FIRE: shadow-tool: concurrent-off — a copy of the runner whose CONCURRENT-CONTROLS test is always false must run a SHARES-none gate's two controls one after another, and section 18 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
 # MUST-FIRE: shadow-tool: order-ignored — a copy of the runner whose ORDER-SORT step is disabled must start a pooled lane's gates in registry order under --order, and section 19 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
 # MUST-FIRE: shadow-tool: tmp-ignored — a copy of the runner whose DISK-TMPDIR test is always false must leave a gate with no TMPDIR from the caller writing its temp files in /tmp, and section 21 must FAIL (mode: that copy is the runner; #321, 14z-210)
+# MUST-FIRE: shadow-tool: tmp-in-repo — a copy of the runner whose RUN-TMP-BASE line puts the run's temp directory under the repo's build/tmp/ again (the #372 shape) must hand a gate with no TMPDIR from the caller a TMPDIR inside the repo, and section 21 must FAIL (mode: that copy is the runner every section drives; #372, 14z-227)
+# MUST-FIRE: shadow-tool: token-serial-off — a copy of the runner whose TOKEN-SERIAL test is always false must start two gates naming one shared token together in a pool of four, and section 18f must FAIL (mode: that copy is the runner every section drives; #370, 14z-227)
 # MUST-FIRE: shadow-tool: lost-unread — a copy of the runner whose LOST-ROWS check is disabled must print GREEN for a pooled lane in which one gate's worker died before writing its row, and section 22 must FAIL (mode: that copy is the runner; #321, 14z-210: PILOT printed GREEN on PASS 1 of 3)
 # MUST-FIRE: shadow-tool: log-reused — a copy of the runner whose LOG-FRESH test is always false must append a second run's row to a log directory that already holds a run, and section 24 must FAIL (mode: that copy is the runner every section drives; #353, 14z-218)
 # MUST-FIRE: shadow-tool: stale-default-cadence — a copy of the runner whose STALE-CADENCE line never asks the audit at freeze cadence must REFUSE `--stale --freeze` on an ondemand name, and section 25 must FAIL (mode: that copy is the runner every section drives; #347, 14z-218)
@@ -188,6 +192,11 @@ chmod +x "$T/runner_jobsleak.sh"
 sed 's@    if \[ -z "${TMPDIR:-}" \]; then   # DISK-TMPDIR@    if false; then   # DISK-TMPDIR disabled@' "$RUNNER" > "$T/runner_tmpoff.sh"
 cmp -s "$RUNNER" "$T/runner_tmpoff.sh" && fail "could not disable the disk TMPDIR — the DISK-TMPDIR line moved"
 chmod +x "$T/runner_tmpoff.sh"
+sed 's@        VS_RUN_TMP="${XDG_CACHE_HOME:-$HOME/.cache}/vampire-saved/tmp/emu_$STAMP.$$"   # RUN-TMP-BASE@        VS_RUN_TMP="$REPO/build/tmp/emu_$STAMP.$$"   # RUN-TMP-BASE in the repo@' "$RUNNER" > "$T/runner_tmprepo.sh"
+cmp -s "$RUNNER" "$T/runner_tmprepo.sh" && fail "could not put the run's temp back in the repo — the RUN-TMP-BASE line moved"
+sed "s@        if \[ \"\$_jobs\" -gt 1 \] && python3 tests/lib/share_pool.py get \"tests/\$g.sh\" 2>/dev/null | grep -qvxE 'none|self'; then   # TOKEN-SERIAL@        if false; then   # TOKEN-SERIAL disabled@" "$RUNNER" > "$T/runner_tokoff.sh"
+cmp -s "$RUNNER" "$T/runner_tokoff.sh" && fail "could not disable the token-holder rule — the TOKEN-SERIAL line moved"
+chmod +x "$T/runner_tmprepo.sh" "$T/runner_tokoff.sh"
 sed 's@    if \[ "$DRY" = 0 \]; then   # LOST-ROWS@    if false; then   # LOST-ROWS disabled@' "$RUNNER" > "$T/runner_lostoff.sh"
 cmp -s "$RUNNER" "$T/runner_lostoff.sh" && fail "could not disable the lost-rows check — the LOST-ROWS line moved"
 chmod +x "$T/runner_lostoff.sh"
@@ -217,6 +226,8 @@ jobs-leak)        if [ "${VS_TEST_NOOP_MODE:-0}" = 1 ]; then ln -s "$RUNNER" "$F
                   else ln -s "$T/runner_jobsleak.sh" "$FR/tests/run_all_emulator.sh"; fi ;;
 order-ignored)    ln -s "$T/runner_orderoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 tmp-ignored)      ln -s "$T/runner_tmpoff.sh" "$FR/tests/run_all_emulator.sh" ;;
+tmp-in-repo)      ln -s "$T/runner_tmprepo.sh" "$FR/tests/run_all_emulator.sh" ;;
+token-serial-off) ln -s "$T/runner_tokoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 lost-unread)      ln -s "$T/runner_lostoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 log-reused)       ln -s "$T/runner_logreused.sh" "$FR/tests/run_all_emulator.sh" ;;
 stale-default-cadence) ln -s "$T/runner_stalecad.sh" "$FR/tests/run_all_emulator.sh" ;;
@@ -1115,6 +1126,35 @@ if ! vs_ctl_is concurrent-off; then
         || { vs_ctl_dead concurrent-off "the disabled runner still ran them ${g18e}s apart"; fail "concurrent-off"; }
 fi
 rm -f "$FR/tests/g_cc.sh" "$FR/tests/g_cc2.sh" "$T"/cc_*
+echo "18f. two gates naming one shared token never run together in a pool; they run after it, one at a time (#370, 14z-227)"
+# g_tk1 and g_tk2 both name release-assets; g_tkn names none. Each plain run writes its start second and sleeps 3 s.
+mktk() {  # mktk <name> <shares line> — a stub gate that records when it started
+    { echo '#!/bin/sh'; echo "# $1.sh — a stub"; echo "# SHARES: $2"; echo ': "${MAME_BIN:-}"'
+      echo 'date +%s > "'"$T"'/tk_$(basename "$0" .sh)"; sleep 3; echo "PASS: fine"; exit 0'; } > "$FR/tests/$1.sh"
+    chmod +x "$FR/tests/$1.sh"
+}
+mktk g_tk1 "self release-assets"; mktk g_tk2 release-assets; mktk g_tkn "none — section 18f's stub: writes its own file"
+reg "$(row g_tk1 mame release - '')" "$(row g_tkn mame release - '')" "$(row g_tk2 mame release - '')"
+gap18f() { _a="$(cat "$T/tk_g_tk1" 2>/dev/null || echo 0)"; _b="$(cat "$T/tk_g_tk2" 2>/dev/null || echo 999)"
+           _d=$((_a - _b)); [ "$_d" -lt 0 ] && _d=$((0 - _d)); echo "$_d"; }
+pass18f() { [ "$(awk -F'\t' 'NR > 1 && $1 ~ /^g_tk/ && $4 == "PASS"' "$1/results.tsv" 2>/dev/null | wc -l | tr -d ' ')" = 3 ]; }
+rm -f "$T"/tk_*; run --lane mame --jobs 4 --log "$T/l18f" > "$T/l18f.out" 2>&1 || true
+g18f="$(gap18f)"
+if ! pass18f "$T/l18f"; then fail "18f: the three stub gates did not all PASS: $(cut -f1,4 "$T/l18f/results.tsv" 2>/dev/null | tr '\n' ' ')"
+elif [ "$g18f" -ge 3 ] && grep -q 'held back' "$T/l18f.out"; then ok "two gates naming release-assets, --jobs 4: one after another (${g18f}s apart), held back from the pool, all PASS"
+else fail "two gates naming release-assets, --jobs 4: they started ${g18f}s apart (want >= 3)"
+     vs_ctl_is token-serial-off && vs_ctl_fired token-serial-off "with the TOKEN-SERIAL test always false the two holders of release-assets started ${g18f}s apart"; fi
+_tkn="$(cat "$T/tk_g_tkn" 2>/dev/null || echo 0)"; _tk1="$(cat "$T/tk_g_tk1" 2>/dev/null || echo 0)"
+[ "$_tk1" -ge $((_tkn + 3)) ] && ok "the holders ran after the pool's other gate (g_tk1 $((_tk1 - _tkn))s after g_tkn)" \
+    || fail "18f: g_tk1 started $((_tk1 - _tkn))s after the none gate g_tkn (want >= 3: held back until the pool ended)"
+if ! vs_ctl_is token-serial-off; then
+    ln -s "$T/runner_tokoff.sh" "$FR/tests/run_all_emulator_tokoff.sh"; rm -f "$T"/tk_*
+    (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator_tokoff.sh --lane mame --jobs 4 --log "$T/l18g" >/dev/null 2>&1) || true
+    rm -f "$FR/tests/run_all_emulator_tokoff.sh"; g18g="$(gap18f)"
+    pass18f "$T/l18g" && [ "$g18g" -lt 3 ] && vs_ctl_fired token-serial-off "a runner without the token-holder rule started both holders of release-assets ${g18g}s apart — section 18f catches it" \
+        || { vs_ctl_dead token-serial-off "the runner without the rule still ran them ${g18g}s apart"; fail "token-serial-off"; }
+fi
+rm -f "$FR/tests/g_tk1.sh" "$FR/tests/g_tk2.sh" "$FR/tests/g_tkn.sh" "$T"/tk_*
 
 echo "19. --order starts a pooled lane LONGEST FIRST; --jobs 1 and no --order keep registry order (#321, 14z-210)"
 # The earlier run gives g_o1 100 s plus a 250 s control row (350 in all) and g_o3 300 s; g_o2 has no row, so its cost is
@@ -1170,14 +1210,18 @@ echo "21. with no TMPDIR from the caller a gate's temp files go to the run's own
 reg "$(row g_tmp mame release - '')"
 t21() {  # t21 <runner> <log> [env...] -> the TMPDIR the gate saw
     _r="$1"; _l="$2"; shift 2
-    (cd "$FR" && env -u TMPDIR "$@" ROMDIR="$T/roms" MERGED=build/fake_merged sh "tests/$_r" --lane mame --log "$_l" > "$_l.out" 2>&1) || true
+    (cd "$FR" && env -u TMPDIR XDG_CACHE_HOME="$T/xdg" "$@" ROMDIR="$T/roms" MERGED=build/fake_merged sh "tests/$_r" --lane mame --log "$_l" > "$_l.out" 2>&1) || true
     sed -n 's/^gate TMPDIR=//p' "$_l/g_tmp.log" 2>/dev/null | head -1
 }
 # Since #364/#371 (design R, 14z-226) every gate gets a TMPDIR of its own, `gate.*` directly under the run's (or the
 # caller's), from tests/lib/session_run.py; the run's directory is its parent.
 v21="$(t21 run_all_emulator.sh "$T/l21")"
+# #372 (14z-227): that run directory is OUTSIDE the repo, under ${XDG_CACHE_HOME:-$HOME/.cache}/vampire-saved/tmp/ (here
+# XDG_CACHE_HOME=$T/xdg), since a MiSTer gate refuses to write its RAM dumps inside the repo.
 case "$v21" in
-    */build/tmp/emu_*/gate.*) ok "no TMPDIR from the caller: the gate's TMPDIR is its own under the run's ($(basename "$(dirname "$v21")")/$(basename "$v21"))"
+    "$FR"/*) fail "no TMPDIR from the caller: the gate's TMPDIR $v21 is INSIDE the repo (#372)"
+        vs_ctl_is tmp-in-repo && vs_ctl_fired tmp-in-repo "with the run's temp under build/tmp/ again the gate saw TMPDIR inside the repo ($v21)" ;;
+    "$T/xdg/vampire-saved/tmp/emu_"*/gate.*) ok "no TMPDIR from the caller: the gate's TMPDIR is its own under the run's, outside the repo ($(basename "$(dirname "$v21")")/$(basename "$v21"))"
         [ -d "$(dirname "$v21")" ] && fail "the run's temp directory $(dirname "$v21") is still there after the run" || ok "the run's temp directory is removed at the end" ;;
     *) fail "no TMPDIR from the caller: the gate saw TMPDIR=$v21"; vs_ctl_is tmp-ignored && vs_ctl_fired tmp-ignored "with the DISK-TMPDIR test disabled the gate saw TMPDIR=$v21" ;;
 esac
@@ -1195,6 +1239,12 @@ if ! vs_ctl_is tmp-ignored; then
     v21d="$(t21 run_all_emulator_tmpoff.sh "$T/l21d")"; rm -f "$FR/tests/run_all_emulator_tmpoff.sh"
     case "$v21d" in /tmp/gate.*) true ;; *) false ;; esac && vs_ctl_fired tmp-ignored "a runner without the disk TMPDIR leaves the gate on the default /tmp ($v21d) — section 21 catches it" \
         || { vs_ctl_dead tmp-ignored "the runner without the disk TMPDIR handed the gate TMPDIR=$v21d"; fail "tmp-ignored"; }
+fi
+if ! vs_ctl_is tmp-in-repo; then
+    ln -s "$T/runner_tmprepo.sh" "$FR/tests/run_all_emulator_tmprepo.sh"
+    v21e="$(t21 run_all_emulator_tmprepo.sh "$T/l21e")"; rm -f "$FR/tests/run_all_emulator_tmprepo.sh"
+    case "$v21e" in "$FR"/build/tmp/emu_*/gate.*) true ;; *) false ;; esac && vs_ctl_fired tmp-in-repo "a runner whose run temp is under build/tmp/ hands the gate a TMPDIR inside the repo — section 21 catches it" \
+        || { vs_ctl_dead tmp-in-repo "the runner with the in-repo base handed the gate TMPDIR=$v21e"; fail "tmp-in-repo"; }
 fi
 rm -f "$FR/tests/g_tmp.sh"
 

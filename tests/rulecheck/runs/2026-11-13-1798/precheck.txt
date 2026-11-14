@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: Where each item of the design stands:  [build/agent227/close/c370.md]
+  FLAG D-ABSOLUTE: - The rule is proven on stub gates only.  [build/agent227/close/c370.md]
+  FLAG D-ABSOLUTE: - A gate holding a token is never pooled, even beside gates that hold a different token.  [build/agent227/close/c370.md]
+  FLAG D-FIGURE: 24.04  [build/agent227/close/c372.md]
+packet_check: 4 flag(s): D-ABSOLUTE 3, D-FIGURE 1

@@ -2,12 +2,13 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 372
+# issues: 373
 number	state	reason	closed	labels	title
-372	OPEN	-	-	bug,severity: low,test-integrity	On Linux with TMPDIR unset, every MiSTer lane gate refuses to run: the emulator runner puts its run temp inside the repo
+373	OPEN	-	-	bug,severity: low,test-integrity	audit_guard_corpus's known-crash control claims the vec4 tripwire; since 2026-10 the rig crashes at vec3 (PC 01afb6) and the control still reads fired
+372	CLOSED	COMPLETED	2026-11-13	bug,severity: low,test-integrity	On Linux with TMPDIR unset, every MiSTer lane gate refuses to run: the emulator runner puts its run temp inside the repo
 371	CLOSED	COMPLETED	2026-11-13	bug,severity: medium,test-integrity	A timed-out emulator gate's MAME processes outlive the gate and the runner (they catch TERM; the runner's -k KILL never fires)
-370	OPEN	-	-	enhancement,test-integrity	Gates declare what they share; the runners never run two jobs holding the same token (replaces the write-traced concurrent-control allow-lists)
-369	OPEN	-	-	enhancement,test-integrity	A control mode is honoured only on positive evidence from its own check (replaces #310's failure-shape enumeration)
+370	CLOSED	COMPLETED	2026-11-13	enhancement,test-integrity	Gates declare what they share; the runners never run two jobs holding the same token (replaces the write-traced concurrent-control allow-lists)
+369	CLOSED	COMPLETED	2026-11-13	enhancement,test-integrity	A control mode is honoured only on positive evidence from its own check (replaces #310's failure-shape enumeration)
 368	CLOSED	COMPLETED	2026-11-08	bug,test-integrity	audit_flicker_attribution's shared-sandbox control fires on a dead leg, never on the frozen-basis check it names
 367	CLOSED	COMPLETED	2026-11-07	bug,test-integrity	classify.sh reads a set -e gate that dies on a tool error (awk: can't open file, exit 2) as HONOURED
 366	CLOSED	COMPLETED	2026-11-07	bug,severity: low,test-integrity	Two gate headers state facts their frozen data no longer holds: test_dead_span_reach (one span, 5 pairs; now two spans, 10) and audit_pass_overrun (ours donovan_2 since M24; now none)
@@ -66,7 +67,7 @@ number	state	reason	closed	labels	title
 313	CLOSED	COMPLETED	2026-10-23	bug,performance,severity: medium	tools/static_confirm.py plan stalls on a large untracked build/sheets/ tree: 1,902 s for 25 of 229 gates, against 37 s for all 229 the day before
 312	CLOSED	COMPLETED	2026-10-24	evolution,performance	A --jobs 8 static tier keeps only about 2.4 of its 8 job slots busy (CPU about 2.2 of 12 cores, 14z-205): one gate's controls run serially inside one pool job
 311	CLOSED	COMPLETED	2026-10-27	bug,severity: low,test-integrity	test_applier_page_browser's browser run does not complete under heavy load (a false red), and sometimes stalls unloaded
-310	OPEN	-	-	bug,severity: low,test-integrity	An executed control whose mode run FAILs without judging anything reads HONOURED
+310	CLOSED	COMPLETED	2026-11-13	bug,severity: low,test-integrity	An executed control whose mode run FAILs without judging anything reads HONOURED
 309	CLOSED	COMPLETED	2026-10-22	bug,severity: low,test-integrity	test_proof_sheets' control relative-unresolved is dead wherever the repository path is as deep as the capture's work dir
 308	CLOSED	COMPLETED	2026-10-23	bug,severity: low,test-integrity	On Windows the release generator writes cp1252 and test_readme_recording writes CRLF, so the gate cannot pass there
 307	CLOSED	COMPLETED	2026-10-24	evolution	build/ has no retention rule for logs and session evidence (47 GB, 1,134 entries); measure what references each family before pruning

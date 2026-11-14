@@ -1,0 +1,13 @@
+decision	recommendation
+subject	#369/#310: close both, the 100-row debt list as #369's stated limit, on the 14z-227 blind reading of its modes
+session	14z-227
+model	rule-checker@163e4ce9cf7b
+claim	Close #369 `done` with the 100 gates left on tests/expected/ctl_caught_debt.tsv as its stated limit, and #310 `done` with it, as the maintainer ruled ("agreed on both", then, on the narrowed figures below put back after rule-checker run 2026-11-13-1795, "Yes, close on these (Recommended)"; DECISIONS_HISTORY.md "Ruled 2026-11-13 (14z-227) — #369 and #310 close"). Basis (build/agent227/close/evidence_a.md, written by script from the files it names, plus hand reads with their code and log lines): the 100 listed gates declare 352 modes; 348 were read blind from their latest logs (taken on 84cc5181 or 6dea53bc, trees that differ only in documents and rule-checker records, none read by an emulator debt gate: build/agent227/close/snapshot_diff.txt) by eight readers, one batch each, with 18 hidden controls of known own and known foreign reds, all read right; 343 of the 348 were read OWN (red from the check the declaration names), 4 OTHER, 1 CANNOT-TELL; one defect was found and filed as #373. NOT TESTED or NOT SHOWN: the 343 hold at least one false OWN, I044 (#373: a crash other than the declared one), and a reader's false OWN on a foreign red is uncontrolled in batches 3 and 4 (88 real items, own-red controls only) and was not caught in batch 2 (I044); batches 1, 2, 7 and 8 carried foreign-red controls only; all 18 controls are emulator-gate logs, so no control tested a false OWN on a static gate's log; the 5 non-OWN items are not shown to have gone red from their declared check (for four of them the same control fires in-gate on the plain run, which shows only that the check sees its fault on the plain run's data); the 4 MiSTer modes (no log); 9 OWN readings a reader flagged with a caveat were not checked by hand; a listed gate's mode stays HONOURED on any red, which the closing comments name as the limit.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	7 flag(s): D-ABSOLUTE 7
+deliverables	build/agent227/close/c369.md build/agent227/close/c310.md
+action	2026-11-13-1790
+redoes	2026-11-13-1795

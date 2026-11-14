@@ -38,6 +38,38 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-227 — **the #310 family stops: its cost and the value of the 100 debt rows measured; #372 fixed and #370 finished by a simpler rule; #310, #369, #370 and #372 closed done; #373 filed
+
+### opened with
+The maintainer: **"read handoff.md, state.md and docs/next_session.md"**; on the cost breakdown, **"do it"**; then **"I
+think either we stop here or we go all the way. But first my bigger question is : how do we measure the value of
+#310"** and **"measure first"**; on the three questions put after the measurement, **"didn't we say that most of the 100
+were non-issues or weaker challenges anyway?"**, **"a ticket"** and **"we should at least look into them"**; on stopping,
+**"agreed on both"**; on the finish line, **"yes, that's the best way forward"**; on the narrowed figures, **"Yes,
+close on these (Recommended)"**; after seven rule-checker rounds, **"Resolve in writing, close (Recommended)"**. Working
+evidence: `build/agent227/` (local; `cost310/`, `m310/`, `kc/`, `fin/`, `close/`).
+
+### (1) THE COST AND THE VALUE OF #310'S FAMILY, MEASURED
+The cost (`build/agent227/cost310/`, local): #310, #364, #369, #370, #371 and #372 took 35.65 to 40.49 active hours of
+210.14 over 22 session transcripts (two attribution rules), and 120.61 of 303.61 background machine hours. The value:
+every declared mode of the 100 gates left on `tests/expected/ctl_caught_debt.tsv` read blind with hidden controls
+(`build/agent227/m310/`, local); the figures are in `docs/project/must_fire_contract.md` § What the 100 cost to leave.
+Ruled: stop (`DECISIONS_HISTORY.md` "Ruled 2026-11-13 (14z-227) — #369 and #310 close").
+
+### (2) #373 FILED — THE KNOWN-CRASH CONTROL NO LONGER REPRODUCES ITS CRASH
+The reading's one defect: `audit_guard_corpus`'s `known-crash` firing line claims the vec4 tripwire, and every kept run
+since 2026-10-12 (ERIS, PILOT, the Mac at HEAD) crashes at vec3 PC 01afb6. Filed as #373, as ruled ("a ticket").
+
+### (3) THE FINISH LINE — #372 AND #370
+As ruled (`DECISIONS_HISTORY.md` "Ruled 2026-11-13 (14z-227) — the family's finish line"): the emulator runner's run temp
+moves out of the repo (#372), and in a pooled lane a gate naming a token of `tests/shares.tsv` runs after the pool, one
+at a time (#370); `tests/test_emulator_runner.sh` sections 21 and 18f, controls `tmp-in-repo` and `token-serial-off`;
+#370's write audit declined. #310, #369, #370 and #372 closed `done` with their comments. Rule-checker runs: #369/#310
+2026-11-13-1790 to -1797 (-1791 withdrawn unspawned), each VIOLATED round a real narrowing of the claim (the batches'
+controls, the 5 non-OWN items, the two log trees, #373's false OWN, the narrowed figures put back, the readers' blindness
+checked), finished in writing at the maintainer's choice; #370/#372 2026-11-13-1799 OK (-1798 withdrawn unspawned).
+PILOT: `test_mister_wide_inert` PASS with TMPDIR unset through the new runner (`build/agent227/fin/pilot/`).
+
 ## Session 14z-226 — **#364 and #371 closed done by design R (`7b5938e9`: the emulator runner runs every gate in a session and a TMPDIR of its own, reaps the session, removes the TMPDIR), measured on every item the ruling listed before the commit; #369 batch 1's session-named limits ruled (items 1, 3, 4 fixed, the rest accepted); #372 filed.** Opus 5.5, transcript `a607a5d6` (compacted four times), 2026-11-11 to 2026-11-13.
 
 ### opened with
