@@ -153,7 +153,9 @@ evidence:
   and 4, 88 real items, carried own-red controls only, so a false OWN there is uncontrolled). 343 were read as red from
   the check the declaration names (one of them #373's crash, not the declared one); the other 5 (4 OTHER, 1 CANNOT-TELL) are not shown to have (for four of them the
   same control fires in-gate on the plain run, which shows the check sees its fault there, not why the mode run
-  went red). The one defect found is #373: a firing line that claims a result the gate never checks. What stays open: a
+  went red). The one defect found is #373: a firing line that claims a result the gate never checks; fixed 14z-227 by
+  migrating that gate (`audit_guard_corpus`: its rig re-timed for the emulated clock, its mode HONOURED only on the
+  tripwire's own line, its in-gate control run on every plain run), so the list holds 99 rows. What stays open: a
   listed gate's mode is still HONOURED on any red, so a later change that turns one red for a foreign reason is not
   caught by the classifier.
 

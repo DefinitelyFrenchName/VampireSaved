@@ -33,7 +33,6 @@ audit_facing_sweep.sh
 audit_ff8130_writers.sh
 audit_flicker_attribution.sh
 audit_forced_pick_fidelity.sh
-audit_guard_corpus.sh
 audit_guard_reentry.sh
 audit_hitbox_parity.sh
 audit_id_writers.sh

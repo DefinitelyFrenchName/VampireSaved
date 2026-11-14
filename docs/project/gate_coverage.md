@@ -1732,7 +1732,7 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 
 **WHAT:** every replay in tests/replays runs under the authoritative crash guard on the build under test in four legs — unpoked and with P1 forced to each tenant — with no 68k exception, PC excursion or soft reset anywhere (rule 6 on any finding).
 
-**HOW:** ~79 replays x 4 legs, guarded on MAME at JOBS legs at once (default min(8, CPUs/3)), a DEAD leg (no verdict line) refused; the control replays the known 14z-93 vec4 tripwire on build/hui41 and must FAIL.
+**HOW:** ~79 replays x 4 legs, guarded on MAME at JOBS legs at once (default min(8, CPUs/3)), a DEAD leg (no verdict line) refused; the control runs the 14z-93 crash rig on build/hui41 (one guarded leg, ~25 s) and must reproduce the planted vec4 tripwire for unresolved 0x494de, named by build/hui41's patch notes.
 
 **EXPECTS:** every leg END-clean; the known crash reproduced by the control. A PASS is rig-bounded: no vector fired on THESE rigs — widen the corpus, never the tolerance.
 

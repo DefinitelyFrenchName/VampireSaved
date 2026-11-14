@@ -1,0 +1,35 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_guard_corpus.sh	8a46aaa92f37b9dcc2024f4838d739caf9293f9c
+build/agent227/bis/res_79dc2d03.txt	5b659fef20ec66de615c440d9a320661dec824fc
+build/agent227/bis/res_a7b608c3.txt	9ca5c1074aa580181f8089695dfb8b7e5b0e9188
+build/agent227/bis/res_ecd67c8a.txt	4d3b416f1d78dff0fa66b56cd8b25025024b6c85
+build/agent227/bis/res_34c84efe.txt	e196496e4715ba8edf1465b1730e4147d8e1ba62
+build/agent227/bis/res_d1d90167.txt	e1d76b6acadccd8795e6c3b54d5db6d55bc8898a
+build/agent227/bis/res_4980bd96.txt	fe360dee8e66091b4cc61b29cade72807e339af1
+build/agent227/bis/res_ce64cb0e.txt	4a9170687479f3d6f7bb46b51e832c9a0b4b39cf
+build/agent227/bis/one.sh	f3b02e9ffd80b570bb6af128c1dd8c28d509dbf5
+build/agent227/rt/res_fd.txt	3dec1b3385c9b88d8a6cdfacd720056cbad504dd
+build/agent227/rt/res_k0.txt	bc757ef9f3ca8515f990cb35f8170a3e3fadeb04
+build/agent227/rt/res_k1.txt	29abbb715f53e1545ed592e091b85570385a91b2
+build/agent227/rt/res_k2.txt	fc8aad47dc710a998bdf14092f24b40f88cb2ce0
+build/agent227/rt/res_k3.txt	70df981dc6ff4b0339575a19b5973949e793e95e
+build/agent227/rt/res_k4.txt	15e35810016cbe392df0938dd6fa9a10513a95b5
+build/agent227/rt/one.sh	3dbc9e8a794f5140185ba373012100dca4603b40
+build/agent227/rt/shift.py	7ba0a6c57af38d994f77b9fa4d0fc4c52966464a
+build/agent227/kc373/mode.log	cf64e7437f4326532f61d8b980a567a306a0d846
+build/agent227/kc373/plain.log	be02772aec2e9c1ee626ec9b669ec0bfd01467db
+build/agent227/kc373/mode_shift0.log	f74113dfba408e7e62df0ac6afdc13de9b6c896f
+build/agent227/kc373/plain_shift0.log	dd0ddeaeb86aa56b7c9adfc2b3f265ca27b4e386
+build/agent227/kc373/mode_dead.log	f9cdb259f004ab7ed68a45e66e7ce5341af2ba23
+build/agent227/kc373/classes.txt	c40723274d4b489023d308f1640fe946c27a9bc1
+build/agent227/kc373/dlu_one.log	a15658769aeb64a867ac0dee71b41bca8d64fbf3
+build/agent227/kc373/dlu_one.tsv	659f7225fe116ed6684acfb86f99b2441b1c5950
+build/agent227/kc373/pilot/plain.log	bb94aaae94b0783be7906e14aa07e2e921af32fe
+build/agent227/kc373/pilot/mode.log	4068797f267ab6c6afaeb29294e5fbac5133dd92
+build/agent227/kc373/pilot_soak.sh	c5ba187468226cc22e14413715071d2daa96ee52
+tests/expected/ctl_caught_debt.tsv	ef8609638f639d53e3fc47925426ae6a188b03c6
+tests/expected/dead_leg_unjudged.tsv.lines-105-115 (lines 105-115 of tests/expected/dead_leg_unjudged.tsv)	b96acd71ac0169bbf22eddbbccd98b9cd0a8b688
+STATE.md.lines-41-52 (lines 41-52 of STATE.md)	f1712a634c0750cc4db9fa1327597eb3519c3c39
+docs/platform/gotchas.md.lines-204-232 (lines 204-232 of docs/platform/gotchas.md)	c1361e2205715f4bca21b38576ab65ce30c2a747
+DECISIONS_HISTORY.md.lines-10182-10191 (lines 10182-10191 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-13 (14z-227) — the known-crash firing line is a ticket of its own (#373)")	4800b93053a9570724c384daa5a6d0019bbe3570
+build/agent227/close/c373.md	d44c7d994a8e6090921785747e9f402fdf56e913

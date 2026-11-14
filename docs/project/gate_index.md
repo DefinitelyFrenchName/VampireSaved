@@ -275,7 +275,7 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
 | `tests/audit_flicker_attribution.sh` | audit | emulator | MAME, a build dir, ~3 min | WHY is each of these flicker frames in a frozen expectation? Re-derives the attribution instead of trusting the commit message that first made it. | 14z-205 |
-| `tests/audit_guard_corpus.sh` | audit | emulator | MAME, a build dir | THE AUTHORITATIVE-GUARD CORPUS SOAK (14z-101, hardening register §5's queued item). Every replay in tests/replays/*.rpl runs under the crash guard on the build under test, in FOUR legs: | 14z-101 |
+| `tests/audit_guard_corpus.sh` | audit | emulator | MAME, a build dir, ~25 s | THE AUTHORITATIVE-GUARD CORPUS SOAK (14z-101, hardening register §5's queued item). Every replay in tests/replays/*.rpl runs under the crash guard on the build under test, in FOUR legs: | 14z-101 |
 | `tests/audit_legacy_pairings.sh` | audit | emulator | MAME, a build dir, ~30 min | WHICH REPLAYS ARE LEGACY CONTENT, and is every one of them compared against VANILLA rather than against itself? | 14z-88 |
 | `tests/audit_mask_window_ff4182.sh` | audit | emulator | MAME, a build dir | on-demand audit of the third masked window (14z-49, maintainer-ratified round 64). | 14z-49 |
 | `tests/audit_mask_window_ff42a2.sh` | audit | emulator | MAME | the row-0x1D palette-staging window ($FF42A2-$FF42C1, mask entry `42a2-42c2`, V3 basis; maintainer-ratified 2026-08-15, applied 14z-88 — then WITHDRAWN the same day with the medallion REVERT this audit motivated) attributed on the TENANT-CO… | 2026-08-15 |

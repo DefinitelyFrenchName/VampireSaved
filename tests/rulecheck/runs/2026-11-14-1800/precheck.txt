@@ -1,0 +1,3 @@
+  FLAG D-FIGURE: 99  [build/agent227/close/c373.md]
+  FLAG D-ABSOLUTE: - The plain run's firing line now runs the rig (one guarded leg, about 25 s) and fires only on that tripwire; otherwise CONTROL DEAD and the gate FAILs.  [build/agent227/close/c373.md]
+packet_check: 2 flag(s): D-ABSOLUTE 1, D-FIGURE 1

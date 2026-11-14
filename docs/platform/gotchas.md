@@ -221,7 +221,14 @@ stopped 12,029 times kept `$FF8080` equal to its reference leg's while its work-
 the basis's — a stop can move the game without moving the frame counter, so a `$FF8080` comparison alone cannot see
 that movement. Since 14z-197 `replay_guard.lua` itself counts emulated frames (#228 step 4, `tests/lua/emu_clock.lua`):
 a `-debug` crash-guard run of `02_demitri_vs_cpu` reproduces the frozen vanilla log byte for byte, and under the old
-`frame_done` clock it does not (`tests/test_crash_guard.sh` section 1b, control `drift-clock`). The original analysis, kept:
+`frame_done` clock it does not (`tests/test_crash_guard.sh` section 1b, control `drift-clock`). **A rig TIMED on the
+old clock reaches a different state on the new one, and nothing says so unless a check reads the outcome** (#373,
+14z-227): `audit_guard_corpus`'s `known-crash` rig had been written on the one-frame lead, crashed elsewhere from
+`ce64cb0e` on (CRASH 20100 vec3 PC 01afb6 instead of the 14z-93 vec4 tripwire at PC 0fb6e0), and its firing line,
+printed on two files existing, kept claiming the tripwire for a month. Bisected to `ce64cb0e` (its parent `4980bd96`
+and the five other commits sampled back to 2026-09-22: the tripwire); the same rig with its replay and pokes moved ONE frame earlier reproduces
+the tripwire on the emulated clock (2 earlier: another crash; 3 or 4: none), as does HEAD under `INSTR_CLOCK=frame_done`.
+Any other rig timed before 14z-197 under `-debug` may carry the same one-frame lead. The original analysis, kept:
 A vsavj replay run under `-debug -debugger none` produces a checksum log that
 diverges from the identical non-debug run at frame 12: `RAM:$FF1CF0.l` (a
 latch toggling 0x00000000/0xFFFFFFFF) is phase-shifted by one frame, with

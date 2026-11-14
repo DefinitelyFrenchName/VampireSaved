@@ -44,6 +44,9 @@
 # classes are the neutered copies' measured classes (batch 2's convention). audit_release_linux_cleanhost (PATH:podman,
 # Linux only) and audit_release_linux_desktop (PILOT's desktop only) are not rows yet: on any other host they SKIP before
 # any instrument, so their rows need a host condition this table does not have.
+# #373 (14z-227): audit_guard_corpus migrated off tests/expected/ctl_caught_debt.tsv (its known-crash mode now HONOURED only on
+# the 0x494de tripwire's own line), so its stripped class is UNJUDGED-CAUGHT (#369 piece 5): with its NJ lines neutered
+# the dead legs reach vs_ctl_caught's backstop (build/agent227/kc373/, local).
 # gate	mode	class	stripped class (the gate with its NJ lines neutered)	dead instrument
 audit_air_dash_height	native-dash-planted	UNJUDGED	HONOURED	MAME_BIN
 audit_air_gc_legacy	air-commit-planted	UNJUDGED	HONOURED	MAME_BIN
@@ -108,7 +111,7 @@ audit_flicker_attribution	wrong-window	UNJUDGED	HONOURED	MAME_BIN
 audit_forced_pick_fidelity	retyped-prologue	UNJUDGED	HONOURED	MAME_BIN
 audit_forced_pick_fidelity	same-leg	UNJUDGED	HONOURED	MAME_BIN
 audit_forced_pick_fidelity	wrong-cursor	UNJUDGED	HONOURED	MAME_BIN
-audit_guard_corpus	known-crash	UNJUDGED	HONOURED	MAME_BIN
+audit_guard_corpus	known-crash	UNJUDGED	UNJUDGED-CAUGHT	MAME_BIN
 audit_guard_reentry	act-late	UNJUDGED	HONOURED	MAME_BIN
 audit_guard_reentry	vs2-pattern	UNJUDGED	HONOURED	MAME_BIN
 audit_hitbox_parity	ids-planted	UNJUDGED	HONOURED	MAME_BIN

@@ -4,7 +4,7 @@
 # repo: DefinitelyFrenchName/VampireSaved
 # issues: 373
 number	state	reason	closed	labels	title
-373	OPEN	-	-	bug,severity: low,test-integrity	audit_guard_corpus's known-crash control claims the vec4 tripwire; since 2026-10 the rig crashes at vec3 (PC 01afb6) and the control still reads fired
+373	CLOSED	COMPLETED	2026-11-14	bug,severity: low,test-integrity	audit_guard_corpus's known-crash control claims the vec4 tripwire; since 2026-10 the rig crashes at vec3 (PC 01afb6) and the control still reads fired
 372	CLOSED	COMPLETED	2026-11-13	bug,severity: low,test-integrity	On Linux with TMPDIR unset, every MiSTer lane gate refuses to run: the emulator runner puts its run temp inside the repo
 371	CLOSED	COMPLETED	2026-11-13	bug,severity: medium,test-integrity	A timed-out emulator gate's MAME processes outlive the gate and the runner (they catch TERM; the runner's -k KILL never fires)
 370	CLOSED	COMPLETED	2026-11-13	enhancement,test-integrity	Gates declare what they share; the runners never run two jobs holding the same token (replaces the write-traced concurrent-control allow-lists)
