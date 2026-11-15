@@ -57,65 +57,14 @@ stales exactly the five gates on the new tree and none on `593ee724` (`build/age
 2026-11-15-1806 OK after 2026-11-15-1805 (VIOLATED on Q1 and Q4: the staleness half not shown; resolved with that plant).
 #348 closed `done` with its comment (`build/agent229/close/c348.md`).
 
-## Session 14z-228 — **#348 estimated (not now), #360's mechanism found and the ticket closed `declined`, #344's cause found and widened to all three tenants (kept parked); the release run, no new assets, and #352 closed done.** Opus 5.5, transcript `ccd11d40`, 2026-11-14.
-
-### opened with
-The maintainer: **"read handoff.md, state.md and docs/next_session.md"**; then **"Estimate #348 and do the analysis for
-#360 and #344"**; on the options, **"Not now"** (#348), **"Record and close declined"** (#360), **"Check Phobos/Pyron
-first"** then **"Record cause, keep parked"** (#344) — `DECISIONS_HISTORY.md` 14z-228. Working evidence:
-`build/agent228/` (local; `t360/`, `t344/`, `t344t/`, `gate*/`).
-
-### (1) #348 ESTIMATED — NOT NOW
-A fresh package of `build/m3b_merged34` (6.2 s on the Mac) equals the tracked `release/merged-m26` on the manifest,
-`apply_release.py` and 20 of 20 patches on all three platforms; the tracked M25 differs on the manifest and 8 of 20
-patches (a free control). Five emulator-tier gates read `release/` and none declares it: the FOLLOWS reader has no
-`release` stem (`docs/project/gate_header_contract.md`). Estimated 2.5 to 4 active hours (ESTIMATED); ruled not now.
-
-### (2) #360 — THE PHASE IS THE POOL'S HISTORY; CLOSED `declined`
-`$FF80B5` is the running walker's slot countdown and the pool allocator pops a free-list stack, so the speed lines' pair
-choice follows slot parity; on `donovan_6` the two free lists part at f3036 inside Dark Force, where the two games' Dark
-Force systems differ by ruling (`docs/game/engine_internals.md` § The speed-line effect; `docs/game/atlas/ram.md`).
-The separating control: ours' free list poked at f5633 into native's order gives native's slots and 0 of 49 records
-differing (28 unpoked). Rule-checker run 2026-11-14-1803 OK after 2026-11-14-1802 (VIOLATED on Q1: ours' walker and copy not
-shown, the untapped premises not named; Q4: no control separating slot parity from a copy defect; both answered, the
-control run). Closed `declined` with its comment (`build/agent228/close/c360.md`); #344 and #348 commented.
-
-### (3) #344 — CAUSE FOUND, ALL THREE TENANTS, KEPT PARKED
-The body tint is vs2's generic Dark Force Power routine `PRG:0x02AF7E` (no vsavj counterpart); Donovan's sword is his
-ported routine's Dark Force branch, which tests vs2's `+0x1C3` where ours sets `+0x111`; the 14z-216 poke did reach the
-branch (retracted). Phobos and Pyron miss the same body tint (capture sheets `build/agent228/t344t/`, local).
-`docs/game/engine_internals.md` § The cause (measured 14z-228); `tests/audit_don_row0c.sh`'s header and two printed
-lines corrected (the gate PASS on the Mac before and after the last print fix, `build/agent228/gate/`, `gate2/`).
-
-### (4) THE RELEASE RUN — NO NEW ASSETS; #352 CLOSED
-The maintainer: **"When you're done, do all the work so we can release."**; on the options, **"Release run, no new
-assets"** and **"Continue in this session"** (`DECISIONS_HISTORY.md` 14z-228). Nothing uploaded; M26 stays the release.
-All at `b072551c` with controls, no reuse: **ERIS** release emulator tier (`--jobs 6 --skip test_mame_parity`, M26's
-order) 3 h 39 min, PASS 458, FAIL 0, SKIP 5 — the five Linux host gates (`audit_dead_leg_linux` new since M26), copied as
-`build/emu_rel228_eris` (sha256 equal both ends); **ERIS under MSYS2** `test_release_launcher_bat`'s Windows half PASS,
-`first-found` FAILs as a mode; **the Mac** MiSTer lane PASS 12 (3 h 32 min), `test_mame_parity` PASS 2,
-`test_release_binaries` PASS 5, `test_readme_recording` PASS 6; **PILOT** `audit_release_linux_desktop` PASS 5 (#352's
-`minimised` mode reached the gate's own FAIL on the real iconified window: `fbneo: not judged, PAUSED` on paused0 and
-title, X's active window 0x0), cleanhost PASS 3, Linux binaries PASS 5, README recording PASS 6, dead-leg PASS 3.
-**The static release tier** at `b072551c` (2 h 33 min, 626 controls executed, all honoured): PASS 243, FAIL 1, SKIP 1 —
-`test_emulator_staleness` red on the half-cap rule: `audit_dead_leg_linux` and its `nj-stripped` mode took 2030 s of a
-3600 s cap (0.56). 14z-223 had registered that cap from a measured 2024 s, against the headroom rule
-(`docs/project/operations.md`: measured × more than 2, rounded up to the hour). Fixed: the cap is 7200
-(`tests/ci_emulator.tsv`); the row's move stales only that gate (the audit, live tree), so it was re-run with controls on
-PILOT at scratch S1 `5d2a87ff` (= `b072551c` + that line): PASS 3 (2031 s, 0.28 of the new cap); then the static release tier at S1:
-PASS 244, FAIL 0, SKIP 1, 637 of 637 controls honoured (2 h 37 min). The SKIP is the launcher's Windows half, covered on ERIS as at 14z-222. Evidence `build/agent228/rel/`
-(local). #352 closed `done` through rule-checker run 2026-11-15-1804 OK (`build/agent228/close/c352.md`).
-
-### CLOSE (14z-228, 2026-11-15)
-Riding this close: (4) (the release run's records, #352's ticket row set to done, the dead-leg cap 3600 to 7200 s in
-`tests/ci_emulator.tsv`, the gotcha "A CAP SET UNDER TWICE THE MEASURED RUNTIME…"). Commits this sitting before the
-close: `b072551c`. Tickets closed: #360 (declined, in `b072551c`'s work) and #352 (done; its comment names the scratch
-commit, and the cap fix reaches GitHub with this close's push); none filed. Steps: sections (this group); next-session
-(the 14z-227 opener, 117 lines, quoted, to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-227 group to
-`STATE_HISTORY.md` with its ledger line); indexes (by the driver); dashboard (14z-163..14z-228, 3,982 figures, 0
-unclassed; five assets uploaded, `datasets` re-pointed: actions v19, costly v39, figures v39, rc_runs v39, tiers v40).
-The tier confirms on `build/agent228/tier1/tier_results.tsv` (`b072551c`'s GREEN tier). The tier's results:
-`build/agent228/closerun/tier_results.tsv`, the next close's `--prev`.
+### CLOSE (14z-229, 2026-11-15)
+Nothing new rides this close beyond its records. Commits this sitting before the close: `cc867fff`. Tickets closed:
+#348 (done, in `cc867fff`'s work); none filed. PILOT and ERIS not used. Steps: sections (this group); next-session (the
+14z-228 opener, 118 lines, quoted, to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-228 group to `STATE_HISTORY.md`
+with its ledger line); indexes (by the driver); dashboard (14z-163..14z-229, 4,028 figures, 0 unclassed; five assets
+uploaded, `datasets` re-pointed: actions v20, costly v40, figures v40, rc_runs v40, tiers v41). The tier confirms on
+`build/agent229/tier1/tier_results.tsv` (`cc867fff`'s GREEN tier). The tier's results:
+`build/agent229/closerun/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

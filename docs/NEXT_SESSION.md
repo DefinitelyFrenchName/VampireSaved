@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-228 CLOSE, 2026-11-15)
+# NEXT SESSION — orientation (rewritten at the 14z-229 CLOSE, 2026-11-15)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -27,7 +27,7 @@ Say so at the opener. Never spawn any agent at `max`. A recommendation leans onl
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
 idle env --default-signal=PIPE`: the inhibitor alone leaves SIGPIPE ignored for every child, gotchas.md, 14z-223). It crashed
-once on 2026-11-08 (no shutdown record; the maintainer brought it back). Idle at the 14z-228 close, its checkout
+once on 2026-11-08 (no shutdown record; the maintainer brought it back). Idle since the 14z-228 close (14z-229 did not use it), its checkout
 `~/vampire-saved` detached at scratch `5d2a87ff` (= `b072551c` + the dead-leg cap; fetch `main` first); its disk 94 G of 249 G used after the 14z-227 cleanup of our old
 scratch directories (feedback memory `pilot-disk-cleanup-before-runs`). **ERIS** (WSL2, 24 threads, 47 GB) runs the release
 shape; its checkout `~/vampire-saved` detached at `b072551c` (fetch first). Hold an ERIS run's ssh open
@@ -38,7 +38,7 @@ or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shel
 a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-228's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-229's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Declared shares (#370 stage 1, `df4b0902`):** every gate carries one `# SHARES:` line; the emulator runner runs a
@@ -96,23 +96,20 @@ the one-paragraph alternative design and ask before starting it.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A host-only gate's runtime is judged only where its record lands** (`docs/project/gotchas.md`, 14z-228):
-  `audit_dead_leg_linux`'s cap was registered at 0.56 of its measured runtime and no record reached the Mac until the
-  release, whose static tier then FAILed the half-cap rule. A cap moved in `tests/ci_emulator.tsv` stales that gate (the
-  registry is judged per row, every column), so the fix costs a re-run of the gate and of the static release tier.
-  Set a cap at measured × more than 2, rounded up to the hour, the day it is measured.
-- **The desktop gate cuts its assets with `tools/upload_release_assets.sh --dry-run`**; it does not download the
-  published ones.
+- **A `# FOLLOWS:` prefix the reader does not list makes the whole declaration vanish** (`docs/project/gotchas.md`,
+  14z-229): `declared()` in `tools/gate_follows.py` accepts only its own prefix list, so a hand-written `release/` classed
+  five gates undeclared until the prefix joined the list. `REF_RE` still has no `release` stem (ruled out of #348's
+  scope), so a NEW gate that reads `release/` is not asked to declare it: declare it by hand.
+- **`tests/test_release_roundtrip.sh` section 5** compares the tracked `release/<name>/` with a fresh package of its build
+  (`docs/project/release_format.md`); at the next freeze a stale tracked release now fails the gate, and its control
+  `other-build-release` needs a previous `release/merged-mN` to exist.
 - **`tools/close.py start` needs `--row "(none — no findings table since #288)"`** when STATE's newest group has no
   findings-table section (every close since #288).
 
-## WHAT HAPPENED THIS SITTING (14z-228)
+## WHAT HAPPENED THIS SITTING (14z-229)
 
-- **Committed:** `b072551c` (#360's mechanism and closure, #344's cause, #348's estimate); the close commit carries the
-  release run's records, #352's row and the dead-leg cap (3600 to 7200 s).
-- **Ruled:** "Not now" (#348); "Record and close declined" (#360); "Check Phobos/Pyron first", then "Record cause, keep
-  parked" (#344); "Release run, no new assets" and "Continue in this session" (`DECISIONS_HISTORY.md` 14z-228).
-- **The release run** (no upload; M26 stays the release): every emulator lane with controls GREEN on ERIS, PILOT and the
-  Mac; the static release tier PASS 244, FAIL 0, SKIP 1 (the launcher's Windows half, PASS on ERIS) at scratch `5d2a87ff`
-  after the cap fix (STATE 14z-228 § (4)).
-- **Closed:** #360 (declined), #352 (done). Commented: #344, #348.
+- **Committed:** `cc867fff` (#348: section 5 of the release gate, `release/` in five FOLLOWS lines, `declared()` taught
+  the prefix); the close commit carries the close's records.
+- **Ruled:** "Ticket scope only (Recommended)", "Legacy form, gate stays listed (Recommended)", "Cap at 4 active hours
+  (Recommended)" (`DECISIONS_HISTORY.md` 14z-229).
+- **Closed:** #348 (done; rule-checker run 2026-11-15-1806 OK after -1805). Nothing filed. PILOT and ERIS not used.
