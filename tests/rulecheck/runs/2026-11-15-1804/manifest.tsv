@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent228/close/c352.md	e234744551abc60042a7bf75240be57821626f06
+build/agent228/close/rc352/desk_plain.log	96ddc7f23dfe70c23527f3a96f7a794587ffb238
+build/agent228/close/rc352/desk_minimised.log	641fc8e0f6953e751aa3ee834a3222233f91cb57
+build/agent228/close/rc352/emulator_runs.txt	a8ec7ad550c356174d55030da131aaaa02f894d5
+build/agent228/close/rc352/static_tiers.txt	b60fefd4dfe1eaed4702abb504ff8b5b2acae71a
+build/agent228/close/rc352/scratch_s1.diff	0db1f346de2f27815e859cbc72df115ecf24bfb2
+build/agent228/close/rc352/bat228.log	4010fa8ebf2eb6713088f0860558ca8f878e5c5c
+build/agent228/close/rc352/bat228_ff.log	a3bc590db9030c56f37b22e306f2862c72d20309
+DECISIONS_HISTORY.md.lines-10056-10091 (lines 10056-10091 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-10 (14z-225) — #352: the PAUSE-reading gate change is built as designed, its new co", and the entries after it up to line 10091)	320e200cc4ad9bc2246988d099fd79cc29382861
+DECISIONS_HISTORY.md.lines-10259-10271 (lines 10259-10271 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-14 (14z-228) — the release is a release run with no new assets, in this sitting")	074508c72dc70734b26a760227948742bc1c6638

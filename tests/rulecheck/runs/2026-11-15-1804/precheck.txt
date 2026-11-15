@@ -1,0 +1,2 @@
+  FLAG D-FIGURE: 46  [build/agent228/close/c352.md]
+packet_check: 1 flag(s): D-FIGURE 1

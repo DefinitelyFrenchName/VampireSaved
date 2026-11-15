@@ -8219,3 +8219,15 @@ approximate the parser, and every approximation has a next counter-example. The 
 limit" after the third. **When a static check of a dynamic language keeps losing to one more shape, write down exactly
 what it covers, name the rest as review in the check, its gate and its contract, and put the alternative that does not
 read text (here, an evidence file the gate cannot write) to the maintainer.**
+
+## A CAP SET UNDER TWICE THE MEASURED RUNTIME WAITED FOR THE NEXT RELEASE TO FAIL — the gate's only runs had stayed on PILOT (paid: 14z-228, the release run)
+
+14z-223 registered `audit_dead_leg_linux` (`tests/ci_emulator.tsv`) with a 3600 s cap from a measured 2024 s, 0.56 of
+it. The headroom rule (`docs/project/operations.md`: measured × more than 2, rounded up to the hour) would have given 7200.
+`test_emulator_staleness` FAILs a row at half its cap at every cadence, but it judges only the run records present in
+the tree's `build/emu_*`. The gate is Linux-and-live-desktop only, and its 14z-223 runs stayed on PILOT, so no record of
+it reached the Mac until this release copied PILOT's back. The static release tier then read the 2030 s row and FAILed.
+The fix (cap 7200) moved the gate's own registry row, which made it stale: it was re-run with controls on PILOT (1 h 35 min)
+and the static release tier re-run whole (2 h 37 min). **When a row's cap is set, apply the ×2 rule to the measured
+figure at that moment. A host-only gate's runtime is judged only where its record lands, so copy the record back when it
+is measured.**

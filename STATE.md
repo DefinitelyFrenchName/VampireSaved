@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-228 — **#348 estimated (not now), #360's mechanism found and the ticket closed `declined`, #344's cause found and widened to all three tenants (kept parked).** Opus 5.5, transcript `ccd11d40`, 2026-11-14.
+## Session 14z-228 — **#348 estimated (not now), #360's mechanism found and the ticket closed `declined`, #344's cause found and widened to all three tenants (kept parked); the release run, no new assets, and #352 closed done.** Opus 5.5, transcript `ccd11d40`, 2026-11-14.
 
 ### opened with
 The maintainer: **"read handoff.md, state.md and docs/next_session.md"**; then **"Estimate #348 and do the analysis for
@@ -68,70 +68,35 @@ branch (retracted). Phobos and Pyron miss the same body tint (capture sheets `bu
 `docs/game/engine_internals.md` § The cause (measured 14z-228); `tests/audit_don_row0c.sh`'s header and two printed
 lines corrected (the gate PASS on the Mac before and after the last print fix, `build/agent228/gate/`, `gate2/`).
 
-## Session 14z-227 — **the #310 family stops: its cost and the value of the 100 debt rows measured; #372 fixed and #370 finished by a simpler rule; #310, #369, #370 and #372 closed done (`e5bfe9dd`); #373 filed and fixed (the known-crash rig re-timed for the emulated clock, its gate migrated off the debt list).** Opus 5.5, transcript `006806e6` (compacted), 2026-11-13 to 2026-11-14.
+### (4) THE RELEASE RUN — NO NEW ASSETS; #352 CLOSED
+The maintainer: **"When you're done, do all the work so we can release."**; on the options, **"Release run, no new
+assets"** and **"Continue in this session"** (`DECISIONS_HISTORY.md` 14z-228). Nothing uploaded; M26 stays the release.
+All at `b072551c` with controls, no reuse: **ERIS** release emulator tier (`--jobs 6 --skip test_mame_parity`, M26's
+order) 3 h 39 min, PASS 458, FAIL 0, SKIP 5 — the five Linux host gates (`audit_dead_leg_linux` new since M26), copied as
+`build/emu_rel228_eris` (sha256 equal both ends); **ERIS under MSYS2** `test_release_launcher_bat`'s Windows half PASS,
+`first-found` FAILs as a mode; **the Mac** MiSTer lane PASS 12 (3 h 32 min), `test_mame_parity` PASS 2,
+`test_release_binaries` PASS 5, `test_readme_recording` PASS 6; **PILOT** `audit_release_linux_desktop` PASS 5 (#352's
+`minimised` mode reached the gate's own FAIL on the real iconified window: `fbneo: not judged, PAUSED` on paused0 and
+title, X's active window 0x0), cleanhost PASS 3, Linux binaries PASS 5, README recording PASS 6, dead-leg PASS 3.
+**The static release tier** at `b072551c` (2 h 33 min, 626 controls executed, all honoured): PASS 243, FAIL 1, SKIP 1 —
+`test_emulator_staleness` red on the half-cap rule: `audit_dead_leg_linux` and its `nj-stripped` mode took 2030 s of a
+3600 s cap (0.56). 14z-223 had registered that cap from a measured 2024 s, against the headroom rule
+(`docs/project/operations.md`: measured × more than 2, rounded up to the hour). Fixed: the cap is 7200
+(`tests/ci_emulator.tsv`); the row's move stales only that gate (the audit, live tree), so it was re-run with controls on
+PILOT at scratch S1 `5d2a87ff` (= `b072551c` + that line): PASS 3 (2031 s, 0.28 of the new cap); then the static release tier at S1:
+PASS 244, FAIL 0, SKIP 1, 637 of 637 controls honoured (2 h 37 min). The SKIP is the launcher's Windows half, covered on ERIS as at 14z-222. Evidence `build/agent228/rel/`
+(local). #352 closed `done` through rule-checker run 2026-11-15-1804 OK (`build/agent228/close/c352.md`).
 
-### opened with
-The maintainer: **"read handoff.md, state.md and docs/next_session.md"**; on the cost breakdown, **"do it"**; then **"I
-think either we stop here or we go all the way. But first my bigger question is : how do we measure the value of
-#310"** and **"measure first"**; on the three questions put after the measurement, **"didn't we say that most of the 100
-were non-issues or weaker challenges anyway?"**, **"a ticket"** and **"we should at least look into them"**; on stopping,
-**"agreed on both"**; on the finish line, **"yes, that's the best way forward"**; on the narrowed figures, **"Yes,
-close on these (Recommended)"**; after seven rule-checker rounds, **"Resolve in writing, close (Recommended)"**; after
-`e5bfe9dd`, **"Old scratch can be all erased"** and **"Do #373 then close"**. Working evidence: `build/agent227/` (local;
-`cost310/`, `m310/`, `kc/`, `fin/`, `close/`, `bis/`, `rt/`, `kc373/`).
-
-### (1) THE COST AND THE VALUE OF #310'S FAMILY, MEASURED
-The cost (`build/agent227/cost310/`, local): #310, #364, #369, #370, #371 and #372 took 35.65 to 40.49 active hours of
-210.14 over 22 session transcripts (two attribution rules), and 120.61 of 303.61 background machine hours. The value:
-every declared mode of the 100 gates left on `tests/expected/ctl_caught_debt.tsv` read blind with hidden controls
-(`build/agent227/m310/`, local); the figures are in `docs/project/must_fire_contract.md` § What the 100 cost to leave.
-Ruled: stop (`DECISIONS_HISTORY.md` "Ruled 2026-11-13 (14z-227) — #369 and #310 close").
-
-### (2) #373 FILED — THE KNOWN-CRASH CONTROL NO LONGER REPRODUCES ITS CRASH
-The reading's one defect: `audit_guard_corpus`'s `known-crash` firing line claims the vec4 tripwire, and every kept run
-since 2026-10-12 (ERIS, PILOT, the Mac at HEAD) crashes at vec3 PC 01afb6. Filed as #373, as ruled ("a ticket").
-Resolved in (4).
-
-### (3) THE FINISH LINE — #372 AND #370
-As ruled (`DECISIONS_HISTORY.md` "Ruled 2026-11-13 (14z-227) — the family's finish line"): the emulator runner's run temp
-moves out of the repo (#372), and in a pooled lane a gate naming a token of `tests/shares.tsv` runs after the pool, one
-at a time (#370); `tests/test_emulator_runner.sh` sections 21 and 18f, controls `tmp-in-repo` and `token-serial-off`;
-#370's write audit declined. #310, #369, #370 and #372 closed `done` with their comments. Rule-checker runs: #369/#310
-2026-11-13-1790 to -1797 (-1791 withdrawn unspawned), each VIOLATED round a real narrowing of the claim (the batches'
-controls, the 5 non-OWN items, the two log trees, #373's false OWN, the narrowed figures put back, the readers' blindness
-checked), finished in writing at the maintainer's choice; #370/#372 2026-11-13-1799 OK (-1798 withdrawn unspawned).
-PILOT: `test_mister_wide_inert` PASS with TMPDIR unset through the new runner (`build/agent227/fin/pilot/`);
-`test_mister_gfxc_fetch` got past the refusal and was stopped without a verdict at 71 min by the run script's own
-2 h bound (`timeout 7200`), the runner reaping its session and removing its run temp. Committed `e5bfe9dd` (strict
-confirm tier GREEN, PASS 123, FAIL 0, 7 carried, `build/agent227/tier1/`); the hash posted on #370 and #372. PILOT's
-old scratch directories (`~/od`, `~/r371*`, `~/m310*`, `~/f372`, about 10 G) deleted on the maintainer's word.
-
-### (4) #373 FIXED — THE CRASH RIG RE-TIMED FOR THE EMULATED CLOCK, ITS GATE OFF THE DEBT LIST
-On "Do #373 then close": bisected on the Mac to `ce64cb0e` (14z-197, `replay_guard.lua` on the emulated clock, #228):
-its parent `4980bd96` and five other commits sampled back to `79dc2d03` (2026-09-22) give `CRASH 14767 vec4 PC 0fb6e0`, `ce64cb0e` gives
-`CRASH 20100 vec3 PC 01afb6` (`build/agent227/bis/`, local). The rig was timed on the old clock's one-frame lead: at HEAD
-under `INSTR_CLOCK=frame_done` it gives the tripwire, and on the emulated clock with its replay and picks moved 1 frame
-earlier `CRASH 14765 vec4 PC 0fb6e0` (2: a vec3 at 9194; 3, 4: END clean; `build/agent227/rt/`, local).
-`tests/audit_guard_corpus.sh` now builds that shift at run time, its mode is HONOURED only on the tripwire's own line,
-and its plain run executes the rig (about 25 s) and fires only on that line, else CONTROL DEAD and FAIL; it left
-`tests/expected/ctl_caught_debt.tsv` (99 rows) and its dead-leg row's stripped class is UNJUDGED-CAUGHT; the gotcha is in
-`docs/platform/gotchas.md`. Evidence (`build/agent227/kc373/`, local): on the Mac the mode HONOURED, a plain run FIRED, a
-shift-0 shadow UNJUDGED-CAUGHT and DEAD, a dead MAME UNJUDGED on the gate's own line, `test_dead_leg_unjudged` on the row
-PASS; on PILOT the full plain soak PASS (388 of 388 legs clean, control FIRED) and the mode CAUGHT.
-Rule-checker run 2026-11-14-1801 OK after 2026-11-14-1800 (VIOLATED on Q1: "every commit" back to 2026-09-22 where six
-were run, the parentage, the `cmp` and PILOT's input hashes not in evidence; the wording narrowed, the evidence added).
-#373 closed `done` with its comment (`build/agent227/close/c373.md`).
-
-### CLOSE (14z-227, 2026-11-14)
-Riding this close: (4) (#373's fix, its ticket row set to done, the debt list's and dead-leg table's rows, the gotcha,
-the contract's note). Commits this sitting before the close: `e5bfe9dd`. Tickets closed: #310, #369, #370, #372 (in
-`e5bfe9dd`'s work; the hash posted on #370 and #372) and #373 (its comment says the commit follows; it reaches GitHub
-with this close's push); filed: #373. Steps: sections (this group); next-session (the 14z-226 opener, 126 lines, quoted,
-to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-226 group to `STATE_HISTORY.md` with its ledger line); indexes (by
-the driver); dashboard (14z-163..14z-227, 3,936 figures, 0 unclassed; five assets uploaded, `datasets` re-pointed:
-actions v18, costly v38, figures v38, rc_runs v38, tiers v39). The tier confirms on
-`build/agent227/tier1/tier_results.tsv` (`e5bfe9dd`'s GREEN tier). The tier's results:
-`build/agent227/closerun/tier_results.tsv`, the next close's `--prev`.
+### CLOSE (14z-228, 2026-11-15)
+Riding this close: (4) (the release run's records, #352's ticket row set to done, the dead-leg cap 3600 to 7200 s in
+`tests/ci_emulator.tsv`, the gotcha "A CAP SET UNDER TWICE THE MEASURED RUNTIME…"). Commits this sitting before the
+close: `b072551c`. Tickets closed: #360 (declined, in `b072551c`'s work) and #352 (done; its comment names the scratch
+commit, and the cap fix reaches GitHub with this close's push); none filed. Steps: sections (this group); next-session
+(the 14z-227 opener, 117 lines, quoted, to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-227 group to
+`STATE_HISTORY.md` with its ledger line); indexes (by the driver); dashboard (14z-163..14z-228, 3,982 figures, 0
+unclassed; five assets uploaded, `datasets` re-pointed: actions v19, costly v39, figures v39, rc_runs v39, tiers v40).
+The tier confirms on `build/agent228/tier1/tier_results.tsv` (`b072551c`'s GREEN tier). The tier's results:
+`build/agent228/closerun/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

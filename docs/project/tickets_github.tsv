@@ -25,7 +25,7 @@ number	state	reason	closed	labels	title
 355	CLOSED	COMPLETED	2026-11-02	bug	close.py red_base takes a plan-refused tier's header-only results file as the re-run's --confirm base
 354	CLOSED	COMPLETED	2026-11-06	enhancement	no gate checks what reaches #294's dead span PRG:0x024024 in the built image
 353	CLOSED	COMPLETED	2026-11-03	bug	run_all_emulator.sh --log on an existing directory appends to its results.tsv: a re-run inherits the earlier run's verdicts
-352	OPEN	-	-	done unshipped,enhancement	audit_release_linux_desktop reports a paused FBNeo window as missing mark and silence instead of NOT JUDGED: paused
+352	CLOSED	COMPLETED	2026-11-15	done unshipped,enhancement	audit_release_linux_desktop reports a paused FBNeo window as missing mark and silence instead of NOT JUDGED: paused
 351	CLOSED	COMPLETED	2026-11-02	bug	proof_sheets run --host cannot run gates whose control build is a freeze tag; the release recipe offers --host pilot
 350	CLOSED	COMPLETED	2026-11-02	bug	publish_sheets.sh hangs at the ssh password prompt: timeout without --foreground takes the terminal from rsync/ssh
 349	CLOSED	COMPLETED	2026-11-02	bug	controls_overlap.py reads a gate SAFE when all its control runs were REFUSED (only SKIP reads HOLLOW)
