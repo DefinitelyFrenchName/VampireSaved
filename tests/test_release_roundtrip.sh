@@ -7,13 +7,18 @@
 #   REFUSES a corrupted patch, a wrong dump and a wrong target sha1 without writing; no
 #   patch carries a verbatim run of reference-ROM bytes (rule 7); and every platform
 #   directory has exactly the ruled inventory with the end-user README sections. The packager
-#   refuses an xdelta3 older than the version measured clean (#279).
+#   refuses an xdelta3 older than the version measured clean (#279). The tree's release/<name>/
+#   is the package of its build: every platform dir's manifest, applier and patches equal a
+#   fresh package (#348).
 # HOW: section 0 runs the packager with a fake xdelta3 reporting 3.0.11 first on PATH; packages the build, applies it in a scratch dir, compares members and keys; section 2
 #   exercises the refusals; section 3 indexes every 64-byte-aligned reference chunk and
 #   slides a window over every patch byte; section 4 checks the per-platform layout,
-#   BINARY.txt hashes and the README sections; nine known-bad controls and one perturbed copy.
+#   BINARY.txt hashes and the README sections; section 5 compares each platform dir's
+#   manifest.json, apply_release.py and patches with section 1's fresh package; ten known-bad
+#   controls and one perturbed copy.
 # EXPECTS: every section green and every control caught (the planted reference chunk, the
-#   secondary-compressed patch, the stray file, the missing README section among them).
+#   secondary-compressed patch, the stray file, the missing README section and the previous
+#   build's tracked release among them).
 #
 # MUST-FIRE: perturbed-copy: encoder-check-removed — a copy of tools/package_release.py without its xdelta3 version check, run with an xdelta3 reporting 3.0.11 first on PATH, must not refuse with the #279 message, and section 0 must fail (#279; mode: section 0 runs that copy)
 # MUST-FIRE: known-bad: corrupted-patch — a package with one patch byte flipped must be REFUSED by the applier without writing (mode: section 1 applies that package and must fail)
@@ -25,6 +30,7 @@
 # MUST-FIRE: known-bad: stray-file — a release copy with a file outside the ruled inventory must fail section 4 (nothing outside the definition ships; mode: section 4 checks that copy)
 # MUST-FIRE: known-bad: readme-missing-section — a release copy whose README lacks the "If it does not work" section must fail section 4 (mode: section 4 checks that copy)
 # MUST-FIRE: known-bad: generator-report-dropped — the generator's README without its "Report a problem" section must fail section 4 (#284; mode: the rendered READMEs lose that heading before the check)
+# MUST-FIRE: known-bad: other-build-release — the previous tracked release (the newest release/merged-mN below <name>) must fail section 5's comparison with the fresh package of this build (#348; mode: section 5 checks that release in place of release/<name>)
 #
 # A release is a set of xdelta3 patches + a manifest + an applier
 # (tools/package_release.py). This gate is what makes it shippable:
@@ -65,6 +71,12 @@
 #      romset, play on <platform>, if it does not work, the no-ROM statement).
 #      The applier needs only Python 3 (its own VCDIFF decoder): section 1's
 #      round trip is what proves that decoder against xdelta3's encoder.
+#   5  THE TRACKED RELEASE IS THE PACKAGE OF ITS BUILD (#348, 14z-229) —
+#      every platform dir of the tree's release/<name>/ carries
+#      manifest.json, apply_release.py and a patch set byte-identical to
+#      section 1's fresh package (no patch missing, none extra); README.md
+#      and apply_release.html are generated per platform and not compared.
+#      Must-fire: the previous tracked release fails the same comparison.
 #
 # Usage: ROMDIR=... tests/test_release_roundtrip.sh [build_rompath] [name]
 #   defaults build/m3b_merged34/rompath, merged-m26. Needs xdelta3.
@@ -76,7 +88,7 @@
 #   the pristine dumps, byte-identical x42 + fingerprint + manifest; the
 #   applier refuses corrupted patch / wrong sha1 / wrong dump without writing;
 #   rule 7 verbatim-chunk scan with a must-fire control. Needs xdelta3.
-# SHARES: none — its 10 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:3ce6645c) and its plain run always pooled (#370 A1, 14z-225)
+# SHARES: none — its 10 control modes were write-traced apart (tests/controls_concurrent.txt, pilot:3ce6645c) and its plain run always pooled (#370 A1, 14z-225); the 11th, other-build-release (#348, 14z-229), only reads release/ and writes under its own mktemp dir
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
@@ -522,10 +534,69 @@ PY
     fi
 fi
 
+echo "== 5. the tree's release/$NAME is the package of its build (#348) =="
+# Section 4 checks the tracked release's LAYOUT; nothing checked that its bytes are the package of the build this gate
+# packages, so a release left from an earlier build of the same mark (one sharing the program but not the set) passed
+# every gate. Each platform dir's manifest.json, apply_release.py and patch set must equal section 1's fresh package
+# file for file; README.md and apply_release.html are generated per platform (tools/package_release_platforms.py) and
+# are not compared. Must-fire control: the PREVIOUS tracked release (the newest release/merged-mN below this one) must
+# fail the same comparison; under CONTROL=other-build-release it is the release the check reads.
+ident_check() {  # ident_check <release dir> — 0 when every platform dir carries the fresh package's bytes
+    python3 - "$1" "$W/rel/$NAME" <<'PY'
+import os, sys
+rel, fresh = sys.argv[1:3]
+def files(d):
+    out = set()
+    for root, _, fs in os.walk(d):
+        for f in fs:
+            if f != ".DS_Store": out.add(os.path.relpath(os.path.join(root, f), d))
+    return out
+want = {f for f in files(fresh) if f in ("manifest.json", "apply_release.py") or f.startswith("patches/")}
+bad = 0
+for p in ("fbneo", "mame", "mister"):
+    pd = os.path.join(rel, p)
+    have = {f for f in files(pd) if f in ("manifest.json", "apply_release.py") or f.startswith("patches/")}
+    for f in sorted(want - have): print(f"FAIL: {pd}/{f} missing (the fresh package has it)"); bad += 1
+    for f in sorted(have - want): print(f"FAIL: {pd}/{f} is not in the fresh package of the build"); bad += 1
+    for f in sorted(want & have):
+        if open(os.path.join(pd, f), "rb").read() != open(os.path.join(fresh, f), "rb").read():
+            print(f"FAIL: {pd}/{f} differs from the fresh package of the build"); bad += 1
+if bad: sys.exit(1)
+print(f"  ok: {rel}: manifest.json, apply_release.py and {len(want) - 2} patches equal the fresh package on fbneo, mame and mister")
+PY
+}
+TRACKED="release/$NAME"
+PREV=""
+case "$NAME" in
+merged-m[0-9]*)
+    _n="${NAME#merged-m}"
+    PREV="$(ls -d release/merged-m[0-9]* 2>/dev/null | sed 's|^release/merged-m||' | grep -E '^[0-9]+$' \
+        | awk -v n="$_n" '$1 < n' | sort -n | tail -1)"
+    [ -n "$PREV" ] && PREV="release/merged-m$PREV" ;;
+esac
+if vs_ctl_is other-build-release; then
+    [ -n "$PREV" ] && [ -d "$PREV" ] \
+        || { echo "REFUSED: CONTROL=other-build-release — no earlier tracked release below $NAME: the mode judged nothing"; exit 3; }
+    TRACKED="$PREV"
+fi
+if [ ! -d "$TRACKED" ]; then
+    echo "  (no $TRACKED in the tree — identity check not applicable)"
+else
+    ident_check "$TRACKED" || fail=1
+    if [ -z "$PREV" ] || [ ! -d "$PREV" ]; then
+        vs_ctl_dead other-build-release "no earlier tracked release below $NAME to check"; fail=1
+    elif ident_check "$PREV" > "$W/ident_prev.log" 2>&1; then
+        vs_ctl_dead other-build-release "$PREV passed the identity check against the fresh $NAME package"; fail=1
+    else
+        vs_ctl_fired other-build-release "$PREV fails it: $(grep -c '^FAIL:' "$W/ident_prev.log") file(s) differ or are missing, first: $(grep -m1 '^FAIL:' "$W/ident_prev.log" | cut -c7-110)"
+    fi
+fi
+
 if [ "$fail" = 0 ]; then
     echo "PASS: release package — round-trips byte-identical from pristine dumps,"
     echo "      the applier refuses bad patches/manifests/dumps without writing,"
-    echo "      and no patch carries reference-ROM bytes (rule 7)"
+    echo "      no patch carries reference-ROM bytes (rule 7),"
+    echo "      and the tree's release/$NAME is the package of its build"
 else
     echo "FAIL: release package"; exit 1
 fi

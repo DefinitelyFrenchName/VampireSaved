@@ -1170,11 +1170,11 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 ### `test_release_roundtrip.sh` — test, ci_static
 
-**WHAT:** the release package is shippable: applied to the PRISTINE dumps it reproduces every authored member byte-identically and every added standalone member from its declared source, hashes to the manifest's keys (both variants), deterministically; the applier REFUSES a corrupted patch, a wrong dump and a wrong target sha1 without writing; no patch carries a verbatim run of reference-ROM bytes (rule 7); and every platform directory has exactly the ruled inventory with the end-user README sections. The packager refuses an xdelta3 older than the version measured clean (#279).
+**WHAT:** the release package is shippable: applied to the PRISTINE dumps it reproduces every authored member byte-identically and every added standalone member from its declared source, hashes to the manifest's keys (both variants), deterministically; the applier REFUSES a corrupted patch, a wrong dump and a wrong target sha1 without writing; no patch carries a verbatim run of reference-ROM bytes (rule 7); and every platform directory has exactly the ruled inventory with the end-user README sections. The packager refuses an xdelta3 older than the version measured clean (#279). The tree's `release/<name>/` is the package of its build: every platform dir's manifest, applier and patches equal a fresh package (#348).
 
-**HOW:** section 0 runs the packager with a fake xdelta3 reporting 3.0.11 first on PATH; packages the build, applies it in a scratch dir, compares members and keys; section 2 exercises the refusals; section 3 indexes every 64-byte-aligned reference chunk and slides a window over every patch byte; section 4 checks the per-platform layout, BINARY.txt hashes and the README sections; nine known-bad controls and one perturbed copy.
+**HOW:** section 0 runs the packager with a fake xdelta3 reporting 3.0.11 first on PATH; packages the build, applies it in a scratch dir, compares members and keys; section 2 exercises the refusals; section 3 indexes every 64-byte-aligned reference chunk and slides a window over every patch byte; section 4 checks the per-platform layout, BINARY.txt hashes and the README sections; section 5 compares each platform dir's manifest.json, apply_release.py and patches with section 1's fresh package; ten known-bad controls and one perturbed copy.
 
-**EXPECTS:** every section green and every control caught (the planted reference chunk, the secondary-compressed patch, the stray file, the missing README section among them).
+**EXPECTS:** every section green and every control caught (the planted reference chunk, the secondary-compressed patch, the stray file, the missing README section and the previous build's tracked release among them).
 
 ### `test_replay_stage_census.sh` — test, ci_portable
 

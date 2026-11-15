@@ -29,7 +29,7 @@
 # EXPECTS: every leg green, the QSound-member control caught by 3a's -verifyroms alone and
 #   the gfx-member control by the framebuffer alone (work RAM is blind to both); a red names
 #   the file, reference or member. ~11 min with section 3.
-# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ emu/mame-patches/
+# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ emu/mame-patches/ release/
 #   tests/expected/linux_host_provided.tsv tests/lib/controls.sh tests/lib/fbneo_boot_log.sh
 #   tests/lib/native_path.sh tests/lua/replay.lua tests/replays/05_timeout_idle.rpl
 #   tests/run_suite.sh tools/build_release_emulators.sh tools/check_host_libs.py

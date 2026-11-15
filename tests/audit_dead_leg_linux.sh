@@ -19,7 +19,7 @@
 # EXPECTS: PASS with 5 rows; a Linux host with podman, a live GNOME session for this user, ROMDIR, and the release's
 #   linux-x86_64 binaries under release/<name>/ (or ASSETS=<dir of zips>), as the two target gates need. Elsewhere it
 #   SKIPs and says so: at release it runs on PILOT, after the two gates it checks.
-# FOLLOWS: tests/test_dead_leg_unjudged.sh tests/expected/dead_leg_unjudged_linux.tsv tests/audit_release_linux_cleanhost.sh tests/lib/shares.sh tests/lib/share_lock.py tests/shares.tsv
+# FOLLOWS: tests/test_dead_leg_unjudged.sh tests/expected/dead_leg_unjudged_linux.tsv tests/audit_release_linux_cleanhost.sh tests/lib/shares.sh tests/lib/share_lock.py tests/shares.tsv release/
 #   tests/audit_release_linux_desktop.sh tests/lib/controls.sh tests/lib/classify.sh tools/desktop_session_play.py
 #   tests/lib/desktop_session.sh emu/fbneo/ emu/fbneo-patches/ tools/setup_fbneo.sh
 #

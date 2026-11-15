@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-624 entries (49 game / 156 platform / 419 project), counted from the buckets at generation.
+625 entries (49 game / 156 platform / 420 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
@@ -233,7 +233,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - FBNeo'S SDL2 PAUSE OUTLASTS ITS CAUSE — once focus comes back the game plays on BEHIND the driver's step schedule, so a capture made on time shows an earlier screen and reads as a wrong mark (paid: 14z-217's M24 release run; measured 14z-225, PILOT, #352)
 - A TIMED-OUT EMULATOR GATE'S MAME OUTLIVES THE GATE AND THE RUNNER — it catches TERM and plays on; `timeout -k`'s KILL never fires because the gate's shell is already gone (paid: 14z-225, PILOT, #371)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 419 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 420 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -654,3 +654,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A FIX THAT LISTS THE WRONG ANSWERS NEVER FINISHES — #310 spent nine sessions teaching the classifier each bad red instead of defining a good one (paid: 14z-206 to 14z-223, #310)
 - A TEXT LINT OF SHELL SOURCE CANNOT BE MADE AIRTIGHT — eight rule-checker runs each found one more shape; state what it covers and stop (paid: 14z-224, #369, rule-checker runs 2026-11-09-1743 to -1749)
 - A CAP SET UNDER TWICE THE MEASURED RUNTIME WAITED FOR THE NEXT RELEASE TO FAIL — the gate's only runs had stayed on PILOT (paid: 14z-228, the release run)
+- A FOLLOWS PREFIX THE READER DOES NOT LIST MAKES THE WHOLE DECLARATION VANISH — `release/` added by hand read as five gates undeclared (paid: 14z-229, #348)

@@ -83,7 +83,9 @@ def declared(text):
     elif not toks:
         problems.append("empty FOLLOWS")
     for t in toks:
-        if not t.startswith(("tests/", "tools/", "docs/", "emu/", "build/manifest", ".claude/")):
+        # release/ is declarable by hand since #348 (14z-229); REF_RE stays blind to it (ruled "Ticket scope only"),
+        # so a gate reading release/ is not ASKED to declare it
+        if not t.startswith(("tests/", "tools/", "docs/", "emu/", "build/manifest", ".claude/", "release/")):
             problems.append(f"not a repo path prefix: {t}")
     return toks, problems
 

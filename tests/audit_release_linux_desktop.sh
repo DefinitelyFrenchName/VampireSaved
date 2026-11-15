@@ -27,7 +27,7 @@
 #   emulator's own stream above -45 dBFS RMS (the sink measured 14z-194 at -27 to -36 dBFS after
 #   select); no FBNeo capture up to select carrying the PAUSE overlay (a paused leg: FAIL, "not judged, PAUSED");
 #   each control fails.
-# FOLLOWS: tools/upload_release_assets.sh tools/desktop_session_play.py tools/desktop_audio_check.py tools/desktop_pause_check.py tests/lib/shares.sh tests/lib/share_lock.py tests/shares.tsv
+# FOLLOWS: tools/upload_release_assets.sh tools/desktop_session_play.py tools/desktop_audio_check.py tools/desktop_pause_check.py tests/lib/shares.sh tests/lib/share_lock.py tests/shares.tsv release/
 #   tools/desktop_mark_check.py build/manifest/version_font.json build/manifest/donovan.toml
 #   build/manifest/huitzil.toml build/manifest/pyron.toml tests/lib/desktop_session.sh
 #   build/manifest/ tests/lib/controls.sh emu/fbneo/ emu/fbneo-patches/ tools/setup_fbneo.sh

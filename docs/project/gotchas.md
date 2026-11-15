@@ -8231,3 +8231,12 @@ The fix (cap 7200) moved the gate's own registry row, which made it stale: it wa
 and the static release tier re-run whole (2 h 37 min). **When a row's cap is set, apply the ×2 rule to the measured
 figure at that moment. A host-only gate's runtime is judged only where its record lands, so copy the record back when it
 is measured.**
+
+## A FOLLOWS PREFIX THE READER DOES NOT LIST MAKES THE WHOLE DECLARATION VANISH — `release/` added by hand read as five gates undeclared (paid: 14z-229, #348)
+
+`tools/gate_follows.py` has two prefix lists, and they are separate: `REF_RE` (the stems it finds in a gate's TEXT) and
+the accept-list in `declared()` (the prefixes a `# FOLLOWS:` line may name). A token outside the accept-list is a
+problem, and a gate with a problem is classed undeclared, so adding `release/` by hand to five gates' lines made
+`test_gate_follows` FAIL with "a frozen declaring gate LOST its declaration" for all five, not "unknown token". The fix
+was `release/` in `declared()`'s list; `REF_RE` stays blind to it by ruling. **A new top-level stem in a FOLLOWS line
+needs `declared()`'s list first; run `test_gate_follows` after any FOLLOWS edit.**

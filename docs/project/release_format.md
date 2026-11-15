@@ -371,7 +371,14 @@ holding at least one `.mra`, the `.rbf` whose sha256 EQUALS its
 `release/bitstreams/<CURRENT>/` one, no cross-platform leakage, and a
 must-fire control (a copy with `mame/emulator/` removed must fail). The
 packager's own refusal (a record whose sha256 does not match the file) was
-exercised by hand at 14z-113.
+exercised by hand at 14z-113. **Section 5 (#348, 14z-229) locks the bytes:**
+each platform directory's `manifest.json`, `apply_release.py` and patch set
+must equal section 1's fresh package of the build (no patch missing, none
+extra; `README.md` and `apply_release.html` are generated per platform and
+not compared), so a tracked release left from an earlier build of the same
+mark fails; must-fire: the previous tracked release (`release/merged-m25`
+against M26: the manifest and 8 of 20 patches differ on each platform, 27
+findings) fails the same comparison.
 
 ## The release run on the freeze's tree — what it reuses (#316)
 

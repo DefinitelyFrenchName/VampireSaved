@@ -84,7 +84,9 @@ demands a declaration at least as wide as `tests/replays/`; untracked build outp
 references. **A stem the reader does not know is invisible to the text class:** its `REF_RE` reads only `tests`, `tools`,
 `docs`, `emu` and `build/manifest`, so a gate reading `release/…` is never asked to declare it — measured 14z-228 (#348):
 five emulator-tier gates read `release/` in code (`audit_release_linux_desktop`, `audit_release_linux_cleanhost`,
-`audit_dead_leg_linux`, `test_readme_recording`, `test_release_binaries`) and none declares it.
+`audit_dead_leg_linux`, `test_readme_recording`, `test_release_binaries`) and none declared it. Since 14z-229 (#348,
+the maintainer: *"Ticket scope only"*) each of the five declares `release/` by hand, which `declared()` accepts as a
+prefix since then; `REF_RE` stays blind to the stem, so a NEW gate that reads `release/…` is still not asked to declare it.
 
 **The reconciliation** (`tests/test_gate_follows.sh`, ci_portable) has THREE classes, and a
 declaration must satisfy all of them. TEXT: every reference must be COVERED by a declared prefix

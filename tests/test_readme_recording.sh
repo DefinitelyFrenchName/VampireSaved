@@ -18,7 +18,7 @@
 #   byte-identical checksum logs, the idle leg departing at frame 300; the used nvram and
 #   the truncated recording fail; no text open() without a named encoding and newline in the
 #   render and reader steps; a missing recording log reaches a FAIL line.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lib/native_path.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lib/native_path.sh release/
 #   tests/lua/ tests/replays/03_two_player_vs.rpl tools/build_release_emulators.sh
 #   tools/setup_mame.sh tools/package_release.py tools/package_release_platforms.py
 #   tools/package_release_readme.template.md tools/apply_release.py tests/lib/hosttext.py

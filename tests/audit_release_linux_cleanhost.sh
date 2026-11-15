@@ -18,7 +18,7 @@
 # EXPECTS: C0 every listed soname present; per emulator: apply OK, ldd 0 not found (binary and every bundled .so),
 #   the run's exit as above, C1 0 unlisted, C2 0 unresolved, and at least one process that asked the host for a
 #   library (the emulator itself ran); each control fails.
-# FOLLOWS: tests/expected/linux_host_provided.tsv tools/cleanhost_libs.py tools/upload_release_assets.sh tests/lib/shares.sh tests/lib/share_lock.py tests/shares.tsv
+# FOLLOWS: tests/expected/linux_host_provided.tsv tools/cleanhost_libs.py tools/upload_release_assets.sh tests/lib/shares.sh tests/lib/share_lock.py tests/shares.tsv release/
 #   tools/package_release_platforms.py tools/build_release_emulators.sh tests/lib/controls.sh
 #   emu/fbneo/ emu/fbneo-patches/ tools/setup_fbneo.sh emu/mame-patches/ tools/setup_mame.sh build/manifest/
 #

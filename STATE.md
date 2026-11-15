@@ -38,6 +38,25 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-229 — **#348 done in the ticket's scope: the tracked release is checked against a fresh package of its build, and five gates follow `release/`.** Opus 5.5, transcript `38e9d96f`, 2026-11-15.
+
+### opened with
+The maintainer: **"read handoff.md, state.md and docs/next_session.md"**; then **"let's tackle #348"**; on the options,
+**"Ticket scope only (Recommended)"**, **"Legacy form, gate stays listed (Recommended)"**, **"Cap at 4 active hours
+(Recommended)"** (`DECISIONS_HISTORY.md` 14z-229). Working evidence: `build/agent229/` (local; `g348/`, `bk/`, `close/`).
+
+### (1) #348 — SECTION 5 OF THE RELEASE GATE, `release/` IN FIVE FOLLOWS LINES
+`tests/test_release_roundtrip.sh` section 5 requires each platform dir of `release/<name>/` to carry the fresh package's
+`manifest.json`, `apply_release.py` and patches; control `other-build-release` (the previous tracked release) fails it
+(`docs/project/release_format.md`). Plain run PASS on the Mac; the mode FAILs only in section 5, 27 findings on
+`release/merged-m25` (= 14z-228's manifest plus 8 of 20 patches, times three platforms). `release/` declared by hand in
+five gates' `# FOLLOWS:`; `declared()` in `tools/gate_follows.py` had to accept the prefix (it classed the five
+undeclared: `docs/project/gotchas.md`, `docs/project/gate_header_contract.md`). The bookkeeping gates and the gates
+reaching `gate_follows.py` PASS on a clean checkout of the staged tree (`build/agent229/bk/`). A plant under `release/`
+stales exactly the five gates on the new tree and none on `593ee724` (`build/agent229/stale/`). Rule-checker run
+2026-11-15-1806 OK after 2026-11-15-1805 (VIOLATED on Q1 and Q4: the staleness half not shown; resolved with that plant).
+#348 closed `done` with its comment (`build/agent229/close/c348.md`).
+
 ## Session 14z-228 — **#348 estimated (not now), #360's mechanism found and the ticket closed `declined`, #344's cause found and widened to all three tenants (kept parked); the release run, no new assets, and #352 closed done.** Opus 5.5, transcript `ccd11d40`, 2026-11-14.
 
 ### opened with

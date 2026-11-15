@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent229/close/c348.md	53698988eb930730387b9782655068da9daf364b
+build/agent229/close/issue348_body.md	fbfc0be0895e1a57f4b2a0a4384266f0fca9ff73
+build/agent229/close/staged_change.diff	bb4898c9dfe0948e47c0fa71b78f83a5b6eab9d1
+build/agent229/g348/plain.log	54bd58c0c88c072f5e141aa6930b7a238e2fc2aa
+build/agent229/g348/mode.log	6a61d4bb5ef5b9f469695f9362bf592b67a8cf63
+build/agent229/bk/before_declared_fix_test_gate_follows.log	460231405a6337bb9d638b466695630a2260e9f0
+build/agent229/bk/bk2_test_gate_follows.log	972b614301dd2ec3d6a4b9135fc1979791ee696c
+build/agent229/bk/bk2_test_must_fire_census.log	381c80beac9923d24a78e7e468a4042a6a000135
+build/agent229/bk/bk2_test_ctl_caught_lint.log	0dd220170388320a705e6067f09290e79367651c
+build/agent229/bk/bk2_test_emulator_staleness.log	0d38dc0bcfba32b8213936a674a9b721ca8bb38b
+build/agent229/bk/bk2_test_gate_descriptions.log	c2d95c4b0c7e857de8ea683d97d0648f1b1d0636
+build/agent229/bk/bk2_test_gate_coverage_current.log	39f471eee61541c21578311b02eb0e8d5623ed84
+build/agent229/bk/bk2_test_gate_index_current.log	25f6dcb7c092236afbb24bcb044555a78978bb59
+build/agent229/bk/bk2_test_annotations_current.log	4a94bb656fd870ec54c686c292f9b7059e1dbeaa
+build/agent229/bk/bk2_test_static_confirm.log	c586d088cc922b7d82365056425d4fd7aebea5ea
+build/agent229/bk/bk3_test_lane_carry.log	215031c47449905cc096188cfe4ae761146530b3
+build/agent229/bk/bk3_test_plants_not_applied.log	3a66096a74c952ddbc590895bb0e94c52767e1c9
+DECISIONS_HISTORY.md.lines-10274-10290 (lines 10274-10290 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-11-15 (14z-229) — #348 taken up in the ticket's scope, the new control in the legacy f")	d48e8bb0d33a2eafef1dece9ebe179749665d6a1

@@ -78,9 +78,8 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **Ask the maintainer what comes next.** One ticket is open: evolution #348 (no gate checks that a tracked
-   `release/<name>` is the package of its build; estimated 14z-228 at 2.5 to 4 active hours, ruled "Not now"). #352
-   closed done on the 14z-228 release run; #360 closed declined. Parked: #123, #124, #125, #128, #344.
+1. **Ask the maintainer what comes next.** No ticket is open outside the parked ones (#123, #124, #125, #128, #344);
+   #348 closed done at 14z-229.
 2. **Before more harness hardening, show its measured cost** (feedback memory `hardening-cost-vs-benefit`): #310's family
    took 35.65 to 40.49 active hours over 22 transcripts (STATE_HISTORY 14z-227 § (1)). Offer stopping or a
    time budget with any new hardening item.
