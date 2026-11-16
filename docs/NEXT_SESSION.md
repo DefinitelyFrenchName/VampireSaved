@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-229 CLOSE, 2026-11-15)
+# NEXT SESSION — orientation (rewritten at the 14z-230 CLOSE, 2026-11-16)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -27,7 +27,8 @@ Say so at the opener. Never spawn any agent at `max`. A recommendation leans onl
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
 drives (the maintainer logs in; it locks after 5 min idle, and a desktop run goes under `gnome-session-inhibit --inhibit
 idle env --default-signal=PIPE`: the inhibitor alone leaves SIGPIPE ignored for every child, gotchas.md, 14z-223). It crashed
-once on 2026-11-08 (no shutdown record; the maintainer brought it back). Idle since the 14z-228 close (14z-229 did not use it), its checkout
+once on 2026-11-08 (no shutdown record; the maintainer brought it back). Idle since the 14z-228 close (14z-229 and 14z-230 did not use it); **at 14z-230 neither PILOT nor ERIS answered SSH**
+(port 22 timed out on both, 2026-11-16): check both are up, or ask the maintainer, before handing them work. Its checkout
 `~/vampire-saved` detached at scratch `5d2a87ff` (= `b072551c` + the dead-leg cap; fetch `main` first); its disk 94 G of 249 G used after the 14z-227 cleanup of our old
 scratch directories (feedback memory `pilot-disk-cleanup-before-runs`). **ERIS** (WSL2, 24 threads, 47 GB) runs the release
 shape; its checkout `~/vampire-saved` detached at `b072551c` (fetch first). Hold an ERIS run's ssh open
@@ -38,7 +39,7 @@ or `ssh pilot 'bash -s' < script`, never as a quoted command line (Windows' shel
 a remote `pkill -f <pattern>` matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-229's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-230's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Declared shares (#370 stage 1, `df4b0902`):** every gate carries one `# SHARES:` line; the emulator runner runs a
@@ -80,6 +81,8 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
 1. **Ask the maintainer what comes next.** No ticket is open outside the parked ones (#123, #124, #125, #128, #344);
    #348 closed done at 14z-229.
+   If the previous sitting was cut off (14z-230 opened that way), its `build/agent<N>/<close run>/close_state.tsv` says
+   which close steps finished; `git rev-list --left-right --count origin/main...main` and the sweep say the rest.
 2. **Before more harness hardening, show its measured cost** (feedback memory `hardening-cost-vs-benefit`): #310's family
    took 35.65 to 40.49 active hours over 22 transcripts (STATE_HISTORY 14z-227 § (1)). Offer stopping or a
    time budget with any new hardening item.
@@ -94,7 +97,7 @@ the one-paragraph alternative design and ask before starting it.
 - #344 (cosmetic; cause found 14z-228 and widened to all three tenants, kept parked on "Record cause, keep parked").
 - **VampireSaved-Rebuilt#1** holds what is left of #120, closed 14z-205.
 
-## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
+## INSTRUMENT FACTS LEARNED AT 14z-229 (read before the work they bear on)
 
 - **A `# FOLLOWS:` prefix the reader does not list makes the whole declaration vanish** (`docs/project/gotchas.md`,
   14z-229): `declared()` in `tools/gate_follows.py` accepts only its own prefix list, so a hand-written `release/` classed
@@ -106,10 +109,10 @@ the one-paragraph alternative design and ask before starting it.
 - **`tools/close.py start` needs `--row "(none — no findings table since #288)"`** when STATE's newest group has no
   findings-table section (every close since #288).
 
-## WHAT HAPPENED THIS SITTING (14z-229)
+## WHAT HAPPENED THIS SITTING (14z-230)
 
-- **Committed:** `cc867fff` (#348: section 5 of the release gate, `release/` in five FOLLOWS lines, `declared()` taught
-  the prefix); the close commit carries the close's records.
-- **Ruled:** "Ticket scope only (Recommended)", "Legacy form, gate stays listed (Recommended)", "Cap at 4 active hours
-  (Recommended)" (`DECISIONS_HISTORY.md` 14z-229).
-- **Closed:** #348 (done; rule-checker run 2026-11-15-1806 OK after -1805). Nothing filed. PILOT and ERIS not used.
+- **Opened** on the maintainer's word that the 14z-229 processes had been terminated after a close that had
+  "alledgedly already happened". Checked on the Mac: every step of 14z-229's close DONE (push and ledger page included),
+  `main` level with `origin/main` at `50b44e71`, `gh-pages` at `5ffbff0f`, nothing staged, stashed or locked, the sweep
+  CLEAN, no file written after the close but its own outputs (STATE 14z-230 § (1)). PILOT and ERIS unreachable.
+- **Committed:** only the close's records. Nothing ruled, closed or filed.

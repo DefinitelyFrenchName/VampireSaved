@@ -38,33 +38,32 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-229 — **#348 done in the ticket's scope: the tracked release is checked against a fresh package of its build, and five gates follow `release/`.** Opus 5.5, transcript `38e9d96f`, 2026-11-15.
+## Session 14z-230 — **the 14z-229 close checked after its processes were terminated: complete, pushed and clean; the close only.** Opus 5.5, transcript `0d13dee8`, 2026-11-16.
 
 ### opened with
-The maintainer: **"read handoff.md, state.md and docs/next_session.md"**; then **"let's tackle #348"**; on the options,
-**"Ticket scope only (Recommended)"**, **"Legacy form, gate stays listed (Recommended)"**, **"Cap at 4 active hours
-(Recommended)"** (`DECISIONS_HISTORY.md` 14z-229). Working evidence: `build/agent229/` (local; `g348/`, `bk/`, `close/`).
+The maintainer: **"claude processes got terminated last session. The session close had alledgedly already happened so
+everything should be clean but I cannot guarantee it"**; then **"Just make sure all the docs are up to date and let's
+cleanly close this session, so that next time we can open a new session without dear of messing up"**.
 
-### (1) #348 — SECTION 5 OF THE RELEASE GATE, `release/` IN FIVE FOLLOWS LINES
-`tests/test_release_roundtrip.sh` section 5 requires each platform dir of `release/<name>/` to carry the fresh package's
-`manifest.json`, `apply_release.py` and patches; control `other-build-release` (the previous tracked release) fails it
-(`docs/project/release_format.md`). Plain run PASS on the Mac; the mode FAILs only in section 5, 27 findings on
-`release/merged-m25` (= 14z-228's manifest plus 8 of 20 patches, times three platforms). `release/` declared by hand in
-five gates' `# FOLLOWS:`; `declared()` in `tools/gate_follows.py` had to accept the prefix (it classed the five
-undeclared: `docs/project/gotchas.md`, `docs/project/gate_header_contract.md`). The bookkeeping gates and the gates
-reaching `gate_follows.py` PASS on a clean checkout of the staged tree (`build/agent229/bk/`). A plant under `release/`
-stales exactly the five gates on the new tree and none on `593ee724` (`build/agent229/stale/`). Rule-checker run
-2026-11-15-1806 OK after 2026-11-15-1805 (VIOLATED on Q1 and Q4: the staleness half not shown; resolved with that plant).
-#348 closed `done` with its comment (`build/agent229/close/c348.md`).
+### (1) THE 14z-229 CLOSE, CHECKED AFTER THE TERMINATION
+On the Mac, 2026-11-16: `build/agent229/closerun/close_state.tsv` has all fourteen steps DONE, the last (`ledger-page`,
+`gh-pages` `5d088667` -> `5ffbff0f`) at 16:20:54Z on 2026-11-15; after a fetch `main` and `origin/main` are both
+`50b44e71` (0 ahead, 0 behind), and `origin`'s `gh-pages` is `5ffbff0f`. No tracked change but `emu/fbneo` (its working
+tree's harness and driver edits, dated 2026-09-03, left unstaged by every close); no stash, no `.git` lock; the untracked
+`.claude/` files date from September to November. The only files newer than the close commit outside `.git` and `emu/`
+are the close's own `pins`, `sweep` and `ledger-page` outputs (`build/agent229/closerun/`, `build/ledger_page/`). No
+emulator or tier process left; the opener's sweep CLEAN. #348 closed on GitHub. PILOT and ERIS did not answer SSH (port 22
+timed out), so their checkouts were not looked at; 14z-229 did not use them. The docs needed no change beyond this
+sitting's records.
 
-### CLOSE (14z-229, 2026-11-15)
-Nothing new rides this close beyond its records. Commits this sitting before the close: `cc867fff`. Tickets closed:
-#348 (done, in `cc867fff`'s work); none filed. PILOT and ERIS not used. Steps: sections (this group); next-session (the
-14z-228 opener, 118 lines, quoted, to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-228 group to `STATE_HISTORY.md`
-with its ledger line); indexes (by the driver); dashboard (14z-163..14z-229, 4,028 figures, 0 unclassed; five assets
-uploaded, `datasets` re-pointed: actions v20, costly v40, figures v40, rc_runs v40, tiers v41). The tier confirms on
-`build/agent229/tier1/tier_results.tsv` (`cc867fff`'s GREEN tier). The tier's results:
-`build/agent229/closerun/tier_results.tsv`, the next close's `--prev`.
+### CLOSE (14z-230, 2026-11-16)
+Nothing rides this close beyond its records. No commit this sitting before the close; no ticket closed or filed; no
+rule-checker run (no action). PILOT and ERIS unreachable, not used. Steps: sections (this group); next-session (the
+14z-229 opener quoted to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-229 group to `STATE_HISTORY.md` with its
+ledger line); indexes (by the driver); dashboard (14z-163..14z-230, 4,042 figures, 0 without a class; five assets uploaded, `datasets` re-pointed:
+actions v21, costly v41, figures v41, rc_runs v41, tiers v42). The tier confirms on
+`build/agent229/closerun/tier_results.tsv` (14z-229's close tier, GREEN). The tier's results:
+`build/agent230/close/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
